@@ -27,6 +27,7 @@ pnpm test
 It rejects redirects and validates the version response before formatting it as TOON or JSON.
 HTTP 401 returns a nonzero `AUTH_REQUIRED` result; malformed successful responses return `INVALID_RESPONSE`.
 Errors are structured on stdout and never include raw vendor bodies or transport diagnostics.
+An interrupted HTTPS response returns `CONNECTION_FAILED`; the total deadline and response bound retain `TIMEOUT` and `OUTPUT_LIMIT`.
 
 API token profiles use `auth: "api-token"`, an HTTPS `origin`, a full `tokenId` and an optional token SecretRef.
 The shipped `axi-credential.schema.json` rejects unknown fields and inline secrets.
@@ -79,6 +80,9 @@ The driver checks those SHA-256 digests before loading the host, importing the s
 Missing or substituted runtime files fail the check even when the TypeScript source is unchanged.
 Keep the manifest snapshot and its original tarballs together outside this repository.
 The manifest's Proxmox archive is used for both journeys, and its executable, admitted runtime sources and runtime package metadata must match the current build.
+The response-stream error correction changes the shipped transport runtime, so the previously admitted archive cannot validate this build.
+Before `--through both` can pass, the outer executor needs a newly approved package archive and admission inventory/manifest with corresponding reviewed pins.
+The existing archive, manifest and host-runtime pins remain enforced until that fixture refresh is approved.
 The host runs the existing credential store, profile writer, adapter and runner with a synthetic user from its own fixture builder.
 The actual public client authenticates against the listening server and executes the version read over loopback HTTP; the vendor boundary remains trusted HTTPS.
 Evidence includes the host revision, manifest and client digests, startup record, client invocation, real audit outcomes, injected credential-source diagnostics and runner cleanup.

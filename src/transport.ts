@@ -6,10 +6,13 @@ import operations from './operations.json' with { type: 'json' }
 export async function readVersion(credentials: Credentials): Promise<Record<string, string>> {
   const operation = operations[0]!
   const body = await new Promise<string>((resolve, reject) => {
+    const fail = (error: Error) => reject(error instanceof Failure ? error :
+      new Failure('CONNECTION_FAILED', 'Trusted HTTPS version request failed.', 'Check the origin and configured CA trust.'))
     const req = request(new URL(operation.wirePath, credentials.origin), {
       method: operation.method, ca: credentials.ca, rejectUnauthorized: true,
       headers: { Authorization: `PVEAPIToken=${credentials.tokenId}=${credentials.token}`, Accept: 'application/json' },
     }, response => {
+      response.on('error', fail)
       const status = response.statusCode ?? 0
       if (status !== 200) {
         response.resume()
@@ -24,13 +27,11 @@ export async function readVersion(credentials: Credentials): Promise<Record<stri
         if (bytes > 65_536) req.destroy(new Failure('OUTPUT_LIMIT', 'Version response exceeds 65536 bytes.', 'Check the server response contract.'))
         else chunks.push(chunk)
       })
-      response.on('error', reject)
       response.on('end', () => resolve(Buffer.concat(chunks).toString('utf8')))
     })
     const deadline = setTimeout(() => req.destroy(new Failure('TIMEOUT', 'Version request exceeded 5000 ms.', 'Check the configured server and retry the read explicitly.')), 5000)
     req.on('close', () => clearTimeout(deadline))
-    req.on('error', error => reject(error instanceof Failure ? error :
-      new Failure('CONNECTION_FAILED', 'Trusted HTTPS version request failed.', 'Check the origin and configured CA trust.')))
+    req.on('error', fail)
     req.end()
   })
   let value: unknown

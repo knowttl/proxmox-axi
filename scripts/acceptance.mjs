@@ -212,6 +212,11 @@ async function verify(values) {
         host: request.headers.host, status: identity === 'unexpected' ? 401 : response.httpStatus })
       if (identity === 'unexpected') { reply.writeHead(401); reply.end(); return }
       reply.writeHead(response.httpStatus, { 'Content-Type': 'application/json', ...(response.headers ?? {}) })
+      if (response.disconnect) {
+        reply.write('{"data":', () => reply.socket.end())
+        return
+      }
+      if (response.stall) { reply.write('{"data":'); return }
       reply.end(typeof response.body === 'string' ? response.body : JSON.stringify(response.body))
     })
     server.on('tlsClientError', error => {
@@ -295,6 +300,12 @@ async function verify(values) {
       { exitCode: 0, requests: 1, version: true, profile: 'selected', identity: 'protected-file-canary' })
     await runCase('AC-VERSION-AUTH/401', ['get', '/version', '--format', 'json'], env,
       { exitCode: 1, requests: 1, error: 'AUTH_REQUIRED' }, denied)
+    await runCase('response-disconnect', ['get', '/version', '--format', 'json'], env,
+      { exitCode: 1, requests: 1, error: 'CONNECTION_FAILED' }, { httpStatus: 200, disconnect: true })
+    await runCase('response-timeout', ['get', '/version', '--format', 'json'], env,
+      { exitCode: 1, requests: 1, error: 'TIMEOUT' }, { httpStatus: 200, stall: true })
+    await runCase('response-output-limit', ['get', '/version', '--format', 'json'], env,
+      { exitCode: 1, requests: 1, error: 'OUTPUT_LIMIT' }, { httpStatus: 200, body: 'x'.repeat(65_537) })
     for (const body of [{ data: null }, { data: { version: '8.2.7' } }, { data: [] }, 'invalid-json']) {
       await runCase(`AC-VERSION-AUTH/shape-${result.cases.length}`, ['get', '/version', '--format', 'json'], env,
         { exitCode: 1, requests: 1, error: 'INVALID_RESPONSE' }, { httpStatus: 200, body })
