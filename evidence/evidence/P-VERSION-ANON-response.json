@@ -1,0 +1,7 @@
+{
+  "httpStatus": 401,
+  "body": "",
+  "headersRetained": false,
+  "outcome": "Authenticated access required",
+  "transformations": "Replaced the private endpoint with pve.example.test and omitted certificate identities. No credentials were used."
+}

@@ -1,0 +1,29 @@
+{
+  "name": "@knowttl/proxmox-axi",
+  "version": "0.0.1",
+  "description": "AXI client for Proxmox VE",
+  "type": "module",
+  "bin": { "proxmox-axi": "bin/proxmox-axi.mjs" },
+  "files": ["bin", "dist", "axi-credential.schema.json", "inventory.json", "help.json", "README.md"],
+  "engines": { "node": ">=24.11.0" },
+  "packageManager": "pnpm@10.22.0",
+  "scripts": {
+    "build": "node scripts/generate.mjs && tsc",
+    "generate": "node scripts/generate.mjs",
+    "lint": "node scripts/generate.mjs --check && tsc --noEmit",
+    "test": "pnpm build && node --test test/*.test.mjs",
+    "verify:acceptance": "pnpm build && node scripts/acceptance.mjs",
+    "prepack": "pnpm build"
+  },
+  "dependencies": {
+    "@toon-format/toon": "2.3.1",
+    "ajv": "8.20.0"
+  },
+  "devDependencies": {
+    "@types/node": "22.20.5",
+    "typescript": "5.9.3"
+  },
+  "pnpm": {
+    "overrides": { "fast-uri": "3.1.8" }
+  }
+}

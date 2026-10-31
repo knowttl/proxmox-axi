@@ -6,6 +6,10 @@ agent_args_override:
     - -c
     - model_reasoning_effort="medium"
 no_ci: true
+commands:
+  prepare: "pnpm install --offline --frozen-lockfile && pnpm build"
+  test: "pnpm test"
+  lint: "pnpm lint"
 review:
   path_instructions:
     - path: "**"
