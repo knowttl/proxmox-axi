@@ -10,6 +10,160 @@
       }
     },
     {
+      "command": "doctor",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value"
+      }
+    },
+    {
+      "command": "auth status",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value"
+      }
+    },
+    {
+      "command": "profile list",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value"
+      }
+    },
+    {
+      "command": "config path",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value"
+      }
+    },
+    {
+      "command": "help",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value"
+      }
+    },
+    {
+      "command": "ls",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "limit": "value",
+        "fields": "value",
+        "full": "boolean"
+      }
+    },
+    {
+      "command": "ls /cluster/resources",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "limit": "value",
+        "fields": "value",
+        "full": "boolean",
+        "api-type": "value"
+      }
+    },
+    {
+      "command": "ls /nodes",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "limit": "value",
+        "fields": "value",
+        "full": "boolean"
+      }
+    },
+    {
+      "command": "ls /nodes/{node}/lxc",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "limit": "value",
+        "fields": "value",
+        "full": "boolean",
+        "api-node": "value"
+      }
+    },
+    {
+      "command": "ls /nodes/{node}/qemu",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "limit": "value",
+        "fields": "value",
+        "full": "boolean",
+        "api-full": "value",
+        "api-node": "value"
+      }
+    },
+    {
+      "command": "ls /nodes/{node}/storage",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "limit": "value",
+        "fields": "value",
+        "full": "boolean",
+        "api-content": "value",
+        "api-enabled": "value",
+        "api-format": "value",
+        "api-node": "value",
+        "api-storage": "value",
+        "api-target": "value"
+      }
+    },
+    {
+      "command": "ls /nodes/{node}/tasks",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "limit": "value",
+        "fields": "value",
+        "full": "boolean",
+        "api-errors": "value",
+        "api-limit": "value",
+        "api-node": "value",
+        "api-since": "value",
+        "api-source": "value",
+        "api-start": "value",
+        "api-statusfilter": "value",
+        "api-typefilter": "value",
+        "api-until": "value",
+        "api-userfilter": "value",
+        "api-vmid": "value"
+      }
+    },
+    {
+      "command": "ls /nodes/{node}/tasks/{upid}/log",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "limit": "value",
+        "fields": "value",
+        "full": "boolean",
+        "api-download": "value",
+        "api-limit": "value",
+        "api-node": "value",
+        "api-start": "value",
+        "api-upid": "value"
+      }
+    },
+    {
       "command": "inventory",
       "effect": "read",
       "flags": {
@@ -6154,6 +6308,9 @@
         "help": "boolean",
         "format": "value",
         "catalogue": "value",
+        "limit": "value",
+        "fields": "value",
+        "full": "boolean",
         "api-path": "value",
         "api-userid": "value"
       },
@@ -6169,6 +6326,9 @@
         "help": "boolean",
         "format": "value",
         "catalogue": "value",
+        "limit": "value",
+        "fields": "value",
+        "full": "boolean",
         "api-type": "value"
       },
       "catalogues": [
@@ -6182,7 +6342,10 @@
       "flags": {
         "help": "boolean",
         "format": "value",
-        "catalogue": "value"
+        "catalogue": "value",
+        "limit": "value",
+        "fields": "value",
+        "full": "boolean"
       },
       "catalogues": [
         "legacy-8.2.7",
@@ -6196,6 +6359,9 @@
         "help": "boolean",
         "format": "value",
         "catalogue": "value",
+        "limit": "value",
+        "fields": "value",
+        "full": "boolean",
         "api-node": "value"
       },
       "catalogues": [
@@ -6210,6 +6376,9 @@
         "help": "boolean",
         "format": "value",
         "catalogue": "value",
+        "limit": "value",
+        "fields": "value",
+        "full": "boolean",
         "api-full": "value",
         "api-node": "value"
       },
@@ -6225,6 +6394,9 @@
         "help": "boolean",
         "format": "value",
         "catalogue": "value",
+        "limit": "value",
+        "fields": "value",
+        "full": "boolean",
         "api-content": "value",
         "api-enabled": "value",
         "api-format": "value",
@@ -6244,6 +6416,9 @@
         "help": "boolean",
         "format": "value",
         "catalogue": "value",
+        "limit": "value",
+        "fields": "value",
+        "full": "boolean",
         "api-errors": "value",
         "api-limit": "value",
         "api-node": "value",
@@ -6262,14 +6437,55 @@
       ]
     },
     {
+      "command": "get /nodes/{node}/tasks/{upid}/log",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value",
+        "limit": "value",
+        "fields": "value",
+        "full": "boolean",
+        "api-download": "value",
+        "api-limit": "value",
+        "api-node": "value",
+        "api-start": "value",
+        "api-upid": "value"
+      },
+      "catalogues": [
+        "legacy-8.2.7",
+        "published-current"
+      ]
+    },
+    {
       "command": "get /nodes/{node}/tasks/{upid}/status",
       "effect": "read",
       "flags": {
         "help": "boolean",
         "format": "value",
         "catalogue": "value",
+        "limit": "value",
+        "fields": "value",
+        "full": "boolean",
         "api-node": "value",
         "api-upid": "value"
+      },
+      "catalogues": [
+        "legacy-8.2.7",
+        "published-current"
+      ]
+    },
+    {
+      "command": "get /nodes/{node}/version",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value",
+        "limit": "value",
+        "fields": "value",
+        "full": "boolean",
+        "api-node": "value"
       },
       "catalogues": [
         "legacy-8.2.7",
@@ -6282,7 +6498,10 @@
       "flags": {
         "help": "boolean",
         "format": "value",
-        "catalogue": "value"
+        "catalogue": "value",
+        "limit": "value",
+        "fields": "value",
+        "full": "boolean"
       },
       "catalogues": [
         "legacy-8.2.7",

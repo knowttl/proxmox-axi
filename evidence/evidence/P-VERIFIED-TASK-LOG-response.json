@@ -1,0 +1,20 @@
+{
+  "httpStatus": 200,
+  "headers": {
+    "Content-Type": "application/json;charset=UTF-8"
+  },
+  "body": {
+    "total": 2,
+    "data": [
+      {
+        "t": "INFO: notified via target `mail-to-root`",
+        "n": 1
+      },
+      {
+        "t": "TASK OK",
+        "n": 2
+      }
+    ]
+  },
+  "interpretation": "Observed token response after propagated audit privileges were verified. This verifies this sample, not every operation or server release."
+}

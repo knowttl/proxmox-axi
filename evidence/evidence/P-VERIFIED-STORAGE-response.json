@@ -1,0 +1,59 @@
+{
+  "httpStatus": 200,
+  "headers": {
+    "Content-Type": "application/json;charset=UTF-8"
+  },
+  "body": {
+    "data": [
+      {
+        "type": "lvmthin",
+        "content": "rootdir,images",
+        "used_fraction": 0.920799999999929,
+        "active": 1,
+        "storage": "storage-3",
+        "shared": 0,
+        "enabled": 1,
+        "used": 688630574927,
+        "total": 747861180416,
+        "avail": 59230605489
+      },
+      {
+        "enabled": 1,
+        "shared": 1,
+        "avail": 39121341943808,
+        "used": 33871145439232,
+        "total": 72992487383040,
+        "type": "cifs",
+        "storage": "storage-4",
+        "used_fraction": 0.464036048826335,
+        "active": 1,
+        "content": "backup,snippets,vztmpl,iso,images,rootdir"
+      },
+      {
+        "avail": 75371954176,
+        "total": 269427478528,
+        "used": 180294852608,
+        "shared": 0,
+        "enabled": 1,
+        "storage": "tag-1",
+        "used_fraction": 0.669177671086222,
+        "content": "rootdir,backup,snippets,images,iso,vztmpl",
+        "active": 1,
+        "type": "dir"
+      },
+      {
+        "enabled": 1,
+        "shared": 0,
+        "avail": 71429062656,
+        "total": 134682742784,
+        "used": 57531219968,
+        "type": "dir",
+        "storage": "storage-2",
+        "active": 1,
+        "used_fraction": 0.427161036215804,
+        "content": "rootdir,snippets,vztmpl,iso"
+      }
+    ]
+  },
+  "interpretation": "Observed token response after propagated audit privileges were verified. This verifies this sample, not every operation or server release."
+}

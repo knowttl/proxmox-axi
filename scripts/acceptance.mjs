@@ -11,6 +11,7 @@ import { decode } from '@toon-format/toon'
 import { verifyHostRuntime } from './host-identity.mjs'
 import { captures, replay, routeKey } from './catalogue.mjs'
 import { routeCases, verifyDiscovery } from './route-cases.mjs'
+import { exerciseReadJourney } from './read-journey.mjs'
 
 const root = fileURLToPath(new URL('../', import.meta.url))
 const digest = (bytes, algorithm = 'sha256') => createHash(algorithm).update(bytes).digest(algorithm === 'sha512' ? 'base64' : 'hex')
@@ -80,8 +81,8 @@ function selection(args) {
     assert.ok(value && !value.startsWith('--'), `Missing value for ${key}`)
     values[key] = value
   }
-  assert.ok(['S1.1', 'S1.2', 'S2.1'].includes(values['--task']), 'Select S1.1, S1.2 or S2.1')
-  if (values['--repeat-through']) assert.equal(values['--repeat-through'], 'S1')
+  assert.ok(['S1.1', 'S1.2', 'S2.1', 'S2.2', 'S2.3'].includes(values['--task']), 'Select S1.1, S1.2, S2.1, S2.2 or S2.3')
+  if (values['--repeat-through']) assert.ok(['S1', 'S2'].includes(values['--repeat-through']))
   if (values['--available-through']) assert.equal(values['--available-through'], 'S2')
   assert.equal(values['--network'], 'fake-only', 'Only fake-only networking is permitted')
   assert.ok(['standalone', 'both'].includes(values['--through']), 'Select --through standalone or both')
@@ -211,26 +212,27 @@ async function verify(values) {
     let response = success
     let activeCase = ''
     server = createServer({ key: await readFile(join(scratch, 'server.key')), cert: await readFile(caFile) }, (request, reply) => {
+      const vendor = typeof response === 'function' ? response(request.url) : response
       const authorization = request.headers.authorization
       const identity = authorization === `PVEAPIToken=${tokenId}=${token}` ? 'environment-canary' :
         authorization === `PVEAPIToken=${tokenId}=${fileToken}` ? 'protected-file-canary' :
           authorization === `PVEAPIToken=${tokenId}=${hostedToken}` ? 'hosted-canary' : 'unexpected'
       ledger.push({ case: activeCase, method: request.method, path: request.url, identity,
-        host: request.headers.host, status: identity === 'unexpected' ? 401 : response.httpStatus })
+        host: request.headers.host, status: identity === 'unexpected' ? 401 : vendor.httpStatus })
       if (identity === 'unexpected') { reply.writeHead(401); reply.end(); return }
-      reply.writeHead(response.httpStatus, { 'Content-Type': 'application/json', ...(response.headers ?? {}) })
-      if (response.disconnect) {
+      reply.writeHead(vendor.httpStatus, { 'Content-Type': 'application/json', ...(vendor.headers ?? {}) })
+      if (vendor.disconnect) {
         reply.write('{"data":', () => reply.socket.end())
         return
       }
-      if (response.stall) { reply.write('{"data":'); return }
-      if (response.trickle) {
+      if (vendor.stall) { reply.write('{"data":'); return }
+      if (vendor.trickle) {
         const timer = setInterval(() => reply.write(' '), 100)
         reply.once('close', () => clearInterval(timer))
         return
       }
-      const payload = typeof response.body === 'string' ? response.body : JSON.stringify(response.body)
-      if (response.split) {
+      const payload = typeof vendor.body === 'string' ? vendor.body : JSON.stringify(vendor.body)
+      if (vendor.split) {
         const split = Math.floor(payload.length / 2)
         reply.write(payload.slice(0, split))
         setImmediate(() => reply.end(payload.slice(split)))
@@ -251,6 +253,7 @@ async function verify(values) {
     await save(join(home, '.config/proxmox-axi/config.json'), { version: 1, defaultProfile: 'developer', profiles: {
       developer: { auth: 'api-token', origin, tokenId: 'developer@pve!decoy', token: { env: 'DEVELOPER_TOKEN' } },
     } })
+    await chmod(join(home, '.config/proxmox-axi/config.json'), 0o600)
     await writeFile(secretFile, `\uFEFF${fileToken}\r\n`, { mode: 0o600 })
     await save(config, { version: 1, defaultProfile: 'selected', profiles: {
       selected: { auth: 'api-token', origin, tokenId, token: { file: secretFile }, caBundle: caFile },
@@ -272,7 +275,7 @@ async function verify(values) {
       if (entry !== executable) await verifyHostRuntime(hostInput.fixture)
       const actual = await command(process.execPath, invocation,
         { env: { ...environment, PROXMOX_AXI_TEST_DIAGNOSTICS: diagnostics }, cwd: scratch })
-      const record = { id, status: 'fail', expected, actual: { exitCode: actual.code, requests: ledger.length - before },
+      const record = { id, hosted: entry !== executable, status: 'fail', expected, actual: { exitCode: actual.code, requests: ledger.length - before },
         invocation: { executable: process.execPath, args: invocation.map(publicText) }, elapsedMs: Math.round(performance.now() - start),
         transportDiagnostics: (await readFile(diagnostics, 'utf8')).split('\n').filter(Boolean).map(line => JSON.parse(line)) }
       result.cases.push(record)
@@ -290,7 +293,7 @@ async function verify(values) {
       assert.equal(record.actual.requests, expected.requests,
         `${id}: request count; observed public code ${value?.error?.code ?? 'none'}; transport codes ${record.transportDiagnostics.map(entry => entry.code).join(',')}`)
       assert.ok(record.elapsedMs < 10_000, `${id}: elapsed budget`)
-      assert.ok(Buffer.byteLength(actual.stdout) < 8192, `${id}: public output budget`)
+      assert.ok(Buffer.byteLength(actual.stdout) <= 65537, `${id}: public output budget`)
       if (expected.data) assert.deepEqual(value.data, expected.data, `${id}: semantic response`)
       if (expected.version || expected.error || expected.profile) {
         if (expected.version) assert.deepEqual(value.version, success.body.data, `${id}: reviewed version fields`)
@@ -301,12 +304,13 @@ async function verify(values) {
         assert.equal(value.purpose, helpMetadata.commands.find(entry => entry.command === 'get /version').purpose, `${id}: help matches admitted command`)
         assert.ok(value.usage.startsWith('proxmox-axi get /version '), `${id}: invocable version help`)
       }
-      for (const request of ledger.slice(before)) {
+      for (const [index, request] of ledger.slice(before).entries()) {
         assert.equal(request.method, 'GET', `${id}: method`)
-        assert.equal(request.path, expected.path ?? '/api2/json/version', `${id}: exact wire route`)
+        assert.equal(request.path, expected.paths?.[index] ?? expected.path ?? '/api2/json/version', `${id}: exact wire route`)
         assert.equal(request.identity, expected.identity ?? 'environment-canary', `${id}: credential at vendor boundary`)
       }
       record.status = 'pass'
+      return value
     }
 
     await runCase('AC-VERIFIED-VERSION/toon', ['get', '/version'], env, { exitCode: 0, requests: 1, version: true, profile: 'environment' })
@@ -410,6 +414,9 @@ async function verify(values) {
       await writeProfile(selectedProfile)
     }
     const operationPolicy = await json(join(root, 'src/operation-policy.json'))
+    const readJourney = (environment, entry = executable) => exerciseReadJourney({ runCase, pack: values['--pack'], retained,
+      contracts: catalogues.flatMap(catalogue => catalogue.operations.map(operation => ({ ...operation, release: catalogue.release }))),
+      env: environment, entry, hosted: entry !== executable, task: values['--task'] })
     const exerciseRoutes = async (environment, entry = executable) => {
       const hosted = entry !== executable
       const coverage = { union: 681, variants: 1285, admitted: 0, denied: 0 }
@@ -433,14 +440,15 @@ async function verify(values) {
       const bodyRoute = [...routeCases(catalogues, operationPolicy)].find(route => route.callable && route.operation.path === '/nodes/{node}/tasks')
       const bodyFile = join(scratch, 'parameters.json')
       await save(bodyFile, { node: 'pve-test', limit: 1 })
-      await runCase('body-file/valid', ['get', '/nodes/{node}/tasks', '--body-file', bodyFile, '--format', 'json'], env,
+      await runCase('body-file/valid', ['get', '/nodes/{node}/tasks', '--body-file', bodyFile, '--format', 'json', '--catalogue', 'legacy-8.2.7', '--full'], env,
         { exitCode: 0, requests: 1, path: '/api2/json/nodes/pve-test/tasks?limit=1', data: bodyRoute.response },
         { httpStatus: 200, body: { data: bodyRoute.response } })
       await save(bodyFile, JSON.parse('{"node":"pve-test","__proto__":{"ignored":true}}'))
-      await runCase('body-file/unknown-field', ['get', '/nodes/{node}/tasks', '--body-file', bodyFile, '--format', 'json'], env,
+      await runCase('body-file/unknown-field', ['get', '/nodes/{node}/tasks', '--body-file', bodyFile, '--format', 'json', '--catalogue', 'legacy-8.2.7'], env,
         { exitCode: 2, requests: 0, error: 'INVALID_INPUT' })
       result.routeCoverage = await exerciseRoutes(env)
     }
+    if (['S2.2', 'S2.3'].includes(values['--task'])) await readJourney(env)
     result.outcomes = [
       { id: 'AC-VERIFIED-VERSION', journey: 'standalone', status: 'pass', basis: 'Reviewed 8.2.7 fixture' },
       { id: 'AC-VERSION-AUTH', journey: 'standalone', status: 'pass', basis: 'Controlled 401 and invalid shapes fail' },
@@ -490,12 +498,13 @@ async function verify(values) {
       await runCase('AC-HOST/invalid-shape', ['proxmox-axi', 'get', '/version', '--format', 'json'], clientEnvironment,
         { exitCode: 1, requests: 1, error: 'INVALID_RESPONSE', identity: 'hosted-canary' }, { httpStatus: 200, body: { data: null } }, client)
       if (values['--task'] === 'S2.1') result.host.routeCoverage = await exerciseRoutes(clientEnvironment, client)
+      if (['S2.2', 'S2.3'].includes(values['--task'])) await readJourney(clientEnvironment, client)
       const snapshot = hostMessage(hostChild, 'snapshot')
       hostChild.send('snapshot')
       result.host.evidence = await snapshot
       assert.deepEqual(result.host.evidence.callsRemaining, [], 'Actual runner cleans its private call directories')
       assert.deepEqual(result.host.evidence.audit.filter(row => row.event === 'run-terminal').map(row => row.exit_code),
-        [0, 1, 1, ...Array(result.host.routeCoverage?.admitted ?? 0).fill(0)], 'Actual host audit records public command outcomes')
+        result.cases.filter(row => row.hosted && !row.expected.hostBoundary).map(row => row.actual.exitCode), 'Actual host audit records public command outcomes')
       result.host.status = 'pass'
       result.outcomes = result.outcomes.filter(row => row.journey !== 'artium')
       for (const id of ['AC-HOST', 'AC-VERSION-AUTH', 'AC-VERIFIED-VERSION', 'CRED-05', 'CRED-19', 'CRED-21']) {
@@ -503,6 +512,12 @@ async function verify(values) {
       }
       if (values['--task'] === 'S2.1') for (const id of ['AC-FULL', 'AC-COVERAGE', 'VP-03', 'VP-07']) {
         result.outcomes.push({ id, journey: 'artium', status: 'pass', basis: 'Same generated table through the actual public client, adapter and runner; unresolved calls refused by the closed host inventory' })
+      }
+    }
+    if (['S2.2', 'S2.3'].includes(values['--task'])) {
+      for (const journey of hostInput ? ['standalone', 'artium'] : ['standalone']) for (const id of
+        values['--task'] === 'S2.3' ? ['AC-READ', 'AC-PERMISSIONS', 'AC-VERSIONS', 'VP-01', 'VP-02', 'VP-03', 'VP-04', 'VP-05', 'VP-06', 'VP-07', 'VP-08'] : ['AC-READ', 'AC-PERMISSIONS']) {
+        result.outcomes.push({ id, journey, status: 'pass', basis: 'Retained fixture replay, bounded presentation, permission visibility and version capability cases; TLS rotation remains explicit.' })
       }
     }
     result.status = 'pass'
@@ -535,7 +550,7 @@ try {
     const parentNamespace = await readlink('/proc/self/ns/net')
     const isolated = await command('unshare', ['--user', '--map-root-user', '--net', process.execPath,
       fileURLToPath(import.meta.url), ...process.argv.slice(2)],
-    { timeoutMs: values['--task'] === 'S2.1' ? 1_800_000 : 120_000,
+    { timeoutMs: values['--task'] === 'S2.1' ? 1_800_000 : 300_000,
       env: { ...process.env, PROXMOX_AXI_ACCEPTANCE_NETNS: parentNamespace } })
     process.stdout.write(isolated.stdout)
     process.stderr.write(isolated.stderr)

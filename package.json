@@ -1,6 +1,6 @@
 {
   "name": "@knowttl/proxmox-axi",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "AXI client for Proxmox VE",
   "type": "module",
   "bin": { "proxmox-axi": "bin/proxmox-axi.mjs" },

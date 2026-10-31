@@ -1,0 +1,19 @@
+{
+  "httpStatus": 200,
+  "headers": {
+    "Content-Type": "application/json;charset=UTF-8"
+  },
+  "body": {
+    "data": [
+      {
+        "id": "node/node-a",
+        "status": "online",
+        "type": "node",
+        "level": "p",
+        "node": "node-a",
+        "ssl_fingerprint": "11:11:11:11:11:11:11:11:11:11:11:11:11:11:11:11:11:11:11:11:11:11:11:11:11:11:11:11:11:11:11:11"
+      }
+    ]
+  },
+  "interpretation": "Observed response under this token. Effective permissions were not captured, so full inventory visibility remains unverified."
+}

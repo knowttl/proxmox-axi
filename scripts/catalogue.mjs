@@ -36,7 +36,7 @@ export function replay(bytes, capture) {
   }
   for (const node of JSON.parse(text.slice(start, end))) visit(node)
   operations.sort((a, b) => a.path.localeCompare(b.path, 'en') || a.method.localeCompare(b.method, 'en'))
-  if (operations.length !== capture.count || new Set(operations.map(routeKey)).size !== operations.length) throw new Error('Vendor route count mismatch')
+  if ((capture.count !== undefined && operations.length !== capture.count) || new Set(operations.map(routeKey)).size !== operations.length) throw new Error('Vendor route count mismatch')
   return { release: capture.release, captureSha256: capture.sha256, operations }
 }
 

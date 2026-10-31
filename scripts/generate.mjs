@@ -77,6 +77,11 @@ const outputs = {
   'catalogue-diff.json': compareCatalogues(catalogues[0], catalogues[1]),
   'artium-invocations.json': { generated: true, commands: [
     { command: 'home', effect: 'read', flags: { help: 'boolean', format: 'value' } },
+    ...['doctor', 'auth status', 'profile list', 'config path', 'help'].map(command => ({ command, effect: 'read', flags: { help: 'boolean', format: 'value' } })),
+    { command: 'ls', effect: 'read', flags: { help: 'boolean', format: 'value', limit: 'value', fields: 'value', full: 'boolean' } },
+    ...contracts.filter(operation => operation.release === 'published-current' && operation.callable && operation.returns.type === 'array').map(operation => ({
+      command: `ls ${operation.path}`, effect: 'read', flags: { help: 'boolean', format: 'value', limit: 'value', fields: 'value', full: 'boolean',
+        ...Object.fromEntries(Object.keys(operation.parameters.properties ?? {}).map(name => [`api-${name}`, 'value'])) } })),
     { command: 'inventory', effect: 'read', flags: { help: 'boolean', format: 'value', catalogue: 'value' } },
     ...[...keys].sort().map(key => {
       const operation = contracts.find(operation => routeKey(operation) === key)
@@ -86,7 +91,7 @@ const outputs = {
     const variants = contracts.filter(operation => routeKey(operation) === key && operation.callable)
     if (!variants.length) return []
     const flags = Object.fromEntries([...new Set(variants.flatMap(operation => Object.keys(operation.parameters.properties ?? {})))].map(name => [`api-${name}`, 'value']))
-    return [{ command: variants[0].command.join(' '), effect: 'read', flags: { help: 'boolean', format: 'value', catalogue: 'value', ...flags },
+    return [{ command: variants[0].command.join(' '), effect: 'read', flags: { help: 'boolean', format: 'value', catalogue: 'value', limit: 'value', fields: 'value', full: 'boolean', ...flags },
       catalogues: variants.map(operation => operation.release) }]
   })] },
 }

@@ -11,6 +11,8 @@
     "reason": "Requires operation-specific effect, transport and secret review before admission."
   },
   "reviewed": {
+    "GET /nodes/{node}/version": { "effect": "read", "transport": "json", "secrets": "none", "reason": "Selected node version metadata for mixed-cluster contract selection." },
+    "GET /nodes/{node}/tasks/{upid}/log": { "effect": "read", "transport": "json", "secrets": "none", "reason": "Retained numbered task log; bounded JSON response and redacted output." },
     "GET /version": { "effect": "read", "transport": "json", "secrets": "none", "reason": "Version metadata only; fixed JSON formatter." },
     "GET /access/permissions": { "effect": "read", "transport": "json", "secrets": "none", "reason": "Effective permission map; no credential values." },
     "GET /cluster/resources": { "effect": "read", "transport": "json", "secrets": "none", "reason": "Cluster resource inventory; type filters select read results." },

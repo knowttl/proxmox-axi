@@ -9,6 +9,8 @@ import test from 'node:test'
 for (const scenario of [
   { name: 'installed tarball satisfies canonical credentials with external egress denied', task: 'S1.2', through: 'standalone', exitCode: 0, status: 'pass', host: 'pending' },
   { name: 'generated route cases satisfy the checked catalogue and admission policy', task: 'S2.1', through: 'standalone', exitCode: 0, status: 'pass', host: 'pending' },
+  { name: 'retained reads preserve permission visibility and bounded output', task: 'S2.2', through: 'standalone', exitCode: 0, status: 'pass', host: 'pending' },
+  { name: 'mixed node capabilities and bounded doctor use selected contracts', task: 'S2.3', through: 'standalone', exitCode: 0, status: 'pass', host: 'pending' },
   { name: 'actual pinned Artium client server and runner satisfy S1.1', through: 'both', exitCode: 0, status: 'pass', host: 'pass' },
   { name: 'both journeys reject missing host fixture inputs', through: 'both', exitCode: 1, status: 'fail', host: 'pending', missingHost: true,
     failure: '--through both requires PROXMOX_AXI_ARTIUM_FIXTURE and PROXMOX_AXI_ARTIUM_MANIFEST' },
