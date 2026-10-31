@@ -1,6 +1,7 @@
 import { readFileSync, writeFileSync } from 'node:fs'
 import { createHash } from 'node:crypto'
 import { captures, replay, routeKey, compareCatalogues } from './catalogue.mjs'
+import { reviewWrite } from './write-policy.ts'
 
 const root = new URL('../', import.meta.url)
 const read = path => readFileSync(new URL(path, root), 'utf8')
@@ -24,7 +25,7 @@ function parameterSchema(vendor = {}) {
     result.pattern = `^(?:${vendor.pattern})$`
   }
   if (vendor.format) {
-    const pattern = typeof vendor.format === 'string' ? constraints.formats[vendor.format] : undefined
+    const pattern = vendor.format === 'pve-command-batch' ? '^[\\s\\S]{1,32768}$' : typeof vendor.format === 'string' ? constraints.formats[vendor.format] : undefined
     if (!pattern) return unresolved('vendor format or property string')
     if (result.pattern) result.allOf = [{ pattern }]
     else result.pattern = pattern
@@ -48,16 +49,33 @@ const policy = JSON.parse(read('src/operation-policy.json'))
 const keys = new Set(catalogues.flatMap(catalogue => catalogue.operations.map(routeKey)))
 if (keys.size !== 681 || Object.keys(policy.reviewed).some(key => !keys.has(key))) throw new Error('Policy route coverage mismatch')
 const contracts = catalogues.flatMap(catalogue => catalogue.operations.map(operation => {
-  const review = policy.reviewed[routeKey(operation)] ?? policy.default
-  const callable = policy.captureBindings[catalogue.release] === catalogue.captureSha256 && review.effect === 'read' && review.transport === 'json' && review.secrets === 'none' && operation.allowtoken !== 0
-  return { ...operation, release: catalogue.release, policy: review, callable,
+  const review = policy.reviewed[routeKey(operation)] ?? reviewWrite(operation) ?? policy.default
+  const callable = policy.captureBindings[catalogue.release] === catalogue.captureSha256 && ['read', 'write', 'batch'].includes(review.effect) && review.transport === 'json' && ['none', 'input-refs'].includes(review.secrets) && operation.allowtoken !== 0
+  const id = operations.find(item => routeKey(item) === routeKey(operation))?.id ?? `OP-${operation.method}-${createHash('sha256').update(routeKey(operation)).digest('hex').slice(0, 10)}`
+  const api = parameterSchema(operation.parameters)
+  for (const name of review.sensitiveInputs ?? []) if (api.properties?.[name]) api.properties[name] = {
+    ...JSON.parse(read('src/profile-schema.json')).$defs.secretRef, 'x-secret': true,
+  }
+  return { ...operation, id, release: catalogue.release, policy: review, callable,
     command: [operation.method.toLowerCase(), operation.path],
     invocation: { method: operation.method, path: operation.path, catalogue: catalogue.release,
-      schema: { type: 'object', additionalProperties: false, properties: { api: parameterSchema(operation.parameters) }, required: ['api'] },
+      schema: { type: 'object', additionalProperties: false, properties: { api }, required: ['api'] },
       parameterNamespace: '--api-', body: { flag: '--body-file', encoding: 'json', maxBytes: 65536 },
       untranslatedPatterns: 'Perl patterns and named formats are retained in parameters; unsupported supplied values fail closed.' } }
 }))
 const outputs = {
+  'write-policy.json': { generated: true, captures, refusedPolicy: policy.default,
+    contractReferences: 'Each contract reference retains the exact vendor privileges, parameter and result schemas. Unclassified variants remain refused.',
+    operations: contracts.filter(operation => operation.policy.effect !== 'read').map(operation => {
+    const route = { id: operation.id, method: operation.method, path: operation.path, release: operation.release, admitted: operation.callable,
+      contract: `dist/contracts.json#/contracts/${contracts.indexOf(operation)}` }
+    if (!operation.callable) return route
+    return { ...route, policy: operation.policy,
+    inputs: Object.keys(operation.parameters.properties ?? {}).map(name => ({ name,
+      admitted: operation.callable && (!operation.policy.allowedInputs || operation.policy.allowedInputs.includes(name)),
+      sensitive: operation.callable ? operation.policy.sensitiveInputs?.includes(name) ?? false : 'unresolved' })),
+    results: { type: operation.returns.type ?? 'unresolved', handling: operation.callable ? 'metadata only; protected results refused' : 'unresolved; refused' },
+  } }) },
   'axi-credential.schema.json': JSON.parse(read('src/profile-schema.json')),
   'inventory.json': { generated: true, captures, unionRoutes: keys.size, variants: contracts.length,
     operations: [...keys].sort().map(key => {
@@ -76,10 +94,26 @@ const outputs = {
   'src/contracts.json': { generated: true, captures, contracts },
   'catalogue-diff.json': compareCatalogues(catalogues[0], catalogues[1]),
   'artium-invocations.json': { generated: true, commands: [
+    { command: 'task cancel', operationId: contracts.find(operation => operation.method === 'DELETE' && operation.path === '/nodes/{node}/tasks/{upid}').id,
+      method: 'DELETE', path: '/nodes/{node}/tasks/{upid}', effect: 'write', flags: {
+        help: 'boolean', format: 'value', 'api-node': 'value', 'api-upid': 'value', preview: 'boolean', confirm: 'value' } },
+    ...['status', 'log', 'wait'].map(command => ({ command: `task ${command}`, effect: 'read', flags: {
+      help: 'boolean', format: 'value', 'api-node': 'value', 'api-upid': 'value', journal: 'value', ...(command === 'wait' ? { 'wait-ms': 'value' } : {}) } })),
+    ...['show', 'reconcile'].map(command => ({ command: `journal ${command}`, effect: 'read', flags: { help: 'boolean', format: 'value' } })),
+    ...[...keys].sort().flatMap(key => {
+      const variants = contracts.filter(operation => routeKey(operation) === key && operation.callable && operation.policy.effect !== 'read')
+      if (!variants.length) return []
+      const operation = variants[0]
+      const verb = { POST: 'create', PUT: 'set', DELETE: 'delete' }[operation.method]
+      const flags = Object.fromEntries([...new Set(variants.flatMap(item => Object.keys(item.parameters.properties ?? {})))].filter(name =>
+        !operation.policy.sensitiveInputs?.includes(name) && (!operation.policy.allowedInputs || operation.policy.allowedInputs.includes(name))).map(name => [`api-${name}`, 'value']))
+      return [{ command: `${verb} ${operation.path}`, operationId: operation.id, method: operation.method, path: operation.path,
+        effect: 'write', flags: { help: 'boolean', format: 'value', preview: 'boolean', confirm: 'value', ...flags } }]
+    }),
     { command: 'home', effect: 'read', flags: { help: 'boolean', format: 'value' } },
     ...['doctor', 'auth status', 'profile list', 'config path', 'help'].map(command => ({ command, effect: 'read', flags: { help: 'boolean', format: 'value' } })),
     { command: 'ls', effect: 'read', flags: { help: 'boolean', format: 'value', limit: 'value', fields: 'value', full: 'boolean' } },
-    ...contracts.filter(operation => operation.release === 'published-current' && operation.callable && operation.returns.type === 'array').map(operation => ({
+    ...contracts.filter(operation => operation.release === 'published-current' && operation.callable && operation.policy.effect === 'read' && operation.returns.type === 'array').map(operation => ({
       command: `ls ${operation.path}`, effect: 'read', flags: { help: 'boolean', format: 'value', limit: 'value', fields: 'value', full: 'boolean',
         ...Object.fromEntries(Object.keys(operation.parameters.properties ?? {}).map(name => [`api-${name}`, 'value'])) } })),
     { command: 'inventory', effect: 'read', flags: { help: 'boolean', format: 'value', catalogue: 'value' } },
@@ -88,10 +122,10 @@ const outputs = {
       return { command: `schema ${operation.method.toLowerCase()} ${operation.path}`, effect: 'read', flags: { help: 'boolean', format: 'value', catalogue: 'value' } }
     }),
     ...[...keys].sort().flatMap(key => {
-    const variants = contracts.filter(operation => routeKey(operation) === key && operation.callable)
+    const variants = contracts.filter(operation => routeKey(operation) === key && operation.callable && operation.policy.effect === 'read')
     if (!variants.length) return []
     const flags = Object.fromEntries([...new Set(variants.flatMap(operation => Object.keys(operation.parameters.properties ?? {})))].map(name => [`api-${name}`, 'value']))
-    return [{ command: variants[0].command.join(' '), effect: 'read', flags: { help: 'boolean', format: 'value', catalogue: 'value', limit: 'value', fields: 'value', full: 'boolean', ...flags },
+    return [{ command: variants[0].command.join(' '), operationId: variants[0].id, method: variants[0].method, path: variants[0].path, effect: 'read', flags: { help: 'boolean', format: 'value', catalogue: 'value', limit: 'value', fields: 'value', full: 'boolean', ...flags },
       catalogues: variants.map(operation => operation.release) }]
   })] },
 }

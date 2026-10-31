@@ -12,6 +12,7 @@ import { verifyHostRuntime } from './host-identity.mjs'
 import { captures, replay, routeKey } from './catalogue.mjs'
 import { routeCases, verifyDiscovery } from './route-cases.mjs'
 import { exerciseReadJourney } from './read-journey.mjs'
+import { exerciseWriteJourney } from './write-journey.ts'
 
 const root = fileURLToPath(new URL('../', import.meta.url))
 const digest = (bytes, algorithm = 'sha256') => createHash(algorithm).update(bytes).digest(algorithm === 'sha512' ? 'base64' : 'hex')
@@ -81,8 +82,8 @@ function selection(args) {
     assert.ok(value && !value.startsWith('--'), `Missing value for ${key}`)
     values[key] = value
   }
-  assert.ok(['S1.1', 'S1.2', 'S2.1', 'S2.2', 'S2.3'].includes(values['--task']), 'Select S1.1, S1.2, S2.1, S2.2 or S2.3')
-  if (values['--repeat-through']) assert.ok(['S1', 'S2'].includes(values['--repeat-through']))
+  assert.ok(['S1.1', 'S1.2', 'S2.1', 'S2.2', 'S2.3', 'S3.1', 'S3.2'].includes(values['--task']), 'Select a task from S1.1 through S3.2')
+  if (values['--repeat-through']) assert.ok(['S1', 'S2', 'S3'].includes(values['--repeat-through']))
   if (values['--available-through']) assert.equal(values['--available-through'], 'S2')
   assert.equal(values['--network'], 'fake-only', 'Only fake-only networking is permitted')
   assert.ok(['standalone', 'both'].includes(values['--through']), 'Select --through standalone or both')
@@ -115,12 +116,12 @@ async function preparePackage(values, out, scratch) {
     hostInput.host = { status: 'starting', revision: pin.revision, manifestSha256: pin.manifestSha256,
       admission: pin.status, sourceHashes: pin.sourceHashes, runtimeHashes,
       clientSha256: runtimeHashes['dist/cli/artium-axi.mjs'] }
-  } else await checked('pnpm', ['pack', '--pack-destination', out])
+  } else await checked('pnpm', ['--config.ignore-scripts=true', 'pack', '--pack-destination', out])
   const consumer = join(scratch, 'consumer')
   await mkdir(consumer)
   await save(join(consumer, 'package.json'), { private: true, packageManager: pkg.packageManager,
     dependencies: { [pkg.name]: `file:${archive}` }, pnpm: pkg.pnpm })
-  await checked('pnpm', ['install', '--ignore-scripts'], { cwd: consumer })
+  await checked('pnpm', ['install', '--offline', '--ignore-scripts'], { cwd: consumer })
   const installed = await realpath(join(consumer, 'node_modules', pkg.name))
   const executable = join(installed, 'bin/proxmox-axi.mjs')
   return { pkg, archive, consumer, installed, executable, hostInput }
@@ -143,6 +144,7 @@ async function verify(values, prepared, scratch) {
   let hostChild
   const hostLogs = []
   try {
+    result.sourceHead = await checked('git', ['rev-parse', 'HEAD'])
     result.network = { mode: 'fake-only', namespace: await readlink('/proc/self/ns/net'), externalEgress: 'denied' }
     const interfaces = Object.keys(networkInterfaces())
     assert.ok(interfaces.every(name => name === 'lo'), 'Network namespace must contain only loopback')
@@ -419,7 +421,7 @@ async function verify(values, prepared, scratch) {
     const operationPolicy = await json(join(root, 'src/operation-policy.json'))
     const readJourney = (environment, entry = executable) => exerciseReadJourney({ runCase, pack: values['--pack'], retained,
       contracts: catalogues.flatMap(catalogue => catalogue.operations.map(operation => ({ ...operation, release: catalogue.release }))),
-      env: environment, entry, hosted: entry !== executable, task: values['--task'] })
+      env: environment, entry, hosted: entry !== executable, task: ['S3.1', 'S3.2'].includes(values['--task']) ? 'S2.3' : values['--task'] })
     const exerciseRoutes = async (environment, entry = executable) => {
       const hosted = entry !== executable
       const coverage = { union: 681, variants: 1285, admitted: 0, denied: 0 }
@@ -429,7 +431,7 @@ async function verify(values, prepared, scratch) {
         const expected = route.callable ? route.operation.path === '/version' ?
           { exitCode: 0, requests: 1, version: true, identity } :
           { exitCode: 0, requests: 1, path: route.expectedPath, data: route.response, identity } :
-          { exitCode: hosted ? 2 : 1, requests: 0, error: hosted ? 'INVALID_INPUT' : 'CONTRACT_UNRESOLVED', hostBoundary: hosted }
+          { exitCode: hosted ? 2 : 1, requests: 0, error: hosted ? 'INVALID_INPUT' : route.reviewedWrite ? 'WRITE_DISABLED' : 'CONTRACT_UNRESOLVED', hostBoundary: hosted }
         await runCase(`${hosted ? 'artium' : 'standalone'}/contract/${route.id}/valid`, args, environment, expected,
           route.operation.path === '/version' ? success : { httpStatus: 200, body: { data: route.response } }, entry)
         await runCase(`${hosted ? 'artium' : 'standalone'}/contract/${route.id}/invalid`, [...args, '--api-constructor', 'invalid'], environment,
@@ -438,7 +440,7 @@ async function verify(values, prepared, scratch) {
       }
       return coverage
     }
-    if (values['--task'] === 'S2.1') {
+    if (values['--task'] === 'S2.1' || (['S3.1', 'S3.2'].includes(values['--task']) && values['--repeat-through'] === 'S3')) {
       verifyDiscovery(inventory, catalogues, (await json(join(installed, 'dist/contracts.json'))).contracts, operationPolicy)
       const bodyRoute = [...routeCases(catalogues, operationPolicy)].find(route => route.callable && route.operation.path === '/nodes/{node}/tasks')
       const bodyFile = join(scratch, 'parameters.json')
@@ -451,7 +453,10 @@ async function verify(values, prepared, scratch) {
         { exitCode: 2, requests: 0, error: 'INVALID_INPUT' })
       result.routeCoverage = await exerciseRoutes(env)
     }
-    if (['S2.2', 'S2.3'].includes(values['--task'])) await readJourney(env)
+    if (['S2.2', 'S2.3', 'S3.1', 'S3.2'].includes(values['--task'])) await readJourney(env)
+    if (['S3.1', 'S3.2'].includes(values['--task'])) {
+      await exerciseWriteJourney({ scratch, out, executable, caFile, env, command, cases: result.cases, ledger, transcripts })
+    }
     result.outcomes = [
       { id: 'AC-VERIFIED-VERSION', journey: 'standalone', status: 'pass', basis: 'Reviewed 8.2.7 fixture' },
       { id: 'AC-VERSION-AUTH', journey: 'standalone', status: 'pass', basis: 'Controlled 401 and invalid shapes fail' },
@@ -460,6 +465,9 @@ async function verify(values, prepared, scratch) {
       { id: 'AC-HOST', journey: 'artium', status: 'pending', reason: result.host.reason },
       { id: 'CRED-19', journey: 'artium', status: 'pending', reason: result.host.reason },
     ]
+    if (['S3.1', 'S3.2'].includes(values['--task'])) for (const id of ['AC-WRITES', 'AC-WRITE', 'AC-SPECIAL-BATCH-POLICY', 'AC-ASYNC', 'AC-SPECIAL-BATCH-RESULTS']) {
+      result.outcomes.push({ id, journey: 'standalone', status: 'pass', basis: 'Packaged executable with durable intents and independent fake business state under process-level outbound denial.' })
+    }
     if (values['--task'] !== 'S1.1') {
       for (const id of ['AC-CREDENTIALS', 'CRED-01', 'CRED-02', 'CRED-03', 'CRED-04', 'CRED-06', 'CRED-09', 'CRED-10', 'CRED-11', 'CRED-12', 'CRED-13', 'CRED-20']) {
         result.outcomes.push({ id, journey: 'standalone', status: 'pass', basis: 'Offline package cases; native platform proof remains S6.1' })
@@ -493,6 +501,14 @@ async function verify(values, prepared, scratch) {
       new SessionStore(ready.url, join(base.XDG_CONFIG_HOME, 'artium-axi/session.json')).write(session)
       const client = join(hostInput.fixture, 'dist/cli/artium-axi.mjs')
       const clientEnvironment = { ...env, ARTIUM_AXI_URL: ready.url, ARTIUM_AXI_TEST_HTTP: '1' }
+      const secondaryLogin = await fetch(`${ready.url}/v1/auth/login`, { method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: 'synthetic-secondary', password: 'CANARY-local-password' }) })
+      assert.equal(secondaryLogin.status, 200)
+      const secondarySession = await secondaryLogin.json()
+      secrets.push(secondarySession.accessToken, secondarySession.refreshToken)
+      const secondaryConfig = join(scratch, 'secondary-config')
+      new SessionStore(ready.url, join(secondaryConfig, 'artium-axi/session.json')).write(secondarySession)
+      const secondaryEnvironment = { ...clientEnvironment, XDG_CONFIG_HOME: secondaryConfig }
       const hostExpected = { exitCode: 0, requests: 1, version: true, profile: 'artium',
         tokenSource: 'env:ARTIUM_SECRET_0', identity: 'hosted-canary' }
       await runCase('AC-HOST/version', ['proxmox-axi', 'get', '/version', '--format', 'json'], clientEnvironment, hostExpected, success, client)
@@ -500,8 +516,20 @@ async function verify(values, prepared, scratch) {
         { exitCode: 1, requests: 1, error: 'AUTH_REQUIRED', identity: 'hosted-canary' }, denied, client)
       await runCase('AC-HOST/invalid-shape', ['proxmox-axi', 'get', '/version', '--format', 'json'], clientEnvironment,
         { exitCode: 1, requests: 1, error: 'INVALID_RESPONSE', identity: 'hosted-canary' }, { httpStatus: 200, body: { data: null } }, client)
-      if (values['--task'] === 'S2.1') result.host.routeCoverage = await exerciseRoutes(clientEnvironment, client)
-      if (['S2.2', 'S2.3'].includes(values['--task'])) await readJourney(clientEnvironment, client)
+      if (values['--task'] === 'S2.1' || (['S3.1', 'S3.2'].includes(values['--task']) && values['--repeat-through'] === 'S3')) result.host.routeCoverage = await exerciseRoutes(clientEnvironment, client)
+      if (['S2.2', 'S2.3', 'S3.1', 'S3.2'].includes(values['--task'])) await readJourney(clientEnvironment, client)
+      if (['S3.1', 'S3.2'].includes(values['--task'])) {
+        await exerciseWriteJourney({ scratch, out, executable: client, caFile, env: { ...clientEnvironment, PROXMOX_AXI_TOKEN: hostedToken },
+          command, cases: result.cases, ledger, transcripts, hosted: { log: join(hostDirectory, 'writes.log'), otherActorEnv: secondaryEnvironment,
+            configure: async (origin, toolOperations, hostOperations, enabled) => {
+              const configured = hostMessage(hostChild, 'configured-writes')
+              hostChild.send({ event: 'configure-writes', origin, toolOperations, hostOperations, enabled })
+              await configured
+            } } })
+        for (const id of ['AC-WRITES', 'AC-WRITE', 'AC-SPECIAL-BATCH-POLICY', 'AC-ASYNC', 'AC-SPECIAL-BATCH-RESULTS']) {
+          result.outcomes.push({ id, journey: 'artium', status: 'pass', basis: 'Actual public client/server/runner, independent host policy and retained native journals across disposable calls.' })
+        }
+      }
       const snapshot = hostMessage(hostChild, 'snapshot')
       hostChild.send('snapshot')
       result.host.evidence = await snapshot
@@ -559,7 +587,7 @@ try {
     const parentNamespace = await readlink('/proc/self/ns/net')
     const isolated = await command('unshare', ['--user', '--map-root-user', '--net', process.execPath,
       fileURLToPath(import.meta.url), ...process.argv.slice(2)],
-    { timeoutMs: values['--task'] === 'S2.1' ? 1_800_000 : 300_000,
+    { timeoutMs: values['--task'] === 'S2.1' || values['--repeat-through'] === 'S3' ? 1_800_000 : 300_000,
       env: { ...process.env, PROXMOX_AXI_ACCEPTANCE_NETNS: parentNamespace, PROXMOX_AXI_ACCEPTANCE_SCRATCH: scratch } })
     process.stdout.write(isolated.stdout)
     process.stderr.write(isolated.stderr)

@@ -3,9 +3,10 @@
 AXI-standard agent-facing CLI for Proxmox VE.
 This build provides canonical API-token credentials, bounded trusted HTTPS, and versioned invocation discovery for the 681-route Proxmox API union.
 Hosted verification uses an explicitly approved, unmerged temporary admission fixture; stock Artium remains unsupported.
-Eleven ordinary read routes have reviewed admission policy.
+Eleven ordinary read routes and 22 mutation routes have reviewed admission policy.
 Other operations remain discoverable but uncallable until their effects, transport and secret handling are reviewed.
-Session authentication, writes, downloads and duplex transports remain deferred.
+Writes are disabled by default and require named operation permissions plus an exact, single-use confirmation.
+Session authentication, downloads and duplex transports remain deferred.
 
 Install the npm package with Node 24.11.0 or later:
 
@@ -72,7 +73,9 @@ No insecure-TLS flag or automatic trust update exists.
 `vendor/` retains the unchanged vendor captures with checked SHA-256 hashes.
 They contain 605 legacy 8.2.7 routes and 680 published-current routes, with a 681-route union.
 The current documentation capture is bound to documentation version 9.2.13, rather than a live-tested server patch.
-`src/operation-policy.json` owns admission decisions and binds them to those exact capture hashes.
+`src/operation-policy.json` owns read admission and capture bindings.
+`scripts/write-policy.ts` positively classifies the reviewed mutation routes and parameter branches.
+The generated `write-policy.json` records each other route as refused, alongside its vendor privileges, input classification and contract reference.
 Unresolved policy fields deny invocation, and changing a capture never admits new operations automatically.
 `src/operations.json` owns required version fields and version help metadata.
 `src/profile-schema.json` owns the current profile contract and runtime validation.
@@ -90,7 +93,8 @@ proxmox-axi doctor --format json
 
 Ordinary reads other than `/version` detect the entry version and, for node-specific routes, the selected node version before choosing a catalogue.
 The published 9.2 schema is supported at the contract level; live commissioning remains pending.
-Versions outside 9.2 are labelled unverified, and all writes remain disabled.
+Versions outside 9.2 are labelled unverified.
+Writes require a detected major of 8 or 9, including when an explicit catalogue was supplied.
 An explicit `--catalogue` selects a replay contract without version detection; inventory visibility remains unknown.
 Before admitting a new schema, compare captures offline with `node scripts/compare-capture.mjs /absolute/previous.txt /absolute/candidate.txt`.
 The comparison parses the JSON schema without executing JavaScript, reports changed contracts and capture hashes, and never updates admission policy or pins.
@@ -115,6 +119,42 @@ Supplied constraints without a reviewed local validator return `CONTRACT_UNRESOL
 The generated `artium-invocations.json` contains the callable command and flag contracts for a host inventory generator.
 It does not update or authorize an existing host fixture by itself.
 
+Writes cover guest power operations, guest destruction, selected scalar configuration branches, pool management, task cancellation and node execute batches.
+Inspect `schema create|set|delete <template>` and the generated policy table before enabling an operation.
+Add only the required IDs to the selected file profile's `writes: { "operations": ["<operation-id>"] }`.
+Environment-only profiles cannot enable writes.
+Artium additionally needs its independent `hostWrites` policy with `allowWrites: true` and the exact operation IDs.
+Host policy never replaces the profile's own permissions.
+The host supplies its authenticated caller and credential revision; callers cannot override those bindings or the persistent journal path.
+
+```sh
+proxmox-axi create '/nodes/{node}/qemu/{vmid}/status/start' --api-node pve-test --api-vmid 100 --profile lab --preview
+proxmox-axi create '/nodes/{node}/qemu/{vmid}/status/start' --api-node pve-test --api-vmid 100 --profile lab --confirm '<confirmation>'
+proxmox-axi task status --api-node pve-test --api-upid '<UPID>' --journal '<intent-id>' --profile lab
+proxmox-axi task wait --api-node pve-test --api-upid '<UPID>' --wait-ms 5000 --journal '<intent-id>' --profile lab
+proxmox-axi journal reconcile '<intent-id>' --profile lab
+```
+
+Preview may perform bounded version reads but sends no business mutation.
+Confirmations expire after five minutes and bind origin, identity, caller, selected contract, policy, target, complete ordered inputs, trust and secret-source revisions.
+Sensitive configuration inputs require env/file SecretRefs in a body file; literal secret arguments are refused.
+An execute batch resolves every ordered node-relative child to its reviewed operation and schema before any wrapper transmission.
+Every child requires tool and host permission, including nested batches.
+Limits are 64 total operations, four nesting levels and 32768 bytes per commands string.
+Any failed child makes the batch fail, with partial outcomes retained and no assumed rollback.
+
+The native journal lives beside the OS state path as `proxmox-axi/writes.log.d`, or beside the host-owned `PROXMOX_AXI_WRITE_LOG` path with `.d` appended.
+It uses protected per-intent records, flushed replacements and exclusive single-use confirmation claims outside disposable hosted call directories.
+Journal failure prevents transmission.
+Records contain request fingerprints and safe metadata rather than credentials or input values.
+An accepted UPID means the action is pending; matching task status distinguishes running, success and failure.
+`task log` retains numbered lines, and `task wait` has a 1-30000 ms elapsed budget.
+Use `--journal` to retain explicit task observations in the associated intent, including batch children.
+Lost responses and crashes remain uncertain, with no automatic mutation retry.
+Reconciliation can observe reviewed direct configuration/status fields or inspect retained UPIDs.
+Observation does not attribute an uncertain mutation, and missing or filtered data never proves failure.
+Variants without a safe reconciliation read say so explicitly.
+
 The public acceptance entry installs a packed tarball into an isolated consumer and executes its exact binary, alongside a competing same-name executable.
 It uses real loopback HTTPS and synthetic credentials inside a Linux user/network namespace containing only loopback.
 An external connection must fail with `ENETUNREACH` before any product journey runs.
@@ -127,6 +167,8 @@ pnpm verify:acceptance -- --task S1.2 --pack /absolute/path/to/pack --out /absol
 pnpm verify:acceptance -- --task S2.1 --pack /absolute/path/to/pack --out /absolute/new/run/S2.1 --network fake-only --through both --all-route-variants --available-through S2 --repeat-through S1
 pnpm verify:acceptance -- --task S2.2 --pack /absolute/path/to/pack --out /absolute/new/run/S2.2 --network fake-only --through both --repeat-through S2
 pnpm verify:acceptance -- --task S2.3 --pack /absolute/path/to/pack --out /absolute/new/run/S2.3 --network fake-only --through both --repeat-through S2
+pnpm verify:acceptance -- --task S3.1 --pack /absolute/path/to/pack --out /absolute/new/run/S3.1 --network fake-only --through both --repeat-through S3
+pnpm verify:acceptance -- --task S3.2 --pack /absolute/path/to/pack --out /absolute/new/run/S3.2 --network fake-only --through both --repeat-through S3
 ```
 
 Use this repository's `evidence` directory for `--pack`; the normalized read captures are bound by the retained manifest.

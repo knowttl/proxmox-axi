@@ -1,6 +1,7 @@
 {
   "unsupportedPatternMarkers": ["(?", "\\p", "\\A", "\\z"],
   "formats": {
+    "pve-poolid": "^[A-Za-z][A-Za-z0-9._-]*$",
     "pve-node": "^[A-Za-z0-9][A-Za-z0-9.-]*$",
     "pve-vmid": "^[1-9][0-9]*$",
     "pve-storage-id": "^[A-Za-z][A-Za-z0-9._-]*$",

@@ -89,7 +89,7 @@ export async function exerciseReadJourney({ runCase, pack, retained, contracts, 
     }
     await run('VP-06/removed-route', ['get', '/nodes/{node}/scan/glusterfs', '--api-node', 'node-a', '--format', 'json'],
       { exitCode: hosted ? 2 : 1, requests: 0, error: hosted ? 'INVALID_INPUT' : 'CAPABILITY_UNSUPPORTED', hostBoundary: hosted }, vendor)
-    await run('VP-06/unknown-write', ['post', '/nodes/{node}/qemu/{vmid}/status/start', '--format', 'json'],
-      { exitCode: hosted ? 2 : 1, requests: 0, error: hosted ? 'INVALID_INPUT' : 'CONTRACT_UNRESOLVED', hostBoundary: hosted }, vendor)
+    await run('VP-06/unknown-write', ['post', '/nodes/{node}/qemu/{vmid}/status/start', '--api-node', 'node-a', '--api-vmid', '100', '--format', 'json'],
+      { exitCode: hosted ? 2 : 1, requests: 0, error: hosted ? 'INVALID_INPUT' : 'WRITE_DISABLED', hostBoundary: hosted }, vendor)
   }
 }

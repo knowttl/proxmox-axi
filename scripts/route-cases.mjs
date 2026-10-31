@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict'
 import { Ajv } from 'ajv'
 import { routeKey } from './catalogue.mjs'
+import { reviewWrite } from './write-policy.ts'
 
 function responseFixture(schema) {
   if (schema.enum) return schema.enum[0]
@@ -46,7 +47,7 @@ export function* routeCases(catalogues, policy) {
         if (path.includes(placeholder)) path = path.replace(placeholder, encoded)
         else query.push(`${encodeURIComponent(name)}=${encodeURIComponent(typeof value === 'boolean' ? (value ? '1' : '0') : String(value))}`)
       }
-      yield { id: `${catalogue.release}/${routeKey(operation)}/${variant.branch}`, operation, release: catalogue.release, callable, args,
+      yield { id: `${catalogue.release}/${routeKey(operation)}/${variant.branch}`, operation, release: catalogue.release, callable, reviewedWrite: !!reviewWrite(operation), args,
         values: variant.values,
         response,
         expectedPath: `/api2/json${path}${query.length ? `?${query.join('&')}` : ''}` }
