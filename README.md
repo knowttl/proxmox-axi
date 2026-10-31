@@ -90,7 +90,7 @@ proxmox-axi doctor --format json
 
 Ordinary reads other than `/version` detect the entry version and, for node-specific routes, the selected node version before choosing a catalogue.
 The published 9.2 schema is supported at the contract level; live commissioning remains pending.
-Legacy 8.x and unknown majors are labelled unverified, and all writes remain disabled.
+Versions outside 9.2 are labelled unverified, and all writes remain disabled.
 An explicit `--catalogue` selects a replay contract without version detection; inventory visibility remains unknown.
 Before admitting a new schema, compare captures offline with `node scripts/compare-capture.mjs /absolute/previous.txt /absolute/candidate.txt`.
 The comparison parses the JSON schema without executing JavaScript, reports changed contracts and capture hashes, and never updates admission policy or pins.
@@ -99,9 +99,10 @@ Scoped privileges may provide useful rows but do not establish complete inventor
 An empty filtered or unverified result never establishes that no resources exist.
 
 TOON is the default; `--format json` preserves the same structured result.
-Lists default to 100 compact rows; `--fields` chooses fields and `--full` includes all received rows and, unless `--fields` is supplied, all received fields.
+`ls` is an alias for `get` and defaults to `/nodes` when no path is supplied.
+Lists default to 100 compact rows; `--limit <1-1000>` changes the display limit, `--fields` chooses fields and `--full` includes all received rows and, unless `--fields` is supplied, all received fields.
 Provider totals and pagination remain separate from received counts and display truncation.
-Rendered output and HTTP responses each have a 65536-byte cap, including full output.
+Rendered output has a 65536-byte cap, including full output.
 HTTP 404 reports `NOT_FOUND_OR_HIDDEN`, since absence and hidden resources cannot be distinguished safely.
 Offline `help`, `inventory`, `schema`, `profile list` and `config path` require no credential values.
 
