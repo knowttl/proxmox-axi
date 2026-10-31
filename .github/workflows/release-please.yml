@@ -1,0 +1,56 @@
+name: release-please
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+  pull-requests: write
+  id-token: write
+
+jobs:
+  release-please:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: googleapis/release-please-action@v4
+        id: release
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: actions/checkout@v6
+        if: ${{ steps.release.outputs.release_created }}
+        with:
+          ref: ${{ steps.release.outputs.tag_name }}
+
+      - uses: actions/setup-node@v6
+        if: ${{ steps.release.outputs.release_created }}
+        with:
+          node-version-file: .node-version
+          registry-url: "https://registry.npmjs.org"
+          package-manager-cache: false
+
+      - uses: pnpm/action-setup@v4
+        if: ${{ steps.release.outputs.release_created }}
+
+      - run: pnpm install --frozen-lockfile
+        if: ${{ steps.release.outputs.release_created }}
+
+      # Ubuntu's AppArmor policy otherwise blocks the acceptance network namespace.
+      - name: Enable isolated acceptance tests
+        if: ${{ steps.release.outputs.release_created }}
+        run: sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
+
+      - run: pnpm lint
+        if: ${{ steps.release.outputs.release_created }}
+
+      - run: pnpm test
+        if: ${{ steps.release.outputs.release_created }}
+
+      # setup-node writes a placeholder token that would override OIDC authentication.
+      - name: Enable OIDC trusted publishing
+        if: ${{ steps.release.outputs.release_created }}
+        run: sed -i '/:_authToken=/d' "$NPM_CONFIG_USERCONFIG"
+
+      - run: npm publish --access public --provenance
+        if: ${{ steps.release.outputs.release_created }}
