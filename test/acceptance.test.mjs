@@ -7,9 +7,10 @@ import { fileURLToPath } from 'node:url'
 import test from 'node:test'
 
 for (const scenario of [
-  { name: 'installed tarball satisfies the standalone S1.1 journey with external egress denied', through: 'standalone', exitCode: 0, status: 'pass' },
-  { name: 'both journeys cannot pass without actual Artium admission', through: 'both', exitCode: 1, status: 'fail',
-    failure: 'Actual Artium journey is pending host admission; --through both cannot pass.' },
+  { name: 'installed tarball satisfies the standalone S1.1 journey with external egress denied', through: 'standalone', exitCode: 0, status: 'pass', host: 'pending' },
+  { name: 'actual pinned Artium client server and runner satisfy S1.1', through: 'both', exitCode: 0, status: 'pass', host: 'pass' },
+  { name: 'both journeys reject missing host fixture inputs', through: 'both', exitCode: 1, status: 'fail', host: 'pending', missingHost: true,
+    failure: '--through both requires PROXMOX_AXI_ARTIUM_FIXTURE and PROXMOX_AXI_ARTIUM_MANIFEST' },
 ]) test(scenario.name, async () => {
   const root = fileURLToPath(new URL('../', import.meta.url))
   const temporary = await mkdtemp(join(tmpdir(), 'proxmox-axi-test-'))
@@ -17,7 +18,8 @@ for (const scenario of [
   try {
     const child = spawn(process.execPath, [join(root, 'scripts/acceptance.mjs'), '--task', 'S1.1',
       '--pack', join(root, 'evidence'), '--out', out, '--network', 'fake-only', '--through', scenario.through],
-    { stdio: ['ignore', 'pipe', 'pipe'] })
+    { stdio: ['ignore', 'pipe', 'pipe'], env: { ...process.env,
+      ...(scenario.missingHost ? { PROXMOX_AXI_ARTIUM_FIXTURE: '', PROXMOX_AXI_ARTIUM_MANIFEST: '' } : {}) } })
     const output = []
     child.stdout.on('data', chunk => output.push(chunk))
     child.stderr.on('data', chunk => output.push(chunk))
@@ -26,7 +28,7 @@ for (const scenario of [
     const result = JSON.parse(await readFile(join(out, 'result.json'), 'utf8'))
     assert.equal(result.status, scenario.status, result.failure)
     assert.equal(result.failure, scenario.failure)
-    assert.equal(result.host.status, 'pending')
+    assert.equal(result.host.status, scenario.host)
     assert.equal(result.cases.every(entry => entry.status === 'pass'), true, result.failure)
   } catch (error) {
     if (process.env.PROXMOX_AXI_TEST_FAILURE_DIR) {

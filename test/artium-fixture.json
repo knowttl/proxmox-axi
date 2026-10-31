@@ -1,0 +1,20 @@
+{
+  "revision": "6d1e406705803a657241295ddf322b4c21fb4ef9",
+  "status": "unmerged-temporary-admission-fixture",
+  "manifestSha256": "652370c2b73da0debc8eedb3dfae202bbab736b97da919b5fcc0240ac19ddb86",
+  "packageSha256": "a4f49b5af6c3a456ad2745ccca07e6b33523671d65fa2e97a63dbf3c8f6ca070",
+  "sourceHashes": {
+    "src/server/app.ts": "fa6b1f44c81f1db5dd59d73ea7e6fadace2d0d59cc1f78997a09a966733c17c1",
+    "src/server/adapters/proxmox.ts": "9f01f85cf1d7c6b04a46ff71e7768dac464f34ab483ef0fa55774ef1aa7a3abc",
+    "src/server/adapters/credential-profile.ts": "3792f9897db94987f273d3fa016e56802a8c4ab8a19287f4f34aa2a864627696",
+    "src/server/runner/runner.ts": "e0f1eea73ab71521ad5e6d8d2f4558c3f75b69e2e2b7c8710ab7c62931777c4b",
+    "src/server/runner/run.ts": "656fc63377c75af6169c0125ed36fece217f2f061b0141109f3b9d0e49647618",
+    "src/server/store/db.ts": "f7aaaeba93631d1ff70fe36ed8e098632e36dd244cfa5bc06eba6b8172453142",
+    "src/server/config.ts": "606a4e8af5212111fd8bbcbb901505e4b1d5190e6b09cad6f8096f3754b800a0",
+    "src/cli/main.ts": "c521ed834a1eae354cad9dda7b54234ca8ed687bd84d7cc8518707cf0294ec1a",
+    "src/shared/api.ts": "32901be14a0cf27f294c389ddd1b36bce9e05bd78d6d24c61f0bf08959828a1d",
+    "tools/inventories/proxmox-axi.json": "dbe48fd5cc72d516521cf9f3de868f79d1d3d40e2d504360cc0ce587ff622626",
+    "package.json": "3f290d3c3a3da67d4baee25f114e9c86db3c0d7d9faea45bb1c5efcfd686578a",
+    "pnpm-lock.yaml": "4adf8e20be300c13d5e3f5a59d0b2e97314a9bfbf4d11e5410b4b82d708094e0"
+  }
+}

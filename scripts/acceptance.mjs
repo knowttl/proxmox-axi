@@ -4,15 +4,25 @@ import { createHash } from 'node:crypto'
 import { createServer } from 'node:https'
 import { createConnection } from 'node:net'
 import { networkInterfaces } from 'node:os'
-import { chmod, mkdir, mkdtemp, readFile, readlink, realpath, rm, writeFile } from 'node:fs/promises'
+import { chmod, copyFile, mkdir, mkdtemp, readFile, readdir, readlink, realpath, rm, symlink, writeFile } from 'node:fs/promises'
 import { isAbsolute, join, relative, sep } from 'node:path'
-import { fileURLToPath } from 'node:url'
+import { fileURLToPath, pathToFileURL } from 'node:url'
 import { decode } from '@toon-format/toon'
 
 const root = fileURLToPath(new URL('../', import.meta.url))
 const digest = (bytes, algorithm = 'sha256') => createHash(algorithm).update(bytes).digest(algorithm === 'sha512' ? 'base64' : 'hex')
 const json = async path => JSON.parse(await readFile(path, 'utf8'))
 const save = (path, value) => writeFile(path, `${JSON.stringify(value, null, 2)}\n`)
+
+async function runtimeFiles(directory, prefix = '') {
+  const files = {}
+  for (const entry of (await readdir(join(directory, prefix), { withFileTypes: true })).sort((a, b) => a.name.localeCompare(b.name))) {
+    const path = join(prefix, entry.name)
+    if (entry.isDirectory()) Object.assign(files, await runtimeFiles(directory, path))
+    else files[path] = digest(await readFile(join(directory, path)))
+  }
+  return files
+}
 
 async function command(executable, args, options = {}) {
   const child = spawn(executable, args, { cwd: root, stdio: ['ignore', 'pipe', 'pipe'], ...options })
@@ -39,6 +49,19 @@ async function checked(executable, args, options) {
   const result = await command(executable, args, options)
   assert.equal(result.code, 0, `${executable} failed: ${result.stderr || result.stdout}`)
   return result.stdout.trim()
+}
+
+function hostMessage(child, event) {
+  return new Promise((resolve, reject) => {
+    const cleanup = () => { clearTimeout(timer); child.off('message', message); child.off('exit', exited); child.off('error', failed) }
+    const message = value => { if (value.event === event) { cleanup(); resolve(value) } }
+    const exited = () => { cleanup(); reject(new Error(`Actual Artium server exited before ${event}`)) }
+    const failed = error => { cleanup(); reject(error) }
+    const timer = setTimeout(() => { cleanup(); reject(new Error(`Actual Artium server did not report ${event} within 30000 ms`)) }, 30_000)
+    child.on('message', message)
+    child.once('exit', exited)
+    child.once('error', failed)
+  })
 }
 
 function selection(args) {
@@ -76,8 +99,10 @@ async function verify(values) {
   }
   const result = { task: 'S1.1', through: values['--through'], platform: `${process.platform}/${process.arch}`,
     node: process.version, operation: 'OP-GET-version', catalogue: 'legacy-8.2.7',
-    cases: [], status: 'fail', host: { status: 'pending', reason: 'Actual Artium admission is awaiting the host owner; no adapter substitute is used.' } }
+    cases: [], status: 'fail', host: { status: 'pending', reason: 'Actual Artium fixture inputs were not selected.' } }
   let server
+  let hostChild
+  const hostLogs = []
   try {
     result.network = { mode: 'fake-only', namespace: await readlink('/proc/self/ns/net'), externalEgress: 'denied' }
     const interfaces = Object.keys(networkInterfaces())
@@ -102,9 +127,27 @@ async function verify(values) {
     assert.equal(success.body.data.version, '8.2.7', 'Approved fixture version')
     assert.equal(denied.httpStatus, 401, 'Approved denial fixture')
 
-    await checked('pnpm', ['pack', '--pack-destination', out], { env: { ...process.env, npm_config_offline: 'true' } })
     const pkg = await json(join(root, 'package.json'))
     const archive = join(out, `knowttl-proxmox-axi-${pkg.version}.tgz`)
+    let hostInput
+    if (values['--through'] === 'both') {
+      assert.ok(process.env.PROXMOX_AXI_ARTIUM_FIXTURE && process.env.PROXMOX_AXI_ARTIUM_MANIFEST,
+        '--through both requires PROXMOX_AXI_ARTIUM_FIXTURE and PROXMOX_AXI_ARTIUM_MANIFEST')
+      const pin = await json(join(root, 'test/artium-fixture.json'))
+      const manifestBytes = await readFile(process.env.PROXMOX_AXI_ARTIUM_MANIFEST)
+      assert.equal(digest(manifestBytes), pin.manifestSha256, 'Reviewed host fixture manifest digest')
+      const manifest = JSON.parse(manifestBytes)
+      assert.equal(manifest.fixtureCommit, pin.revision, 'Reviewed temporary admission revision')
+      const fixture = await realpath(process.env.PROXMOX_AXI_ARTIUM_FIXTURE)
+      for (const [path, hash] of Object.entries(pin.sourceHashes)) assert.equal(digest(await readFile(join(fixture, path))), hash, `Host source pin: ${path}`)
+      const admitted = manifest.tools.find(tool => tool.tool === 'proxmox-axi')
+      assert.equal(digest(await readFile(admitted.tarball)), pin.packageSha256, 'Admitted tool archive')
+      await copyFile(admitted.tarball, archive)
+      hostInput = { fixture, pin }
+      result.host = { status: 'starting', revision: pin.revision, manifestSha256: pin.manifestSha256,
+        admission: pin.status, sourceHashes: pin.sourceHashes,
+        clientSha256: digest(await readFile(join(fixture, 'dist/cli/artium-axi.mjs'))) }
+    } else await checked('pnpm', ['pack', '--pack-destination', out], { env: { ...process.env, npm_config_offline: 'true' } })
     const archiveBytes = await readFile(archive)
     const consumer = join(scratch, 'consumer')
     await mkdir(consumer)
@@ -117,6 +160,21 @@ async function verify(values) {
     const installedPackage = await json(join(installed, 'package.json'))
     assert.equal(installedPackage.name, pkg.name)
     assert.equal(installedPackage.version, pkg.version)
+    if (hostInput) {
+      for (const directory of ['bin', 'dist']) {
+        assert.deepEqual(await runtimeFiles(join(root, directory)), await runtimeFiles(join(installed, directory)), `Complete shipped ${directory} tree must match the current build`)
+      }
+      const admittedInventory = await json(join(hostInput.fixture, 'tools/inventories/proxmox-axi.json'))
+      for (const source of admittedInventory.sources) {
+        assert.equal(digest(await readFile(join(installed, source.path))), source.sha256, `Admitted package source: ${source.path}`)
+        if (source.path === 'package.json') {
+          for (const field of ['name', 'version', 'type', 'bin', 'dependencies', 'engines']) {
+            assert.deepEqual(pkg[field], installedPackage[field], `Current package runtime metadata: ${field}`)
+          }
+        } else assert.equal(digest(await readFile(join(root, source.path))), source.sha256, `Current runtime must match admitted package: ${source.path}`)
+      }
+      assert.equal(digest(await readFile(executable)), digest(await readFile(join(root, 'bin/proxmox-axi.mjs'))), 'Current executable matches admitted package')
+    }
     const inventory = await json(join(installed, 'inventory.json'))
     assert.deepEqual(inventory.operations.map(({ id, method, path, command }) => ({ id, method, path, command })),
       [{ id: 'OP-GET-version', method: 'GET', path: '/version', command: ['get', '/version'] }], 'Admit exactly the reviewed version read')
@@ -138,14 +196,16 @@ async function verify(values) {
     const token = 'CANARY-proxmox-token-S1-1'
     const fileToken = 'CANARY-proxmox-file-token-S1-1'
     const decoy = 'CANARY-developer-profile-S1-1'
-    secrets.push(token, fileToken, decoy)
+    const hostedToken = 'CANARY-proxmox-hosted-token-S1-1'
+    secrets.push(token, fileToken, decoy, hostedToken, 'CANARY-local-password')
     const tokenId = 'synthetic@pve!acceptance'
     let response = success
     let activeCase = ''
     server = createServer({ key: await readFile(join(scratch, 'server.key')), cert: await readFile(caFile) }, (request, reply) => {
       const authorization = request.headers.authorization
       const identity = authorization === `PVEAPIToken=${tokenId}=${token}` ? 'environment-canary' :
-        authorization === `PVEAPIToken=${tokenId}=${fileToken}` ? 'protected-file-canary' : 'unexpected'
+        authorization === `PVEAPIToken=${tokenId}=${fileToken}` ? 'protected-file-canary' :
+          authorization === `PVEAPIToken=${tokenId}=${hostedToken}` ? 'hosted-canary' : 'unexpected'
       ledger.push({ case: activeCase, method: request.method, path: request.url, identity,
         host: request.headers.host, status: identity === 'unexpected' ? 401 : response.httpStatus })
       if (identity === 'unexpected') { reply.writeHead(401); reply.end(); return }
@@ -177,13 +237,13 @@ async function verify(values) {
     const env = { ...base, PROXMOX_AXI_ORIGIN: origin, PROXMOX_AXI_TOKEN_ID: tokenId,
       PROXMOX_AXI_TOKEN: token, PROXMOX_AXI_CA_BUNDLE: caFile }
 
-    const runCase = async (id, args, environment, expected, vendor = success) => {
+    const runCase = async (id, args, environment, expected, vendor = success, entry = executable) => {
       activeCase = id
       response = vendor
       const before = ledger.length
       const diagnostics = join(scratch, 'transport.jsonl')
       await writeFile(diagnostics, '')
-      const invocation = ['--import', fileURLToPath(new URL('./transport-observer.mjs', import.meta.url)), executable, ...args]
+      const invocation = ['--import', fileURLToPath(new URL('./transport-observer.mjs', import.meta.url)), entry, ...args]
       const start = performance.now()
       const actual = await command(process.execPath, invocation,
         { env: { ...environment, PROXMOX_AXI_TEST_DIAGNOSTICS: diagnostics }, cwd: scratch })
@@ -191,13 +251,15 @@ async function verify(values) {
         invocation: { executable: process.execPath, args: invocation.map(publicText) }, elapsedMs: Math.round(performance.now() - start),
         transportDiagnostics: (await readFile(diagnostics, 'utf8')).split('\n').filter(Boolean).map(line => JSON.parse(line)) }
       result.cases.push(record)
-      for (const value of [token, fileToken, decoy]) {
+      for (const value of secrets) {
         assert.ok(!`${actual.stdout}${actual.stderr}`.includes(value), `${id}: secret leaked to public output`)
       }
       transcripts.push(`case: ${id}\nexit: ${actual.code}\nstdout:\n${actual.stdout}stderr:\n${actual.stderr}`)
       const value = expected.bareVersion ? undefined : args.includes('json') ? JSON.parse(actual.stdout) : decode(actual.stdout)
       record.actual.output = value
-      assert.equal(actual.stderr, '', `${id}: no raw diagnostics on stderr`)
+      if (entry !== executable && expected.exitCode !== 0) {
+        assert.match(actual.stderr, /^artium-axi: request_id [0-9a-f-]{36}\n$/, `${id}: only the host's safe request ID diagnostic`)
+      } else assert.equal(actual.stderr, '', `${id}: no raw diagnostics on stderr`)
       assert.equal(actual.code, expected.exitCode, `${id}: exit code; stdout=${actual.stdout}`)
       if (expected.error) assert.equal(value.error?.code, expected.error, `${id}: observed public code ${value.error?.code ?? 'none'}`)
       assert.equal(record.actual.requests, expected.requests,
@@ -259,17 +321,65 @@ async function verify(values) {
       { id: 'AC-HOST', journey: 'artium', status: 'pending', reason: result.host.reason },
       { id: 'CRED-19', journey: 'artium', status: 'pending', reason: result.host.reason },
     ]
-    if (values['--through'] === 'both') throw new Error('Actual Artium journey is pending host admission; --through both cannot pass.')
+    if (hostInput) {
+      const hostDirectory = join(scratch, 'host')
+      await mkdir(join(hostDirectory, 'tools'), { recursive: true, mode: 0o700 })
+      await symlink(join(consumer, 'node_modules'), join(hostDirectory, 'tools/node_modules'))
+      const startupArgs = [fileURLToPath(new URL('./artium-host.mjs', import.meta.url)), hostInput.fixture, hostDirectory, origin, caFile]
+      result.host.startup = { executable: process.execPath, args: startupArgs, cwd: hostDirectory }
+      hostChild = spawn(process.execPath, startupArgs, { cwd: hostDirectory,
+        env: { ...env, PROXMOX_AXI_ACCEPTANCE_HOST_TOKEN: hostedToken }, stdio: ['ignore', 'pipe', 'pipe', 'ipc'] })
+      hostChild.stdout.on('data', chunk => hostLogs.push(chunk))
+      hostChild.stderr.on('data', chunk => hostLogs.push(chunk))
+      const ready = await hostMessage(hostChild, 'ready')
+      result.host.ready = ready
+      assert.equal(ready.namespace, result.network.namespace, 'Actual host shares the fake-only network namespace')
+      assert.equal(await realpath(ready.executable), executable, 'Actual host must execute the same pinned installed package')
+      const login = await fetch(`${ready.url}/v1/auth/login`, { method: 'POST',
+        headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ username: 'synthetic-user', password: 'CANARY-local-password' }) })
+      assert.equal(login.status, 200, 'Real local Artium authentication')
+      const session = await login.json()
+      assert.equal(session.status, 'authenticated')
+      secrets.push(session.accessToken, session.refreshToken)
+      const { SessionStore } = await import(pathToFileURL(join(hostInput.fixture, 'dist/src/cli/session.js')))
+      new SessionStore(ready.url, join(base.XDG_CONFIG_HOME, 'artium-axi/session.json')).write(session)
+      const client = join(hostInput.fixture, 'dist/cli/artium-axi.mjs')
+      const clientEnvironment = { ...env, ARTIUM_AXI_URL: ready.url, ARTIUM_AXI_TEST_HTTP: '1' }
+      const hostExpected = { exitCode: 0, requests: 1, version: true, profile: 'artium',
+        tokenSource: 'env:ARTIUM_SECRET_0', identity: 'hosted-canary' }
+      await runCase('AC-HOST/version', ['proxmox-axi', 'get', '/version', '--format', 'json'], clientEnvironment, hostExpected, success, client)
+      await runCase('AC-HOST/401', ['proxmox-axi', 'get', '/version', '--format', 'json'], clientEnvironment,
+        { exitCode: 1, requests: 1, error: 'AUTH_REQUIRED', identity: 'hosted-canary' }, denied, client)
+      await runCase('AC-HOST/invalid-shape', ['proxmox-axi', 'get', '/version', '--format', 'json'], clientEnvironment,
+        { exitCode: 1, requests: 1, error: 'INVALID_RESPONSE', identity: 'hosted-canary' }, { httpStatus: 200, body: { data: null } }, client)
+      const snapshot = hostMessage(hostChild, 'snapshot')
+      hostChild.send('snapshot')
+      result.host.evidence = await snapshot
+      assert.deepEqual(result.host.evidence.callsRemaining, [], 'Actual runner cleans its private call directories')
+      assert.deepEqual(result.host.evidence.audit.filter(row => row.event === 'run-terminal').map(row => row.exit_code), [0, 1, 1], 'Actual host audit records public command outcomes')
+      result.host.status = 'pass'
+      result.outcomes = result.outcomes.filter(row => row.journey !== 'artium')
+      for (const id of ['AC-HOST', 'AC-VERSION-AUTH', 'AC-VERIFIED-VERSION', 'CRED-05', 'CRED-19', 'CRED-21']) {
+        result.outcomes.push({ id, journey: 'artium', status: 'pass', basis: 'Actual public client/server/runner with private injected artium profile and distinct vendor canary' })
+      }
+    }
     result.status = 'pass'
-    result.scope = 'Standalone subset only; full S1.1 remains pending.'
+    result.scope = hostInput ? 'S1.1 through both journeys using the unmerged admission fixture; stock Artium is unsupported.' : 'Standalone subset only; full S1.1 requires --through both.'
   } catch (error) {
     result.failure = publicText(error.message)
     process.exitCode = 1
   } finally {
+    if (hostChild && hostChild.exitCode === null && hostChild.signalCode === null) {
+      const stopped = new Promise(resolve => hostChild.once('close', resolve))
+      if (hostChild.connected) hostChild.send('stop')
+      else hostChild.kill('SIGTERM')
+      await stopped
+    }
     if (server) await new Promise(resolve => { server.close(resolve); server.closeAllConnections() })
     await writeFile(join(out, 'result.json'), publicText(`${JSON.stringify(result, null, 2)}\n`))
     await writeFile(join(out, 'requests.jsonl'), ledger.map(row => JSON.stringify(row)).join('\n') + (ledger.length ? '\n' : ''))
     await save(join(out, 'tls-errors.json'), tlsErrors)
+    await writeFile(join(out, 'host-startup.txt'), publicText(Buffer.concat(hostLogs).toString()))
     await writeFile(join(out, 'public-output.txt'), publicText(transcripts.join('\n')))
     await rm(scratch, { recursive: true, force: true })
   }

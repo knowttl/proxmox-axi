@@ -1,8 +1,8 @@
 # proxmox-axi
 
 AXI-standard agent-facing CLI for Proxmox VE.
-This build provides the standalone portion of S1.1: an authenticated version read through the installed package.
-Actual Artium client/server admission is pending and full S1.1 has not passed.
+This build provides S1.1: an authenticated version read through the installed package, standalone and through an actual local Artium client/server/runner.
+Hosted verification uses an explicitly approved, unmerged temporary admission fixture; stock Artium remains unsupported.
 Other API operations, session authentication and writes are not admitted in this build.
 
 Use Node 24.14.0 and pnpm 10.22.0.
@@ -17,6 +17,9 @@ pnpm build
 node bin/proxmox-axi.mjs get --help
 node bin/proxmox-axi.mjs --version
 pnpm lint
+# Select the externally prepared, pinned local admission fixture before tests.
+export PROXMOX_AXI_ARTIUM_FIXTURE=/absolute/path/to/prepared/artium
+export PROXMOX_AXI_ARTIUM_MANIFEST=/absolute/path/to/captured/manifest.json
 pnpm test
 ```
 
@@ -67,7 +70,16 @@ Transport diagnostics observe Node's error channel without replacing HTTP or TLS
 Set `PROXMOX_AXI_TEST_FAILURE_DIR` to an external directory to preserve sanitized evidence when a test fails.
 The two sanitized captures under `evidence/` are byte-preserved; their provenance and hashes are listed in `evidence/README.md`.
 
-`--through both` runs the standalone checks and then fails explicitly because actual Artium admission is pending.
-An adapter substitute cannot satisfy that selection.
-The approved host baseline is Artium revision `4fc023c9ff7605980b8d34339b36528aa015c1f1`; the host owner must supply a reviewed admission revision before hosted verification can pass.
+`--through both` requires the two external fixture inputs above and fails if either is missing or its pinned identity differs.
+The selected temporary admission revision is `6d1e406705803a657241295ddf322b4c21fb4ef9`, recorded with the captured manifest digest in `test/artium-fixture.json`.
+Prepare it from an exact `git archive` export, install its frozen dependencies offline, and follow its fixture startup guide in task-owned scratch space.
+For a Git-free export, invoke the host compiler, copy its store migrations into `dist/src/server/store/migrations`, and run `scripts/build-cli.mjs`; its aggregate build wrapper requires Git metadata.
+Keep the manifest snapshot and its original tarballs together outside this repository.
+The manifest's Proxmox archive is used for both journeys, and its executable, admitted runtime sources and runtime package metadata must match the current build.
+The host runs the existing credential store, profile writer, adapter and runner with a synthetic user from its own fixture builder.
+The actual public client authenticates against the listening server and executes the version read over loopback HTTP; the vendor boundary remains trusted HTTPS.
+Evidence includes the host revision, manifest and client digests, startup record, client invocation, real audit outcomes, injected credential-source diagnostics and runner cleanup.
+The hosted canary differs from the standalone token, while a competing developer profile and environment remain present.
+An adapter substitute cannot satisfy this selection.
+Run the full S1.1 check with the same acceptance command above and `--through both`.
 No live Proxmox, deployment, publication or hosted CI is part of these checks.
