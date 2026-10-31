@@ -1,0 +1,13 @@
+{
+  "method": "GET",
+  "origin": "https://pve.example.test:8006",
+  "path": "/api2/json/nodes/node-a/lxc",
+  "headers": {
+    "Accept": "application/json"
+  },
+  "credentialReference": "User-entered read-only API token, value and identity omitted",
+  "bounds": {
+    "maximumResponseBytes": 262144,
+    "socketInactivityTimeoutSeconds": 8
+  }
+}

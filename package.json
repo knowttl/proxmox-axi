@@ -1,6 +1,6 @@
 {
   "name": "@knowttl/proxmox-axi",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "AXI client for Proxmox VE",
   "repository": { "type": "git", "url": "https://github.com/knowttl/proxmox-axi.git" },
   "publishConfig": { "access": "public" },

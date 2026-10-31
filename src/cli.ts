@@ -4,19 +4,21 @@ import { homedir } from 'node:os'
 import { lstat, open } from 'node:fs/promises'
 import { isAbsolute } from 'node:path'
 import { configurationPath, listProfiles, resolveCredentials, type Credentials } from './credentials.js'
-import { executeRead, readVersion } from './transport.js'
-import { buildPath, contracts, parseParameter, selectContract, validateResponse } from './contract.js'
+import { buildPath, contracts, parseParameter, selectContract } from './contract.js'
 import { Failure } from './errors.js'
 import { redact } from './redact.js'
+import { readOperation, doctor } from './reads.js'
+import { presentRead } from './presentation.js'
 import operations from './operations.json' with { type: 'json' }
 
-const flags = ['--config', '--profile', '--format', '--catalogue', '--body-file', '--help']
+const flags = ['--config', '--profile', '--format', '--catalogue', '--body-file', '--limit', '--fields', '--full', '--help']
 const help = {
   purpose: operations[0]!.help,
   usage: 'proxmox-axi get /version [--config <absolute-path>] [--profile <name>] [--format toon|json]',
   flags: ['--config <absolute-path> (default PROXMOX_AXI_CONFIG or OS config path)',
     '--profile <name> (default canonical profile selection)', '--format toon|json (default toon)',
-    '--catalogue legacy-8.2.7|published-current (default legacy-8.2.7)',
+    '--catalogue legacy-8.2.7|published-current (default detect target version; explicit selection is unverified)',
+    '--limit <1-1000> (default 100 display rows)', '--fields <comma-separated names>', '--full (all received rows and fields; 65536-byte cap)',
     '--api-<parameter> <value> (vendor parameter)', '--body-file <absolute-path|-> (JSON, 64 KiB, five seconds)', '--help'],
   examples: ['proxmox-axi get /version', 'proxmox-axi get /version --profile lab --format json'],
 }
@@ -31,6 +33,11 @@ export async function main(args: string[]): Promise<void> {
         text = text.replaceAll(secret, '[REDACTED]')
       }
     }
+    if (Buffer.byteLength(text) > 65536) {
+      process.exitCode = 1
+      const error = { error: { code: 'OUTPUT_LIMIT', message: 'Rendered output exceeds 65536 bytes.' }, help: ['Request fewer rows or fields.'] }
+      text = format === 'json' ? JSON.stringify(error) : encode(error)
+    }
     console.log(text)
   }
   try {
@@ -41,7 +48,7 @@ export async function main(args: string[]): Promise<void> {
       if (!argument.startsWith('-')) { positional.push(argument); continue }
       if (!flags.includes(argument) && !argument.startsWith('--api-')) throw usage('Unknown flag; valid flags: --config, --profile, --format, --catalogue, --body-file, --api-<parameter>, --help.')
       if (/^--api-(?:password|token|ticket|otp|secret|api-key|private-key|vncticket|csrf-prevention-token)$/.test(argument)) throw usage('Secret arguments are not accepted; use a protected credential reference or the operation-specific private input contract.')
-      if (argument === '--help') { options.help = 'true'; continue }
+      if (argument === '--help' || argument === '--full') { options[argument === '--help' ? 'help' : '--full'] = 'true'; continue }
       const value = args[++index]
       if (!value || value.startsWith('--') || (value.startsWith('-') && value !== '-' && !argument.startsWith('--api-'))) throw usage('A flag value is required.')
       if (options[argument]) throw usage('Duplicate flags are not allowed.')
@@ -49,7 +56,16 @@ export async function main(args: string[]): Promise<void> {
     }
     format = options['--format'] ?? 'toon'
     if (!['toon', 'json'].includes(format)) { format = 'toon'; throw usage('Format must be toon or json.') }
+    if (positional[0] === 'help') { positional.shift(); options.help = 'true' }
+    if (positional[0] === 'ls') {
+      if (positional.length === 1) positional.push('/nodes')
+      positional[0] = 'get'
+    }
     const command = positional.join(' ')
+    const limit = Number(options['--limit'] ?? 100)
+    if (!Number.isSafeInteger(limit) || limit < 1 || limit > 1000) throw usage('Display limit must be an integer from 1 to 1000.')
+    const fields = options['--fields']?.split(',')
+    if (fields?.some(field => !/^[a-zA-Z0-9_-]+$/.test(field))) throw usage('Fields must be comma-separated field names.')
     if (options.help && (['inventory', 'schema', 'config path', 'profile list', 'doctor', 'auth status'].includes(command) || positional[0] === 'schema')) {
       const usages: Record<string, string> = {
         inventory: 'inventory [--catalogue <release>] [--format toon|json]',
@@ -79,10 +95,11 @@ export async function main(args: string[]): Promise<void> {
     }
     const release = options['--catalogue'] ?? 'legacy-8.2.7'
     if (command === 'inventory') {
-      if (Object.keys(options).some(key => !['--format', '--catalogue'].includes(key))) throw usage('Invalid inventory option.')
+      if (Object.keys(options).some(key => !['--format', '--catalogue', '--full', '--limit'].includes(key))) throw usage('Invalid inventory option.')
       const selected = contracts.filter(contract => contract.release === release)
       if (!selected.length) throw usage('Unknown catalogue.')
-      output({ release, count: selected.length, operations: selected.map(({ method, path, callable }) => ({ method, path, callable })) })
+      output({ release, count: selected.length, operations: selected.slice(0, options['--full'] ? selected.length : limit).map(({ method, path, callable }) => ({ method, path, callable })),
+        help: ['proxmox-axi inventory --full', 'proxmox-axi schema get /nodes'] })
       return
     }
     if (positional[0] === 'schema' && positional.length === 3) {
@@ -105,6 +122,7 @@ export async function main(args: string[]): Promise<void> {
       return
     }
     const isLocal = ['', 'home', 'auth status', 'doctor'].includes(command)
+    if (isLocal && Object.keys(options).some(key => !['--config', '--profile', '--format'].includes(key))) throw usage('Valid local flags: --config, --profile, --format, --help.')
     const contract = ['', 'home', 'doctor'].includes(command) ? selectContract('GET', '/version', release) :
       isLocal ? undefined : positional.length === 2 ? selectContract(positional[0]!, positional[1]!, release) : undefined
     if (!isLocal && !contract) throw usage('Select a command from inventory.')
@@ -142,21 +160,29 @@ export async function main(args: string[]): Promise<void> {
       values[name] = parseParameter(value, schema)
     }
     if (isLocal && (Object.keys(values).length || options['--body-file'] || options['--catalogue'])) throw usage('Invalid local command option.')
-    if (contract && !contract.callable) throw new Failure('CONTRACT_UNRESOLVED', 'Operation is not admitted by the reviewed policy.', 'Inspect the operation schema and policy before requesting admission.')
+    if (contract && !contract.callable) {
+      if (!options['--catalogue'] && contract.method === 'GET' && !contracts.some(candidate => candidate.release === 'published-current' && candidate.path === contract.path && candidate.method === contract.method)) {
+        throw new Failure('CAPABILITY_UNSUPPORTED', 'Legacy route is absent from the current catalogue.', 'Use proxmox-axi inventory --catalogue published-current to inspect available routes.')
+      }
+      throw new Failure('CONTRACT_UNRESOLVED', 'Operation is not admitted by the reviewed policy.', 'Inspect the operation schema and policy before requesting admission.')
+    }
     const wirePath = contract ? buildPath(contract, values) : undefined
     credentials = await resolveCredentials({ ...(options['--config'] ? { config: options['--config'] } : {}),
       verifyAcl: command === 'auth status' || command === 'doctor',
       ...(options['--profile'] ? { profile: options['--profile'] } : {}) })
     if (command === 'auth status') {
       output({ credential: { ...credentials.diagnostics, origin: credentials.origin, tokenId: credentials.tokenId } })
+    } else if (command === 'doctor') {
+      output(redact(await doctor(credentials), [credentials.token]) as Record<string, unknown>)
     } else {
-      const requestPath = wirePath ?? buildPath(selectContract('GET', '/version', release), {})
-      const data = !contract || contract.path === '/version' ? await readVersion(credentials, requestPath) : await executeRead(credentials, requestPath)
-      if (contract && contract.path !== '/version') validateResponse(data, contract.returns)
-      const safeData = redact(data, [credentials.token])
+      const selected = contract ?? selectContract('GET', '/version', release)
+      const result = await readOperation(credentials, selected, values, options['--catalogue'])
+      const nextOptions = ['--config', '--profile', '--catalogue'].filter(key => options[key]).map(key => `${key} ${JSON.stringify(options[key])}`).join(' ')
+      const next = `proxmox-axi schema get ${selected.path} ${nextOptions}`.trim()
+      const safeData = redact(presentRead(result, selected.path, { limit, full: !!options['--full'], ...(fields ? { fields } : {}), next }), [credentials.token]) as Record<string, unknown>
       output({ ...(['', 'home'].includes(command) ? { bin: fileURLToPath(new URL('../bin/proxmox-axi.mjs', import.meta.url)).replace(homedir(), '~'),
-        description: 'Read Proxmox VE server information.' } : {}),
-        ...(!contract || contract.path === '/version' ? { version: safeData } : { data: safeData }), credential: credentials.diagnostics })
+        description: 'Read Proxmox VE inventory and task information.', help: ['proxmox-axi ls', 'proxmox-axi doctor', 'proxmox-axi inventory'] } : {}),
+        ...(selected.path === '/version' ? { version: safeData.data, compatibility: safeData.compatibility } : safeData), credential: credentials.diagnostics })
     }
   } catch (error) {
     const failure = error instanceof Failure ? error : new Failure('CONFIG_INVALID', 'Unable to read the selected configuration.', 'Check the selected configuration and protected file paths.')

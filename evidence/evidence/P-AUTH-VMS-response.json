@@ -1,0 +1,10 @@
+{
+  "httpStatus": 200,
+  "headers": {
+    "Content-Type": "application/json;charset=UTF-8"
+  },
+  "body": {
+    "data": []
+  },
+  "interpretation": "Observed response under this token. Effective permissions were not captured, so full inventory visibility remains unverified."
+}

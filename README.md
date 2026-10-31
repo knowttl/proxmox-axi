@@ -3,7 +3,7 @@
 AXI-standard agent-facing CLI for Proxmox VE.
 This build provides canonical API-token credentials, bounded trusted HTTPS, and versioned invocation discovery for the 681-route Proxmox API union.
 Hosted verification uses an explicitly approved, unmerged temporary admission fixture; stock Artium remains unsupported.
-Nine ordinary read routes have reviewed admission policy.
+Eleven ordinary read routes have reviewed admission policy.
 Other operations remain discoverable but uncallable until their effects, transport and secret handling are reviewed.
 Session authentication, writes, downloads and duplex transports remain deferred.
 
@@ -56,7 +56,7 @@ A token reference is exactly `{ "env": "VARIABLE_NAME" }` or `{ "file": "/absolu
 An omitted reference defaults to `{ "env": "PROXMOX_AXI_TOKEN" }`.
 `auth status` reports the selected sources without their secret values and sends no request.
 `config path` reports the canonical configuration path, and `profile list` lists profile names without resolving secrets.
-`doctor` verifies file protection and performs one bounded version read.
+`doctor` verifies file protection and checks the entry version, permissions and node inventory, then checks the first returned node's version, VMs, containers, stores, tasks and one task status when available, in at most nine bounded reads.
 The tool never reads baseline clients' configuration or writes credential files.
 Private files use one bounded reader and atomic replacement module.
 Linux checks ownership and modes before reading through a checked file descriptor.
@@ -74,7 +74,7 @@ They contain 605 legacy 8.2.7 routes and 680 published-current routes, with a 68
 The current documentation capture is bound to documentation version 9.2.13, rather than a live-tested server patch.
 `src/operation-policy.json` owns admission decisions and binds them to those exact capture hashes.
 Unresolved policy fields deny invocation, and changing a capture never admits new operations automatically.
-`src/operations.json` owns the version output projection.
+`src/operations.json` owns required version fields and version help metadata.
 `src/profile-schema.json` owns the current profile contract and runtime validation.
 `pnpm generate` replays both captures and generates inventory, help, invocation schemas, a release diff and the shipped credential schema.
 `pnpm lint` rejects stale output.
@@ -84,7 +84,27 @@ Never edit generated files by hand.
 proxmox-axi inventory --catalogue legacy-8.2.7 --format json
 proxmox-axi schema get '/nodes/{node}/tasks' --catalogue published-current --format json
 proxmox-axi get '/nodes/{node}/tasks' --api-node pve-test --api-limit 10
+proxmox-axi ls '/nodes/{node}/qemu' --api-node pve-test --fields vmid,name,status --limit 20
+proxmox-axi doctor --format json
 ```
+
+Ordinary reads other than `/version` detect the entry version and, for node-specific routes, the selected node version before choosing a catalogue.
+The published 9.2 schema is supported at the contract level; live commissioning remains pending.
+Versions outside 9.2 are labelled unverified, and all writes remain disabled.
+An explicit `--catalogue` selects a replay contract without version detection; inventory visibility remains unknown.
+Before admitting a new schema, compare captures offline with `node scripts/compare-capture.mjs /absolute/previous.txt /absolute/candidate.txt`.
+The comparison parses the JSON schema without executing JavaScript, reports changed contracts and capture hashes, and never updates admission policy or pins.
+Automatic inventory reads check effective root audit permissions and report `complete` or `permission-filtered` visibility.
+Scoped privileges may provide useful rows but do not establish complete inventory.
+An empty filtered or unverified result never establishes that no resources exist.
+
+TOON is the default; `--format json` preserves the same structured result.
+`ls` is an alias for `get` and defaults to `/nodes` when no path is supplied.
+Lists default to 100 compact rows; `--limit <1-1000>` changes the display limit, `--fields` chooses fields and `--full` includes all received rows and, unless `--fields` is supplied, all received fields.
+Provider totals and pagination remain separate from received counts and display truncation.
+Rendered output has a 65536-byte cap, including full output.
+HTTP 404 reports `NOT_FOUND_OR_HIDDEN`, since absence and hidden resources cannot be distinguished safely.
+Offline `help`, `inventory`, `schema`, `profile list` and `config path` require no credential values.
 
 Invocation paths use catalogue templates and exactly-once parameter encoding.
 Vendor parameters have their own `--api-` namespace, so `--api-format` is distinct from the CLI's output `--format`.
@@ -105,15 +125,17 @@ Package installation can fetch dependencies before the isolated product journeys
 pnpm verify:acceptance -- --task S1.1 --pack /absolute/path/to/pack --out /absolute/new/run/S1.1 --network fake-only --through standalone
 pnpm verify:acceptance -- --task S1.2 --pack /absolute/path/to/pack --out /absolute/new/run/S1.2 --network fake-only --through both --repeat-through S1
 pnpm verify:acceptance -- --task S2.1 --pack /absolute/path/to/pack --out /absolute/new/run/S2.1 --network fake-only --through both --all-route-variants --available-through S2 --repeat-through S1
+pnpm verify:acceptance -- --task S2.2 --pack /absolute/path/to/pack --out /absolute/new/run/S2.2 --network fake-only --through both --repeat-through S2
+pnpm verify:acceptance -- --task S2.3 --pack /absolute/path/to/pack --out /absolute/new/run/S2.3 --network fake-only --through both --repeat-through S2
 ```
 
-Use this repository's `evidence` directory or the complete approved evidence pack for `--pack`.
+Use this repository's `evidence` directory for `--pack`; the normalized read captures are bound by the retained manifest.
 Create the parent run directory first; the task output directory must be new and outside the checkout.
 The driver verifies retained fixture hashes and records package integrity, fixture identity, sanitized public transcripts, case outcomes and the fake request ledger.
 Private scratch state and canary values are removed before it returns.
 Transport diagnostics observe Node's error channel without replacing HTTP or TLS behavior and retain only error codes and timings.
 Set `PROXMOX_AXI_TEST_FAILURE_DIR` to an external directory to preserve sanitized evidence when a test fails.
-The two sanitized captures under `evidence/` are byte-preserved; their provenance and hashes are listed in `evidence/README.md`.
+The retained sanitized captures and their formatting provenance are described in `evidence/README.md`.
 
 `pnpm test` always runs native and offline tests, including rejection of an explicitly requested hosted journey with missing fixture inputs.
 Actual Artium tests are opt-in: without `PROXMOX_AXI_ARTIUM_FIXTURE`, they skip with the reason `Artium fixture not supplied`.

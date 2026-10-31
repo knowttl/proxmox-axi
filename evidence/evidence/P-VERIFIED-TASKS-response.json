@@ -1,0 +1,24 @@
+{
+  "httpStatus": 200,
+  "headers": {
+    "Content-Type": "application/json;charset=UTF-8"
+  },
+  "body": {
+    "total": 951,
+    "data": [
+      {
+        "status": "OK",
+        "id": "",
+        "user": "root@pam",
+        "type": "aptupdate",
+        "pid": 1,
+        "node": "node-a",
+        "starttime": 1793352146,
+        "endtime": 1793352148,
+        "pstart": 2,
+        "upid": "UPID:node-a:00000001:00000002:6AE461D2:aptupdate::root@pam:"
+      }
+    ]
+  },
+  "interpretation": "Observed token response after propagated audit privileges were verified. This verifies this sample, not every operation or server release."
+}

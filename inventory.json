@@ -13019,23 +13019,23 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "read",
+            "transport": "json",
+            "secrets": "none",
+            "reason": "Retained numbered task log; bounded JSON response and redacted output."
           },
           "contract": "dist/contracts.json#/contracts/580"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "read",
+            "transport": "json",
+            "secrets": "none",
+            "reason": "Retained numbered task log; bounded JSON response and redacted output."
           },
           "contract": "dist/contracts.json#/contracts/1260"
         }
@@ -13118,23 +13118,23 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "read",
+            "transport": "json",
+            "secrets": "none",
+            "reason": "Selected node version metadata for mixed-cluster contract selection."
           },
           "contract": "dist/contracts.json#/contracts/585"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "read",
+            "transport": "json",
+            "secrets": "none",
+            "reason": "Selected node version metadata for mixed-cluster contract selection."
           },
           "contract": "dist/contracts.json#/contracts/1265"
         }

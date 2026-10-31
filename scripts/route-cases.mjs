@@ -35,7 +35,8 @@ export function* routeCases(catalogues, policy) {
       else if (schema.type === 'integer') variants.push({ branch: `${name}=minimum`, values: { ...values, [name]: schema.minimum ?? 1 } })
     }
     for (const variant of variants) {
-      const args = [operation.method.toLowerCase(), operation.path, '--catalogue', catalogue.release, '--format', 'json']
+      const args = [operation.method.toLowerCase(), operation.path, '--catalogue', catalogue.release, '--format', 'json', '--full']
+      const response = operation.path.endsWith('/version') ? { version: '8.2.7', release: '8.2', repoid: '3e0176e6bb2ade3b' } : responseFixture(operation.returns ?? {})
       if (callable) for (const [name, value] of Object.entries(variant.values)) args.push(`--api-${name}`, String(value))
       let path = operation.path
       const query = []
@@ -47,7 +48,7 @@ export function* routeCases(catalogues, policy) {
       }
       yield { id: `${catalogue.release}/${routeKey(operation)}/${variant.branch}`, operation, release: catalogue.release, callable, args,
         values: variant.values,
-        response: responseFixture(operation.returns ?? {}),
+        response,
         expectedPath: `/api2/json${path}${query.length ? `?${query.join('&')}` : ''}` }
     }
   }

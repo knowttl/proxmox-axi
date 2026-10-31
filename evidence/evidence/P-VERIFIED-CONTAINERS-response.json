@@ -1,0 +1,32 @@
+{
+  "httpStatus": 200,
+  "headers": {
+    "Content-Type": "application/json;charset=UTF-8"
+  },
+  "body": {
+    "data": [
+      {
+        "pid": 10001,
+        "diskread": 1227141120,
+        "maxswap": 536870912,
+        "netin": 110382948,
+        "swap": 0,
+        "disk": 7841710080,
+        "name": "guest-1008",
+        "cpu": 0,
+        "netout": 7127765,
+        "vmid": 1008,
+        "tags": "tag-2",
+        "diskwrite": 14487552,
+        "maxmem": 4294967296,
+        "cpus": 2,
+        "status": "running",
+        "maxdisk": 33501757440,
+        "type": "lxc",
+        "mem": 284569600,
+        "uptime": 66917
+      }
+    ]
+  },
+  "interpretation": "Observed token response after propagated audit privileges were verified. This verifies this sample, not every operation or server release."
+}

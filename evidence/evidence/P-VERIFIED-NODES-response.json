@@ -1,0 +1,26 @@
+{
+  "httpStatus": 200,
+  "headers": {
+    "Content-Type": "application/json;charset=UTF-8"
+  },
+  "body": {
+    "data": [
+      {
+        "node": "node-a",
+        "type": "node",
+        "uptime": 67003,
+        "maxdisk": 134682742784,
+        "mem": 54532235264,
+        "cpu": 0.373351010938018,
+        "ssl_fingerprint": "11:11:11:11:11:11:11:11:11:11:11:11:11:11:11:11:11:11:11:11:11:11:11:11:11:11:11:11:11:11:11:11",
+        "id": "node/node-a",
+        "status": "online",
+        "maxcpu": 16,
+        "disk": 57531211776,
+        "maxmem": 67335008256,
+        "level": "p"
+      }
+    ]
+  },
+  "interpretation": "Observed token response after propagated audit privileges were verified. This verifies this sample, not every operation or server release."
+}

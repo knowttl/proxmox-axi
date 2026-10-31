@@ -6,7 +6,7 @@ import type { Credentials } from './credentials.js'
 import { Failure } from './errors.js'
 import operations from './operations.json' with { type: 'json' }
 
-export async function executeRead(credentials: Credentials, wirePath: string): Promise<unknown> {
+export async function executeRead(credentials: Credentials, wirePath: string, envelope = false): Promise<unknown> {
   if (!wirePath.startsWith('/api2/json/') || wirePath.includes('#')) throw new Failure('INVALID_INPUT', 'Invalid API path.', 'Select a reviewed API operation.', 2)
   const body = await new Promise<string>((resolve, reject) => {
     const fail = (error: Error) => reject(error instanceof Failure ? error :
@@ -46,8 +46,8 @@ export async function executeRead(credentials: Credentials, wirePath: string): P
       response.on('error', fail)
       const status = response.statusCode ?? 0
       if (status !== 200) {
-        response.resume()
-        reject(new Failure(status === 401 ? 'AUTH_REQUIRED' : status === 403 ? 'PERMISSION_DENIED' : 'HTTP_ERROR',
+        response.destroy()
+        reject(new Failure(status === 401 ? 'AUTH_REQUIRED' : status === 403 ? 'PERMISSION_DENIED' : status === 404 ? 'NOT_FOUND_OR_HIDDEN' : 'HTTP_ERROR',
           `Request returned HTTP ${status}.`, 'Check the configured identity and its permission to read the selected operation.'))
         return
       }
@@ -67,8 +67,9 @@ export async function executeRead(credentials: Credentials, wirePath: string): P
   let value: unknown
   try { value = JSON.parse(body) } catch { throw invalidResponse() }
   if (!value || typeof value !== 'object' || Array.isArray(value) || !('data' in value)) throw invalidResponse()
+  if ('total' in value && (!Number.isSafeInteger(value.total) || Number(value.total) < 0 || (Array.isArray(value.data) && Number(value.total) < value.data.length))) throw invalidResponse()
   const data: unknown = value.data
-  return data
+  return envelope ? value : data
 }
 
 export async function readVersion(credentials: Credentials, wirePath: string): Promise<Record<string, string>> {
@@ -77,7 +78,7 @@ export async function readVersion(credentials: Credentials, wirePath: string): P
   if (!data || typeof data !== 'object' || Array.isArray(data)) throw invalidResponse()
   const fields = data as Record<string, unknown>
   if (operation.requiredResponseFields.some(field => typeof fields[field] !== 'string' || !fields[field])) throw invalidResponse()
-  return Object.fromEntries(operation.requiredResponseFields.map(field => [field, fields[field] as string]))
+  return fields as Record<string, string>
 }
 
 function invalidResponse(): Failure {
