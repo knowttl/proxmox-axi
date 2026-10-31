@@ -1,0 +1,1542 @@
+{
+  "added": [
+    "POST /access/vncticket",
+    "GET /cluster/bulk-action",
+    "GET /cluster/bulk-action/guest",
+    "POST /cluster/bulk-action/guest/migrate",
+    "POST /cluster/bulk-action/guest/shutdown",
+    "POST /cluster/bulk-action/guest/start",
+    "POST /cluster/bulk-action/guest/suspend",
+    "GET /cluster/ceph/health-mute",
+    "PUT /cluster/ceph/health-mute/{code}",
+    "POST /cluster/ceph/restart-bulk",
+    "GET /cluster/ha/rules",
+    "POST /cluster/ha/rules",
+    "DELETE /cluster/ha/rules/{rule}",
+    "GET /cluster/ha/rules/{rule}",
+    "PUT /cluster/ha/rules/{rule}",
+    "POST /cluster/ha/status/arm-ha",
+    "POST /cluster/ha/status/disarm-ha",
+    "GET /cluster/qemu",
+    "GET /cluster/qemu/cpu-flags",
+    "GET /cluster/qemu/custom-cpu-models",
+    "POST /cluster/qemu/custom-cpu-models",
+    "DELETE /cluster/qemu/custom-cpu-models/{cputype}",
+    "GET /cluster/qemu/custom-cpu-models/{cputype}",
+    "PUT /cluster/qemu/custom-cpu-models/{cputype}",
+    "GET /cluster/sdn/dry-run",
+    "GET /cluster/sdn/fabrics",
+    "GET /cluster/sdn/fabrics/all",
+    "GET /cluster/sdn/fabrics/fabric",
+    "POST /cluster/sdn/fabrics/fabric",
+    "DELETE /cluster/sdn/fabrics/fabric/{id}",
+    "GET /cluster/sdn/fabrics/fabric/{id}",
+    "PUT /cluster/sdn/fabrics/fabric/{id}",
+    "GET /cluster/sdn/fabrics/node",
+    "GET /cluster/sdn/fabrics/node/{fabric_id}",
+    "POST /cluster/sdn/fabrics/node/{fabric_id}",
+    "DELETE /cluster/sdn/fabrics/node/{fabric_id}/{node_id}",
+    "GET /cluster/sdn/fabrics/node/{fabric_id}/{node_id}",
+    "PUT /cluster/sdn/fabrics/node/{fabric_id}/{node_id}",
+    "DELETE /cluster/sdn/lock",
+    "POST /cluster/sdn/lock",
+    "GET /cluster/sdn/prefix-lists",
+    "POST /cluster/sdn/prefix-lists",
+    "DELETE /cluster/sdn/prefix-lists/{id}",
+    "GET /cluster/sdn/prefix-lists/{id}",
+    "PUT /cluster/sdn/prefix-lists/{id}",
+    "GET /cluster/sdn/prefix-lists/{id}/entries",
+    "POST /cluster/sdn/prefix-lists/{id}/entries",
+    "DELETE /cluster/sdn/prefix-lists/{id}/entries/{url_seq}",
+    "GET /cluster/sdn/prefix-lists/{id}/entries/{url_seq}",
+    "PUT /cluster/sdn/prefix-lists/{id}/entries/{url_seq}",
+    "POST /cluster/sdn/rollback",
+    "GET /cluster/sdn/route-maps",
+    "GET /cluster/sdn/route-maps/entries",
+    "POST /cluster/sdn/route-maps/entries",
+    "GET /cluster/sdn/route-maps/entries/{route-map-id}",
+    "DELETE /cluster/sdn/route-maps/entries/{route-map-id}/entry/{order}",
+    "GET /cluster/sdn/route-maps/entries/{route-map-id}/entry/{order}",
+    "PUT /cluster/sdn/route-maps/entries/{route-map-id}/entry/{order}",
+    "GET /nodes/{node}/capabilities/qemu/cpu-flags",
+    "GET /nodes/{node}/capabilities/qemu/migration",
+    "DELETE /nodes/{node}/ceph/fs/{name}",
+    "GET /nodes/{node}/ceph/releases",
+    "POST /nodes/{node}/ceph/restart-bulk",
+    "GET /nodes/{node}/lxc/{vmid}/migrate",
+    "POST /nodes/{node}/qemu/{vmid}/dbus-vmstate",
+    "GET /nodes/{node}/query-oci-repo-tags",
+    "GET /nodes/{node}/sdn/fabrics/{fabric}",
+    "GET /nodes/{node}/sdn/fabrics/{fabric}/interfaces",
+    "GET /nodes/{node}/sdn/fabrics/{fabric}/neighbors",
+    "GET /nodes/{node}/sdn/fabrics/{fabric}/routes",
+    "GET /nodes/{node}/sdn/vnets/{vnet}",
+    "GET /nodes/{node}/sdn/vnets/{vnet}/mac-vrf",
+    "GET /nodes/{node}/sdn/zones/{zone}/bridges",
+    "GET /nodes/{node}/sdn/zones/{zone}/ip-vrf",
+    "GET /nodes/{node}/storage/{storage}/identity",
+    "POST /nodes/{node}/storage/{storage}/oci-registry-pull"
+  ],
+  "removed": [
+    "GET /nodes/{node}/scan/glusterfs"
+  ],
+  "changed": [
+    {
+      "route": "POST /access/domains",
+      "fields": [
+        "parameters"
+      ]
+    },
+    {
+      "route": "PUT /access/domains/{realm}",
+      "fields": [
+        "parameters"
+      ]
+    },
+    {
+      "route": "GET /access/roles/{roleid}",
+      "fields": [
+        "returns"
+      ]
+    },
+    {
+      "route": "PUT /access/users/{userid}/token/{tokenid}",
+      "fields": [
+        "parameters",
+        "returns"
+      ]
+    },
+    {
+      "route": "GET /cluster/acme/plugins",
+      "fields": [
+        "returns"
+      ]
+    },
+    {
+      "route": "POST /cluster/acme/plugins",
+      "fields": [
+        "parameters"
+      ]
+    },
+    {
+      "route": "GET /cluster/acme/plugins/{id}",
+      "fields": [
+        "returns"
+      ]
+    },
+    {
+      "route": "PUT /cluster/acme/plugins/{id}",
+      "fields": [
+        "parameters"
+      ]
+    },
+    {
+      "route": "GET /cluster/backup",
+      "fields": [
+        "returns"
+      ]
+    },
+    {
+      "route": "POST /cluster/backup",
+      "fields": [
+        "parameters"
+      ]
+    },
+    {
+      "route": "GET /cluster/backup/{id}",
+      "fields": [
+        "returns"
+      ]
+    },
+    {
+      "route": "PUT /cluster/backup/{id}",
+      "fields": [
+        "parameters"
+      ]
+    },
+    {
+      "route": "GET /cluster/ceph/metadata",
+      "fields": [
+        "parameters",
+        "returns"
+      ]
+    },
+    {
+      "route": "POST /cluster/config",
+      "fields": [
+        "parameters"
+      ]
+    },
+    {
+      "route": "POST /cluster/firewall/aliases",
+      "fields": [
+        "parameters"
+      ]
+    },
+    {
+      "route": "PUT /cluster/firewall/aliases/{name}",
+      "fields": [
+        "parameters"
+      ]
+    },
+    {
+      "route": "GET /cluster/firewall/groups",
+      "fields": [
+        "returns"
+      ]
+    },
+    {
+      "route": "POST /cluster/firewall/groups",
+      "fields": [
+        "parameters"
+      ]
+    },
+    {
+      "route": "GET /cluster/firewall/groups/{group}",
+      "fields": [
+        "returns"
+      ]
+    },
+    {
+      "route": "POST /cluster/firewall/groups/{group}",
+      "fields": [
+        "parameters"
+      ]
+    },
+    {
+      "route": "GET /cluster/firewall/groups/{group}/{pos}",
+      "fields": [
+        "returns"
+      ]
+    },
+    {
+      "route": "PUT /cluster/firewall/groups/{group}/{pos}",
+      "fields": [
+        "parameters"
+      ]
+    },
+    {
+      "route": "POST /cluster/firewall/ipset",
+      "fields": [
+        "parameters"
+      ]
+    },
+    {
+      "route": "POST /cluster/firewall/ipset/{name}",
+      "fields": [
+        "parameters"
+      ]
+    },
+    {
+      "route": "PUT /cluster/firewall/ipset/{name}/{cidr}",
+      "fields": [
+        "parameters"
+      ]
+    },
+    {
+      "route": "GET /cluster/firewall/options",
+      "fields": [
+        "returns"
+      ]
+    },
+    {
+      "route": "PUT /cluster/firewall/options",
+      "fields": [
+        "parameters"
+      ]
+    },
+    {
+      "route": "GET /cluster/firewall/refs",
+      "fields": [
+        "returns"
+      ]
+    },
+    {
+      "route": "GET /cluster/firewall/rules",
+      "fields": [
+        "returns"
+      ]
+    },
+    {
+      "route": "POST /cluster/firewall/rules",
+      "fields": [
+        "parameters"
+      ]
+    },
+    {
+      "route": "GET /cluster/firewall/rules/{pos}",
+      "fields": [
+        "returns"
+      ]
+    },
+    {
+      "route": "PUT /cluster/firewall/rules/{pos}",
+      "fields": [
+        "parameters"
+      ]
+    },
+    {
+      "route": "POST /cluster/ha/groups",
+      "fields": [
+        "parameters"
+      ]
+    },
+    {
+      "route": "PUT /cluster/ha/groups/{group}",
+      "fields": [
+        "parameters"
+      ]
+    },
+    {
+      "route": "POST /cluster/ha/resources",
+      "fields": [
+        "parameters"
+      ]
+    },
+    {
+      "route": "DELETE /cluster/ha/resources/{sid}",
+      "fields": [
+        "parameters"
+      ]
+    },
+    {
+      "route": "GET /cluster/ha/resources/{sid}",
+      "fields": [
+        "returns"
+      ]
+    },
+    {
+      "route": "PUT /cluster/ha/resources/{sid}",
+      "fields": [
+        "parameters"
+      ]
+    },
+    {
+      "route": "POST /cluster/ha/resources/{sid}/migrate",
+      "fields": [
+        "returns"
+      ]
+    },
+    {
+      "route": "POST /cluster/ha/resources/{sid}/relocate",
+      "fields": [
+        "returns"
+      ]
+    },
+    {
+      "route": "GET /cluster/ha/status/current",
+      "fields": [
+        "returns"
+      ]
+    },
+    {
+      "route": "GET /cluster/log",
+      "fields": [
+        "permissions"
+      ]
+    },
+    {
+      "route": "POST /cluster/mapping/pci",
+      "fields": [
+        "parameters"
+      ]
+    },
+    {
+      "route": "PUT /cluster/mapping/pci/{id}",
+      "fields": [
+        "parameters"
+      ]
+    },
+    {
+      "route": "GET /cluster/metrics/export",
+      "fields": [
+        "parameters",
+        "protected",
+        "vendorMetadata"
+      ]
+    },
+    {
+      "route": "POST /cluster/metrics/server/{id}",
+      "fields": [
+        "parameters"
+      ]
+    },
+    {
+      "route": "PUT /cluster/metrics/server/{id}",
+      "fields": [
+        "parameters"
+      ]
+    },
+    {
+      "route": "GET /cluster/options",
+      "fields": [
+        "returns"
+      ]
+    },
+    {
+      "route": "PUT /cluster/options",
+      "fields": [
+        "parameters"
+      ]
+    },
+    {
+      "route": "GET /cluster/replication",
+      "fields": [
+        "returns"
+      ]
+    },
+    {
+      "route": "POST /cluster/replication",
+      "fields": [
+        "permissions"
+      ]
+    },
+    {
+      "route": "DELETE /cluster/replication/{id}",
+      "fields": [
+        "permissions"
+      ]
+    },
+    {
+      "route": "GET /cluster/replication/{id}",
+      "fields": [
+        "returns"
+      ]
+    },
+    {
+      "route": "PUT /cluster/replication/{id}",
+      "fields": [
+        "permissions"
+      ]
+    },
+    {
+      "route": "GET /cluster/resources",
+      "fields": [
+        "returns"
+      ]
+    },
+    {
+      "route": "PUT /cluster/sdn",
+      "fields": [
+        "parameters"
+      ]
+    },
+    {
+      "route": "GET /cluster/sdn/controllers",
+      "fields": [
+        "returns"
+      ]
+    },
+    {
+      "route": "POST /cluster/sdn/controllers",
+      "fields": [
+        "parameters"
+      ]
+    },
+    {
+      "route": "DELETE /cluster/sdn/controllers/{controller}",
+      "fields": [
+        "parameters"
+      ]
+    },
+    {
+      "route": "GET /cluster/sdn/controllers/{controller}",
+      "fields": [
+        "parameters",
+        "returns"
+      ]
+    },
+    {
+      "route": "PUT /cluster/sdn/controllers/{controller}",
+      "fields": [
+        "parameters"
+      ]
+    },
+    {
+      "route": "POST /cluster/sdn/dns",
+      "fields": [
+        "parameters"
+      ]
+    },
+    {
+      "route": "DELETE /cluster/sdn/dns/{dns}",
+      "fields": [
+        "parameters"
+      ]
+    },
+    {
+      "route": "GET /cluster/sdn/dns/{dns}",
+      "fields": [
+        "parameters"
+      ]
+    },
+    {
+      "route": "PUT /cluster/sdn/dns/{dns}",
+      "fields": [
+        "parameters"
+      ]
+    },
+    {
+      "route": "POST /cluster/sdn/ipams",
+      "fields": [
+        "parameters"
+      ]
+    },
+    {
+      "route": "DELETE /cluster/sdn/ipams/{ipam}",
+      "fields": [
+        "parameters"
+      ]
+    },
+    {
+      "route": "GET /cluster/sdn/ipams/{ipam}",
+      "fields": [
+        "parameters"
+      ]
+    },
+    {
+      "route": "PUT /cluster/sdn/ipams/{ipam}",
+      "fields": [
+        "parameters"
+      ]
+    },
+    {
+      "route": "GET /cluster/sdn/ipams/{ipam}/status",
+      "fields": [
+        "parameters"
+      ]
+    },
+    {
+      "route": "GET /cluster/sdn/vnets",
+      "fields": [
+        "returns"
+      ]
+    },
+    {
+      "route": "POST /cluster/sdn/vnets",
+      "fields": [
+        "parameters"
+      ]
+    },
+    {
+      "route": "DELETE /cluster/sdn/vnets/{vnet}",
+      "fields": [
+        "parameters"
+      ]
+    },
+    {
+      "route": "GET /cluster/sdn/vnets/{vnet}",
+      "fields": [
+        "parameters",
+        "returns"
+      ]
+    },
+    {
+      "route": "PUT /cluster/sdn/vnets/{vnet}",
+      "fields": [
+        "parameters"
+      ]
+    },
+    {
+      "route": "GET /cluster/sdn/vnets/{vnet}/firewall",
+      "fields": [
+        "parameters"
+      ]
+    },
+    {
+      "route": "GET /cluster/sdn/vnets/{vnet}/firewall/options",
+      "fields": [
+        "parameters"
+      ]
+    },
+    {
+      "route": "PUT /cluster/sdn/vnets/{vnet}/firewall/options",
+      "fields": [
+        "parameters"
+      ]
+    },
+    {
+      "route": "GET /cluster/sdn/vnets/{vnet}/firewall/rules",
+      "fields": [
+        "parameters",
+        "returns"
+      ]
+    },
+    {
+      "route": "POST /cluster/sdn/vnets/{vnet}/firewall/rules",
+      "fields": [
+        "parameters"
+      ]
+    },
+    {
+      "route": "DELETE /cluster/sdn/vnets/{vnet}/firewall/rules/{pos}",
+      "fields": [
+        "parameters"
+      ]
+    },
+    {
+      "route": "GET /cluster/sdn/vnets/{vnet}/firewall/rules/{pos}",
+      "fields": [
+        "parameters",
+        "returns"
+      ]
+    },
+    {
+      "route": "PUT /cluster/sdn/vnets/{vnet}/firewall/rules/{pos}",
+      "fields": [
+        "parameters"
+      ]
+    },
+    {
+      "route": "DELETE /cluster/sdn/vnets/{vnet}/ips",
+      "fields": [
+        "parameters"
+      ]
+    },
+    {
+      "route": "POST /cluster/sdn/vnets/{vnet}/ips",
+      "fields": [
+        "parameters"
+      ]
+    },
+    {
+      "route": "PUT /cluster/sdn/vnets/{vnet}/ips",
+      "fields": [
+        "parameters"
+      ]
+    },
+    {
+      "route": "GET /cluster/sdn/vnets/{vnet}/subnets",
+      "fields": [
+        "parameters"
+      ]
+    },
+    {
+      "route": "POST /cluster/sdn/vnets/{vnet}/subnets",
+      "fields": [
+        "parameters"
+      ]
+    },
+    {
+      "route": "DELETE /cluster/sdn/vnets/{vnet}/subnets/{subnet}",
+      "fields": [
+        "parameters"
+      ]
+    },
+    {
+      "route": "GET /cluster/sdn/vnets/{vnet}/subnets/{subnet}",
+      "fields": [
+        "parameters"
+      ]
+    },
+    {
+      "route": "PUT /cluster/sdn/vnets/{vnet}/subnets/{subnet}",
+      "fields": [
+        "parameters"
+      ]
+    },
+    {
+      "route": "GET /cluster/sdn/zones",
+      "fields": [
+        "returns"
+      ]
+    },
+    {
+      "route": "POST /cluster/sdn/zones",
+      "fields": [
+        "parameters"
+      ]
+    },
+    {
+      "route": "DELETE /cluster/sdn/zones/{zone}",
+      "fields": [
+        "parameters"
+      ]
+    },
+    {
+      "route": "GET /cluster/sdn/zones/{zone}",
+      "fields": [
+        "parameters",
+        "returns"
+      ]
+    },
+    {
+      "route": "PUT /cluster/sdn/zones/{zone}",
+      "fields": [
+        "parameters"
+      ]
+    },
+    {
+      "route": "GET /nodes/{node}/apt/changelog",
+      "fields": [
+        "parameters"
+      ]
+    },
+    {
+      "route": "GET /nodes/{node}/apt/update",
+      "fields": [
+        "returns"
+      ]
+    },
+    {
+      "route": "GET /nodes/{node}/apt/versions",
+      "fields": [
+        "returns"
+      ]
+    },
+    {
+      "route": "GET /nodes/{node}/capabilities",
+      "fields": [
+        "vendorMetadata"
+      ]
+    },
+    {
+      "route": "GET /nodes/{node}/capabilities/qemu",
+      "fields": [
+        "vendorMetadata"
+      ]
+    },
+    {
+      "route": "GET /nodes/{node}/capabilities/qemu/cpu",
+      "fields": [
+        "parameters",
+        "returns",
+        "permissions"
+      ]
+    },
+    {
+      "route": "GET /nodes/{node}/capabilities/qemu/machines",
+      "fields": [
+        "parameters"
+      ]
+    },
+    {
+      "route": "GET /nodes/{node}/ceph/cfg/db",
+      "fields": [
+        "returns"
+      ]
+    },
+    {
+      "route": "GET /nodes/{node}/ceph/cfg/value",
+      "fields": [
+        "parameters",
+        "returns"
+      ]
+    },
+    {
+      "route": "GET /nodes/{node}/ceph/cmd-safety",
+      "fields": [
+        "returns"
+      ]
+    },
+    {
+      "route": "GET /nodes/{node}/ceph/fs",
+      "fields": [
+        "returns"
+      ]
+    },
+    {
+      "route": "POST /nodes/{node}/ceph/init",
+      "fields": [
+        "parameters"
+      ]
+    },
+    {
+      "route": "GET /nodes/{node}/ceph/log",
+      "fields": [
+        "parameters",
+        "returns"
+      ]
+    },
+    {
+      "route": "GET /nodes/{node}/ceph/mds",
+      "fields": [
+        "returns"
+      ]
+    },
+    {
+      "route": "POST /nodes/{node}/ceph/mds/{name}",
+      "fields": [
+        "parameters"
+      ]
+    },
+    {
+      "route": "GET /nodes/{node}/ceph/mgr",
+      "fields": [
+        "returns"
+      ]
+    },
+    {
+      "route": "POST /nodes/{node}/ceph/mgr/{id}",
+      "fields": [
+        "parameters"
+      ]
+    },
+    {
+      "route": "GET /nodes/{node}/ceph/mon",
+      "fields": [
+        "returns"
+      ]
+    },
+    {
+      "route": "POST /nodes/{node}/ceph/mon/{monid}",
+      "fields": [
+        "parameters"
+      ]
+    },
+    {
+      "route": "GET /nodes/{node}/ceph/osd",
+      "fields": [
+        "returns"
+      ]
+    },
+    {
+      "route": "POST /nodes/{node}/ceph/osd",
+      "fields": [
+        "parameters"
+      ]
+    },
+    {
+      "route": "DELETE /nodes/{node}/ceph/osd/{osdid}",
+      "fields": [
+        "parameters"
+      ]
+    },
+    {
+      "route": "GET /nodes/{node}/ceph/osd/{osdid}/metadata",
+      "fields": [
+        "returns"
+      ]
+    },
+    {
+      "route": "GET /nodes/{node}/ceph/pool",
+      "fields": [
+        "returns"
+      ]
+    },
+    {
+      "route": "POST /nodes/{node}/ceph/pool",
+      "fields": [
+        "parameters"
+      ]
+    },
+    {
+      "route": "GET /nodes/{node}/ceph/pool/{name}/status",
+      "fields": [
+        "returns"
+      ]
+    },
+    {
+      "route": "POST /nodes/{node}/ceph/restart",
+      "fields": [
+        "parameters"
+      ]
+    },
+    {
+      "route": "GET /nodes/{node}/config",
+      "fields": [
+        "parameters",
+        "returns"
+      ]
+    },
+    {
+      "route": "PUT /nodes/{node}/config",
+      "fields": [
+        "parameters"
+      ]
+    },
+    {
+      "route": "GET /nodes/{node}/firewall/options",
+      "fields": [
+        "returns"
+      ]
+    },
+    {
+      "route": "PUT /nodes/{node}/firewall/options",
+      "fields": [
+        "parameters"
+      ]
+    },
+    {
+      "route": "GET /nodes/{node}/firewall/rules",
+      "fields": [
+        "returns"
+      ]
+    },
+    {
+      "route": "POST /nodes/{node}/firewall/rules",
+      "fields": [
+        "parameters"
+      ]
+    },
+    {
+      "route": "GET /nodes/{node}/firewall/rules/{pos}",
+      "fields": [
+        "returns"
+      ]
+    },
+    {
+      "route": "PUT /nodes/{node}/firewall/rules/{pos}",
+      "fields": [
+        "parameters"
+      ]
+    },
+    {
+      "route": "GET /nodes/{node}/journal",
+      "fields": [
+        "parameters"
+      ]
+    },
+    {
+      "route": "GET /nodes/{node}/lxc",
+      "fields": [
+        "returns"
+      ]
+    },
+    {
+      "route": "POST /nodes/{node}/lxc",
+      "fields": [
+        "parameters",
+        "permissions"
+      ]
+    },
+    {
+      "route": "GET /nodes/{node}/lxc/{vmid}/config",
+      "fields": [
+        "returns"
+      ]
+    },
+    {
+      "route": "PUT /nodes/{node}/lxc/{vmid}/config",
+      "fields": [
+        "parameters"
+      ]
+    },
+    {
+      "route": "POST /nodes/{node}/lxc/{vmid}/firewall/aliases",
+      "fields": [
+        "parameters"
+      ]
+    },
+    {
+      "route": "PUT /nodes/{node}/lxc/{vmid}/firewall/aliases/{name}",
+      "fields": [
+        "parameters"
+      ]
+    },
+    {
+      "route": "POST /nodes/{node}/lxc/{vmid}/firewall/ipset",
+      "fields": [
+        "parameters"
+      ]
+    },
+    {
+      "route": "POST /nodes/{node}/lxc/{vmid}/firewall/ipset/{name}",
+      "fields": [
+        "parameters"
+      ]
+    },
+    {
+      "route": "PUT /nodes/{node}/lxc/{vmid}/firewall/ipset/{name}/{cidr}",
+      "fields": [
+        "parameters"
+      ]
+    },
+    {
+      "route": "GET /nodes/{node}/lxc/{vmid}/firewall/options",
+      "fields": [
+        "returns"
+      ]
+    },
+    {
+      "route": "PUT /nodes/{node}/lxc/{vmid}/firewall/options",
+      "fields": [
+        "parameters"
+      ]
+    },
+    {
+      "route": "GET /nodes/{node}/lxc/{vmid}/firewall/rules",
+      "fields": [
+        "returns"
+      ]
+    },
+    {
+      "route": "POST /nodes/{node}/lxc/{vmid}/firewall/rules",
+      "fields": [
+        "parameters"
+      ]
+    },
+    {
+      "route": "GET /nodes/{node}/lxc/{vmid}/firewall/rules/{pos}",
+      "fields": [
+        "returns"
+      ]
+    },
+    {
+      "route": "PUT /nodes/{node}/lxc/{vmid}/firewall/rules/{pos}",
+      "fields": [
+        "parameters"
+      ]
+    },
+    {
+      "route": "GET /nodes/{node}/lxc/{vmid}/status/current",
+      "fields": [
+        "returns"
+      ]
+    },
+    {
+      "route": "POST /nodes/{node}/lxc/{vmid}/vncproxy",
+      "fields": [
+        "returns"
+      ]
+    },
+    {
+      "route": "POST /nodes/{node}/migrateall",
+      "fields": [
+        "parameters"
+      ]
+    },
+    {
+      "route": "GET /nodes/{node}/network",
+      "fields": [
+        "parameters",
+        "returns"
+      ]
+    },
+    {
+      "route": "POST /nodes/{node}/network",
+      "fields": [
+        "parameters"
+      ]
+    },
+    {
+      "route": "PUT /nodes/{node}/network",
+      "fields": [
+        "parameters"
+      ]
+    },
+    {
+      "route": "PUT /nodes/{node}/network/{iface}",
+      "fields": [
+        "parameters"
+      ]
+    },
+    {
+      "route": "GET /nodes/{node}/qemu",
+      "fields": [
+        "returns"
+      ]
+    },
+    {
+      "route": "POST /nodes/{node}/qemu",
+      "fields": [
+        "parameters"
+      ]
+    },
+    {
+      "route": "POST /nodes/{node}/qemu/{vmid}/agent",
+      "fields": [
+        "permissions"
+      ]
+    },
+    {
+      "route": "POST /nodes/{node}/qemu/{vmid}/agent/exec",
+      "fields": [
+        "parameters",
+        "permissions"
+      ]
+    },
+    {
+      "route": "GET /nodes/{node}/qemu/{vmid}/agent/exec-status",
+      "fields": [
+        "permissions"
+      ]
+    },
+    {
+      "route": "GET /nodes/{node}/qemu/{vmid}/agent/file-read",
+      "fields": [
+        "parameters",
+        "returns",
+        "permissions"
+      ]
+    },
+    {
+      "route": "POST /nodes/{node}/qemu/{vmid}/agent/file-write",
+      "fields": [
+        "permissions"
+      ]
+    },
+    {
+      "route": "POST /nodes/{node}/qemu/{vmid}/agent/fsfreeze-freeze",
+      "fields": [
+        "permissions"
+      ]
+    },
+    {
+      "route": "POST /nodes/{node}/qemu/{vmid}/agent/fsfreeze-status",
+      "fields": [
+        "permissions"
+      ]
+    },
+    {
+      "route": "POST /nodes/{node}/qemu/{vmid}/agent/fsfreeze-thaw",
+      "fields": [
+        "permissions"
+      ]
+    },
+    {
+      "route": "POST /nodes/{node}/qemu/{vmid}/agent/fstrim",
+      "fields": [
+        "permissions"
+      ]
+    },
+    {
+      "route": "GET /nodes/{node}/qemu/{vmid}/agent/get-fsinfo",
+      "fields": [
+        "permissions"
+      ]
+    },
+    {
+      "route": "GET /nodes/{node}/qemu/{vmid}/agent/get-host-name",
+      "fields": [
+        "permissions"
+      ]
+    },
+    {
+      "route": "GET /nodes/{node}/qemu/{vmid}/agent/get-memory-block-info",
+      "fields": [
+        "permissions"
+      ]
+    },
+    {
+      "route": "GET /nodes/{node}/qemu/{vmid}/agent/get-memory-blocks",
+      "fields": [
+        "permissions"
+      ]
+    },
+    {
+      "route": "GET /nodes/{node}/qemu/{vmid}/agent/get-osinfo",
+      "fields": [
+        "permissions"
+      ]
+    },
+    {
+      "route": "GET /nodes/{node}/qemu/{vmid}/agent/get-time",
+      "fields": [
+        "permissions"
+      ]
+    },
+    {
+      "route": "GET /nodes/{node}/qemu/{vmid}/agent/get-timezone",
+      "fields": [
+        "permissions"
+      ]
+    },
+    {
+      "route": "GET /nodes/{node}/qemu/{vmid}/agent/get-users",
+      "fields": [
+        "permissions"
+      ]
+    },
+    {
+      "route": "GET /nodes/{node}/qemu/{vmid}/agent/get-vcpus",
+      "fields": [
+        "permissions"
+      ]
+    },
+    {
+      "route": "GET /nodes/{node}/qemu/{vmid}/agent/info",
+      "fields": [
+        "permissions"
+      ]
+    },
+    {
+      "route": "GET /nodes/{node}/qemu/{vmid}/agent/network-get-interfaces",
+      "fields": [
+        "permissions"
+      ]
+    },
+    {
+      "route": "POST /nodes/{node}/qemu/{vmid}/agent/ping",
+      "fields": [
+        "permissions"
+      ]
+    },
+    {
+      "route": "POST /nodes/{node}/qemu/{vmid}/agent/set-user-password",
+      "fields": [
+        "permissions"
+      ]
+    },
+    {
+      "route": "POST /nodes/{node}/qemu/{vmid}/agent/shutdown",
+      "fields": [
+        "permissions"
+      ]
+    },
+    {
+      "route": "POST /nodes/{node}/qemu/{vmid}/agent/suspend-disk",
+      "fields": [
+        "permissions"
+      ]
+    },
+    {
+      "route": "POST /nodes/{node}/qemu/{vmid}/agent/suspend-hybrid",
+      "fields": [
+        "permissions"
+      ]
+    },
+    {
+      "route": "POST /nodes/{node}/qemu/{vmid}/agent/suspend-ram",
+      "fields": [
+        "permissions"
+      ]
+    },
+    {
+      "route": "POST /nodes/{node}/qemu/{vmid}/clone",
+      "fields": [
+        "parameters"
+      ]
+    },
+    {
+      "route": "GET /nodes/{node}/qemu/{vmid}/config",
+      "fields": [
+        "returns"
+      ]
+    },
+    {
+      "route": "POST /nodes/{node}/qemu/{vmid}/config",
+      "fields": [
+        "parameters"
+      ]
+    },
+    {
+      "route": "PUT /nodes/{node}/qemu/{vmid}/config",
+      "fields": [
+        "parameters"
+      ]
+    },
+    {
+      "route": "POST /nodes/{node}/qemu/{vmid}/firewall/aliases",
+      "fields": [
+        "parameters"
+      ]
+    },
+    {
+      "route": "PUT /nodes/{node}/qemu/{vmid}/firewall/aliases/{name}",
+      "fields": [
+        "parameters"
+      ]
+    },
+    {
+      "route": "POST /nodes/{node}/qemu/{vmid}/firewall/ipset",
+      "fields": [
+        "parameters"
+      ]
+    },
+    {
+      "route": "POST /nodes/{node}/qemu/{vmid}/firewall/ipset/{name}",
+      "fields": [
+        "parameters"
+      ]
+    },
+    {
+      "route": "PUT /nodes/{node}/qemu/{vmid}/firewall/ipset/{name}/{cidr}",
+      "fields": [
+        "parameters"
+      ]
+    },
+    {
+      "route": "GET /nodes/{node}/qemu/{vmid}/firewall/options",
+      "fields": [
+        "returns"
+      ]
+    },
+    {
+      "route": "PUT /nodes/{node}/qemu/{vmid}/firewall/options",
+      "fields": [
+        "parameters"
+      ]
+    },
+    {
+      "route": "GET /nodes/{node}/qemu/{vmid}/firewall/rules",
+      "fields": [
+        "returns"
+      ]
+    },
+    {
+      "route": "POST /nodes/{node}/qemu/{vmid}/firewall/rules",
+      "fields": [
+        "parameters"
+      ]
+    },
+    {
+      "route": "GET /nodes/{node}/qemu/{vmid}/firewall/rules/{pos}",
+      "fields": [
+        "returns"
+      ]
+    },
+    {
+      "route": "PUT /nodes/{node}/qemu/{vmid}/firewall/rules/{pos}",
+      "fields": [
+        "parameters"
+      ]
+    },
+    {
+      "route": "GET /nodes/{node}/qemu/{vmid}/migrate",
+      "fields": [
+        "returns"
+      ]
+    },
+    {
+      "route": "POST /nodes/{node}/qemu/{vmid}/migrate",
+      "fields": [
+        "parameters"
+      ]
+    },
+    {
+      "route": "POST /nodes/{node}/qemu/{vmid}/monitor",
+      "fields": [
+        "permissions"
+      ]
+    },
+    {
+      "route": "POST /nodes/{node}/qemu/{vmid}/move_disk",
+      "fields": [
+        "parameters"
+      ]
+    },
+    {
+      "route": "GET /nodes/{node}/qemu/{vmid}/status/current",
+      "fields": [
+        "returns"
+      ]
+    },
+    {
+      "route": "POST /nodes/{node}/qemu/{vmid}/status/resume",
+      "fields": [
+        "parameters"
+      ]
+    },
+    {
+      "route": "POST /nodes/{node}/qemu/{vmid}/status/start",
+      "fields": [
+        "parameters"
+      ]
+    },
+    {
+      "route": "POST /nodes/{node}/qemu/{vmid}/vncproxy",
+      "fields": [
+        "parameters",
+        "returns"
+      ]
+    },
+    {
+      "route": "POST /nodes/{node}/replication/{id}/schedule_now",
+      "fields": [
+        "permissions"
+      ]
+    },
+    {
+      "route": "GET /nodes/{node}/rrd",
+      "fields": [
+        "parameters"
+      ]
+    },
+    {
+      "route": "GET /nodes/{node}/rrddata",
+      "fields": [
+        "parameters"
+      ]
+    },
+    {
+      "route": "GET /nodes/{node}/sdn",
+      "fields": [
+        "vendorMetadata"
+      ]
+    },
+    {
+      "route": "GET /nodes/{node}/sdn/zones",
+      "fields": [
+        "returns"
+      ]
+    },
+    {
+      "route": "GET /nodes/{node}/sdn/zones/{zone}",
+      "fields": [
+        "parameters",
+        "permissions"
+      ]
+    },
+    {
+      "route": "GET /nodes/{node}/sdn/zones/{zone}/content",
+      "fields": [
+        "parameters",
+        "permissions"
+      ]
+    },
+    {
+      "route": "GET /nodes/{node}/services",
+      "fields": [
+        "returns"
+      ]
+    },
+    {
+      "route": "GET /nodes/{node}/services/{service}",
+      "fields": [
+        "parameters"
+      ]
+    },
+    {
+      "route": "POST /nodes/{node}/services/{service}/reload",
+      "fields": [
+        "parameters"
+      ]
+    },
+    {
+      "route": "POST /nodes/{node}/services/{service}/restart",
+      "fields": [
+        "parameters"
+      ]
+    },
+    {
+      "route": "POST /nodes/{node}/services/{service}/start",
+      "fields": [
+        "parameters"
+      ]
+    },
+    {
+      "route": "GET /nodes/{node}/services/{service}/state",
+      "fields": [
+        "parameters",
+        "returns"
+      ]
+    },
+    {
+      "route": "POST /nodes/{node}/services/{service}/stop",
+      "fields": [
+        "parameters"
+      ]
+    },
+    {
+      "route": "POST /nodes/{node}/spiceshell",
+      "fields": [
+        "parameters"
+      ]
+    },
+    {
+      "route": "POST /nodes/{node}/startall",
+      "fields": [
+        "parameters"
+      ]
+    },
+    {
+      "route": "GET /nodes/{node}/status",
+      "fields": [
+        "returns"
+      ]
+    },
+    {
+      "route": "POST /nodes/{node}/stopall",
+      "fields": [
+        "parameters"
+      ]
+    },
+    {
+      "route": "GET /nodes/{node}/storage",
+      "fields": [
+        "returns"
+      ]
+    },
+    {
+      "route": "GET /nodes/{node}/storage/{storage}/content",
+      "fields": [
+        "returns"
+      ]
+    },
+    {
+      "route": "GET /nodes/{node}/storage/{storage}/status",
+      "fields": [
+        "returns"
+      ]
+    },
+    {
+      "route": "PUT /nodes/{node}/subscription",
+      "fields": [
+        "parameters"
+      ]
+    },
+    {
+      "route": "POST /nodes/{node}/suspendall",
+      "fields": [
+        "parameters"
+      ]
+    },
+    {
+      "route": "GET /nodes/{node}/tasks",
+      "fields": [
+        "parameters",
+        "returns"
+      ]
+    },
+    {
+      "route": "GET /nodes/{node}/tasks/{upid}/log",
+      "fields": [
+        "parameters"
+      ]
+    },
+    {
+      "route": "POST /nodes/{node}/termproxy",
+      "fields": [
+        "parameters",
+        "returns"
+      ]
+    },
+    {
+      "route": "POST /nodes/{node}/vncshell",
+      "fields": [
+        "parameters",
+        "returns"
+      ]
+    },
+    {
+      "route": "GET /nodes/{node}/vncwebsocket",
+      "fields": [
+        "parameters"
+      ]
+    },
+    {
+      "route": "POST /nodes/{node}/vzdump",
+      "fields": [
+        "parameters",
+        "permissions"
+      ]
+    },
+    {
+      "route": "GET /nodes/{node}/vzdump/defaults",
+      "fields": [
+        "returns"
+      ]
+    },
+    {
+      "route": "GET /storage",
+      "fields": [
+        "parameters"
+      ]
+    },
+    {
+      "route": "POST /storage",
+      "fields": [
+        "parameters",
+        "returns"
+      ]
+    },
+    {
+      "route": "PUT /storage/{storage}",
+      "fields": [
+        "parameters",
+        "returns"
+      ]
+    }
+  ]
+}

@@ -7,16 +7,20 @@ import { fileURLToPath } from 'node:url'
 import test from 'node:test'
 
 for (const scenario of [
-  { name: 'installed tarball satisfies the standalone S1.1 journey with external egress denied', through: 'standalone', exitCode: 0, status: 'pass', host: 'pending' },
+  { name: 'installed tarball satisfies canonical credentials with external egress denied', task: 'S1.2', through: 'standalone', exitCode: 0, status: 'pass', host: 'pending' },
+  { name: 'generated route cases satisfy the checked catalogue and admission policy', task: 'S2.1', through: 'standalone', exitCode: 0, status: 'pass', host: 'pending' },
   { name: 'actual pinned Artium client server and runner satisfy S1.1', through: 'both', exitCode: 0, status: 'pass', host: 'pass' },
   { name: 'both journeys reject missing host fixture inputs', through: 'both', exitCode: 1, status: 'fail', host: 'pending', missingHost: true,
     failure: '--through both requires PROXMOX_AXI_ARTIUM_FIXTURE and PROXMOX_AXI_ARTIUM_MANIFEST' },
-]) test(scenario.name, async () => {
+]) test(scenario.name, {
+  skip: scenario.through === 'both' && !scenario.missingHost && !process.env.PROXMOX_AXI_ARTIUM_FIXTURE
+    ? 'Artium fixture not supplied' : false,
+}, async () => {
   const root = fileURLToPath(new URL('../', import.meta.url))
   const temporary = await mkdtemp(join(tmpdir(), 'proxmox-axi-test-'))
   const out = join(temporary, 'S1.1')
   try {
-    const child = spawn(process.execPath, [join(root, 'scripts/acceptance.mjs'), '--task', 'S1.1',
+    const child = spawn(process.execPath, [join(root, 'scripts/acceptance.mjs'), '--task', scenario.task ?? 'S1.1',
       '--pack', join(root, 'evidence'), '--out', out, '--network', 'fake-only', '--through', scenario.through],
     { stdio: ['ignore', 'pipe', 'pipe'], env: { ...process.env,
       ...(scenario.missingHost ? { PROXMOX_AXI_ARTIUM_FIXTURE: '', PROXMOX_AXI_ARTIUM_MANIFEST: '' } : {}) } })

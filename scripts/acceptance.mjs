@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import { spawn } from 'node:child_process'
-import { createHash } from 'node:crypto'
+import { createHash, X509Certificate } from 'node:crypto'
 import { createServer } from 'node:https'
 import { createConnection } from 'node:net'
 import { networkInterfaces } from 'node:os'
@@ -9,6 +9,8 @@ import { isAbsolute, join, relative, sep } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 import { decode } from '@toon-format/toon'
 import { verifyHostRuntime } from './host-identity.mjs'
+import { captures, replay, routeKey } from './catalogue.mjs'
+import { routeCases, verifyDiscovery } from './route-cases.mjs'
 
 const root = fileURLToPath(new URL('../', import.meta.url))
 const digest = (bytes, algorithm = 'sha256') => createHash(algorithm).update(bytes).digest(algorithm === 'sha512' ? 'base64' : 'hex')
@@ -26,10 +28,11 @@ async function runtimeFiles(directory, prefix = '') {
 }
 
 async function command(executable, args, options = {}) {
-  const child = spawn(executable, args, { cwd: root, stdio: ['ignore', 'pipe', 'pipe'], ...options })
+  const { timeoutMs = 60_000, ...spawnOptions } = options
+  const child = spawn(executable, args, { cwd: root, stdio: ['ignore', 'pipe', 'pipe'], ...spawnOptions })
   const stdout = [], stderr = []
   let bytes = 0
-  const timer = setTimeout(() => child.kill('SIGKILL'), 60_000)
+  const timer = setTimeout(() => child.kill('SIGKILL'), timeoutMs)
   for (const [stream, chunks] of [[child.stdout, stdout], [child.stderr, stderr]]) stream.on('data', chunk => {
     bytes += chunk.length
     if (bytes > 1_048_576) child.kill('SIGKILL')
@@ -70,13 +73,16 @@ function selection(args) {
   for (let index = 0; index < args.length; index++) {
     const key = args[index]
     if (key === '--' && index === 0) continue
-    assert.ok(['--task', '--pack', '--out', '--network', '--through'].includes(key), `Unknown argument: ${key}`)
+    assert.ok(['--task', '--pack', '--out', '--network', '--through', '--repeat-through', '--available-through', '--all-route-variants'].includes(key), `Unknown argument: ${key}`)
     assert.equal(values[key], undefined, `Duplicate argument: ${key}`)
+    if (key === '--all-route-variants') { values[key] = true; continue }
     const value = args[++index]
     assert.ok(value && !value.startsWith('--'), `Missing value for ${key}`)
     values[key] = value
   }
-  assert.equal(values['--task'], 'S1.1', 'Only task S1.1 is implemented')
+  assert.ok(['S1.1', 'S1.2', 'S2.1'].includes(values['--task']), 'Select S1.1, S1.2 or S2.1')
+  if (values['--repeat-through']) assert.equal(values['--repeat-through'], 'S1')
+  if (values['--available-through']) assert.equal(values['--available-through'], 'S2')
   assert.equal(values['--network'], 'fake-only', 'Only fake-only networking is permitted')
   assert.ok(['standalone', 'both'].includes(values['--through']), 'Select --through standalone or both')
   for (const key of ['--pack', '--out']) assert.ok(values[key] && isAbsolute(values[key]), `${key} must be absolute`)
@@ -98,7 +104,7 @@ async function verify(values) {
     }
     return value
   }
-  const result = { task: 'S1.1', through: values['--through'], platform: `${process.platform}/${process.arch}`,
+  const result = { task: values['--task'], through: values['--through'], platform: `${process.platform}/${process.arch}`,
     node: process.version, operation: 'OP-GET-version', catalogue: 'legacy-8.2.7',
     cases: [], status: 'fail', host: { status: 'pending', reason: 'Actual Artium fixture inputs were not selected.' } }
   let server
@@ -179,10 +185,10 @@ async function verify(values) {
       assert.equal(digest(await readFile(executable)), digest(await readFile(join(root, 'bin/proxmox-axi.mjs'))), 'Current executable matches admitted package')
     }
     const inventory = await json(join(installed, 'inventory.json'))
-    assert.deepEqual(inventory.operations.map(({ id, method, path, command }) => ({ id, method, path, command })),
-      [{ id: 'OP-GET-version', method: 'GET', path: '/version', command: ['get', '/version'] }], 'Admit exactly the reviewed version read')
+    const catalogues = await Promise.all(captures.map(async capture => replay(await readFile(join(root, 'vendor', capture.file)), capture)))
+    assert.deepEqual(new Set(inventory.operations.map(routeKey)), new Set(catalogues.flatMap(catalogue => catalogue.operations.map(routeKey))), 'Inventory covers the exact independent vendor union')
     const helpMetadata = await json(join(installed, 'help.json'))
-    assert.deepEqual(helpMetadata.commands.map(entry => entry.command), ['get /version'], 'Generated help command boundary')
+    assert.deepEqual(new Set(helpMetadata.commands.map(entry => entry.command)), new Set(inventory.operations.map(entry => entry.command.join(' '))), 'Generated help covers the inventory')
     result.package = { name: pkg.name, version: pkg.version, archive, sha256: digest(archiveBytes),
       integrity: `sha512-${digest(archiveBytes, 'sha512')}`, executable,
       executableSha256: digest(await readFile(executable)), inventorySha256: digest(await readFile(join(installed, 'inventory.json'))),
@@ -196,7 +202,7 @@ async function verify(values) {
       '-subj', '/CN=localhost', '-addext', 'subjectAltName=IP:127.0.0.1', '-addext', 'basicConstraints=critical,CA:TRUE'])
     const caFile = join(scratch, 'server.crt')
     await chmod(caFile, 0o600)
-    const token = 'CANARY-proxmox-token-S1-1'
+    const token = 'CANARY-proxmox+token/S1-1?value="x"'
     const fileToken = 'CANARY-proxmox-file-token-S1-1'
     const decoy = 'CANARY-developer-profile-S1-1'
     const hostedToken = 'CANARY-proxmox-hosted-token-S1-1'
@@ -218,7 +224,17 @@ async function verify(values) {
         return
       }
       if (response.stall) { reply.write('{"data":'); return }
-      reply.end(typeof response.body === 'string' ? response.body : JSON.stringify(response.body))
+      if (response.trickle) {
+        const timer = setInterval(() => reply.write(' '), 100)
+        reply.once('close', () => clearInterval(timer))
+        return
+      }
+      const payload = typeof response.body === 'string' ? response.body : JSON.stringify(response.body)
+      if (response.split) {
+        const split = Math.floor(payload.length / 2)
+        reply.write(payload.slice(0, split))
+        setImmediate(() => reply.end(payload.slice(split)))
+      } else reply.end(payload)
     })
     server.on('tlsClientError', error => {
       const code = typeof error.code === 'string' && /^[A-Z][A-Z0-9_]{0,95}$/.test(error.code) ? error.code : 'UNKNOWN'
@@ -264,10 +280,10 @@ async function verify(values) {
         assert.ok(!`${actual.stdout}${actual.stderr}`.includes(value), `${id}: secret leaked to public output`)
       }
       transcripts.push(`case: ${id}\nexit: ${actual.code}\nstdout:\n${actual.stdout}stderr:\n${actual.stderr}`)
-      const value = expected.bareVersion ? undefined : args.includes('json') ? JSON.parse(actual.stdout) : decode(actual.stdout)
+      const value = expected.bareVersion ? undefined : expected.hostBoundary ? decode(actual.stdout) : args.includes('json') ? JSON.parse(actual.stdout) : decode(actual.stdout)
       record.actual.output = value
       if (entry !== executable && expected.exitCode !== 0) {
-        assert.match(actual.stderr, /^artium-axi: request_id [0-9a-f-]{36}\n$/, `${id}: only the host's safe request ID diagnostic`)
+        assert.ok((expected.hostBoundary && actual.stderr === '') || /^artium-axi: request_id [0-9a-f-]{36}\n$/.test(actual.stderr), `${id}: only the host's safe request ID diagnostic`)
       } else assert.equal(actual.stderr, '', `${id}: no raw diagnostics on stderr`)
       assert.equal(actual.code, expected.exitCode, `${id}: exit code; stdout=${actual.stdout}`)
       if (expected.error) assert.equal(value.error?.code, expected.error, `${id}: observed public code ${value.error?.code ?? 'none'}`)
@@ -275,18 +291,19 @@ async function verify(values) {
         `${id}: request count; observed public code ${value?.error?.code ?? 'none'}; transport codes ${record.transportDiagnostics.map(entry => entry.code).join(',')}`)
       assert.ok(record.elapsedMs < 10_000, `${id}: elapsed budget`)
       assert.ok(Buffer.byteLength(actual.stdout) < 8192, `${id}: public output budget`)
+      if (expected.data) assert.deepEqual(value.data, expected.data, `${id}: semantic response`)
       if (expected.version || expected.error || expected.profile) {
         if (expected.version) assert.deepEqual(value.version, success.body.data, `${id}: reviewed version fields`)
         if (expected.profile) assert.equal(value.credential.profile, expected.profile, `${id}: credential source`)
         if (expected.tokenSource) assert.equal(value.credential.tokenSource, expected.tokenSource, `${id}: secret reference source`)
       } else if (expected.bareVersion) assert.equal(actual.stdout, `${pkg.version}\n`)
       else if (expected.help) {
-        assert.equal(value.purpose, helpMetadata.commands[0].purpose, `${id}: help matches admitted command`)
+        assert.equal(value.purpose, helpMetadata.commands.find(entry => entry.command === 'get /version').purpose, `${id}: help matches admitted command`)
         assert.ok(value.usage.startsWith('proxmox-axi get /version '), `${id}: invocable version help`)
       }
       for (const request of ledger.slice(before)) {
         assert.equal(request.method, 'GET', `${id}: method`)
-        assert.equal(request.path, '/api2/json/version', `${id}: exact wire route`)
+        assert.equal(request.path, expected.path ?? '/api2/json/version', `${id}: exact wire route`)
         assert.equal(request.identity, expected.identity ?? 'environment-canary', `${id}: credential at vendor boundary`)
       }
       record.status = 'pass'
@@ -318,7 +335,7 @@ async function verify(values) {
       { exitCode: 1, requests: 0, error: 'CONNECTION_FAILED' })
     await runCase('unknown-flag', ['get', '/version', '--token', token], env,
       { exitCode: 2, requests: 0, error: 'INVALID_INPUT' })
-    await runCase('unknown-route', ['get', '/nodes'], env, { exitCode: 2, requests: 0, error: 'INVALID_INPUT' })
+    await runCase('unknown-route', ['get', '/unknown-route'], env, { exitCode: 2, requests: 0, error: 'INVALID_INPUT' })
     await runCase('source-diagnostics', ['auth', 'status', '--format', 'json'], env,
       { exitCode: 0, requests: 0, profile: 'environment', tokenSource: 'env:PROXMOX_AXI_TOKEN' })
     await runCase('missing-profile', ['get', '/version', '--format', 'json'],
@@ -328,6 +345,102 @@ async function verify(values) {
     for (const flag of ['-v', '-V', '--version']) await runCase(`package-version/${flag}`, [flag], base,
       { exitCode: 0, requests: 0, bareVersion: true })
     await runCase('offline-help', ['get', '--help'], base, { exitCode: 0, requests: 0, help: true })
+    if (values['--task'] !== 'S1.1') {
+      const selectedProfile = { auth: 'api-token', origin, tokenId, caBundle: caFile }
+      const writeProfile = async profile => {
+        await save(config, { version: 1, profiles: { selected: profile } })
+        await chmod(config, 0o600)
+      }
+      const fileArgs = ['get', '/version', '--config', config, '--profile', 'selected', '--format', 'json']
+      await runCase('CRED-01', ['auth', 'status', '--format', 'json'], env,
+        { exitCode: 0, requests: 0, profile: 'environment', tokenSource: 'env:PROXMOX_AXI_TOKEN' })
+      await runCase('CRED-02', ['get', '/version', '--format', 'json'], { ...base, PROXMOX_AXI_TOKEN_ID: tokenId },
+        { exitCode: 1, requests: 0, error: 'CONFIG_INVALID' })
+      await runCase('CRED-03', fileArgs, { ...env, PROXMOX_AXI_ORIGIN: 'https://competing.example.test' },
+        { exitCode: 0, requests: 1, version: true, profile: 'selected', identity: 'protected-file-canary' })
+      for (const reference of [token, { env: 'BAD NAME' }, { env: 'PROXMOX_AXI_TOKEN', file: secretFile }, { stored: true }]) {
+        await writeProfile({ ...selectedProfile, token: reference })
+        await runCase(`CRED-04/${result.cases.length}`, fileArgs, env, { exitCode: 1, requests: 0, error: 'CONFIG_INVALID' })
+      }
+      await writeProfile(selectedProfile)
+      await runCase('CRED-06/default', fileArgs, env, { exitCode: 0, requests: 1, version: true, profile: 'selected' })
+      await runCase('CRED-06/missing', fileArgs, base, { exitCode: 1, requests: 0, error: 'AUTH_REQUIRED' })
+      await symlink(secretFile, join(scratch, 'linked-token'))
+      await writeProfile({ ...selectedProfile, token: { file: join(scratch, 'linked-token') } })
+      await runCase('CRED-09/link', fileArgs, env, { exitCode: 1, requests: 0, error: 'CONFIG_INSECURE' })
+      await chmod(secretFile, 0o644)
+      await writeProfile({ ...selectedProfile, token: { file: secretFile } })
+      await runCase('CRED-09/mode', fileArgs, env, { exitCode: 1, requests: 0, error: 'CONFIG_INSECURE' })
+      await chmod(secretFile, 0o600)
+      await writeProfile({ ...selectedProfile, userId: 'wrong@pve' })
+      await runCase('CRED-11/mixed', fileArgs, env, { exitCode: 1, requests: 0, error: 'CONFIG_INVALID' })
+      await runCase('CRED-11/profile', ['get', '/version', '--config', config, '--profile', 'wrong', '--format', 'json'], env,
+        { exitCode: 1, requests: 0, error: 'PROFILE_NOT_FOUND' })
+      await runCase('CRED-12', ['get', '/version', '--format', 'json'],
+        { ...base, PROXMOX_AXI_CONFIG: join(scratch, 'missing') }, { exitCode: 1, requests: 0, error: 'AUTH_REQUIRED' })
+      await runCase('CRED-13', ['get', '/version', '--format', 'json'], env, { exitCode: 0, requests: 1 },
+        { httpStatus: 200, split: true, body: { data: { version: token, release: encodeURIComponent(token), repoid: token } } })
+      await runCase('elapsed-deadline/trickle', ['get', '/version', '--format', 'json'], env,
+        { exitCode: 1, requests: 1, error: 'TIMEOUT' }, { httpStatus: 200, trickle: true })
+      assert.ok(result.cases.at(-1).elapsedMs < 6500, 'Trickle stops within the total elapsed deadline plus process startup budget')
+      const pin = new X509Certificate(await readFile(caFile)).fingerprint256.replaceAll(':', '').toLowerCase()
+      await writeProfile({ auth: 'api-token', origin, tokenId, certificatePin: { origin, sha256: pin } })
+      await runCase('CRED-20/valid', fileArgs, env, { exitCode: 0, requests: 1, version: true })
+      await writeProfile({ auth: 'api-token', origin, tokenId, certificatePin: { origin, sha256: '0'.repeat(64) } })
+      await runCase('CRED-20/changed', fileArgs, env, { exitCode: 1, requests: 0, error: 'CONNECTION_FAILED' })
+      await checked('openssl', ['req', '-new', '-key', join(scratch, 'server.key'), '-out', join(scratch, 'expired.csr'),
+        '-subj', '/CN=localhost', '-addext', 'subjectAltName=IP:127.0.0.1'])
+      await checked('openssl', ['x509', '-req', '-in', join(scratch, 'expired.csr'), '-signkey', join(scratch, 'server.key'),
+        '-out', join(scratch, 'expired.crt'), '-days', '-1', '-copy_extensions', 'copy'])
+      const expired = await readFile(join(scratch, 'expired.crt'))
+      server.setSecureContext({ key: await readFile(join(scratch, 'server.key')), cert: expired })
+      const expiredPin = new X509Certificate(expired).fingerprint256.replaceAll(':', '').toLowerCase()
+      await writeProfile({ auth: 'api-token', origin, tokenId, certificatePin: { origin, sha256: expiredPin } })
+      await runCase('CRED-20/expired', fileArgs, env, { exitCode: 1, requests: 0, error: 'CONNECTION_FAILED' })
+      server.setSecureContext({ key: await readFile(join(scratch, 'server.key')), cert: await readFile(caFile) })
+      const { replacePrivateFile, readPrivateFile } = await import(pathToFileURL(join(installed, 'dist/private-file.js')))
+      const atomicPath = join(scratch, 'atomic.json')
+      await replacePrivateFile(atomicPath, 'prior-valid-state')
+      await assert.rejects(replacePrivateFile(atomicPath, 'replacement', { platform: 'win32',
+        restrictAcl: async (_path, directory) => { if (!directory) throw new Error('controlled protection failure') } }), /controlled protection failure/)
+      assert.equal(await readPrivateFile(atomicPath, true), 'prior-valid-state')
+      await replacePrivateFile(atomicPath, 'new-complete-state')
+      assert.equal(await readPrivateFile(atomicPath, true), 'new-complete-state')
+      result.cases.push({ id: 'CRED-10/atomic-replacement', status: 'pass', basis: 'Installed private-file interface; interrupted protection retains old state, successful replacement publishes complete state; native Windows rename contention remains S6.1' })
+      await writeProfile(selectedProfile)
+    }
+    const operationPolicy = await json(join(root, 'src/operation-policy.json'))
+    const exerciseRoutes = async (environment, entry = executable) => {
+      const hosted = entry !== executable
+      const coverage = { union: 681, variants: 1285, admitted: 0, denied: 0 }
+      for (const route of routeCases(catalogues, operationPolicy)) {
+        const args = hosted ? ['proxmox-axi', ...route.args] : route.args
+        const identity = hosted ? 'hosted-canary' : 'environment-canary'
+        const expected = route.callable ? route.operation.path === '/version' ?
+          { exitCode: 0, requests: 1, version: true, identity } :
+          { exitCode: 0, requests: 1, path: route.expectedPath, data: route.response, identity } :
+          { exitCode: hosted ? 2 : 1, requests: 0, error: hosted ? 'INVALID_INPUT' : 'CONTRACT_UNRESOLVED', hostBoundary: hosted }
+        await runCase(`${hosted ? 'artium' : 'standalone'}/contract/${route.id}/valid`, args, environment, expected,
+          route.operation.path === '/version' ? success : { httpStatus: 200, body: { data: route.response } }, entry)
+        await runCase(`${hosted ? 'artium' : 'standalone'}/contract/${route.id}/invalid`, [...args, '--api-constructor', 'invalid'], environment,
+          { exitCode: 2, requests: 0, error: 'INVALID_INPUT', hostBoundary: hosted }, success, entry)
+        coverage[route.callable ? 'admitted' : 'denied']++
+      }
+      return coverage
+    }
+    if (values['--task'] === 'S2.1') {
+      verifyDiscovery(inventory, catalogues, (await json(join(installed, 'dist/contracts.json'))).contracts, operationPolicy)
+      const bodyRoute = [...routeCases(catalogues, operationPolicy)].find(route => route.callable && route.operation.path === '/nodes/{node}/tasks')
+      const bodyFile = join(scratch, 'parameters.json')
+      await save(bodyFile, { node: 'pve-test', limit: 1 })
+      await runCase('body-file/valid', ['get', '/nodes/{node}/tasks', '--body-file', bodyFile, '--format', 'json'], env,
+        { exitCode: 0, requests: 1, path: '/api2/json/nodes/pve-test/tasks?limit=1', data: bodyRoute.response },
+        { httpStatus: 200, body: { data: bodyRoute.response } })
+      await save(bodyFile, JSON.parse('{"node":"pve-test","__proto__":{"ignored":true}}'))
+      await runCase('body-file/unknown-field', ['get', '/nodes/{node}/tasks', '--body-file', bodyFile, '--format', 'json'], env,
+        { exitCode: 2, requests: 0, error: 'INVALID_INPUT' })
+      result.routeCoverage = await exerciseRoutes(env)
+    }
     result.outcomes = [
       { id: 'AC-VERIFIED-VERSION', journey: 'standalone', status: 'pass', basis: 'Reviewed 8.2.7 fixture' },
       { id: 'AC-VERSION-AUTH', journey: 'standalone', status: 'pass', basis: 'Controlled 401 and invalid shapes fail' },
@@ -336,6 +449,14 @@ async function verify(values) {
       { id: 'AC-HOST', journey: 'artium', status: 'pending', reason: result.host.reason },
       { id: 'CRED-19', journey: 'artium', status: 'pending', reason: result.host.reason },
     ]
+    if (values['--task'] !== 'S1.1') {
+      for (const id of ['AC-CREDENTIALS', 'CRED-01', 'CRED-02', 'CRED-03', 'CRED-04', 'CRED-06', 'CRED-09', 'CRED-10', 'CRED-11', 'CRED-12', 'CRED-13', 'CRED-20']) {
+        result.outcomes.push({ id, journey: 'standalone', status: 'pass', basis: 'Offline package cases; native platform proof remains S6.1' })
+      }
+    }
+    if (values['--task'] === 'S2.1') for (const id of ['AC-FULL', 'AC-COVERAGE', 'VP-03', 'VP-07']) {
+      result.outcomes.push({ id, journey: 'standalone', status: 'pass', basis: 'Pinned catalogue union, preserved schema constraints, generated admitted wire cases and unresolved-route zero-request refusals; deferred runtime capabilities remain blocked' })
+    }
     if (hostInput) {
       const hostDirectory = join(scratch, 'host')
       await mkdir(join(hostDirectory, 'tools'), { recursive: true, mode: 0o700 })
@@ -368,19 +489,24 @@ async function verify(values) {
         { exitCode: 1, requests: 1, error: 'AUTH_REQUIRED', identity: 'hosted-canary' }, denied, client)
       await runCase('AC-HOST/invalid-shape', ['proxmox-axi', 'get', '/version', '--format', 'json'], clientEnvironment,
         { exitCode: 1, requests: 1, error: 'INVALID_RESPONSE', identity: 'hosted-canary' }, { httpStatus: 200, body: { data: null } }, client)
+      if (values['--task'] === 'S2.1') result.host.routeCoverage = await exerciseRoutes(clientEnvironment, client)
       const snapshot = hostMessage(hostChild, 'snapshot')
       hostChild.send('snapshot')
       result.host.evidence = await snapshot
       assert.deepEqual(result.host.evidence.callsRemaining, [], 'Actual runner cleans its private call directories')
-      assert.deepEqual(result.host.evidence.audit.filter(row => row.event === 'run-terminal').map(row => row.exit_code), [0, 1, 1], 'Actual host audit records public command outcomes')
+      assert.deepEqual(result.host.evidence.audit.filter(row => row.event === 'run-terminal').map(row => row.exit_code),
+        [0, 1, 1, ...Array(result.host.routeCoverage?.admitted ?? 0).fill(0)], 'Actual host audit records public command outcomes')
       result.host.status = 'pass'
       result.outcomes = result.outcomes.filter(row => row.journey !== 'artium')
       for (const id of ['AC-HOST', 'AC-VERSION-AUTH', 'AC-VERIFIED-VERSION', 'CRED-05', 'CRED-19', 'CRED-21']) {
         result.outcomes.push({ id, journey: 'artium', status: 'pass', basis: 'Actual public client/server/runner with private injected artium profile and distinct vendor canary' })
       }
+      if (values['--task'] === 'S2.1') for (const id of ['AC-FULL', 'AC-COVERAGE', 'VP-03', 'VP-07']) {
+        result.outcomes.push({ id, journey: 'artium', status: 'pass', basis: 'Same generated table through the actual public client, adapter and runner; unresolved calls refused by the closed host inventory' })
+      }
     }
     result.status = 'pass'
-    result.scope = hostInput ? 'S1.1 through both journeys using the unmerged admission fixture; stock Artium is unsupported.' : 'Standalone subset only; full S1.1 requires --through both.'
+    result.scope = hostInput ? `${result.task} through both journeys using the unmerged admission fixture; stock Artium is unsupported.` : `Standalone subset only; full ${result.task} requires --through both.`
   } catch (error) {
     result.failure = publicText(error.message)
     process.exitCode = 1
@@ -409,7 +535,8 @@ try {
     const parentNamespace = await readlink('/proc/self/ns/net')
     const isolated = await command('unshare', ['--user', '--map-root-user', '--net', process.execPath,
       fileURLToPath(import.meta.url), ...process.argv.slice(2)],
-    { env: { ...process.env, PROXMOX_AXI_ACCEPTANCE_NETNS: parentNamespace } })
+    { timeoutMs: values['--task'] === 'S2.1' ? 1_800_000 : 120_000,
+      env: { ...process.env, PROXMOX_AXI_ACCEPTANCE_NETNS: parentNamespace } })
     process.stdout.write(isolated.stdout)
     process.stderr.write(isolated.stderr)
     process.exitCode = isolated.code

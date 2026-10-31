@@ -1,0 +1,6293 @@
+{
+  "generated": true,
+  "commands": [
+    {
+      "command": "home",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value"
+      }
+    },
+    {
+      "command": "inventory",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema delete /access/domains/{realm}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema delete /access/groups/{groupid}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema delete /access/roles/{roleid}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema delete /access/tfa/{userid}/{id}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema delete /access/users/{userid}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema delete /access/users/{userid}/token/{tokenid}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema delete /cluster/acme/account/{name}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema delete /cluster/acme/plugins/{id}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema delete /cluster/backup/{id}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema delete /cluster/config/nodes/{node}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema delete /cluster/firewall/aliases/{name}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema delete /cluster/firewall/groups/{group}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema delete /cluster/firewall/groups/{group}/{pos}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema delete /cluster/firewall/ipset/{name}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema delete /cluster/firewall/ipset/{name}/{cidr}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema delete /cluster/firewall/rules/{pos}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema delete /cluster/ha/groups/{group}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema delete /cluster/ha/resources/{sid}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema delete /cluster/ha/rules/{rule}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema delete /cluster/jobs/realm-sync/{id}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema delete /cluster/mapping/dir/{id}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema delete /cluster/mapping/pci/{id}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema delete /cluster/mapping/usb/{id}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema delete /cluster/metrics/server/{id}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema delete /cluster/notifications/endpoints/gotify/{name}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema delete /cluster/notifications/endpoints/sendmail/{name}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema delete /cluster/notifications/endpoints/smtp/{name}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema delete /cluster/notifications/endpoints/webhook/{name}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema delete /cluster/notifications/matchers/{name}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema delete /cluster/qemu/custom-cpu-models/{cputype}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema delete /cluster/replication/{id}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema delete /cluster/sdn/controllers/{controller}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema delete /cluster/sdn/dns/{dns}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema delete /cluster/sdn/fabrics/fabric/{id}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema delete /cluster/sdn/fabrics/node/{fabric_id}/{node_id}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema delete /cluster/sdn/ipams/{ipam}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema delete /cluster/sdn/lock",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema delete /cluster/sdn/prefix-lists/{id}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema delete /cluster/sdn/prefix-lists/{id}/entries/{url_seq}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema delete /cluster/sdn/route-maps/entries/{route-map-id}/entry/{order}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema delete /cluster/sdn/vnets/{vnet}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema delete /cluster/sdn/vnets/{vnet}/firewall/rules/{pos}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema delete /cluster/sdn/vnets/{vnet}/ips",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema delete /cluster/sdn/vnets/{vnet}/subnets/{subnet}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema delete /cluster/sdn/zones/{zone}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema delete /nodes/{node}/ceph/fs/{name}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema delete /nodes/{node}/ceph/mds/{name}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema delete /nodes/{node}/ceph/mgr/{id}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema delete /nodes/{node}/ceph/mon/{monid}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema delete /nodes/{node}/ceph/osd/{osdid}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema delete /nodes/{node}/ceph/pool/{name}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema delete /nodes/{node}/certificates/acme/certificate",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema delete /nodes/{node}/certificates/custom",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema delete /nodes/{node}/disks/directory/{name}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema delete /nodes/{node}/disks/lvm/{name}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema delete /nodes/{node}/disks/lvmthin/{name}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema delete /nodes/{node}/disks/zfs/{name}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema delete /nodes/{node}/firewall/rules/{pos}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema delete /nodes/{node}/lxc/{vmid}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema delete /nodes/{node}/lxc/{vmid}/firewall/aliases/{name}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema delete /nodes/{node}/lxc/{vmid}/firewall/ipset/{name}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema delete /nodes/{node}/lxc/{vmid}/firewall/ipset/{name}/{cidr}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema delete /nodes/{node}/lxc/{vmid}/firewall/rules/{pos}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema delete /nodes/{node}/lxc/{vmid}/snapshot/{snapname}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema delete /nodes/{node}/network",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema delete /nodes/{node}/network/{iface}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema delete /nodes/{node}/qemu/{vmid}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema delete /nodes/{node}/qemu/{vmid}/firewall/aliases/{name}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema delete /nodes/{node}/qemu/{vmid}/firewall/ipset/{name}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema delete /nodes/{node}/qemu/{vmid}/firewall/ipset/{name}/{cidr}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema delete /nodes/{node}/qemu/{vmid}/firewall/rules/{pos}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema delete /nodes/{node}/qemu/{vmid}/snapshot/{snapname}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema delete /nodes/{node}/storage/{storage}/content/{volume}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema delete /nodes/{node}/storage/{storage}/prunebackups",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema delete /nodes/{node}/subscription",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema delete /nodes/{node}/tasks/{upid}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema delete /pools",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema delete /pools/{poolid}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema delete /storage/{storage}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /access",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /access/acl",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /access/domains",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /access/domains/{realm}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /access/groups",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /access/groups/{groupid}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /access/openid",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /access/permissions",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /access/roles",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /access/roles/{roleid}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /access/tfa",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /access/tfa/{userid}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /access/tfa/{userid}/{id}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /access/ticket",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /access/users",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /access/users/{userid}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /access/users/{userid}/tfa",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /access/users/{userid}/token",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /access/users/{userid}/token/{tokenid}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /cluster",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /cluster/acme",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /cluster/acme/account",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /cluster/acme/account/{name}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /cluster/acme/challenge-schema",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /cluster/acme/directories",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /cluster/acme/meta",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /cluster/acme/plugins",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /cluster/acme/plugins/{id}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /cluster/acme/tos",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /cluster/backup",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /cluster/backup-info",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /cluster/backup-info/not-backed-up",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /cluster/backup/{id}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /cluster/backup/{id}/included_volumes",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /cluster/bulk-action",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /cluster/bulk-action/guest",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /cluster/ceph",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /cluster/ceph/flags",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /cluster/ceph/flags/{flag}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /cluster/ceph/health-mute",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /cluster/ceph/metadata",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /cluster/ceph/status",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /cluster/config",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /cluster/config/apiversion",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /cluster/config/join",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /cluster/config/nodes",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /cluster/config/qdevice",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /cluster/config/totem",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /cluster/firewall",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /cluster/firewall/aliases",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /cluster/firewall/aliases/{name}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /cluster/firewall/groups",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /cluster/firewall/groups/{group}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /cluster/firewall/groups/{group}/{pos}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /cluster/firewall/ipset",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /cluster/firewall/ipset/{name}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /cluster/firewall/ipset/{name}/{cidr}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /cluster/firewall/macros",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /cluster/firewall/options",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /cluster/firewall/refs",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /cluster/firewall/rules",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /cluster/firewall/rules/{pos}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /cluster/ha",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /cluster/ha/groups",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /cluster/ha/groups/{group}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /cluster/ha/resources",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /cluster/ha/resources/{sid}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /cluster/ha/rules",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /cluster/ha/rules/{rule}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /cluster/ha/status",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /cluster/ha/status/current",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /cluster/ha/status/manager_status",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /cluster/jobs",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /cluster/jobs/realm-sync",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /cluster/jobs/realm-sync/{id}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /cluster/jobs/schedule-analyze",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /cluster/log",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /cluster/mapping",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /cluster/mapping/dir",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /cluster/mapping/dir/{id}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /cluster/mapping/pci",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /cluster/mapping/pci/{id}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /cluster/mapping/usb",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /cluster/mapping/usb/{id}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /cluster/metrics",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /cluster/metrics/export",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /cluster/metrics/server",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /cluster/metrics/server/{id}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /cluster/nextid",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /cluster/notifications",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /cluster/notifications/endpoints",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /cluster/notifications/endpoints/gotify",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /cluster/notifications/endpoints/gotify/{name}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /cluster/notifications/endpoints/sendmail",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /cluster/notifications/endpoints/sendmail/{name}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /cluster/notifications/endpoints/smtp",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /cluster/notifications/endpoints/smtp/{name}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /cluster/notifications/endpoints/webhook",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /cluster/notifications/endpoints/webhook/{name}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /cluster/notifications/matcher-field-values",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /cluster/notifications/matcher-fields",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /cluster/notifications/matchers",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /cluster/notifications/matchers/{name}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /cluster/notifications/targets",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /cluster/options",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /cluster/qemu",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /cluster/qemu/cpu-flags",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /cluster/qemu/custom-cpu-models",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /cluster/qemu/custom-cpu-models/{cputype}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /cluster/replication",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /cluster/replication/{id}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /cluster/resources",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /cluster/sdn",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /cluster/sdn/controllers",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /cluster/sdn/controllers/{controller}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /cluster/sdn/dns",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /cluster/sdn/dns/{dns}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /cluster/sdn/dry-run",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /cluster/sdn/fabrics",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /cluster/sdn/fabrics/all",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /cluster/sdn/fabrics/fabric",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /cluster/sdn/fabrics/fabric/{id}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /cluster/sdn/fabrics/node",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /cluster/sdn/fabrics/node/{fabric_id}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /cluster/sdn/fabrics/node/{fabric_id}/{node_id}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /cluster/sdn/ipams",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /cluster/sdn/ipams/{ipam}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /cluster/sdn/ipams/{ipam}/status",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /cluster/sdn/prefix-lists",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /cluster/sdn/prefix-lists/{id}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /cluster/sdn/prefix-lists/{id}/entries",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /cluster/sdn/prefix-lists/{id}/entries/{url_seq}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /cluster/sdn/route-maps",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /cluster/sdn/route-maps/entries",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /cluster/sdn/route-maps/entries/{route-map-id}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /cluster/sdn/route-maps/entries/{route-map-id}/entry/{order}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /cluster/sdn/vnets",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /cluster/sdn/vnets/{vnet}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /cluster/sdn/vnets/{vnet}/firewall",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /cluster/sdn/vnets/{vnet}/firewall/options",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /cluster/sdn/vnets/{vnet}/firewall/rules",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /cluster/sdn/vnets/{vnet}/firewall/rules/{pos}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /cluster/sdn/vnets/{vnet}/subnets",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /cluster/sdn/vnets/{vnet}/subnets/{subnet}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /cluster/sdn/zones",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /cluster/sdn/zones/{zone}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /cluster/status",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /cluster/tasks",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/aplinfo",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/apt",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/apt/changelog",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/apt/repositories",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/apt/update",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/apt/versions",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/capabilities",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/capabilities/qemu",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/capabilities/qemu/cpu",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/capabilities/qemu/cpu-flags",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/capabilities/qemu/machines",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/capabilities/qemu/migration",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/ceph",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/ceph/cfg",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/ceph/cfg/db",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/ceph/cfg/raw",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/ceph/cfg/value",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/ceph/cmd-safety",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/ceph/crush",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/ceph/fs",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/ceph/log",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/ceph/mds",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/ceph/mgr",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/ceph/mon",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/ceph/osd",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/ceph/osd/{osdid}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/ceph/osd/{osdid}/lv-info",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/ceph/osd/{osdid}/metadata",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/ceph/pool",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/ceph/pool/{name}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/ceph/pool/{name}/status",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/ceph/releases",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/ceph/rules",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/ceph/status",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/certificates",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/certificates/acme",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/certificates/info",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/config",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/disks",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/disks/directory",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/disks/list",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/disks/lvm",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/disks/lvmthin",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/disks/smart",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/disks/zfs",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/disks/zfs/{name}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/dns",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/firewall",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/firewall/log",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/firewall/options",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/firewall/rules",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/firewall/rules/{pos}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/hardware",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/hardware/pci",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/hardware/pci/{pci-id-or-mapping}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/hardware/pci/{pci-id-or-mapping}/mdev",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/hardware/usb",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/hosts",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/journal",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/lxc",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/lxc/{vmid}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/lxc/{vmid}/config",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/lxc/{vmid}/feature",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/lxc/{vmid}/firewall",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/lxc/{vmid}/firewall/aliases",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/lxc/{vmid}/firewall/aliases/{name}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/lxc/{vmid}/firewall/ipset",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/lxc/{vmid}/firewall/ipset/{name}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/lxc/{vmid}/firewall/ipset/{name}/{cidr}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/lxc/{vmid}/firewall/log",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/lxc/{vmid}/firewall/options",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/lxc/{vmid}/firewall/refs",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/lxc/{vmid}/firewall/rules",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/lxc/{vmid}/firewall/rules/{pos}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/lxc/{vmid}/interfaces",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/lxc/{vmid}/migrate",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/lxc/{vmid}/mtunnelwebsocket",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/lxc/{vmid}/pending",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/lxc/{vmid}/rrd",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/lxc/{vmid}/rrddata",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/lxc/{vmid}/snapshot",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/lxc/{vmid}/snapshot/{snapname}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/lxc/{vmid}/snapshot/{snapname}/config",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/lxc/{vmid}/status",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/lxc/{vmid}/status/current",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/lxc/{vmid}/vncwebsocket",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/netstat",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/network",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/network/{iface}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/qemu",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/qemu/{vmid}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/qemu/{vmid}/agent",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/qemu/{vmid}/agent/exec-status",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/qemu/{vmid}/agent/file-read",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/qemu/{vmid}/agent/get-fsinfo",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/qemu/{vmid}/agent/get-host-name",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/qemu/{vmid}/agent/get-memory-block-info",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/qemu/{vmid}/agent/get-memory-blocks",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/qemu/{vmid}/agent/get-osinfo",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/qemu/{vmid}/agent/get-time",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/qemu/{vmid}/agent/get-timezone",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/qemu/{vmid}/agent/get-users",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/qemu/{vmid}/agent/get-vcpus",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/qemu/{vmid}/agent/info",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/qemu/{vmid}/agent/network-get-interfaces",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/qemu/{vmid}/cloudinit",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/qemu/{vmid}/cloudinit/dump",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/qemu/{vmid}/config",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/qemu/{vmid}/feature",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/qemu/{vmid}/firewall",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/qemu/{vmid}/firewall/aliases",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/qemu/{vmid}/firewall/aliases/{name}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/qemu/{vmid}/firewall/ipset",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/qemu/{vmid}/firewall/ipset/{name}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/qemu/{vmid}/firewall/ipset/{name}/{cidr}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/qemu/{vmid}/firewall/log",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/qemu/{vmid}/firewall/options",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/qemu/{vmid}/firewall/refs",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/qemu/{vmid}/firewall/rules",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/qemu/{vmid}/firewall/rules/{pos}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/qemu/{vmid}/migrate",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/qemu/{vmid}/mtunnelwebsocket",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/qemu/{vmid}/pending",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/qemu/{vmid}/rrd",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/qemu/{vmid}/rrddata",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/qemu/{vmid}/snapshot",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/qemu/{vmid}/snapshot/{snapname}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/qemu/{vmid}/snapshot/{snapname}/config",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/qemu/{vmid}/status",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/qemu/{vmid}/status/current",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/qemu/{vmid}/vncwebsocket",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/query-oci-repo-tags",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/query-url-metadata",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/replication",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/replication/{id}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/replication/{id}/log",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/replication/{id}/status",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/report",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/rrd",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/rrddata",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/scan",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/scan/cifs",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/scan/glusterfs",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/scan/iscsi",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/scan/lvm",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/scan/lvmthin",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/scan/nfs",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/scan/pbs",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/scan/zfs",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/sdn",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/sdn/fabrics/{fabric}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/sdn/fabrics/{fabric}/interfaces",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/sdn/fabrics/{fabric}/neighbors",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/sdn/fabrics/{fabric}/routes",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/sdn/vnets/{vnet}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/sdn/vnets/{vnet}/mac-vrf",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/sdn/zones",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/sdn/zones/{zone}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/sdn/zones/{zone}/bridges",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/sdn/zones/{zone}/content",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/sdn/zones/{zone}/ip-vrf",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/services",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/services/{service}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/services/{service}/state",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/status",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/storage",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/storage/{storage}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/storage/{storage}/content",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/storage/{storage}/content/{volume}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/storage/{storage}/file-restore/download",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/storage/{storage}/file-restore/list",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/storage/{storage}/identity",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/storage/{storage}/import-metadata",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/storage/{storage}/prunebackups",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/storage/{storage}/rrd",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/storage/{storage}/rrddata",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/storage/{storage}/status",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/subscription",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/syslog",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/tasks",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/tasks/{upid}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/tasks/{upid}/log",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/tasks/{upid}/status",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/time",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/version",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/vncwebsocket",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/vzdump/defaults",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /nodes/{node}/vzdump/extractconfig",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /pools",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /pools/{poolid}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /storage",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /storage/{storage}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema get /version",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /access/domains",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /access/domains/{realm}/sync",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /access/groups",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /access/openid/auth-url",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /access/openid/login",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /access/roles",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /access/tfa/{userid}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /access/ticket",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /access/users",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /access/users/{userid}/token/{tokenid}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /access/vncticket",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /cluster/acme/account",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /cluster/acme/plugins",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /cluster/backup",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /cluster/bulk-action/guest/migrate",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /cluster/bulk-action/guest/shutdown",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /cluster/bulk-action/guest/start",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /cluster/bulk-action/guest/suspend",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /cluster/ceph/restart-bulk",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /cluster/config",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /cluster/config/join",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /cluster/config/nodes/{node}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /cluster/firewall/aliases",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /cluster/firewall/groups",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /cluster/firewall/groups/{group}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /cluster/firewall/ipset",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /cluster/firewall/ipset/{name}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /cluster/firewall/rules",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /cluster/ha/groups",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /cluster/ha/resources",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /cluster/ha/resources/{sid}/migrate",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /cluster/ha/resources/{sid}/relocate",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /cluster/ha/rules",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /cluster/ha/status/arm-ha",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /cluster/ha/status/disarm-ha",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /cluster/jobs/realm-sync/{id}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /cluster/mapping/dir",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /cluster/mapping/pci",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /cluster/mapping/usb",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /cluster/metrics/server/{id}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /cluster/notifications/endpoints/gotify",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /cluster/notifications/endpoints/sendmail",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /cluster/notifications/endpoints/smtp",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /cluster/notifications/endpoints/webhook",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /cluster/notifications/matchers",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /cluster/notifications/targets/{name}/test",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /cluster/qemu/custom-cpu-models",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /cluster/replication",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /cluster/sdn/controllers",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /cluster/sdn/dns",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /cluster/sdn/fabrics/fabric",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /cluster/sdn/fabrics/node/{fabric_id}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /cluster/sdn/ipams",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /cluster/sdn/lock",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /cluster/sdn/prefix-lists",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /cluster/sdn/prefix-lists/{id}/entries",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /cluster/sdn/rollback",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /cluster/sdn/route-maps/entries",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /cluster/sdn/vnets",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /cluster/sdn/vnets/{vnet}/firewall/rules",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /cluster/sdn/vnets/{vnet}/ips",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /cluster/sdn/vnets/{vnet}/subnets",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /cluster/sdn/zones",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /nodes/{node}/aplinfo",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /nodes/{node}/apt/repositories",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /nodes/{node}/apt/update",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /nodes/{node}/ceph/fs/{name}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /nodes/{node}/ceph/init",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /nodes/{node}/ceph/mds/{name}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /nodes/{node}/ceph/mgr/{id}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /nodes/{node}/ceph/mon/{monid}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /nodes/{node}/ceph/osd",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /nodes/{node}/ceph/osd/{osdid}/in",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /nodes/{node}/ceph/osd/{osdid}/out",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /nodes/{node}/ceph/osd/{osdid}/scrub",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /nodes/{node}/ceph/pool",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /nodes/{node}/ceph/restart",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /nodes/{node}/ceph/restart-bulk",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /nodes/{node}/ceph/start",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /nodes/{node}/ceph/stop",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /nodes/{node}/certificates/acme/certificate",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /nodes/{node}/certificates/custom",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /nodes/{node}/disks/directory",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /nodes/{node}/disks/initgpt",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /nodes/{node}/disks/lvm",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /nodes/{node}/disks/lvmthin",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /nodes/{node}/disks/zfs",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /nodes/{node}/execute",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /nodes/{node}/firewall/rules",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /nodes/{node}/hosts",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /nodes/{node}/lxc",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /nodes/{node}/lxc/{vmid}/clone",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /nodes/{node}/lxc/{vmid}/firewall/aliases",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /nodes/{node}/lxc/{vmid}/firewall/ipset",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /nodes/{node}/lxc/{vmid}/firewall/ipset/{name}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /nodes/{node}/lxc/{vmid}/firewall/rules",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /nodes/{node}/lxc/{vmid}/migrate",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /nodes/{node}/lxc/{vmid}/move_volume",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /nodes/{node}/lxc/{vmid}/mtunnel",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /nodes/{node}/lxc/{vmid}/remote_migrate",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /nodes/{node}/lxc/{vmid}/snapshot",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /nodes/{node}/lxc/{vmid}/snapshot/{snapname}/rollback",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /nodes/{node}/lxc/{vmid}/spiceproxy",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /nodes/{node}/lxc/{vmid}/status/reboot",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /nodes/{node}/lxc/{vmid}/status/resume",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /nodes/{node}/lxc/{vmid}/status/shutdown",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /nodes/{node}/lxc/{vmid}/status/start",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /nodes/{node}/lxc/{vmid}/status/stop",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /nodes/{node}/lxc/{vmid}/status/suspend",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /nodes/{node}/lxc/{vmid}/template",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /nodes/{node}/lxc/{vmid}/termproxy",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /nodes/{node}/lxc/{vmid}/vncproxy",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /nodes/{node}/migrateall",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /nodes/{node}/network",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /nodes/{node}/qemu",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /nodes/{node}/qemu/{vmid}/agent",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /nodes/{node}/qemu/{vmid}/agent/exec",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /nodes/{node}/qemu/{vmid}/agent/file-write",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /nodes/{node}/qemu/{vmid}/agent/fsfreeze-freeze",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /nodes/{node}/qemu/{vmid}/agent/fsfreeze-status",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /nodes/{node}/qemu/{vmid}/agent/fsfreeze-thaw",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /nodes/{node}/qemu/{vmid}/agent/fstrim",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /nodes/{node}/qemu/{vmid}/agent/ping",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /nodes/{node}/qemu/{vmid}/agent/set-user-password",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /nodes/{node}/qemu/{vmid}/agent/shutdown",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /nodes/{node}/qemu/{vmid}/agent/suspend-disk",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /nodes/{node}/qemu/{vmid}/agent/suspend-hybrid",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /nodes/{node}/qemu/{vmid}/agent/suspend-ram",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /nodes/{node}/qemu/{vmid}/clone",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /nodes/{node}/qemu/{vmid}/config",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /nodes/{node}/qemu/{vmid}/dbus-vmstate",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /nodes/{node}/qemu/{vmid}/firewall/aliases",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /nodes/{node}/qemu/{vmid}/firewall/ipset",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /nodes/{node}/qemu/{vmid}/firewall/ipset/{name}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /nodes/{node}/qemu/{vmid}/firewall/rules",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /nodes/{node}/qemu/{vmid}/migrate",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /nodes/{node}/qemu/{vmid}/monitor",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /nodes/{node}/qemu/{vmid}/move_disk",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /nodes/{node}/qemu/{vmid}/mtunnel",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /nodes/{node}/qemu/{vmid}/remote_migrate",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /nodes/{node}/qemu/{vmid}/snapshot",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /nodes/{node}/qemu/{vmid}/snapshot/{snapname}/rollback",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /nodes/{node}/qemu/{vmid}/spiceproxy",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /nodes/{node}/qemu/{vmid}/status/reboot",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /nodes/{node}/qemu/{vmid}/status/reset",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /nodes/{node}/qemu/{vmid}/status/resume",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /nodes/{node}/qemu/{vmid}/status/shutdown",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /nodes/{node}/qemu/{vmid}/status/start",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /nodes/{node}/qemu/{vmid}/status/stop",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /nodes/{node}/qemu/{vmid}/status/suspend",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /nodes/{node}/qemu/{vmid}/template",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /nodes/{node}/qemu/{vmid}/termproxy",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /nodes/{node}/qemu/{vmid}/vncproxy",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /nodes/{node}/replication/{id}/schedule_now",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /nodes/{node}/services/{service}/reload",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /nodes/{node}/services/{service}/restart",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /nodes/{node}/services/{service}/start",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /nodes/{node}/services/{service}/stop",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /nodes/{node}/spiceshell",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /nodes/{node}/startall",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /nodes/{node}/status",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /nodes/{node}/stopall",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /nodes/{node}/storage/{storage}/content",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /nodes/{node}/storage/{storage}/content/{volume}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /nodes/{node}/storage/{storage}/download-url",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /nodes/{node}/storage/{storage}/oci-registry-pull",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /nodes/{node}/storage/{storage}/upload",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /nodes/{node}/subscription",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /nodes/{node}/suspendall",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /nodes/{node}/termproxy",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /nodes/{node}/vncshell",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /nodes/{node}/vzdump",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /nodes/{node}/wakeonlan",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /pools",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema post /storage",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema put /access/acl",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema put /access/domains/{realm}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema put /access/groups/{groupid}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema put /access/password",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema put /access/roles/{roleid}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema put /access/tfa/{userid}/{id}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema put /access/users/{userid}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema put /access/users/{userid}/token/{tokenid}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema put /access/users/{userid}/unlock-tfa",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema put /cluster/acme/account/{name}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema put /cluster/acme/plugins/{id}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema put /cluster/backup/{id}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema put /cluster/ceph/flags",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema put /cluster/ceph/flags/{flag}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema put /cluster/ceph/health-mute/{code}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema put /cluster/firewall/aliases/{name}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema put /cluster/firewall/groups/{group}/{pos}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema put /cluster/firewall/ipset/{name}/{cidr}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema put /cluster/firewall/options",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema put /cluster/firewall/rules/{pos}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema put /cluster/ha/groups/{group}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema put /cluster/ha/resources/{sid}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema put /cluster/ha/rules/{rule}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema put /cluster/jobs/realm-sync/{id}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema put /cluster/mapping/dir/{id}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema put /cluster/mapping/pci/{id}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema put /cluster/mapping/usb/{id}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema put /cluster/metrics/server/{id}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema put /cluster/notifications/endpoints/gotify/{name}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema put /cluster/notifications/endpoints/sendmail/{name}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema put /cluster/notifications/endpoints/smtp/{name}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema put /cluster/notifications/endpoints/webhook/{name}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema put /cluster/notifications/matchers/{name}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema put /cluster/options",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema put /cluster/qemu/custom-cpu-models/{cputype}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema put /cluster/replication/{id}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema put /cluster/sdn",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema put /cluster/sdn/controllers/{controller}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema put /cluster/sdn/dns/{dns}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema put /cluster/sdn/fabrics/fabric/{id}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema put /cluster/sdn/fabrics/node/{fabric_id}/{node_id}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema put /cluster/sdn/ipams/{ipam}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema put /cluster/sdn/prefix-lists/{id}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema put /cluster/sdn/prefix-lists/{id}/entries/{url_seq}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema put /cluster/sdn/route-maps/entries/{route-map-id}/entry/{order}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema put /cluster/sdn/vnets/{vnet}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema put /cluster/sdn/vnets/{vnet}/firewall/options",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema put /cluster/sdn/vnets/{vnet}/firewall/rules/{pos}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema put /cluster/sdn/vnets/{vnet}/ips",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema put /cluster/sdn/vnets/{vnet}/subnets/{subnet}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema put /cluster/sdn/zones/{zone}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema put /nodes/{node}/apt/repositories",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema put /nodes/{node}/ceph/pool/{name}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema put /nodes/{node}/certificates/acme/certificate",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema put /nodes/{node}/config",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema put /nodes/{node}/disks/wipedisk",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema put /nodes/{node}/dns",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema put /nodes/{node}/firewall/options",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema put /nodes/{node}/firewall/rules/{pos}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema put /nodes/{node}/lxc/{vmid}/config",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema put /nodes/{node}/lxc/{vmid}/firewall/aliases/{name}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema put /nodes/{node}/lxc/{vmid}/firewall/ipset/{name}/{cidr}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema put /nodes/{node}/lxc/{vmid}/firewall/options",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema put /nodes/{node}/lxc/{vmid}/firewall/rules/{pos}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema put /nodes/{node}/lxc/{vmid}/resize",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema put /nodes/{node}/lxc/{vmid}/snapshot/{snapname}/config",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema put /nodes/{node}/network",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema put /nodes/{node}/network/{iface}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema put /nodes/{node}/qemu/{vmid}/cloudinit",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema put /nodes/{node}/qemu/{vmid}/config",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema put /nodes/{node}/qemu/{vmid}/firewall/aliases/{name}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema put /nodes/{node}/qemu/{vmid}/firewall/ipset/{name}/{cidr}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema put /nodes/{node}/qemu/{vmid}/firewall/options",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema put /nodes/{node}/qemu/{vmid}/firewall/rules/{pos}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema put /nodes/{node}/qemu/{vmid}/resize",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema put /nodes/{node}/qemu/{vmid}/sendkey",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema put /nodes/{node}/qemu/{vmid}/snapshot/{snapname}/config",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema put /nodes/{node}/qemu/{vmid}/unlink",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema put /nodes/{node}/storage/{storage}/content/{volume}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema put /nodes/{node}/subscription",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema put /nodes/{node}/time",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema put /pools",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema put /pools/{poolid}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "schema put /storage/{storage}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      }
+    },
+    {
+      "command": "get /access/permissions",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value",
+        "api-path": "value",
+        "api-userid": "value"
+      },
+      "catalogues": [
+        "legacy-8.2.7",
+        "published-current"
+      ]
+    },
+    {
+      "command": "get /cluster/resources",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value",
+        "api-type": "value"
+      },
+      "catalogues": [
+        "legacy-8.2.7",
+        "published-current"
+      ]
+    },
+    {
+      "command": "get /nodes",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      },
+      "catalogues": [
+        "legacy-8.2.7",
+        "published-current"
+      ]
+    },
+    {
+      "command": "get /nodes/{node}/lxc",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value",
+        "api-node": "value"
+      },
+      "catalogues": [
+        "legacy-8.2.7",
+        "published-current"
+      ]
+    },
+    {
+      "command": "get /nodes/{node}/qemu",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value",
+        "api-full": "value",
+        "api-node": "value"
+      },
+      "catalogues": [
+        "legacy-8.2.7",
+        "published-current"
+      ]
+    },
+    {
+      "command": "get /nodes/{node}/storage",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value",
+        "api-content": "value",
+        "api-enabled": "value",
+        "api-format": "value",
+        "api-node": "value",
+        "api-storage": "value",
+        "api-target": "value"
+      },
+      "catalogues": [
+        "legacy-8.2.7",
+        "published-current"
+      ]
+    },
+    {
+      "command": "get /nodes/{node}/tasks",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value",
+        "api-errors": "value",
+        "api-limit": "value",
+        "api-node": "value",
+        "api-since": "value",
+        "api-source": "value",
+        "api-start": "value",
+        "api-statusfilter": "value",
+        "api-typefilter": "value",
+        "api-until": "value",
+        "api-userfilter": "value",
+        "api-vmid": "value"
+      },
+      "catalogues": [
+        "legacy-8.2.7",
+        "published-current"
+      ]
+    },
+    {
+      "command": "get /nodes/{node}/tasks/{upid}/status",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value",
+        "api-node": "value",
+        "api-upid": "value"
+      },
+      "catalogues": [
+        "legacy-8.2.7",
+        "published-current"
+      ]
+    },
+    {
+      "command": "get /version",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value"
+      },
+      "catalogues": [
+        "legacy-8.2.7",
+        "published-current"
+      ]
+    }
+  ]
+}

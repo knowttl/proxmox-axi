@@ -1,11 +1,2749 @@
 {
   "generated": true,
-  "source": "src/operations.json",
-  "sourceSha256": "b6f1a0eb8c0404a41a3083005d4ff39440cdb417ae408d44149e9668fa66286d",
+  "sources": [
+    "src/operations.json",
+    "vendor/proxmox-host-api-schema.txt",
+    "vendor/proxmox-api-schema.txt"
+  ],
+  "operationsSha256": "df31f8884bb0a470f9be418c9867734f248ba61f2daf163c5ebc65ffe1d57a87",
+  "captures": [
+    {
+      "release": "legacy-8.2.7",
+      "file": "proxmox-host-api-schema.txt",
+      "sha256": "61100b5ee3ec822c5ee54906bbe6354d6296468fbd00aed9ad032cfad184258d",
+      "count": 605
+    },
+    {
+      "release": "published-current",
+      "file": "proxmox-api-schema.txt",
+      "sha256": "68a8ac7b4994525a1df5530e2d96f4fc76b6401f07861ac8a51635a0b9ce7c53",
+      "count": 680
+    }
+  ],
   "commands": [
+    {
+      "command": "delete /access/domains/{realm}",
+      "purpose": "Delete an authentication server."
+    },
+    {
+      "command": "delete /access/groups/{groupid}",
+      "purpose": "Delete group."
+    },
+    {
+      "command": "delete /access/roles/{roleid}",
+      "purpose": "Delete role."
+    },
+    {
+      "command": "delete /access/tfa/{userid}/{id}",
+      "purpose": "Delete a TFA entry by ID."
+    },
+    {
+      "command": "delete /access/users/{userid}",
+      "purpose": "Delete user."
+    },
+    {
+      "command": "delete /access/users/{userid}/token/{tokenid}",
+      "purpose": "Remove API token for a specific user."
+    },
+    {
+      "command": "delete /cluster/acme/account/{name}",
+      "purpose": "Deactivate existing ACME account at CA."
+    },
+    {
+      "command": "delete /cluster/acme/plugins/{id}",
+      "purpose": "Delete ACME plugin configuration."
+    },
+    {
+      "command": "delete /cluster/backup/{id}",
+      "purpose": "Delete vzdump backup job definition."
+    },
+    {
+      "command": "delete /cluster/config/nodes/{node}",
+      "purpose": "Removes a node from the cluster configuration."
+    },
+    {
+      "command": "delete /cluster/firewall/aliases/{name}",
+      "purpose": "Remove IP or Network alias."
+    },
+    {
+      "command": "delete /cluster/firewall/groups/{group}",
+      "purpose": "Delete security group."
+    },
+    {
+      "command": "delete /cluster/firewall/groups/{group}/{pos}",
+      "purpose": "Delete rule."
+    },
+    {
+      "command": "delete /cluster/firewall/ipset/{name}",
+      "purpose": "Delete IPSet"
+    },
+    {
+      "command": "delete /cluster/firewall/ipset/{name}/{cidr}",
+      "purpose": "Remove IP or Network from IPSet."
+    },
+    {
+      "command": "delete /cluster/firewall/rules/{pos}",
+      "purpose": "Delete rule."
+    },
+    {
+      "command": "delete /cluster/ha/groups/{group}",
+      "purpose": "Delete ha group configuration."
+    },
+    {
+      "command": "delete /cluster/ha/resources/{sid}",
+      "purpose": "Delete resource configuration."
+    },
+    {
+      "command": "delete /cluster/ha/rules/{rule}",
+      "purpose": "Delete HA rule."
+    },
+    {
+      "command": "delete /cluster/jobs/realm-sync/{id}",
+      "purpose": "Delete realm-sync job definition."
+    },
+    {
+      "command": "delete /cluster/mapping/dir/{id}",
+      "purpose": "Remove directory mapping."
+    },
+    {
+      "command": "delete /cluster/mapping/pci/{id}",
+      "purpose": "Remove Hardware Mapping."
+    },
+    {
+      "command": "delete /cluster/mapping/usb/{id}",
+      "purpose": "Remove Hardware Mapping."
+    },
+    {
+      "command": "delete /cluster/metrics/server/{id}",
+      "purpose": "Remove Metric server."
+    },
+    {
+      "command": "delete /cluster/notifications/endpoints/gotify/{name}",
+      "purpose": "Remove gotify endpoint"
+    },
+    {
+      "command": "delete /cluster/notifications/endpoints/sendmail/{name}",
+      "purpose": "Remove sendmail endpoint"
+    },
+    {
+      "command": "delete /cluster/notifications/endpoints/smtp/{name}",
+      "purpose": "Remove smtp endpoint"
+    },
+    {
+      "command": "delete /cluster/notifications/endpoints/webhook/{name}",
+      "purpose": "Remove webhook endpoint"
+    },
+    {
+      "command": "delete /cluster/notifications/matchers/{name}",
+      "purpose": "Remove matcher"
+    },
+    {
+      "command": "delete /cluster/qemu/custom-cpu-models/{cputype}",
+      "purpose": "Delete a custom CPU model definition."
+    },
+    {
+      "command": "delete /cluster/replication/{id}",
+      "purpose": "Mark replication job for removal."
+    },
+    {
+      "command": "delete /cluster/sdn/controllers/{controller}",
+      "purpose": "Delete sdn controller object configuration."
+    },
+    {
+      "command": "delete /cluster/sdn/dns/{dns}",
+      "purpose": "Delete sdn dns object configuration."
+    },
+    {
+      "command": "delete /cluster/sdn/fabrics/fabric/{id}",
+      "purpose": "Add a fabric"
+    },
+    {
+      "command": "delete /cluster/sdn/fabrics/node/{fabric_id}/{node_id}",
+      "purpose": "Add a node"
+    },
+    {
+      "command": "delete /cluster/sdn/ipams/{ipam}",
+      "purpose": "Delete sdn ipam object configuration."
+    },
+    {
+      "command": "delete /cluster/sdn/lock",
+      "purpose": "Release global lock for SDN configuration"
+    },
+    {
+      "command": "delete /cluster/sdn/prefix-lists/{id}",
+      "purpose": "Delete Prefix List"
+    },
+    {
+      "command": "delete /cluster/sdn/prefix-lists/{id}/entries/{url_seq}",
+      "purpose": "Delete Prefix List Entry"
+    },
+    {
+      "command": "delete /cluster/sdn/route-maps/entries/{route-map-id}/entry/{order}",
+      "purpose": "Delete Route Map Entry"
+    },
+    {
+      "command": "delete /cluster/sdn/vnets/{vnet}",
+      "purpose": "Delete sdn vnet object configuration."
+    },
+    {
+      "command": "delete /cluster/sdn/vnets/{vnet}/firewall/rules/{pos}",
+      "purpose": "Delete rule."
+    },
+    {
+      "command": "delete /cluster/sdn/vnets/{vnet}/ips",
+      "purpose": "Delete IP Mappings in a VNet"
+    },
+    {
+      "command": "delete /cluster/sdn/vnets/{vnet}/subnets/{subnet}",
+      "purpose": "Delete sdn subnet object configuration."
+    },
+    {
+      "command": "delete /cluster/sdn/zones/{zone}",
+      "purpose": "Delete sdn zone object configuration."
+    },
+    {
+      "command": "delete /nodes/{node}/ceph/fs/{name}",
+      "purpose": "Destroy a Ceph filesystem. Refuses if any PVE storage entry of type 'cephfs' still references the filesystem and is not disabled. Optionally also removes the storage entries and/or the underlying metadata and data pools."
+    },
+    {
+      "command": "delete /nodes/{node}/ceph/mds/{name}",
+      "purpose": "Destroy Ceph Metadata Server"
+    },
+    {
+      "command": "delete /nodes/{node}/ceph/mgr/{id}",
+      "purpose": "Destroy Ceph Manager."
+    },
+    {
+      "command": "delete /nodes/{node}/ceph/mon/{monid}",
+      "purpose": "Destroy Ceph Monitor and Manager."
+    },
+    {
+      "command": "delete /nodes/{node}/ceph/osd/{osdid}",
+      "purpose": "Destroy OSD"
+    },
+    {
+      "command": "delete /nodes/{node}/ceph/pool/{name}",
+      "purpose": "Destroy pool"
+    },
+    {
+      "command": "delete /nodes/{node}/certificates/acme/certificate",
+      "purpose": "Revoke existing certificate from CA."
+    },
+    {
+      "command": "delete /nodes/{node}/certificates/custom",
+      "purpose": "DELETE custom certificate chain and key."
+    },
+    {
+      "command": "delete /nodes/{node}/disks/directory/{name}",
+      "purpose": "Unmounts the storage and removes the mount unit."
+    },
+    {
+      "command": "delete /nodes/{node}/disks/lvm/{name}",
+      "purpose": "Remove an LVM Volume Group."
+    },
+    {
+      "command": "delete /nodes/{node}/disks/lvmthin/{name}",
+      "purpose": "Remove an LVM thin pool."
+    },
+    {
+      "command": "delete /nodes/{node}/disks/zfs/{name}",
+      "purpose": "Destroy a ZFS pool."
+    },
+    {
+      "command": "delete /nodes/{node}/firewall/rules/{pos}",
+      "purpose": "Delete rule."
+    },
+    {
+      "command": "delete /nodes/{node}/lxc/{vmid}",
+      "purpose": "Destroy the container (also delete all uses files)."
+    },
+    {
+      "command": "delete /nodes/{node}/lxc/{vmid}/firewall/aliases/{name}",
+      "purpose": "Remove IP or Network alias."
+    },
+    {
+      "command": "delete /nodes/{node}/lxc/{vmid}/firewall/ipset/{name}",
+      "purpose": "Delete IPSet"
+    },
+    {
+      "command": "delete /nodes/{node}/lxc/{vmid}/firewall/ipset/{name}/{cidr}",
+      "purpose": "Remove IP or Network from IPSet."
+    },
+    {
+      "command": "delete /nodes/{node}/lxc/{vmid}/firewall/rules/{pos}",
+      "purpose": "Delete rule."
+    },
+    {
+      "command": "delete /nodes/{node}/lxc/{vmid}/snapshot/{snapname}",
+      "purpose": "Delete a LXC snapshot."
+    },
+    {
+      "command": "delete /nodes/{node}/network",
+      "purpose": "Revert network configuration changes."
+    },
+    {
+      "command": "delete /nodes/{node}/network/{iface}",
+      "purpose": "Delete network device configuration"
+    },
+    {
+      "command": "delete /nodes/{node}/qemu/{vmid}",
+      "purpose": "Destroy the VM and  all used/owned volumes. Removes any VM specific permissions and firewall rules"
+    },
+    {
+      "command": "delete /nodes/{node}/qemu/{vmid}/firewall/aliases/{name}",
+      "purpose": "Remove IP or Network alias."
+    },
+    {
+      "command": "delete /nodes/{node}/qemu/{vmid}/firewall/ipset/{name}",
+      "purpose": "Delete IPSet"
+    },
+    {
+      "command": "delete /nodes/{node}/qemu/{vmid}/firewall/ipset/{name}/{cidr}",
+      "purpose": "Remove IP or Network from IPSet."
+    },
+    {
+      "command": "delete /nodes/{node}/qemu/{vmid}/firewall/rules/{pos}",
+      "purpose": "Delete rule."
+    },
+    {
+      "command": "delete /nodes/{node}/qemu/{vmid}/snapshot/{snapname}",
+      "purpose": "Delete a VM snapshot."
+    },
+    {
+      "command": "delete /nodes/{node}/storage/{storage}/content/{volume}",
+      "purpose": "Delete volume"
+    },
+    {
+      "command": "delete /nodes/{node}/storage/{storage}/prunebackups",
+      "purpose": "Prune backups. Only those using the standard naming scheme are considered."
+    },
+    {
+      "command": "delete /nodes/{node}/subscription",
+      "purpose": "Delete subscription key of this node."
+    },
+    {
+      "command": "delete /nodes/{node}/tasks/{upid}",
+      "purpose": "Stop a task."
+    },
+    {
+      "command": "delete /pools",
+      "purpose": "Delete pool."
+    },
+    {
+      "command": "delete /pools/{poolid}",
+      "purpose": "Delete pool (deprecated, no support for nested pools, use 'DELETE /pools/?poolid={poolid}')."
+    },
+    {
+      "command": "delete /storage/{storage}",
+      "purpose": "Delete storage configuration."
+    },
+    {
+      "command": "get /access",
+      "purpose": "Directory index."
+    },
+    {
+      "command": "get /access/acl",
+      "purpose": "Get Access Control List (ACLs)."
+    },
+    {
+      "command": "get /access/domains",
+      "purpose": "Authentication domain index."
+    },
+    {
+      "command": "get /access/domains/{realm}",
+      "purpose": "Get auth server configuration."
+    },
+    {
+      "command": "get /access/groups",
+      "purpose": "Group index."
+    },
+    {
+      "command": "get /access/groups/{groupid}",
+      "purpose": "Get group configuration."
+    },
+    {
+      "command": "get /access/openid",
+      "purpose": "Directory index."
+    },
+    {
+      "command": "get /access/permissions",
+      "purpose": "Retrieve effective permissions of given user/token."
+    },
+    {
+      "command": "get /access/roles",
+      "purpose": "Role index."
+    },
+    {
+      "command": "get /access/roles/{roleid}",
+      "purpose": "Get role configuration."
+    },
+    {
+      "command": "get /access/tfa",
+      "purpose": "List TFA configurations of users."
+    },
+    {
+      "command": "get /access/tfa/{userid}",
+      "purpose": "List TFA configurations of users."
+    },
+    {
+      "command": "get /access/tfa/{userid}/{id}",
+      "purpose": "Fetch a requested TFA entry if present."
+    },
+    {
+      "command": "get /access/ticket",
+      "purpose": "Dummy. Useful for formatters which want to provide a login page."
+    },
+    {
+      "command": "get /access/users",
+      "purpose": "User index."
+    },
+    {
+      "command": "get /access/users/{userid}",
+      "purpose": "Get user configuration."
+    },
+    {
+      "command": "get /access/users/{userid}/tfa",
+      "purpose": "Get user TFA types (Personal and Realm)."
+    },
+    {
+      "command": "get /access/users/{userid}/token",
+      "purpose": "Get user API tokens."
+    },
+    {
+      "command": "get /access/users/{userid}/token/{tokenid}",
+      "purpose": "Get specific API token information."
+    },
+    {
+      "command": "get /cluster",
+      "purpose": "Cluster index."
+    },
+    {
+      "command": "get /cluster/acme",
+      "purpose": "ACMEAccount index."
+    },
+    {
+      "command": "get /cluster/acme/account",
+      "purpose": "ACMEAccount index."
+    },
+    {
+      "command": "get /cluster/acme/account/{name}",
+      "purpose": "Return existing ACME account information."
+    },
+    {
+      "command": "get /cluster/acme/challenge-schema",
+      "purpose": "Get schema of ACME challenge types."
+    },
+    {
+      "command": "get /cluster/acme/directories",
+      "purpose": "Get named known ACME directory endpoints."
+    },
+    {
+      "command": "get /cluster/acme/meta",
+      "purpose": "Retrieve ACME Directory Meta Information"
+    },
+    {
+      "command": "get /cluster/acme/plugins",
+      "purpose": "ACME plugin index."
+    },
+    {
+      "command": "get /cluster/acme/plugins/{id}",
+      "purpose": "Get ACME plugin configuration."
+    },
+    {
+      "command": "get /cluster/acme/tos",
+      "purpose": "Retrieve ACME TermsOfService URL from CA. Deprecated, please use /cluster/acme/meta."
+    },
+    {
+      "command": "get /cluster/backup",
+      "purpose": "List vzdump backup schedule."
+    },
+    {
+      "command": "get /cluster/backup-info",
+      "purpose": "Index for backup info related endpoints"
+    },
+    {
+      "command": "get /cluster/backup-info/not-backed-up",
+      "purpose": "Shows all guests which are not covered by any backup job."
+    },
+    {
+      "command": "get /cluster/backup/{id}",
+      "purpose": "Read vzdump backup job definition."
+    },
+    {
+      "command": "get /cluster/backup/{id}/included_volumes",
+      "purpose": "Returns included guests and the backup status of their disks. Optimized to be used in ExtJS tree views."
+    },
+    {
+      "command": "get /cluster/bulk-action",
+      "purpose": "List resource types."
+    },
+    {
+      "command": "get /cluster/bulk-action/guest",
+      "purpose": "Bulk action index."
+    },
+    {
+      "command": "get /cluster/ceph",
+      "purpose": "Cluster ceph index."
+    },
+    {
+      "command": "get /cluster/ceph/flags",
+      "purpose": "get the status of all ceph flags"
+    },
+    {
+      "command": "get /cluster/ceph/flags/{flag}",
+      "purpose": "Get the status of a specific ceph flag."
+    },
+    {
+      "command": "get /cluster/ceph/health-mute",
+      "purpose": "Get the currently muted Ceph health checks."
+    },
+    {
+      "command": "get /cluster/ceph/metadata",
+      "purpose": "Get ceph metadata."
+    },
+    {
+      "command": "get /cluster/ceph/status",
+      "purpose": "Get ceph status."
+    },
+    {
+      "command": "get /cluster/config",
+      "purpose": "Directory index."
+    },
+    {
+      "command": "get /cluster/config/apiversion",
+      "purpose": "Return the version of the cluster join API available on this node."
+    },
+    {
+      "command": "get /cluster/config/join",
+      "purpose": "Get information needed to join this cluster over the connected node."
+    },
+    {
+      "command": "get /cluster/config/nodes",
+      "purpose": "Corosync node list."
+    },
+    {
+      "command": "get /cluster/config/qdevice",
+      "purpose": "Get QDevice status"
+    },
+    {
+      "command": "get /cluster/config/totem",
+      "purpose": "Get corosync totem protocol settings."
+    },
+    {
+      "command": "get /cluster/firewall",
+      "purpose": "Directory index."
+    },
+    {
+      "command": "get /cluster/firewall/aliases",
+      "purpose": "List aliases"
+    },
+    {
+      "command": "get /cluster/firewall/aliases/{name}",
+      "purpose": "Read alias."
+    },
+    {
+      "command": "get /cluster/firewall/groups",
+      "purpose": "List security groups."
+    },
+    {
+      "command": "get /cluster/firewall/groups/{group}",
+      "purpose": "List rules."
+    },
+    {
+      "command": "get /cluster/firewall/groups/{group}/{pos}",
+      "purpose": "Get single rule data."
+    },
+    {
+      "command": "get /cluster/firewall/ipset",
+      "purpose": "List IPSets"
+    },
+    {
+      "command": "get /cluster/firewall/ipset/{name}",
+      "purpose": "List IPSet content"
+    },
+    {
+      "command": "get /cluster/firewall/ipset/{name}/{cidr}",
+      "purpose": "Read IP or Network settings from IPSet."
+    },
+    {
+      "command": "get /cluster/firewall/macros",
+      "purpose": "List available macros"
+    },
+    {
+      "command": "get /cluster/firewall/options",
+      "purpose": "Get Firewall options."
+    },
+    {
+      "command": "get /cluster/firewall/refs",
+      "purpose": "Lists possible IPSet/Alias reference which are allowed in source/dest properties."
+    },
+    {
+      "command": "get /cluster/firewall/rules",
+      "purpose": "List rules."
+    },
+    {
+      "command": "get /cluster/firewall/rules/{pos}",
+      "purpose": "Get single rule data."
+    },
+    {
+      "command": "get /cluster/ha",
+      "purpose": "Directory index."
+    },
+    {
+      "command": "get /cluster/ha/groups",
+      "purpose": "Get HA groups."
+    },
+    {
+      "command": "get /cluster/ha/groups/{group}",
+      "purpose": "Read ha group configuration."
+    },
+    {
+      "command": "get /cluster/ha/resources",
+      "purpose": "List HA resources."
+    },
+    {
+      "command": "get /cluster/ha/resources/{sid}",
+      "purpose": "Read resource configuration."
+    },
+    {
+      "command": "get /cluster/ha/rules",
+      "purpose": "Get HA rules."
+    },
+    {
+      "command": "get /cluster/ha/rules/{rule}",
+      "purpose": "Read HA rule."
+    },
+    {
+      "command": "get /cluster/ha/status",
+      "purpose": "Directory index."
+    },
+    {
+      "command": "get /cluster/ha/status/current",
+      "purpose": "Get HA manger status."
+    },
+    {
+      "command": "get /cluster/ha/status/manager_status",
+      "purpose": "Get full HA manger status, including LRM status."
+    },
+    {
+      "command": "get /cluster/jobs",
+      "purpose": "Index for jobs related endpoints."
+    },
+    {
+      "command": "get /cluster/jobs/realm-sync",
+      "purpose": "List configured realm-sync-jobs."
+    },
+    {
+      "command": "get /cluster/jobs/realm-sync/{id}",
+      "purpose": "Read realm-sync job definition."
+    },
+    {
+      "command": "get /cluster/jobs/schedule-analyze",
+      "purpose": "Returns a list of future schedule runtimes."
+    },
+    {
+      "command": "get /cluster/log",
+      "purpose": "Read cluster log"
+    },
+    {
+      "command": "get /cluster/mapping",
+      "purpose": "List resource types."
+    },
+    {
+      "command": "get /cluster/mapping/dir",
+      "purpose": "List directory mapping"
+    },
+    {
+      "command": "get /cluster/mapping/dir/{id}",
+      "purpose": "Get directory mapping."
+    },
+    {
+      "command": "get /cluster/mapping/pci",
+      "purpose": "List PCI Hardware Mapping"
+    },
+    {
+      "command": "get /cluster/mapping/pci/{id}",
+      "purpose": "Get PCI Mapping."
+    },
+    {
+      "command": "get /cluster/mapping/usb",
+      "purpose": "List USB Hardware Mappings"
+    },
+    {
+      "command": "get /cluster/mapping/usb/{id}",
+      "purpose": "Get USB Mapping."
+    },
+    {
+      "command": "get /cluster/metrics",
+      "purpose": "Metrics index."
+    },
+    {
+      "command": "get /cluster/metrics/export",
+      "purpose": "Retrieve metrics of the cluster."
+    },
+    {
+      "command": "get /cluster/metrics/server",
+      "purpose": "List configured metric servers."
+    },
+    {
+      "command": "get /cluster/metrics/server/{id}",
+      "purpose": "Read metric server configuration."
+    },
+    {
+      "command": "get /cluster/nextid",
+      "purpose": "Get next free VMID. Pass a VMID to assert that its free (at time of check)."
+    },
+    {
+      "command": "get /cluster/notifications",
+      "purpose": "Index for notification-related API endpoints."
+    },
+    {
+      "command": "get /cluster/notifications/endpoints",
+      "purpose": "Index for all available endpoint types."
+    },
+    {
+      "command": "get /cluster/notifications/endpoints/gotify",
+      "purpose": "Returns a list of all gotify endpoints"
+    },
+    {
+      "command": "get /cluster/notifications/endpoints/gotify/{name}",
+      "purpose": "Return a specific gotify endpoint"
+    },
+    {
+      "command": "get /cluster/notifications/endpoints/sendmail",
+      "purpose": "Returns a list of all sendmail endpoints"
+    },
+    {
+      "command": "get /cluster/notifications/endpoints/sendmail/{name}",
+      "purpose": "Return a specific sendmail endpoint"
+    },
+    {
+      "command": "get /cluster/notifications/endpoints/smtp",
+      "purpose": "Returns a list of all smtp endpoints"
+    },
+    {
+      "command": "get /cluster/notifications/endpoints/smtp/{name}",
+      "purpose": "Return a specific smtp endpoint"
+    },
+    {
+      "command": "get /cluster/notifications/endpoints/webhook",
+      "purpose": "Returns a list of all webhook endpoints"
+    },
+    {
+      "command": "get /cluster/notifications/endpoints/webhook/{name}",
+      "purpose": "Return a specific webhook endpoint"
+    },
+    {
+      "command": "get /cluster/notifications/matcher-field-values",
+      "purpose": "Returns known notification metadata fields and their known values"
+    },
+    {
+      "command": "get /cluster/notifications/matcher-fields",
+      "purpose": "Returns known notification metadata fields"
+    },
+    {
+      "command": "get /cluster/notifications/matchers",
+      "purpose": "Returns a list of all matchers"
+    },
+    {
+      "command": "get /cluster/notifications/matchers/{name}",
+      "purpose": "Return a specific matcher"
+    },
+    {
+      "command": "get /cluster/notifications/targets",
+      "purpose": "Returns a list of all entities that can be used as notification targets."
+    },
+    {
+      "command": "get /cluster/options",
+      "purpose": "Get datacenter options. Without 'Sys.Audit' on '/' not all options are returned."
+    },
+    {
+      "command": "get /cluster/qemu",
+      "purpose": "Cluster-wide QEMU index"
+    },
+    {
+      "command": "get /cluster/qemu/cpu-flags",
+      "purpose": "List of available CPU flags. Currently only implemented for x86_64, returns an empty list for aarch64."
+    },
+    {
+      "command": "get /cluster/qemu/custom-cpu-models",
+      "purpose": "List all custom CPU model definitions visible to the user."
+    },
+    {
+      "command": "get /cluster/qemu/custom-cpu-models/{cputype}",
+      "purpose": "Retrieve details about a specific custom CPU model."
+    },
+    {
+      "command": "get /cluster/replication",
+      "purpose": "List replication jobs."
+    },
+    {
+      "command": "get /cluster/replication/{id}",
+      "purpose": "Read replication job configuration."
+    },
+    {
+      "command": "get /cluster/resources",
+      "purpose": "Resources index (cluster wide)."
+    },
+    {
+      "command": "get /cluster/sdn",
+      "purpose": "Directory index."
+    },
+    {
+      "command": "get /cluster/sdn/controllers",
+      "purpose": "SDN controllers index."
+    },
+    {
+      "command": "get /cluster/sdn/controllers/{controller}",
+      "purpose": "Read sdn controller configuration."
+    },
+    {
+      "command": "get /cluster/sdn/dns",
+      "purpose": "SDN dns index."
+    },
+    {
+      "command": "get /cluster/sdn/dns/{dns}",
+      "purpose": "Read sdn dns configuration."
+    },
+    {
+      "command": "get /cluster/sdn/dry-run",
+      "purpose": "Dry-run the SDN apply action and return the difference between the current configuration and the pending configuration"
+    },
+    {
+      "command": "get /cluster/sdn/fabrics",
+      "purpose": "SDN Fabrics Index"
+    },
+    {
+      "command": "get /cluster/sdn/fabrics/all",
+      "purpose": "SDN Fabrics Index"
+    },
+    {
+      "command": "get /cluster/sdn/fabrics/fabric",
+      "purpose": "SDN Fabrics Index"
+    },
+    {
+      "command": "get /cluster/sdn/fabrics/fabric/{id}",
+      "purpose": "Update a fabric"
+    },
+    {
+      "command": "get /cluster/sdn/fabrics/node",
+      "purpose": "SDN Fabrics Index"
+    },
+    {
+      "command": "get /cluster/sdn/fabrics/node/{fabric_id}",
+      "purpose": "SDN Fabrics Index"
+    },
+    {
+      "command": "get /cluster/sdn/fabrics/node/{fabric_id}/{node_id}",
+      "purpose": "Get a node"
+    },
+    {
+      "command": "get /cluster/sdn/ipams",
+      "purpose": "SDN ipams index."
+    },
+    {
+      "command": "get /cluster/sdn/ipams/{ipam}",
+      "purpose": "Read sdn ipam configuration."
+    },
+    {
+      "command": "get /cluster/sdn/ipams/{ipam}/status",
+      "purpose": "List PVE IPAM Entries"
+    },
+    {
+      "command": "get /cluster/sdn/prefix-lists",
+      "purpose": "List Prefix Lists"
+    },
+    {
+      "command": "get /cluster/sdn/prefix-lists/{id}",
+      "purpose": "Get Prefix List"
+    },
+    {
+      "command": "get /cluster/sdn/prefix-lists/{id}/entries",
+      "purpose": "List Prefix List Entries"
+    },
+    {
+      "command": "get /cluster/sdn/prefix-lists/{id}/entries/{url_seq}",
+      "purpose": "Get Prefix List Entry"
+    },
+    {
+      "command": "get /cluster/sdn/route-maps",
+      "purpose": "List Route Maps"
+    },
+    {
+      "command": "get /cluster/sdn/route-maps/entries",
+      "purpose": "Lists all route map entries."
+    },
+    {
+      "command": "get /cluster/sdn/route-maps/entries/{route-map-id}",
+      "purpose": "List all entries for a given Route Map"
+    },
+    {
+      "command": "get /cluster/sdn/route-maps/entries/{route-map-id}/entry/{order}",
+      "purpose": "Get Route Map Entry"
+    },
+    {
+      "command": "get /cluster/sdn/vnets",
+      "purpose": "SDN vnets index."
+    },
+    {
+      "command": "get /cluster/sdn/vnets/{vnet}",
+      "purpose": "Read sdn vnet configuration."
+    },
+    {
+      "command": "get /cluster/sdn/vnets/{vnet}/firewall",
+      "purpose": "Directory index."
+    },
+    {
+      "command": "get /cluster/sdn/vnets/{vnet}/firewall/options",
+      "purpose": "Get vnet firewall options."
+    },
+    {
+      "command": "get /cluster/sdn/vnets/{vnet}/firewall/rules",
+      "purpose": "List rules."
+    },
+    {
+      "command": "get /cluster/sdn/vnets/{vnet}/firewall/rules/{pos}",
+      "purpose": "Get single rule data."
+    },
+    {
+      "command": "get /cluster/sdn/vnets/{vnet}/subnets",
+      "purpose": "SDN subnets index."
+    },
+    {
+      "command": "get /cluster/sdn/vnets/{vnet}/subnets/{subnet}",
+      "purpose": "Read sdn subnet configuration."
+    },
+    {
+      "command": "get /cluster/sdn/zones",
+      "purpose": "SDN zones index."
+    },
+    {
+      "command": "get /cluster/sdn/zones/{zone}",
+      "purpose": "Read sdn zone configuration."
+    },
+    {
+      "command": "get /cluster/status",
+      "purpose": "Get cluster status information."
+    },
+    {
+      "command": "get /cluster/tasks",
+      "purpose": "List recent tasks (cluster wide)."
+    },
+    {
+      "command": "get /nodes",
+      "purpose": "Cluster node index."
+    },
+    {
+      "command": "get /nodes/{node}",
+      "purpose": "Node index."
+    },
+    {
+      "command": "get /nodes/{node}/aplinfo",
+      "purpose": "Get list of appliances."
+    },
+    {
+      "command": "get /nodes/{node}/apt",
+      "purpose": "Directory index for apt (Advanced Package Tool)."
+    },
+    {
+      "command": "get /nodes/{node}/apt/changelog",
+      "purpose": "Get package changelogs."
+    },
+    {
+      "command": "get /nodes/{node}/apt/repositories",
+      "purpose": "Get APT repository information."
+    },
+    {
+      "command": "get /nodes/{node}/apt/update",
+      "purpose": "List available updates."
+    },
+    {
+      "command": "get /nodes/{node}/apt/versions",
+      "purpose": "Get package information for important Proxmox packages."
+    },
+    {
+      "command": "get /nodes/{node}/capabilities",
+      "purpose": "Node capabilities index."
+    },
+    {
+      "command": "get /nodes/{node}/capabilities/qemu",
+      "purpose": "QEMU capabilities index."
+    },
+    {
+      "command": "get /nodes/{node}/capabilities/qemu/cpu",
+      "purpose": "List all custom and default CPU models."
+    },
+    {
+      "command": "get /nodes/{node}/capabilities/qemu/cpu-flags",
+      "purpose": "List of available VM-specific CPU flags. Returns an empty list for 'aarch64' as no VM-specific flags are defined for it yet."
+    },
+    {
+      "command": "get /nodes/{node}/capabilities/qemu/machines",
+      "purpose": "Get available QEMU/KVM machine types."
+    },
+    {
+      "command": "get /nodes/{node}/capabilities/qemu/migration",
+      "purpose": "Get node-specific QEMU migration capabilities of the node. Requires the 'Sys.Audit' permission on '/nodes/<node>'."
+    },
+    {
+      "command": "get /nodes/{node}/ceph",
+      "purpose": "Directory index."
+    },
+    {
+      "command": "get /nodes/{node}/ceph/cfg",
+      "purpose": "Directory index."
+    },
+    {
+      "command": "get /nodes/{node}/ceph/cfg/db",
+      "purpose": "Get the Ceph configuration database."
+    },
+    {
+      "command": "get /nodes/{node}/ceph/cfg/raw",
+      "purpose": "Get the Ceph configuration file."
+    },
+    {
+      "command": "get /nodes/{node}/ceph/cfg/value",
+      "purpose": "Get configured values from either the config file or config DB."
+    },
+    {
+      "command": "get /nodes/{node}/ceph/cmd-safety",
+      "purpose": "Heuristical check if it is safe to perform an action."
+    },
+    {
+      "command": "get /nodes/{node}/ceph/crush",
+      "purpose": "Get OSD crush map"
+    },
+    {
+      "command": "get /nodes/{node}/ceph/fs",
+      "purpose": "Directory index."
+    },
+    {
+      "command": "get /nodes/{node}/ceph/log",
+      "purpose": "Read ceph log"
+    },
+    {
+      "command": "get /nodes/{node}/ceph/mds",
+      "purpose": "MDS directory index."
+    },
+    {
+      "command": "get /nodes/{node}/ceph/mgr",
+      "purpose": "MGR directory index."
+    },
+    {
+      "command": "get /nodes/{node}/ceph/mon",
+      "purpose": "Get Ceph monitor list."
+    },
+    {
+      "command": "get /nodes/{node}/ceph/osd",
+      "purpose": "Get Ceph osd list/tree."
+    },
+    {
+      "command": "get /nodes/{node}/ceph/osd/{osdid}",
+      "purpose": "OSD index."
+    },
+    {
+      "command": "get /nodes/{node}/ceph/osd/{osdid}/lv-info",
+      "purpose": "Get OSD volume details"
+    },
+    {
+      "command": "get /nodes/{node}/ceph/osd/{osdid}/metadata",
+      "purpose": "Get OSD details"
+    },
+    {
+      "command": "get /nodes/{node}/ceph/pool",
+      "purpose": "List all pools and their settings (which are settable by the POST/PUT endpoints)."
+    },
+    {
+      "command": "get /nodes/{node}/ceph/pool/{name}",
+      "purpose": "Pool index."
+    },
+    {
+      "command": "get /nodes/{node}/ceph/pool/{name}/status",
+      "purpose": "Show the current pool status."
+    },
+    {
+      "command": "get /nodes/{node}/ceph/releases",
+      "purpose": "List all known Ceph releases, marking which ones can be installed on this node."
+    },
+    {
+      "command": "get /nodes/{node}/ceph/rules",
+      "purpose": "List ceph rules."
+    },
+    {
+      "command": "get /nodes/{node}/ceph/status",
+      "purpose": "Get ceph status."
+    },
+    {
+      "command": "get /nodes/{node}/certificates",
+      "purpose": "Node index."
+    },
+    {
+      "command": "get /nodes/{node}/certificates/acme",
+      "purpose": "ACME index."
+    },
+    {
+      "command": "get /nodes/{node}/certificates/info",
+      "purpose": "Get information about node's certificates."
+    },
+    {
+      "command": "get /nodes/{node}/config",
+      "purpose": "Get node configuration options."
+    },
+    {
+      "command": "get /nodes/{node}/disks",
+      "purpose": "Node index."
+    },
+    {
+      "command": "get /nodes/{node}/disks/directory",
+      "purpose": "PVE Managed Directory storages."
+    },
+    {
+      "command": "get /nodes/{node}/disks/list",
+      "purpose": "List local disks."
+    },
+    {
+      "command": "get /nodes/{node}/disks/lvm",
+      "purpose": "List LVM Volume Groups"
+    },
+    {
+      "command": "get /nodes/{node}/disks/lvmthin",
+      "purpose": "List LVM thinpools"
+    },
+    {
+      "command": "get /nodes/{node}/disks/smart",
+      "purpose": "Get SMART Health of a disk."
+    },
+    {
+      "command": "get /nodes/{node}/disks/zfs",
+      "purpose": "List Zpools."
+    },
+    {
+      "command": "get /nodes/{node}/disks/zfs/{name}",
+      "purpose": "Get details about a zpool."
+    },
+    {
+      "command": "get /nodes/{node}/dns",
+      "purpose": "Read DNS settings."
+    },
+    {
+      "command": "get /nodes/{node}/firewall",
+      "purpose": "Directory index."
+    },
+    {
+      "command": "get /nodes/{node}/firewall/log",
+      "purpose": "Read firewall log"
+    },
+    {
+      "command": "get /nodes/{node}/firewall/options",
+      "purpose": "Get host firewall options."
+    },
+    {
+      "command": "get /nodes/{node}/firewall/rules",
+      "purpose": "List rules."
+    },
+    {
+      "command": "get /nodes/{node}/firewall/rules/{pos}",
+      "purpose": "Get single rule data."
+    },
+    {
+      "command": "get /nodes/{node}/hardware",
+      "purpose": "Index of hardware types"
+    },
+    {
+      "command": "get /nodes/{node}/hardware/pci",
+      "purpose": "List local PCI devices."
+    },
+    {
+      "command": "get /nodes/{node}/hardware/pci/{pci-id-or-mapping}",
+      "purpose": "Index of available pci methods"
+    },
+    {
+      "command": "get /nodes/{node}/hardware/pci/{pci-id-or-mapping}/mdev",
+      "purpose": "List mediated device types for given PCI device."
+    },
+    {
+      "command": "get /nodes/{node}/hardware/usb",
+      "purpose": "List local USB devices."
+    },
+    {
+      "command": "get /nodes/{node}/hosts",
+      "purpose": "Get the content of /etc/hosts."
+    },
+    {
+      "command": "get /nodes/{node}/journal",
+      "purpose": "Read Journal"
+    },
+    {
+      "command": "get /nodes/{node}/lxc",
+      "purpose": "LXC container index (per node)."
+    },
+    {
+      "command": "get /nodes/{node}/lxc/{vmid}",
+      "purpose": "Directory index"
+    },
+    {
+      "command": "get /nodes/{node}/lxc/{vmid}/config",
+      "purpose": "Get container configuration."
+    },
+    {
+      "command": "get /nodes/{node}/lxc/{vmid}/feature",
+      "purpose": "Check if feature for virtual machine is available."
+    },
+    {
+      "command": "get /nodes/{node}/lxc/{vmid}/firewall",
+      "purpose": "Directory index."
+    },
+    {
+      "command": "get /nodes/{node}/lxc/{vmid}/firewall/aliases",
+      "purpose": "List aliases"
+    },
+    {
+      "command": "get /nodes/{node}/lxc/{vmid}/firewall/aliases/{name}",
+      "purpose": "Read alias."
+    },
+    {
+      "command": "get /nodes/{node}/lxc/{vmid}/firewall/ipset",
+      "purpose": "List IPSets"
+    },
+    {
+      "command": "get /nodes/{node}/lxc/{vmid}/firewall/ipset/{name}",
+      "purpose": "List IPSet content"
+    },
+    {
+      "command": "get /nodes/{node}/lxc/{vmid}/firewall/ipset/{name}/{cidr}",
+      "purpose": "Read IP or Network settings from IPSet."
+    },
+    {
+      "command": "get /nodes/{node}/lxc/{vmid}/firewall/log",
+      "purpose": "Read firewall log"
+    },
+    {
+      "command": "get /nodes/{node}/lxc/{vmid}/firewall/options",
+      "purpose": "Get VM firewall options."
+    },
+    {
+      "command": "get /nodes/{node}/lxc/{vmid}/firewall/refs",
+      "purpose": "Lists possible IPSet/Alias reference which are allowed in source/dest properties."
+    },
+    {
+      "command": "get /nodes/{node}/lxc/{vmid}/firewall/rules",
+      "purpose": "List rules."
+    },
+    {
+      "command": "get /nodes/{node}/lxc/{vmid}/firewall/rules/{pos}",
+      "purpose": "Get single rule data."
+    },
+    {
+      "command": "get /nodes/{node}/lxc/{vmid}/interfaces",
+      "purpose": "Get IP addresses of the specified container interface."
+    },
+    {
+      "command": "get /nodes/{node}/lxc/{vmid}/migrate",
+      "purpose": "Get preconditions for migration."
+    },
+    {
+      "command": "get /nodes/{node}/lxc/{vmid}/mtunnelwebsocket",
+      "purpose": "Migration tunnel endpoint for websocket upgrade - only for internal use by VM migration."
+    },
+    {
+      "command": "get /nodes/{node}/lxc/{vmid}/pending",
+      "purpose": "Get container configuration, including pending changes."
+    },
+    {
+      "command": "get /nodes/{node}/lxc/{vmid}/rrd",
+      "purpose": "Read VM RRD statistics (returns PNG)"
+    },
+    {
+      "command": "get /nodes/{node}/lxc/{vmid}/rrddata",
+      "purpose": "Read VM RRD statistics"
+    },
+    {
+      "command": "get /nodes/{node}/lxc/{vmid}/snapshot",
+      "purpose": "List all snapshots."
+    },
+    {
+      "command": "get /nodes/{node}/lxc/{vmid}/snapshot/{snapname}",
+      "purpose": ""
+    },
+    {
+      "command": "get /nodes/{node}/lxc/{vmid}/snapshot/{snapname}/config",
+      "purpose": "Get snapshot configuration"
+    },
+    {
+      "command": "get /nodes/{node}/lxc/{vmid}/status",
+      "purpose": "Directory index"
+    },
+    {
+      "command": "get /nodes/{node}/lxc/{vmid}/status/current",
+      "purpose": "Get virtual machine status."
+    },
+    {
+      "command": "get /nodes/{node}/lxc/{vmid}/vncwebsocket",
+      "purpose": "Opens a weksocket for VNC traffic."
+    },
+    {
+      "command": "get /nodes/{node}/netstat",
+      "purpose": "Read tap/vm network device interface counters"
+    },
+    {
+      "command": "get /nodes/{node}/network",
+      "purpose": "List available networks"
+    },
+    {
+      "command": "get /nodes/{node}/network/{iface}",
+      "purpose": "Read network device configuration"
+    },
+    {
+      "command": "get /nodes/{node}/qemu",
+      "purpose": "Virtual machine index (per node)."
+    },
+    {
+      "command": "get /nodes/{node}/qemu/{vmid}",
+      "purpose": "Directory index"
+    },
+    {
+      "command": "get /nodes/{node}/qemu/{vmid}/agent",
+      "purpose": "QEMU Guest Agent command index."
+    },
+    {
+      "command": "get /nodes/{node}/qemu/{vmid}/agent/exec-status",
+      "purpose": "Gets the status of the given pid started by the guest-agent"
+    },
+    {
+      "command": "get /nodes/{node}/qemu/{vmid}/agent/file-read",
+      "purpose": "Reads the given file via guest agent. Is limited to 16777216 bytes."
+    },
+    {
+      "command": "get /nodes/{node}/qemu/{vmid}/agent/get-fsinfo",
+      "purpose": "Execute get-fsinfo."
+    },
+    {
+      "command": "get /nodes/{node}/qemu/{vmid}/agent/get-host-name",
+      "purpose": "Execute get-host-name."
+    },
+    {
+      "command": "get /nodes/{node}/qemu/{vmid}/agent/get-memory-block-info",
+      "purpose": "Execute get-memory-block-info."
+    },
+    {
+      "command": "get /nodes/{node}/qemu/{vmid}/agent/get-memory-blocks",
+      "purpose": "Execute get-memory-blocks."
+    },
+    {
+      "command": "get /nodes/{node}/qemu/{vmid}/agent/get-osinfo",
+      "purpose": "Execute get-osinfo."
+    },
+    {
+      "command": "get /nodes/{node}/qemu/{vmid}/agent/get-time",
+      "purpose": "Execute get-time."
+    },
+    {
+      "command": "get /nodes/{node}/qemu/{vmid}/agent/get-timezone",
+      "purpose": "Execute get-timezone."
+    },
+    {
+      "command": "get /nodes/{node}/qemu/{vmid}/agent/get-users",
+      "purpose": "Execute get-users."
+    },
+    {
+      "command": "get /nodes/{node}/qemu/{vmid}/agent/get-vcpus",
+      "purpose": "Execute get-vcpus."
+    },
+    {
+      "command": "get /nodes/{node}/qemu/{vmid}/agent/info",
+      "purpose": "Execute info."
+    },
+    {
+      "command": "get /nodes/{node}/qemu/{vmid}/agent/network-get-interfaces",
+      "purpose": "Execute network-get-interfaces."
+    },
+    {
+      "command": "get /nodes/{node}/qemu/{vmid}/cloudinit",
+      "purpose": "Get the cloudinit configuration with both current and pending values."
+    },
+    {
+      "command": "get /nodes/{node}/qemu/{vmid}/cloudinit/dump",
+      "purpose": "Get automatically generated cloudinit config."
+    },
+    {
+      "command": "get /nodes/{node}/qemu/{vmid}/config",
+      "purpose": "Get the virtual machine configuration with pending configuration changes applied. Set the 'current' parameter to get the current configuration instead."
+    },
+    {
+      "command": "get /nodes/{node}/qemu/{vmid}/feature",
+      "purpose": "Check if feature for virtual machine is available."
+    },
+    {
+      "command": "get /nodes/{node}/qemu/{vmid}/firewall",
+      "purpose": "Directory index."
+    },
+    {
+      "command": "get /nodes/{node}/qemu/{vmid}/firewall/aliases",
+      "purpose": "List aliases"
+    },
+    {
+      "command": "get /nodes/{node}/qemu/{vmid}/firewall/aliases/{name}",
+      "purpose": "Read alias."
+    },
+    {
+      "command": "get /nodes/{node}/qemu/{vmid}/firewall/ipset",
+      "purpose": "List IPSets"
+    },
+    {
+      "command": "get /nodes/{node}/qemu/{vmid}/firewall/ipset/{name}",
+      "purpose": "List IPSet content"
+    },
+    {
+      "command": "get /nodes/{node}/qemu/{vmid}/firewall/ipset/{name}/{cidr}",
+      "purpose": "Read IP or Network settings from IPSet."
+    },
+    {
+      "command": "get /nodes/{node}/qemu/{vmid}/firewall/log",
+      "purpose": "Read firewall log"
+    },
+    {
+      "command": "get /nodes/{node}/qemu/{vmid}/firewall/options",
+      "purpose": "Get VM firewall options."
+    },
+    {
+      "command": "get /nodes/{node}/qemu/{vmid}/firewall/refs",
+      "purpose": "Lists possible IPSet/Alias reference which are allowed in source/dest properties."
+    },
+    {
+      "command": "get /nodes/{node}/qemu/{vmid}/firewall/rules",
+      "purpose": "List rules."
+    },
+    {
+      "command": "get /nodes/{node}/qemu/{vmid}/firewall/rules/{pos}",
+      "purpose": "Get single rule data."
+    },
+    {
+      "command": "get /nodes/{node}/qemu/{vmid}/migrate",
+      "purpose": "Get preconditions for migration."
+    },
+    {
+      "command": "get /nodes/{node}/qemu/{vmid}/mtunnelwebsocket",
+      "purpose": "Migration tunnel endpoint for websocket upgrade - only for internal use by VM migration."
+    },
+    {
+      "command": "get /nodes/{node}/qemu/{vmid}/pending",
+      "purpose": "Get the virtual machine configuration with both current and pending values."
+    },
+    {
+      "command": "get /nodes/{node}/qemu/{vmid}/rrd",
+      "purpose": "Read VM RRD statistics (returns PNG)"
+    },
+    {
+      "command": "get /nodes/{node}/qemu/{vmid}/rrddata",
+      "purpose": "Read VM RRD statistics"
+    },
+    {
+      "command": "get /nodes/{node}/qemu/{vmid}/snapshot",
+      "purpose": "List all snapshots."
+    },
+    {
+      "command": "get /nodes/{node}/qemu/{vmid}/snapshot/{snapname}",
+      "purpose": ""
+    },
+    {
+      "command": "get /nodes/{node}/qemu/{vmid}/snapshot/{snapname}/config",
+      "purpose": "Get snapshot configuration"
+    },
+    {
+      "command": "get /nodes/{node}/qemu/{vmid}/status",
+      "purpose": "Directory index"
+    },
+    {
+      "command": "get /nodes/{node}/qemu/{vmid}/status/current",
+      "purpose": "Get virtual machine status."
+    },
+    {
+      "command": "get /nodes/{node}/qemu/{vmid}/vncwebsocket",
+      "purpose": "Opens a weksocket for VNC traffic."
+    },
+    {
+      "command": "get /nodes/{node}/query-oci-repo-tags",
+      "purpose": "List all tags for an OCI repository reference."
+    },
+    {
+      "command": "get /nodes/{node}/query-url-metadata",
+      "purpose": "Query metadata of an URL: file size, file name and mime type."
+    },
+    {
+      "command": "get /nodes/{node}/replication",
+      "purpose": "List status of all replication jobs on this node."
+    },
+    {
+      "command": "get /nodes/{node}/replication/{id}",
+      "purpose": "Directory index."
+    },
+    {
+      "command": "get /nodes/{node}/replication/{id}/log",
+      "purpose": "Read replication job log."
+    },
+    {
+      "command": "get /nodes/{node}/replication/{id}/status",
+      "purpose": "Get replication job status."
+    },
+    {
+      "command": "get /nodes/{node}/report",
+      "purpose": "Gather various systems information about a node"
+    },
+    {
+      "command": "get /nodes/{node}/rrd",
+      "purpose": "Read node RRD statistics (returns PNG)"
+    },
+    {
+      "command": "get /nodes/{node}/rrddata",
+      "purpose": "Read node RRD statistics"
+    },
+    {
+      "command": "get /nodes/{node}/scan",
+      "purpose": "Index of available scan methods"
+    },
+    {
+      "command": "get /nodes/{node}/scan/cifs",
+      "purpose": "Scan remote CIFS server."
+    },
+    {
+      "command": "get /nodes/{node}/scan/glusterfs",
+      "purpose": "Scan remote GlusterFS server."
+    },
+    {
+      "command": "get /nodes/{node}/scan/iscsi",
+      "purpose": "Scan remote iSCSI server."
+    },
+    {
+      "command": "get /nodes/{node}/scan/lvm",
+      "purpose": "List local LVM volume groups."
+    },
+    {
+      "command": "get /nodes/{node}/scan/lvmthin",
+      "purpose": "List local LVM Thin Pools."
+    },
+    {
+      "command": "get /nodes/{node}/scan/nfs",
+      "purpose": "Scan remote NFS server."
+    },
+    {
+      "command": "get /nodes/{node}/scan/pbs",
+      "purpose": "Scan remote Proxmox Backup Server."
+    },
+    {
+      "command": "get /nodes/{node}/scan/zfs",
+      "purpose": "Scan zfs pool list on local node."
+    },
+    {
+      "command": "get /nodes/{node}/sdn",
+      "purpose": "SDN index."
+    },
+    {
+      "command": "get /nodes/{node}/sdn/fabrics/{fabric}",
+      "purpose": "Directory index for SDN fabric status."
+    },
+    {
+      "command": "get /nodes/{node}/sdn/fabrics/{fabric}/interfaces",
+      "purpose": "Get all interfaces for a fabric."
+    },
+    {
+      "command": "get /nodes/{node}/sdn/fabrics/{fabric}/neighbors",
+      "purpose": "Get all neighbors for a fabric."
+    },
+    {
+      "command": "get /nodes/{node}/sdn/fabrics/{fabric}/routes",
+      "purpose": "Get all routes for a fabric."
+    },
+    {
+      "command": "get /nodes/{node}/sdn/vnets/{vnet}",
+      "purpose": ""
+    },
+    {
+      "command": "get /nodes/{node}/sdn/vnets/{vnet}/mac-vrf",
+      "purpose": "Get the MAC VRF for a VNet in an EVPN zone."
+    },
+    {
+      "command": "get /nodes/{node}/sdn/zones",
+      "purpose": "Get status for all zones."
+    },
+    {
+      "command": "get /nodes/{node}/sdn/zones/{zone}",
+      "purpose": ""
+    },
+    {
+      "command": "get /nodes/{node}/sdn/zones/{zone}/bridges",
+      "purpose": "Get a list of all bridges (vnets) that are part of a zone, as well as the ports that are members of that bridge."
+    },
+    {
+      "command": "get /nodes/{node}/sdn/zones/{zone}/content",
+      "purpose": "List zone content."
+    },
+    {
+      "command": "get /nodes/{node}/sdn/zones/{zone}/ip-vrf",
+      "purpose": "Get the IP VRF of an EVPN zone."
+    },
+    {
+      "command": "get /nodes/{node}/services",
+      "purpose": "Service list."
+    },
+    {
+      "command": "get /nodes/{node}/services/{service}",
+      "purpose": "Directory index"
+    },
+    {
+      "command": "get /nodes/{node}/services/{service}/state",
+      "purpose": "Read service properties"
+    },
+    {
+      "command": "get /nodes/{node}/status",
+      "purpose": "Read node status"
+    },
+    {
+      "command": "get /nodes/{node}/storage",
+      "purpose": "Get status for all datastores."
+    },
+    {
+      "command": "get /nodes/{node}/storage/{storage}",
+      "purpose": ""
+    },
+    {
+      "command": "get /nodes/{node}/storage/{storage}/content",
+      "purpose": "List storage content."
+    },
+    {
+      "command": "get /nodes/{node}/storage/{storage}/content/{volume}",
+      "purpose": "Get volume attributes"
+    },
+    {
+      "command": "get /nodes/{node}/storage/{storage}/file-restore/download",
+      "purpose": "Extract a file or directory (as zip archive) from a PBS backup."
+    },
+    {
+      "command": "get /nodes/{node}/storage/{storage}/file-restore/list",
+      "purpose": "List files and directories for single file restore under the given path."
+    },
+    {
+      "command": "get /nodes/{node}/storage/{storage}/identity",
+      "purpose": "Return identity information for this storage instance."
+    },
+    {
+      "command": "get /nodes/{node}/storage/{storage}/import-metadata",
+      "purpose": "Get the base parameters for creating a guest which imports data from a foreign importable guest, like an ESXi VM"
+    },
+    {
+      "command": "get /nodes/{node}/storage/{storage}/prunebackups",
+      "purpose": "Get prune information for backups. NOTE: this is only a preview and might not be what a subsequent prune call does if backups are removed/added in the meantime."
+    },
+    {
+      "command": "get /nodes/{node}/storage/{storage}/rrd",
+      "purpose": "Read storage RRD statistics (returns PNG)."
+    },
+    {
+      "command": "get /nodes/{node}/storage/{storage}/rrddata",
+      "purpose": "Read storage RRD statistics."
+    },
+    {
+      "command": "get /nodes/{node}/storage/{storage}/status",
+      "purpose": "Read storage status."
+    },
+    {
+      "command": "get /nodes/{node}/subscription",
+      "purpose": "Read subscription info."
+    },
+    {
+      "command": "get /nodes/{node}/syslog",
+      "purpose": "Read system log"
+    },
+    {
+      "command": "get /nodes/{node}/tasks",
+      "purpose": "Read task list for one node (finished tasks)."
+    },
+    {
+      "command": "get /nodes/{node}/tasks/{upid}",
+      "purpose": ""
+    },
+    {
+      "command": "get /nodes/{node}/tasks/{upid}/log",
+      "purpose": "Read task log."
+    },
+    {
+      "command": "get /nodes/{node}/tasks/{upid}/status",
+      "purpose": "Read task status."
+    },
+    {
+      "command": "get /nodes/{node}/time",
+      "purpose": "Read server time and time zone settings."
+    },
+    {
+      "command": "get /nodes/{node}/version",
+      "purpose": "API version details"
+    },
+    {
+      "command": "get /nodes/{node}/vncwebsocket",
+      "purpose": "Opens a websocket for VNC traffic."
+    },
+    {
+      "command": "get /nodes/{node}/vzdump/defaults",
+      "purpose": "Get the currently configured vzdump defaults."
+    },
+    {
+      "command": "get /nodes/{node}/vzdump/extractconfig",
+      "purpose": "Extract configuration from vzdump backup archive."
+    },
+    {
+      "command": "get /pools",
+      "purpose": "List pools or get pool configuration."
+    },
+    {
+      "command": "get /pools/{poolid}",
+      "purpose": "Get pool configuration (deprecated, no support for nested pools, use 'GET /pools/?poolid={poolid}')."
+    },
+    {
+      "command": "get /storage",
+      "purpose": "Storage index."
+    },
+    {
+      "command": "get /storage/{storage}",
+      "purpose": "Read storage configuration."
+    },
     {
       "command": "get /version",
       "purpose": "Read the authenticated server version. Requires a configured API token."
+    },
+    {
+      "command": "post /access/domains",
+      "purpose": "Add an authentication server."
+    },
+    {
+      "command": "post /access/domains/{realm}/sync",
+      "purpose": "Syncs users and/or groups from the configured LDAP to user.cfg. NOTE: Synced groups will have the name 'name-$realm', so make sure those groups do not exist to prevent overwriting."
+    },
+    {
+      "command": "post /access/groups",
+      "purpose": "Create new group."
+    },
+    {
+      "command": "post /access/openid/auth-url",
+      "purpose": "Get the OpenId Authorization Url for the specified realm."
+    },
+    {
+      "command": "post /access/openid/login",
+      "purpose": " Verify OpenID authorization code and create a ticket."
+    },
+    {
+      "command": "post /access/roles",
+      "purpose": "Create new role."
+    },
+    {
+      "command": "post /access/tfa/{userid}",
+      "purpose": "Add a TFA entry for a user."
+    },
+    {
+      "command": "post /access/ticket",
+      "purpose": "Create or verify authentication ticket."
+    },
+    {
+      "command": "post /access/users",
+      "purpose": "Create new user."
+    },
+    {
+      "command": "post /access/users/{userid}/token/{tokenid}",
+      "purpose": "Generate a new API token for a specific user. NOTE: returns API token value, which needs to be stored as it cannot be retrieved afterwards!"
+    },
+    {
+      "command": "post /access/vncticket",
+      "purpose": "verify VNC authentication ticket."
+    },
+    {
+      "command": "post /cluster/acme/account",
+      "purpose": "Register a new ACME account with CA."
+    },
+    {
+      "command": "post /cluster/acme/plugins",
+      "purpose": "Add ACME plugin configuration."
+    },
+    {
+      "command": "post /cluster/backup",
+      "purpose": "Create new vzdump backup job."
+    },
+    {
+      "command": "post /cluster/bulk-action/guest/migrate",
+      "purpose": "Bulk migrate all guests on the cluster."
+    },
+    {
+      "command": "post /cluster/bulk-action/guest/shutdown",
+      "purpose": "Bulk shutdown all guests on the cluster."
+    },
+    {
+      "command": "post /cluster/bulk-action/guest/start",
+      "purpose": "Bulk start or resume all guests on the cluster."
+    },
+    {
+      "command": "post /cluster/bulk-action/guest/suspend",
+      "purpose": "Bulk suspend all guests on the cluster."
+    },
+    {
+      "command": "post /cluster/ceph/restart-bulk",
+      "purpose": "Cluster-wide rolling restart of all Ceph daemons of the given type. For MON/MGR/MDS each daemon is restarted only after Ceph reports the previous one is back up and the next one is safe to stop. For OSDs the cluster path orchestrates the per-node endpoint at /nodes/{node}/ceph/restart-bulk on each node in turn, inheriting that endpoint's per-OSD 'noout' handling and resume support. The 'noout' flag itself is not exposed by this endpoint as it is OSD-specific (and for OSDs handled by the per-node sub-tasks)."
+    },
+    {
+      "command": "post /cluster/config",
+      "purpose": "Generate new cluster configuration. If no links given, default to local IP address as link0."
+    },
+    {
+      "command": "post /cluster/config/join",
+      "purpose": "Joins this node into an existing cluster. If no links are given, default to IP resolved by node's hostname on single link (fallback fails for clusters with multiple links)."
+    },
+    {
+      "command": "post /cluster/config/nodes/{node}",
+      "purpose": "Adds a node to the cluster configuration. This call is for internal use."
+    },
+    {
+      "command": "post /cluster/firewall/aliases",
+      "purpose": "Create IP or Network Alias."
+    },
+    {
+      "command": "post /cluster/firewall/groups",
+      "purpose": "Create new security group."
+    },
+    {
+      "command": "post /cluster/firewall/groups/{group}",
+      "purpose": "Create new rule."
+    },
+    {
+      "command": "post /cluster/firewall/ipset",
+      "purpose": "Create new IPSet"
+    },
+    {
+      "command": "post /cluster/firewall/ipset/{name}",
+      "purpose": "Add IP or Network to IPSet."
+    },
+    {
+      "command": "post /cluster/firewall/rules",
+      "purpose": "Create new rule."
+    },
+    {
+      "command": "post /cluster/ha/groups",
+      "purpose": "Create a new HA group."
+    },
+    {
+      "command": "post /cluster/ha/resources",
+      "purpose": "Create a new HA resource."
+    },
+    {
+      "command": "post /cluster/ha/resources/{sid}/migrate",
+      "purpose": "Request resource migration (online) to another node."
+    },
+    {
+      "command": "post /cluster/ha/resources/{sid}/relocate",
+      "purpose": "Request resource relocatzion to another node. This stops the service on the old node, and restarts it on the target node."
+    },
+    {
+      "command": "post /cluster/ha/rules",
+      "purpose": "Create HA rule."
+    },
+    {
+      "command": "post /cluster/ha/status/arm-ha",
+      "purpose": "Request re-arming the HA stack after it was disarmed."
+    },
+    {
+      "command": "post /cluster/ha/status/disarm-ha",
+      "purpose": "Request disarming the HA stack, releasing all watchdogs cluster-wide."
+    },
+    {
+      "command": "post /cluster/jobs/realm-sync/{id}",
+      "purpose": "Create new realm-sync job."
+    },
+    {
+      "command": "post /cluster/mapping/dir",
+      "purpose": "Create a new directory mapping."
+    },
+    {
+      "command": "post /cluster/mapping/pci",
+      "purpose": "Create a new hardware mapping."
+    },
+    {
+      "command": "post /cluster/mapping/usb",
+      "purpose": "Create a new hardware mapping."
+    },
+    {
+      "command": "post /cluster/metrics/server/{id}",
+      "purpose": "Create a new external metric server config"
+    },
+    {
+      "command": "post /cluster/notifications/endpoints/gotify",
+      "purpose": "Create a new gotify endpoint"
+    },
+    {
+      "command": "post /cluster/notifications/endpoints/sendmail",
+      "purpose": "Create a new sendmail endpoint"
+    },
+    {
+      "command": "post /cluster/notifications/endpoints/smtp",
+      "purpose": "Create a new smtp endpoint"
+    },
+    {
+      "command": "post /cluster/notifications/endpoints/webhook",
+      "purpose": "Create a new webhook endpoint"
+    },
+    {
+      "command": "post /cluster/notifications/matchers",
+      "purpose": "Create a new matcher"
+    },
+    {
+      "command": "post /cluster/notifications/targets/{name}/test",
+      "purpose": "Send a test notification to a provided target."
+    },
+    {
+      "command": "post /cluster/qemu/custom-cpu-models",
+      "purpose": "Add a custom CPU model definition."
+    },
+    {
+      "command": "post /cluster/replication",
+      "purpose": "Create a new replication job"
+    },
+    {
+      "command": "post /cluster/sdn/controllers",
+      "purpose": "Create a new sdn controller object."
+    },
+    {
+      "command": "post /cluster/sdn/dns",
+      "purpose": "Create a new sdn dns object."
+    },
+    {
+      "command": "post /cluster/sdn/fabrics/fabric",
+      "purpose": "Add a fabric"
+    },
+    {
+      "command": "post /cluster/sdn/fabrics/node/{fabric_id}",
+      "purpose": "Add a node"
+    },
+    {
+      "command": "post /cluster/sdn/ipams",
+      "purpose": "Create a new sdn ipam object."
+    },
+    {
+      "command": "post /cluster/sdn/lock",
+      "purpose": "Acquire global lock for SDN configuration"
+    },
+    {
+      "command": "post /cluster/sdn/prefix-lists",
+      "purpose": "Create Prefix List"
+    },
+    {
+      "command": "post /cluster/sdn/prefix-lists/{id}/entries",
+      "purpose": "Create Prefix List Entry"
+    },
+    {
+      "command": "post /cluster/sdn/rollback",
+      "purpose": "Rollback pending changes to SDN configuration"
+    },
+    {
+      "command": "post /cluster/sdn/route-maps/entries",
+      "purpose": "Create Route Map entry"
+    },
+    {
+      "command": "post /cluster/sdn/vnets",
+      "purpose": "Create a new sdn vnet object."
+    },
+    {
+      "command": "post /cluster/sdn/vnets/{vnet}/firewall/rules",
+      "purpose": "Create new rule."
+    },
+    {
+      "command": "post /cluster/sdn/vnets/{vnet}/ips",
+      "purpose": "Create IP Mapping in a VNet"
+    },
+    {
+      "command": "post /cluster/sdn/vnets/{vnet}/subnets",
+      "purpose": "Create a new sdn subnet object."
+    },
+    {
+      "command": "post /cluster/sdn/zones",
+      "purpose": "Create a new sdn zone object."
+    },
+    {
+      "command": "post /nodes/{node}/aplinfo",
+      "purpose": "Download appliance templates."
+    },
+    {
+      "command": "post /nodes/{node}/apt/repositories",
+      "purpose": "Change the properties of a repository. Currently only allows enabling/disabling."
+    },
+    {
+      "command": "post /nodes/{node}/apt/update",
+      "purpose": "This is used to resynchronize the package index files from their sources (apt-get update)."
+    },
+    {
+      "command": "post /nodes/{node}/ceph/fs/{name}",
+      "purpose": "Create a Ceph filesystem"
+    },
+    {
+      "command": "post /nodes/{node}/ceph/init",
+      "purpose": "Create initial ceph default configuration and setup symlinks."
+    },
+    {
+      "command": "post /nodes/{node}/ceph/mds/{name}",
+      "purpose": "Create Ceph Metadata Server (MDS)"
+    },
+    {
+      "command": "post /nodes/{node}/ceph/mgr/{id}",
+      "purpose": "Create Ceph Manager"
+    },
+    {
+      "command": "post /nodes/{node}/ceph/mon/{monid}",
+      "purpose": "Create Ceph Monitor and Manager"
+    },
+    {
+      "command": "post /nodes/{node}/ceph/osd",
+      "purpose": "Create OSD"
+    },
+    {
+      "command": "post /nodes/{node}/ceph/osd/{osdid}/in",
+      "purpose": "ceph osd in"
+    },
+    {
+      "command": "post /nodes/{node}/ceph/osd/{osdid}/out",
+      "purpose": "ceph osd out"
+    },
+    {
+      "command": "post /nodes/{node}/ceph/osd/{osdid}/scrub",
+      "purpose": "Instruct the OSD to scrub."
+    },
+    {
+      "command": "post /nodes/{node}/ceph/pool",
+      "purpose": "Create Ceph pool"
+    },
+    {
+      "command": "post /nodes/{node}/ceph/restart",
+      "purpose": "Restart ceph services."
+    },
+    {
+      "command": "post /nodes/{node}/ceph/restart-bulk",
+      "purpose": "Rolling restart of all Ceph OSDs on this node. Each OSD is restarted only after Ceph reports the previous one is back up and the next one is safe to stop. For non-OSD Ceph daemons, use the cluster-wide endpoint at /cluster/ceph/restart-bulk. The 'noout' flag is applied only to the OSDs targeted by this run, so unrelated OSDs on other nodes that fail during the restart window still get out-marked normally. Aborting the resulting task (for example via 'pvesh task stop') triggers a SIGTERM handler that unsets the per-OSD 'noout' if this endpoint set it. Per-daemon progress is checkpointed in Ceph's config-key store ('pve/ceph-bulk-restart/node/<node>'), so an aborted run can be resumed by re-issuing this endpoint with 'resume=1'."
+    },
+    {
+      "command": "post /nodes/{node}/ceph/start",
+      "purpose": "Start ceph services."
+    },
+    {
+      "command": "post /nodes/{node}/ceph/stop",
+      "purpose": "Stop ceph services."
+    },
+    {
+      "command": "post /nodes/{node}/certificates/acme/certificate",
+      "purpose": "Order a new certificate from ACME-compatible CA."
+    },
+    {
+      "command": "post /nodes/{node}/certificates/custom",
+      "purpose": "Upload or update custom certificate chain and key."
+    },
+    {
+      "command": "post /nodes/{node}/disks/directory",
+      "purpose": "Create a Filesystem on an unused disk. Will be mounted under '/mnt/pve/NAME'."
+    },
+    {
+      "command": "post /nodes/{node}/disks/initgpt",
+      "purpose": "Initialize Disk with GPT"
+    },
+    {
+      "command": "post /nodes/{node}/disks/lvm",
+      "purpose": "Create an LVM Volume Group"
+    },
+    {
+      "command": "post /nodes/{node}/disks/lvmthin",
+      "purpose": "Create an LVM thinpool"
+    },
+    {
+      "command": "post /nodes/{node}/disks/zfs",
+      "purpose": "Create a ZFS pool."
+    },
+    {
+      "command": "post /nodes/{node}/execute",
+      "purpose": "Execute multiple commands in order, root only."
+    },
+    {
+      "command": "post /nodes/{node}/firewall/rules",
+      "purpose": "Create new rule."
+    },
+    {
+      "command": "post /nodes/{node}/hosts",
+      "purpose": "Write /etc/hosts."
+    },
+    {
+      "command": "post /nodes/{node}/lxc",
+      "purpose": "Create or restore a container."
+    },
+    {
+      "command": "post /nodes/{node}/lxc/{vmid}/clone",
+      "purpose": "Create a container clone/copy"
+    },
+    {
+      "command": "post /nodes/{node}/lxc/{vmid}/firewall/aliases",
+      "purpose": "Create IP or Network Alias."
+    },
+    {
+      "command": "post /nodes/{node}/lxc/{vmid}/firewall/ipset",
+      "purpose": "Create new IPSet"
+    },
+    {
+      "command": "post /nodes/{node}/lxc/{vmid}/firewall/ipset/{name}",
+      "purpose": "Add IP or Network to IPSet."
+    },
+    {
+      "command": "post /nodes/{node}/lxc/{vmid}/firewall/rules",
+      "purpose": "Create new rule."
+    },
+    {
+      "command": "post /nodes/{node}/lxc/{vmid}/migrate",
+      "purpose": "Migrate the container to another node. Creates a new migration task."
+    },
+    {
+      "command": "post /nodes/{node}/lxc/{vmid}/move_volume",
+      "purpose": "Move a rootfs-/mp-volume to a different storage or to a different container."
+    },
+    {
+      "command": "post /nodes/{node}/lxc/{vmid}/mtunnel",
+      "purpose": "Migration tunnel endpoint - only for internal use by CT migration."
+    },
+    {
+      "command": "post /nodes/{node}/lxc/{vmid}/remote_migrate",
+      "purpose": "Migrate the container to another cluster. Creates a new migration task. EXPERIMENTAL feature!"
+    },
+    {
+      "command": "post /nodes/{node}/lxc/{vmid}/snapshot",
+      "purpose": "Snapshot a container."
+    },
+    {
+      "command": "post /nodes/{node}/lxc/{vmid}/snapshot/{snapname}/rollback",
+      "purpose": "Rollback LXC state to specified snapshot."
+    },
+    {
+      "command": "post /nodes/{node}/lxc/{vmid}/spiceproxy",
+      "purpose": "Returns a SPICE configuration to connect to the CT."
+    },
+    {
+      "command": "post /nodes/{node}/lxc/{vmid}/status/reboot",
+      "purpose": "Reboot the container by shutting it down, and starting it again. Applies pending changes."
+    },
+    {
+      "command": "post /nodes/{node}/lxc/{vmid}/status/resume",
+      "purpose": "Resume the container."
+    },
+    {
+      "command": "post /nodes/{node}/lxc/{vmid}/status/shutdown",
+      "purpose": "Shutdown the container. This will trigger a clean shutdown of the container, see lxc-stop(1) for details."
+    },
+    {
+      "command": "post /nodes/{node}/lxc/{vmid}/status/start",
+      "purpose": "Start the container."
+    },
+    {
+      "command": "post /nodes/{node}/lxc/{vmid}/status/stop",
+      "purpose": "Stop the container. This will abruptly stop all processes running in the container."
+    },
+    {
+      "command": "post /nodes/{node}/lxc/{vmid}/status/suspend",
+      "purpose": "Suspend the container. This is experimental."
+    },
+    {
+      "command": "post /nodes/{node}/lxc/{vmid}/template",
+      "purpose": "Create a Template."
+    },
+    {
+      "command": "post /nodes/{node}/lxc/{vmid}/termproxy",
+      "purpose": "Creates a TCP proxy connection."
+    },
+    {
+      "command": "post /nodes/{node}/lxc/{vmid}/vncproxy",
+      "purpose": "Creates a TCP VNC proxy connections."
+    },
+    {
+      "command": "post /nodes/{node}/migrateall",
+      "purpose": "Migrate all VMs and Containers."
+    },
+    {
+      "command": "post /nodes/{node}/network",
+      "purpose": "Create network device configuration"
+    },
+    {
+      "command": "post /nodes/{node}/qemu",
+      "purpose": "Create or restore a virtual machine."
+    },
+    {
+      "command": "post /nodes/{node}/qemu/{vmid}/agent",
+      "purpose": "Execute QEMU Guest Agent commands."
+    },
+    {
+      "command": "post /nodes/{node}/qemu/{vmid}/agent/exec",
+      "purpose": "Executes the given command in the vm via the guest-agent and returns an object with the pid."
+    },
+    {
+      "command": "post /nodes/{node}/qemu/{vmid}/agent/file-write",
+      "purpose": "Writes the given file via guest agent."
+    },
+    {
+      "command": "post /nodes/{node}/qemu/{vmid}/agent/fsfreeze-freeze",
+      "purpose": "Execute fsfreeze-freeze."
+    },
+    {
+      "command": "post /nodes/{node}/qemu/{vmid}/agent/fsfreeze-status",
+      "purpose": "Execute fsfreeze-status."
+    },
+    {
+      "command": "post /nodes/{node}/qemu/{vmid}/agent/fsfreeze-thaw",
+      "purpose": "Execute fsfreeze-thaw."
+    },
+    {
+      "command": "post /nodes/{node}/qemu/{vmid}/agent/fstrim",
+      "purpose": "Execute fstrim."
+    },
+    {
+      "command": "post /nodes/{node}/qemu/{vmid}/agent/ping",
+      "purpose": "Execute ping."
+    },
+    {
+      "command": "post /nodes/{node}/qemu/{vmid}/agent/set-user-password",
+      "purpose": "Sets the password for the given user to the given password"
+    },
+    {
+      "command": "post /nodes/{node}/qemu/{vmid}/agent/shutdown",
+      "purpose": "Execute shutdown."
+    },
+    {
+      "command": "post /nodes/{node}/qemu/{vmid}/agent/suspend-disk",
+      "purpose": "Execute suspend-disk."
+    },
+    {
+      "command": "post /nodes/{node}/qemu/{vmid}/agent/suspend-hybrid",
+      "purpose": "Execute suspend-hybrid."
+    },
+    {
+      "command": "post /nodes/{node}/qemu/{vmid}/agent/suspend-ram",
+      "purpose": "Execute suspend-ram."
+    },
+    {
+      "command": "post /nodes/{node}/qemu/{vmid}/clone",
+      "purpose": "Create a copy of virtual machine/template."
+    },
+    {
+      "command": "post /nodes/{node}/qemu/{vmid}/config",
+      "purpose": "Set virtual machine options (asynchronous API)."
+    },
+    {
+      "command": "post /nodes/{node}/qemu/{vmid}/dbus-vmstate",
+      "purpose": "Control the dbus-vmstate helper for a given running VM."
+    },
+    {
+      "command": "post /nodes/{node}/qemu/{vmid}/firewall/aliases",
+      "purpose": "Create IP or Network Alias."
+    },
+    {
+      "command": "post /nodes/{node}/qemu/{vmid}/firewall/ipset",
+      "purpose": "Create new IPSet"
+    },
+    {
+      "command": "post /nodes/{node}/qemu/{vmid}/firewall/ipset/{name}",
+      "purpose": "Add IP or Network to IPSet."
+    },
+    {
+      "command": "post /nodes/{node}/qemu/{vmid}/firewall/rules",
+      "purpose": "Create new rule."
+    },
+    {
+      "command": "post /nodes/{node}/qemu/{vmid}/migrate",
+      "purpose": "Migrate virtual machine. Creates a new migration task."
+    },
+    {
+      "command": "post /nodes/{node}/qemu/{vmid}/monitor",
+      "purpose": "Execute QEMU monitor commands."
+    },
+    {
+      "command": "post /nodes/{node}/qemu/{vmid}/move_disk",
+      "purpose": "Move volume to different storage or to a different VM."
+    },
+    {
+      "command": "post /nodes/{node}/qemu/{vmid}/mtunnel",
+      "purpose": "Migration tunnel endpoint - only for internal use by VM migration."
+    },
+    {
+      "command": "post /nodes/{node}/qemu/{vmid}/remote_migrate",
+      "purpose": "Migrate virtual machine to a remote cluster. Creates a new migration task. EXPERIMENTAL feature!"
+    },
+    {
+      "command": "post /nodes/{node}/qemu/{vmid}/snapshot",
+      "purpose": "Snapshot a VM."
+    },
+    {
+      "command": "post /nodes/{node}/qemu/{vmid}/snapshot/{snapname}/rollback",
+      "purpose": "Rollback VM state to specified snapshot."
+    },
+    {
+      "command": "post /nodes/{node}/qemu/{vmid}/spiceproxy",
+      "purpose": "Returns a SPICE configuration to connect to the VM."
+    },
+    {
+      "command": "post /nodes/{node}/qemu/{vmid}/status/reboot",
+      "purpose": "Reboot the VM by shutting it down, and starting it again. Applies pending changes."
+    },
+    {
+      "command": "post /nodes/{node}/qemu/{vmid}/status/reset",
+      "purpose": "Reset virtual machine."
+    },
+    {
+      "command": "post /nodes/{node}/qemu/{vmid}/status/resume",
+      "purpose": "Resume virtual machine."
+    },
+    {
+      "command": "post /nodes/{node}/qemu/{vmid}/status/shutdown",
+      "purpose": "Shutdown virtual machine. This is similar to pressing the power button on a physical machine. This will send an ACPI event for the guest OS, which should then proceed to a clean shutdown."
+    },
+    {
+      "command": "post /nodes/{node}/qemu/{vmid}/status/start",
+      "purpose": "Start virtual machine."
+    },
+    {
+      "command": "post /nodes/{node}/qemu/{vmid}/status/stop",
+      "purpose": "Stop virtual machine. The qemu process will exit immediately. This is akin to pulling the power plug of a running computer and may damage the VM data."
+    },
+    {
+      "command": "post /nodes/{node}/qemu/{vmid}/status/suspend",
+      "purpose": "Suspend virtual machine."
+    },
+    {
+      "command": "post /nodes/{node}/qemu/{vmid}/template",
+      "purpose": "Create a Template."
+    },
+    {
+      "command": "post /nodes/{node}/qemu/{vmid}/termproxy",
+      "purpose": "Creates a TCP proxy connections."
+    },
+    {
+      "command": "post /nodes/{node}/qemu/{vmid}/vncproxy",
+      "purpose": "Creates a TCP VNC proxy connections."
+    },
+    {
+      "command": "post /nodes/{node}/replication/{id}/schedule_now",
+      "purpose": "Schedule replication job to start as soon as possible."
+    },
+    {
+      "command": "post /nodes/{node}/services/{service}/reload",
+      "purpose": "Reload service. Falls back to restart if service cannot be reloaded."
+    },
+    {
+      "command": "post /nodes/{node}/services/{service}/restart",
+      "purpose": "Hard restart service. Use reload if you want to reduce interruptions."
+    },
+    {
+      "command": "post /nodes/{node}/services/{service}/start",
+      "purpose": "Start service."
+    },
+    {
+      "command": "post /nodes/{node}/services/{service}/stop",
+      "purpose": "Stop service."
+    },
+    {
+      "command": "post /nodes/{node}/spiceshell",
+      "purpose": "Creates a SPICE shell."
+    },
+    {
+      "command": "post /nodes/{node}/startall",
+      "purpose": "Start all VMs and containers located on this node (by default only those with onboot=1)."
+    },
+    {
+      "command": "post /nodes/{node}/status",
+      "purpose": "Reboot or shutdown a node."
+    },
+    {
+      "command": "post /nodes/{node}/stopall",
+      "purpose": "Stop all VMs and Containers."
+    },
+    {
+      "command": "post /nodes/{node}/storage/{storage}/content",
+      "purpose": "Allocate disk images."
+    },
+    {
+      "command": "post /nodes/{node}/storage/{storage}/content/{volume}",
+      "purpose": "Copy a volume. This is experimental code - do not use."
+    },
+    {
+      "command": "post /nodes/{node}/storage/{storage}/download-url",
+      "purpose": "Download templates, ISO images, OVAs and VM images by using an URL."
+    },
+    {
+      "command": "post /nodes/{node}/storage/{storage}/oci-registry-pull",
+      "purpose": "Pull an OCI image from a registry."
+    },
+    {
+      "command": "post /nodes/{node}/storage/{storage}/upload",
+      "purpose": "Upload templates, ISO images, OVAs and VM images."
+    },
+    {
+      "command": "post /nodes/{node}/subscription",
+      "purpose": "Update subscription info."
+    },
+    {
+      "command": "post /nodes/{node}/suspendall",
+      "purpose": "Suspend all VMs."
+    },
+    {
+      "command": "post /nodes/{node}/termproxy",
+      "purpose": "Creates a VNC Shell proxy."
+    },
+    {
+      "command": "post /nodes/{node}/vncshell",
+      "purpose": "Creates a VNC Shell proxy."
+    },
+    {
+      "command": "post /nodes/{node}/vzdump",
+      "purpose": "Create backup."
+    },
+    {
+      "command": "post /nodes/{node}/wakeonlan",
+      "purpose": "Try to wake a node via 'wake on LAN' network packet."
+    },
+    {
+      "command": "post /pools",
+      "purpose": "Create new pool."
+    },
+    {
+      "command": "post /storage",
+      "purpose": "Create a new storage."
+    },
+    {
+      "command": "put /access/acl",
+      "purpose": "Update Access Control List (add or remove permissions)."
+    },
+    {
+      "command": "put /access/domains/{realm}",
+      "purpose": "Update authentication server settings."
+    },
+    {
+      "command": "put /access/groups/{groupid}",
+      "purpose": "Update group data."
+    },
+    {
+      "command": "put /access/password",
+      "purpose": "Change user password."
+    },
+    {
+      "command": "put /access/roles/{roleid}",
+      "purpose": "Update an existing role."
+    },
+    {
+      "command": "put /access/tfa/{userid}/{id}",
+      "purpose": "Add a TFA entry for a user."
+    },
+    {
+      "command": "put /access/users/{userid}",
+      "purpose": "Update user configuration."
+    },
+    {
+      "command": "put /access/users/{userid}/token/{tokenid}",
+      "purpose": "Update API token for a specific user."
+    },
+    {
+      "command": "put /access/users/{userid}/unlock-tfa",
+      "purpose": "Unlock a user's TFA authentication."
+    },
+    {
+      "command": "put /cluster/acme/account/{name}",
+      "purpose": "Update existing ACME account information with CA. Note: not specifying any new account information triggers a refresh."
+    },
+    {
+      "command": "put /cluster/acme/plugins/{id}",
+      "purpose": "Update ACME plugin configuration."
+    },
+    {
+      "command": "put /cluster/backup/{id}",
+      "purpose": "Update vzdump backup job definition."
+    },
+    {
+      "command": "put /cluster/ceph/flags",
+      "purpose": "Set/Unset multiple ceph flags at once."
+    },
+    {
+      "command": "put /cluster/ceph/flags/{flag}",
+      "purpose": "Set or clear (unset) a specific ceph flag"
+    },
+    {
+      "command": "put /cluster/ceph/health-mute/{code}",
+      "purpose": "Mute or unmute a Ceph health check. A muted check no longer counts towards the cluster status, but stays visible and keeps being evaluated."
+    },
+    {
+      "command": "put /cluster/firewall/aliases/{name}",
+      "purpose": "Update IP or Network alias."
+    },
+    {
+      "command": "put /cluster/firewall/groups/{group}/{pos}",
+      "purpose": "Modify rule data."
+    },
+    {
+      "command": "put /cluster/firewall/ipset/{name}/{cidr}",
+      "purpose": "Update IP or Network settings"
+    },
+    {
+      "command": "put /cluster/firewall/options",
+      "purpose": "Set Firewall options."
+    },
+    {
+      "command": "put /cluster/firewall/rules/{pos}",
+      "purpose": "Modify rule data."
+    },
+    {
+      "command": "put /cluster/ha/groups/{group}",
+      "purpose": "Update ha group configuration."
+    },
+    {
+      "command": "put /cluster/ha/resources/{sid}",
+      "purpose": "Update resource configuration."
+    },
+    {
+      "command": "put /cluster/ha/rules/{rule}",
+      "purpose": "Update HA rule."
+    },
+    {
+      "command": "put /cluster/jobs/realm-sync/{id}",
+      "purpose": "Update realm-sync job definition."
+    },
+    {
+      "command": "put /cluster/mapping/dir/{id}",
+      "purpose": "Update a directory mapping."
+    },
+    {
+      "command": "put /cluster/mapping/pci/{id}",
+      "purpose": "Update a hardware mapping."
+    },
+    {
+      "command": "put /cluster/mapping/usb/{id}",
+      "purpose": "Update a hardware mapping."
+    },
+    {
+      "command": "put /cluster/metrics/server/{id}",
+      "purpose": "Update metric server configuration."
+    },
+    {
+      "command": "put /cluster/notifications/endpoints/gotify/{name}",
+      "purpose": "Update existing gotify endpoint"
+    },
+    {
+      "command": "put /cluster/notifications/endpoints/sendmail/{name}",
+      "purpose": "Update existing sendmail endpoint"
+    },
+    {
+      "command": "put /cluster/notifications/endpoints/smtp/{name}",
+      "purpose": "Update existing smtp endpoint"
+    },
+    {
+      "command": "put /cluster/notifications/endpoints/webhook/{name}",
+      "purpose": "Update existing webhook endpoint"
+    },
+    {
+      "command": "put /cluster/notifications/matchers/{name}",
+      "purpose": "Update existing matcher"
+    },
+    {
+      "command": "put /cluster/options",
+      "purpose": "Set datacenter options."
+    },
+    {
+      "command": "put /cluster/qemu/custom-cpu-models/{cputype}",
+      "purpose": "Update a custom CPU model definition."
+    },
+    {
+      "command": "put /cluster/replication/{id}",
+      "purpose": "Update replication job configuration."
+    },
+    {
+      "command": "put /cluster/sdn",
+      "purpose": "Apply sdn controller changes && reload."
+    },
+    {
+      "command": "put /cluster/sdn/controllers/{controller}",
+      "purpose": "Update sdn controller object configuration."
+    },
+    {
+      "command": "put /cluster/sdn/dns/{dns}",
+      "purpose": "Update sdn dns object configuration."
+    },
+    {
+      "command": "put /cluster/sdn/fabrics/fabric/{id}",
+      "purpose": "Update a fabric"
+    },
+    {
+      "command": "put /cluster/sdn/fabrics/node/{fabric_id}/{node_id}",
+      "purpose": "Update a node"
+    },
+    {
+      "command": "put /cluster/sdn/ipams/{ipam}",
+      "purpose": "Update sdn ipam object configuration."
+    },
+    {
+      "command": "put /cluster/sdn/prefix-lists/{id}",
+      "purpose": "Update Prefix List"
+    },
+    {
+      "command": "put /cluster/sdn/prefix-lists/{id}/entries/{url_seq}",
+      "purpose": "Update Prefix List Entry"
+    },
+    {
+      "command": "put /cluster/sdn/route-maps/entries/{route-map-id}/entry/{order}",
+      "purpose": "Update Route Map Entry"
+    },
+    {
+      "command": "put /cluster/sdn/vnets/{vnet}",
+      "purpose": "Update sdn vnet object configuration."
+    },
+    {
+      "command": "put /cluster/sdn/vnets/{vnet}/firewall/options",
+      "purpose": "Set Firewall options."
+    },
+    {
+      "command": "put /cluster/sdn/vnets/{vnet}/firewall/rules/{pos}",
+      "purpose": "Modify rule data."
+    },
+    {
+      "command": "put /cluster/sdn/vnets/{vnet}/ips",
+      "purpose": "Update IP Mapping in a VNet"
+    },
+    {
+      "command": "put /cluster/sdn/vnets/{vnet}/subnets/{subnet}",
+      "purpose": "Update sdn subnet object configuration."
+    },
+    {
+      "command": "put /cluster/sdn/zones/{zone}",
+      "purpose": "Update sdn zone object configuration."
+    },
+    {
+      "command": "put /nodes/{node}/apt/repositories",
+      "purpose": "Add a standard repository to the configuration"
+    },
+    {
+      "command": "put /nodes/{node}/ceph/pool/{name}",
+      "purpose": "Change POOL settings"
+    },
+    {
+      "command": "put /nodes/{node}/certificates/acme/certificate",
+      "purpose": "Renew existing certificate from CA."
+    },
+    {
+      "command": "put /nodes/{node}/config",
+      "purpose": "Set node configuration options."
+    },
+    {
+      "command": "put /nodes/{node}/disks/wipedisk",
+      "purpose": "Wipe a disk or partition."
+    },
+    {
+      "command": "put /nodes/{node}/dns",
+      "purpose": "Write DNS settings."
+    },
+    {
+      "command": "put /nodes/{node}/firewall/options",
+      "purpose": "Set Firewall options."
+    },
+    {
+      "command": "put /nodes/{node}/firewall/rules/{pos}",
+      "purpose": "Modify rule data."
+    },
+    {
+      "command": "put /nodes/{node}/lxc/{vmid}/config",
+      "purpose": "Set container options."
+    },
+    {
+      "command": "put /nodes/{node}/lxc/{vmid}/firewall/aliases/{name}",
+      "purpose": "Update IP or Network alias."
+    },
+    {
+      "command": "put /nodes/{node}/lxc/{vmid}/firewall/ipset/{name}/{cidr}",
+      "purpose": "Update IP or Network settings"
+    },
+    {
+      "command": "put /nodes/{node}/lxc/{vmid}/firewall/options",
+      "purpose": "Set Firewall options."
+    },
+    {
+      "command": "put /nodes/{node}/lxc/{vmid}/firewall/rules/{pos}",
+      "purpose": "Modify rule data."
+    },
+    {
+      "command": "put /nodes/{node}/lxc/{vmid}/resize",
+      "purpose": "Resize a container mount point."
+    },
+    {
+      "command": "put /nodes/{node}/lxc/{vmid}/snapshot/{snapname}/config",
+      "purpose": "Update snapshot metadata."
+    },
+    {
+      "command": "put /nodes/{node}/network",
+      "purpose": "Reload network configuration"
+    },
+    {
+      "command": "put /nodes/{node}/network/{iface}",
+      "purpose": "Update network device configuration"
+    },
+    {
+      "command": "put /nodes/{node}/qemu/{vmid}/cloudinit",
+      "purpose": "Regenerate and change cloudinit config drive."
+    },
+    {
+      "command": "put /nodes/{node}/qemu/{vmid}/config",
+      "purpose": "Set virtual machine options (synchronous API) - You should consider using the POST method instead for any actions involving hotplug or storage allocation."
+    },
+    {
+      "command": "put /nodes/{node}/qemu/{vmid}/firewall/aliases/{name}",
+      "purpose": "Update IP or Network alias."
+    },
+    {
+      "command": "put /nodes/{node}/qemu/{vmid}/firewall/ipset/{name}/{cidr}",
+      "purpose": "Update IP or Network settings"
+    },
+    {
+      "command": "put /nodes/{node}/qemu/{vmid}/firewall/options",
+      "purpose": "Set Firewall options."
+    },
+    {
+      "command": "put /nodes/{node}/qemu/{vmid}/firewall/rules/{pos}",
+      "purpose": "Modify rule data."
+    },
+    {
+      "command": "put /nodes/{node}/qemu/{vmid}/resize",
+      "purpose": "Extend volume size."
+    },
+    {
+      "command": "put /nodes/{node}/qemu/{vmid}/sendkey",
+      "purpose": "Send key event to virtual machine."
+    },
+    {
+      "command": "put /nodes/{node}/qemu/{vmid}/snapshot/{snapname}/config",
+      "purpose": "Update snapshot metadata."
+    },
+    {
+      "command": "put /nodes/{node}/qemu/{vmid}/unlink",
+      "purpose": "Unlink/delete disk images."
+    },
+    {
+      "command": "put /nodes/{node}/storage/{storage}/content/{volume}",
+      "purpose": "Update volume attributes"
+    },
+    {
+      "command": "put /nodes/{node}/subscription",
+      "purpose": "Set subscription key."
+    },
+    {
+      "command": "put /nodes/{node}/time",
+      "purpose": "Set time zone."
+    },
+    {
+      "command": "put /pools",
+      "purpose": "Update pool."
+    },
+    {
+      "command": "put /pools/{poolid}",
+      "purpose": "Update pool data (deprecated, no support for nested pools - use 'PUT /pools/?poolid={poolid}' instead)."
+    },
+    {
+      "command": "put /storage/{storage}",
+      "purpose": "Update storage configuration."
     }
   ]
 }

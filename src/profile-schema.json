@@ -7,9 +7,19 @@
   "properties": {
     "auth": { "const": "api-token" },
     "origin": { "type": "string", "pattern": "^https://[^/?#@]+$" },
-    "tokenId": { "type": "string", "pattern": "^[^\\s@!]+@[^\\s@!]+![^\\s@!]+$" },
+    "tokenId": { "type": "string", "maxLength": 256, "pattern": "^[^\\s:/@!=]+@[A-Za-z][A-Za-z0-9._-]*![A-Za-z][A-Za-z0-9._-]*$",
+      "allOf": [{ "pattern": "^[\\x21-\\x7e]+$" }] },
     "token": { "$ref": "#/$defs/secretRef", "x-secret": true },
-    "caBundle": { "type": "string", "minLength": 1 }
+    "caBundle": { "type": "string", "minLength": 1 },
+    "certificatePin": {
+      "type": "object", "additionalProperties": false,
+      "required": ["sha256", "origin"],
+      "properties": {
+        "sha256": { "type": "string", "pattern": "^[a-fA-F0-9]{64}$" },
+        "origin": { "type": "string", "pattern": "^https://[^/?#@]+$" },
+        "replaceHostname": { "type": "boolean" }
+      }
+    }
   },
   "$defs": {
     "secretRef": {

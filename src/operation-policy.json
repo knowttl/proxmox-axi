@@ -1,0 +1,24 @@
+{
+  "version": 1,
+  "captureBindings": {
+    "legacy-8.2.7": "61100b5ee3ec822c5ee54906bbe6354d6296468fbd00aed9ad032cfad184258d",
+    "published-current": "68a8ac7b4994525a1df5530e2d96f4fc76b6401f07861ac8a51635a0b9ce7c53"
+  },
+  "default": {
+    "effect": "unresolved",
+    "transport": "unresolved",
+    "secrets": "unresolved",
+    "reason": "Requires operation-specific effect, transport and secret review before admission."
+  },
+  "reviewed": {
+    "GET /version": { "effect": "read", "transport": "json", "secrets": "none", "reason": "Version metadata only; fixed JSON formatter." },
+    "GET /access/permissions": { "effect": "read", "transport": "json", "secrets": "none", "reason": "Effective permission map; no credential values." },
+    "GET /cluster/resources": { "effect": "read", "transport": "json", "secrets": "none", "reason": "Cluster resource inventory; type filters select read results." },
+    "GET /nodes": { "effect": "read", "transport": "json", "secrets": "none", "reason": "Node inventory and metrics." },
+    "GET /nodes/{node}/lxc": { "effect": "read", "transport": "json", "secrets": "none", "reason": "Container inventory and status metrics." },
+    "GET /nodes/{node}/qemu": { "effect": "read", "transport": "json", "secrets": "none", "reason": "VM inventory and status metrics." },
+    "GET /nodes/{node}/storage": { "effect": "read", "transport": "json", "secrets": "none", "reason": "Storage inventory and space metrics; filters do not mutate storage." },
+    "GET /nodes/{node}/tasks": { "effect": "read", "transport": "json", "secrets": "none", "reason": "Task history inventory with bounded JSON output." },
+    "GET /nodes/{node}/tasks/{upid}/status": { "effect": "read", "transport": "json", "secrets": "none", "reason": "Status of one existing task, no task control." }
+  }
+}

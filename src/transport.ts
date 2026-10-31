@@ -1,15 +1,46 @@
-import { request } from 'node:https'
+import { Agent, request } from 'node:https'
+import { connect, checkServerIdentity } from 'node:tls'
+import { createHash, X509Certificate } from 'node:crypto'
+import { isIP } from 'node:net'
 import type { Credentials } from './credentials.js'
 import { Failure } from './errors.js'
 import operations from './operations.json' with { type: 'json' }
 
-export async function readVersion(credentials: Credentials): Promise<Record<string, string>> {
-  const operation = operations[0]!
+export async function executeRead(credentials: Credentials, wirePath: string): Promise<unknown> {
+  if (!wirePath.startsWith('/api2/json/') || wirePath.includes('#')) throw new Failure('INVALID_INPUT', 'Invalid API path.', 'Select a reviewed API operation.', 2)
   const body = await new Promise<string>((resolve, reject) => {
     const fail = (error: Error) => reject(error instanceof Failure ? error :
-      new Failure('CONNECTION_FAILED', 'Trusted HTTPS version request failed.', 'Check the origin and configured CA trust.'))
-    const req = request(new URL(operation.wirePath, credentials.origin), {
-      method: operation.method, ca: credentials.ca, rejectUnauthorized: true,
+      new Failure('CONNECTION_FAILED', 'Trusted HTTPS request failed.', 'Check the origin and configured CA trust.'))
+    const origin = new URL(credentials.origin)
+    const hostname = origin.hostname.replace(/^\[|\]$/g, '')
+    let req: ReturnType<typeof request> | undefined
+    const pin = credentials.certificatePin
+    const socket = connect({ host: hostname, port: Number(origin.port || 443),
+      servername: isIP(hostname) ? '' : hostname,
+      ...(credentials.ca ? { ca: credentials.ca } : {}), rejectUnauthorized: !pin })
+    const deadline = setTimeout(() => {
+      const error = new Failure('TIMEOUT', 'Request exceeded 5000 ms.', 'Check the server and retry the read explicitly.')
+      req?.destroy(error)
+      socket.destroy(error)
+    }, 5000)
+    socket.once('close', () => clearTimeout(deadline))
+    socket.on('error', fail)
+    socket.once('secureConnect', () => {
+      if (pin) {
+        const peer = socket.getPeerCertificate(true)
+        const certificate = new X509Certificate(peer.raw)
+        const now = Date.now()
+        if (pin.origin !== credentials.origin || createHash('sha256').update(peer.raw).digest('hex') !== pin.sha256.toLowerCase() ||
+          now < Date.parse(certificate.validFrom) || now > Date.parse(certificate.validTo) ||
+          (!pin.replaceHostname && checkServerIdentity(hostname, peer))) {
+          socket.destroy(new Failure('CONNECTION_FAILED', 'Pinned certificate validation failed.', 'Review the certificate and origin before updating trust.'))
+          return
+        }
+      }
+      const agent = new Agent({ keepAlive: false })
+      agent.createConnection = () => socket
+      req = request(new URL(wirePath, origin), {
+      method: 'GET', agent,
       headers: { Authorization: `PVEAPIToken=${credentials.tokenId}=${credentials.token}`, Accept: 'application/json' },
     }, response => {
       response.on('error', fail)
@@ -17,27 +48,32 @@ export async function readVersion(credentials: Credentials): Promise<Record<stri
       if (status !== 200) {
         response.resume()
         reject(new Failure(status === 401 ? 'AUTH_REQUIRED' : status === 403 ? 'PERMISSION_DENIED' : 'HTTP_ERROR',
-          `Version request returned HTTP ${status}.`, 'Check the configured identity and its permission to read /version.'))
+          `Request returned HTTP ${status}.`, 'Check the configured identity and its permission to read the selected operation.'))
         return
       }
       let bytes = 0
       const chunks: Buffer[] = []
       response.on('data', (chunk: Buffer) => {
         bytes += chunk.length
-        if (bytes > 65_536) req.destroy(new Failure('OUTPUT_LIMIT', 'Version response exceeds 65536 bytes.', 'Check the server response contract.'))
+        if (bytes > 65_536) req!.destroy(new Failure('OUTPUT_LIMIT', 'Response exceeds 65536 bytes.', 'Check the server response contract.'))
         else chunks.push(chunk)
       })
       response.on('end', () => resolve(Buffer.concat(chunks).toString('utf8')))
     })
-    const deadline = setTimeout(() => req.destroy(new Failure('TIMEOUT', 'Version request exceeded 5000 ms.', 'Check the configured server and retry the read explicitly.')), 5000)
-    req.on('close', () => clearTimeout(deadline))
     req.on('error', fail)
     req.end()
+    })
   })
   let value: unknown
   try { value = JSON.parse(body) } catch { throw invalidResponse() }
   if (!value || typeof value !== 'object' || Array.isArray(value) || !('data' in value)) throw invalidResponse()
   const data: unknown = value.data
+  return data
+}
+
+export async function readVersion(credentials: Credentials, wirePath: string): Promise<Record<string, string>> {
+  const operation = operations[0]!
+  const data = await executeRead(credentials, wirePath)
   if (!data || typeof data !== 'object' || Array.isArray(data)) throw invalidResponse()
   const fields = data as Record<string, unknown>
   if (operation.requiredResponseFields.some(field => typeof fields[field] !== 'string' || !fields[field])) throw invalidResponse()
