@@ -45,7 +45,7 @@ A token reference is exactly `{ "env": "VARIABLE_NAME" }` or `{ "file": "/absolu
 An omitted reference defaults to `{ "env": "PROXMOX_AXI_TOKEN" }`.
 `auth status` reports the selected sources without their secret values and sends no request.
 `config path` reports the canonical configuration path, and `profile list` lists profile names without resolving secrets.
-`doctor` verifies file protection and checks entry and selected-node versions, permissions, inventory and one task status in at most nine bounded reads.
+`doctor` verifies file protection and checks the entry version, permissions and node inventory, then checks the first returned node's version, VMs, containers, stores, tasks and one task status when available, in at most nine bounded reads.
 The tool never reads baseline clients' configuration or writes credential files.
 Private files use one bounded reader and atomic replacement module.
 Linux checks ownership and modes before reading through a checked file descriptor.
@@ -77,7 +77,7 @@ proxmox-axi ls '/nodes/{node}/qemu' --api-node pve-test --fields vmid,name,statu
 proxmox-axi doctor --format json
 ```
 
-Ordinary reads detect the entry version and the selected node version before choosing a catalogue.
+Ordinary reads other than `/version` detect the entry version and, for node-specific routes, the selected node version before choosing a catalogue.
 The published 9.2 schema is supported at the contract level; live commissioning remains pending.
 Legacy 8.x and unknown majors are labelled unverified, and all writes remain disabled.
 An explicit `--catalogue` selects a replay contract without version detection; inventory visibility remains unknown.
@@ -88,7 +88,7 @@ Scoped privileges may provide useful rows but do not establish complete inventor
 An empty filtered or unverified result never establishes that no resources exist.
 
 TOON is the default; `--format json` preserves the same structured result.
-Lists default to 100 compact rows; `--fields` chooses fields and `--full` includes all received fields and rows.
+Lists default to 100 compact rows; `--fields` chooses fields and `--full` includes all received rows and, unless `--fields` is supplied, all received fields.
 Provider totals and pagination remain separate from received counts and display truncation.
 Rendered output and HTTP responses each have a 65536-byte cap, including full output.
 HTTP 404 reports `NOT_FOUND_OR_HIDDEN`, since absence and hidden resources cannot be distinguished safely.
