@@ -16,7 +16,10 @@ const { EnvironmentKeyProvider } = await load('src/server/store/key-provider.js'
 const { EmbeddedSecretSource } = await load('src/server/store/secret-source.js')
 const { loadTrustedCa } = await load('src/server/trusted-ca.js')
 const { seedToolUser } = await load('test/fixtures/tokens.js')
-const { toolPaths } = await load('src/server/config.js')
+const { toolPaths, healthDefaults } = await load('src/server/config.js')
+
+// Scheduled health reads must not enter the requested-operation ledger during this bounded replay.
+healthDefaults.tickMs = 1_800_001
 
 // Seed real stores using the host's existing synthetic-user builder. HTTP,
 // authentication, profile writing, adapter execution and runner are unchanged.

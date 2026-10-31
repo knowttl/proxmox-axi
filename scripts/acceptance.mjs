@@ -280,7 +280,7 @@ async function verify(values) {
         assert.ok(!`${actual.stdout}${actual.stderr}`.includes(value), `${id}: secret leaked to public output`)
       }
       transcripts.push(`case: ${id}\nexit: ${actual.code}\nstdout:\n${actual.stdout}stderr:\n${actual.stderr}`)
-      const value = expected.bareVersion ? undefined : args.includes('json') ? JSON.parse(actual.stdout) : decode(actual.stdout)
+      const value = expected.bareVersion ? undefined : expected.hostBoundary ? decode(actual.stdout) : args.includes('json') ? JSON.parse(actual.stdout) : decode(actual.stdout)
       record.actual.output = value
       if (entry !== executable && expected.exitCode !== 0) {
         assert.ok((expected.hostBoundary && actual.stderr === '') || /^artium-axi: request_id [0-9a-f-]{36}\n$/.test(actual.stderr), `${id}: only the host's safe request ID diagnostic`)
@@ -419,11 +419,11 @@ async function verify(values) {
         const expected = route.callable ? route.operation.path === '/version' ?
           { exitCode: 0, requests: 1, version: true, identity } :
           { exitCode: 0, requests: 1, path: route.expectedPath, data: route.response, identity } :
-          { exitCode: 1, requests: 0, error: hosted ? 'INVALID_INPUT' : 'CONTRACT_UNRESOLVED', hostBoundary: hosted }
+          { exitCode: hosted ? 2 : 1, requests: 0, error: hosted ? 'INVALID_INPUT' : 'CONTRACT_UNRESOLVED', hostBoundary: hosted }
         await runCase(`${hosted ? 'artium' : 'standalone'}/contract/${route.id}/valid`, args, environment, expected,
           route.operation.path === '/version' ? success : { httpStatus: 200, body: { data: route.response } }, entry)
         await runCase(`${hosted ? 'artium' : 'standalone'}/contract/${route.id}/invalid`, [...args, '--api-constructor', 'invalid'], environment,
-          { exitCode: hosted ? 1 : 2, requests: 0, error: 'INVALID_INPUT', hostBoundary: hosted }, success, entry)
+          { exitCode: 2, requests: 0, error: 'INVALID_INPUT', hostBoundary: hosted }, success, entry)
         coverage[route.callable ? 'admitted' : 'denied']++
       }
       return coverage
