@@ -1,2 +1,3 @@
 evidence/** -text
+evidence/evidence/*.json whitespace=cr-at-eol
 test/fixtures/** -text
