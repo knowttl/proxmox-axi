@@ -12,7 +12,10 @@ for (const scenario of [
   { name: 'actual pinned Artium client server and runner satisfy S1.1', through: 'both', exitCode: 0, status: 'pass', host: 'pass' },
   { name: 'both journeys reject missing host fixture inputs', through: 'both', exitCode: 1, status: 'fail', host: 'pending', missingHost: true,
     failure: '--through both requires PROXMOX_AXI_ARTIUM_FIXTURE and PROXMOX_AXI_ARTIUM_MANIFEST' },
-]) test(scenario.name, async () => {
+]) test(scenario.name, {
+  skip: scenario.through === 'both' && !scenario.missingHost && !process.env.PROXMOX_AXI_ARTIUM_FIXTURE
+    ? 'Artium fixture not supplied' : false,
+}, async () => {
   const root = fileURLToPath(new URL('../', import.meta.url))
   const temporary = await mkdtemp(join(tmpdir(), 'proxmox-axi-test-'))
   const out = join(temporary, 'S1.1')
