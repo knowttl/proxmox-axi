@@ -19,14 +19,11 @@ pnpm build
 node bin/proxmox-axi.mjs get --help
 node bin/proxmox-axi.mjs --version
 pnpm lint
-# Select the externally prepared, pinned local admission fixture before tests.
-export PROXMOX_AXI_ARTIUM_FIXTURE=/absolute/path/to/prepared/artium
-export PROXMOX_AXI_ARTIUM_MANIFEST=/absolute/path/to/captured/manifest.json
 pnpm test
 ```
 
-`get /version` uses trusted HTTPS, a five-second total deadline and a 64 KiB response bound.
-It rejects redirects and validates the version response before formatting it as TOON or JSON.
+All admitted reads use trusted HTTPS, a five-second total deadline and a 64 KiB response bound, and reject redirects.
+`get /version` validates the version response before formatting it as TOON or JSON.
 HTTP 401 returns a nonzero `AUTH_REQUIRED` result; malformed successful responses return `INVALID_RESPONSE`.
 Errors are structured on stdout and never include raw vendor bodies or transport diagnostics.
 An interrupted HTTPS response returns `CONNECTION_FAILED`; the total deadline and response bound retain `TIMEOUT` and `OUTPUT_LIMIT`.
@@ -52,7 +49,7 @@ An omitted reference defaults to `{ "env": "PROXMOX_AXI_TOKEN" }`.
 The tool never reads baseline clients' configuration or writes credential files.
 Private files use one bounded reader and atomic replacement module.
 Linux checks ownership and modes before reading through a checked file descriptor.
-Windows rejects reparse points, applies protected DACLs on writes, verifies DACLs for `auth status`, and bounds rename retries to about one second.
+Windows rejects reparse points, applies protected DACLs on writes, verifies DACLs for `auth status` and `doctor`, and bounds rename retries to about one second.
 Native Windows proof remains assigned to S6.1.
 
 A file profile may use `certificatePin: { "origin": "https://pve.example.test:8006", "sha256": "<64 hex characters>" }` instead of `caBundle`.
@@ -107,7 +104,17 @@ Transport diagnostics observe Node's error channel without replacing HTTP or TLS
 Set `PROXMOX_AXI_TEST_FAILURE_DIR` to an external directory to preserve sanitized evidence when a test fails.
 The two sanitized captures under `evidence/` are byte-preserved; their provenance and hashes are listed in `evidence/README.md`.
 
-`--through both` requires the two external fixture inputs above and fails if either is missing or its pinned identity differs.
+`pnpm test` always runs native and offline tests, including rejection of an explicitly requested hosted journey with missing fixture inputs.
+Actual Artium tests are opt-in: without `PROXMOX_AXI_ARTIUM_FIXTURE`, they skip with the reason `Artium fixture not supplied`.
+To include them, select the externally prepared, pinned local admission fixture:
+
+```sh
+export PROXMOX_AXI_ARTIUM_FIXTURE=/absolute/path/to/prepared/artium
+export PROXMOX_AXI_ARTIUM_MANIFEST=/absolute/path/to/captured/manifest.json
+pnpm test
+```
+
+Explicit acceptance with `--through both` requires both external fixture inputs and fails if either is missing or its pinned identity differs.
 The selected temporary admission revision and captured manifest digest are recorded in `test/artium-fixture.json`.
 Prepare it from an exact `git archive` export, install its frozen dependencies offline, and follow its fixture startup guide in task-owned scratch space.
 For a Git-free export, invoke the host compiler, copy its store migrations into `dist/src/server/store/migrations`, and run `scripts/build-cli.mjs`; its aggregate build wrapper requires Git metadata.
