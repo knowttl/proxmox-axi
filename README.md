@@ -7,6 +7,17 @@ Nine ordinary read routes have reviewed admission policy.
 Other operations remain discoverable but uncallable until their effects, transport and secret handling are reviewed.
 Session authentication, writes, downloads and duplex transports remain deferred.
 
+Install the npm package with Node 24.11.0 or later:
+
+```sh
+npm install -g @knowttl/proxmox-axi
+proxmox-axi --version
+proxmox-axi get --help
+```
+
+The executable is `proxmox-axi`.
+For development from source:
+
 Use Node 24.14.0 and pnpm 10.22.0.
 Node's supported minimum is 24.11.0; `.node-version` pins the tested runtime.
 TypeScript 5.9.3, Node types 22.20.5, TOON 2.3.1 and Ajv 8.20.0 align with the checked Artium toolchain.
@@ -14,7 +25,7 @@ The lockfile pins every transitive dependency and its integrity.
 The fast-uri override retains the checked host's exact 3.1.8 version.
 
 ```sh
-pnpm install --offline --frozen-lockfile
+pnpm install --frozen-lockfile
 pnpm build
 node bin/proxmox-axi.mjs get --help
 node bin/proxmox-axi.mjs --version
@@ -88,7 +99,7 @@ The public acceptance entry installs a packed tarball into an isolated consumer 
 It uses real loopback HTTPS and synthetic credentials inside a Linux user/network namespace containing only loopback.
 An external connection must fail with `ENETUNREACH` before any product journey runs.
 Linux user/network namespaces, iproute2 and OpenSSL are required; missing isolation fails the check.
-Dependencies must already be available in the pnpm store; acceptance installs are offline.
+Package installation can fetch dependencies before the isolated product journeys start.
 
 ```sh
 pnpm verify:acceptance -- --task S1.1 --pack /absolute/path/to/pack --out /absolute/new/run/S1.1 --network fake-only --through standalone
