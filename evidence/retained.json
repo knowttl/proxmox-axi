@@ -1,0 +1,10 @@
+[
+  {
+    "path": "evidence/P-VERIFIED-VERSION-response.json",
+    "sha256": "52b56a5a1d3f31401ab6619e403555bfa8c2d883b42b2dfb7d99eb3f2a7214b3"
+  },
+  {
+    "path": "evidence/P-VERSION-ANON-response.json",
+    "sha256": "76faa31a733ec62dcfcd48acbc2003383071a1e35977aac575323de037d01a27"
+  }
+]

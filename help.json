@@ -1,0 +1,11 @@
+{
+  "generated": true,
+  "source": "src/operations.json",
+  "sourceSha256": "b6f1a0eb8c0404a41a3083005d4ff39440cdb417ae408d44149e9668fa66286d",
+  "commands": [
+    {
+      "command": "get /version",
+      "purpose": "Read the authenticated server version. Requires a configured API token."
+    }
+  ]
+}

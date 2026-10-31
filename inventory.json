@@ -1,0 +1,31 @@
+{
+  "generated": true,
+  "source": "src/operations.json",
+  "sourceSha256": "b6f1a0eb8c0404a41a3083005d4ff39440cdb417ae408d44149e9668fa66286d",
+  "operations": [
+    {
+      "id": "OP-GET-version",
+      "method": "GET",
+      "path": "/version",
+      "wirePath": "/api2/json/version",
+      "command": [
+        "get",
+        "/version"
+      ],
+      "effect": "read",
+      "permission": {
+        "user": "all"
+      },
+      "catalogues": [
+        "legacy-8.2.7",
+        "published-current"
+      ],
+      "help": "Read the authenticated server version. Requires a configured API token.",
+      "requiredResponseFields": [
+        "version",
+        "release",
+        "repoid"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "httpStatus": 200,
+  "headers": {
+    "Content-Type": "application/json;charset=UTF-8"
+  },
+  "body": {
+    "data": {
+      "repoid": "3e0176e6bb2ade3b",
+      "release": "8.2",
+      "version": "8.2.7"
+    }
+  },
+  "interpretation": "Observed token response after propagated audit privileges were verified. This verifies this sample, not every operation or server release."
+}
