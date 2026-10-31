@@ -3,7 +3,6 @@
     "id": "OP-GET-version",
     "method": "GET",
     "path": "/version",
-    "wirePath": "/api2/json/version",
     "command": ["get", "/version"],
     "effect": "read",
     "permission": { "user": "all" },

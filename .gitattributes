@@ -1,3 +1,10 @@
 evidence/** -text
 evidence/evidence/*.json whitespace=cr-at-eol
 test/fixtures/** -text
+vendor/** -text -whitespace linguist-vendored=true
+src/contracts.json linguist-generated=true
+inventory.json linguist-generated=true
+help.json linguist-generated=true
+artium-invocations.json linguist-generated=true
+catalogue-diff.json linguist-generated=true
+axi-credential.schema.json linguist-generated=true
