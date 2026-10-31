@@ -144,6 +144,7 @@ async function verify(values) {
       const runtimeHashes = await verifyHostRuntime(fixture)
       const admitted = manifest.tools.find(tool => tool.tool === 'proxmox-axi')
       assert.equal(digest(await readFile(admitted.tarball)), pin.packageSha256, 'Admitted tool archive')
+      assert.equal(`sha512-${digest(await readFile(admitted.tarball), 'sha512')}`, pin.packageIntegrity, 'Admitted tool archive integrity')
       await copyFile(admitted.tarball, archive)
       hostInput = { fixture, pin }
       result.host = { status: 'starting', revision: pin.revision, manifestSha256: pin.manifestSha256,

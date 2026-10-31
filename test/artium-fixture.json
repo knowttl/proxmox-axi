@@ -1,8 +1,9 @@
 {
-  "revision": "6d1e406705803a657241295ddf322b4c21fb4ef9",
+  "revision": "7ae4bafb2a60cbb5794459986c2802a333d7857c",
   "status": "unmerged-temporary-admission-fixture",
-  "manifestSha256": "652370c2b73da0debc8eedb3dfae202bbab736b97da919b5fcc0240ac19ddb86",
-  "packageSha256": "a4f49b5af6c3a456ad2745ccca07e6b33523671d65fa2e97a63dbf3c8f6ca070",
+  "manifestSha256": "8879b0eb8750c45af2fca29dff63b4f7dabc68e152909d316d84f39cb2425c22",
+  "packageSha256": "523f2358f7b34b975fe9f783495384c8fa59691a990c583aa810627133038227",
+  "packageIntegrity": "sha512-LPHkvmzCN2cqisfVffhjJdLOF6H4ixukItpyZ2U9kTPNmMsFUtfulAnuJF9Ot/u66cZ70UPOtB9uMVZVVysR4g==",
   "sourceHashes": {
     "src/server/app.ts": "fa6b1f44c81f1db5dd59d73ea7e6fadace2d0d59cc1f78997a09a966733c17c1",
     "src/server/adapters/proxmox.ts": "9f01f85cf1d7c6b04a46ff71e7768dac464f34ab483ef0fa55774ef1aa7a3abc",

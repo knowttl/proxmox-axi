@@ -72,7 +72,7 @@ Set `PROXMOX_AXI_TEST_FAILURE_DIR` to an external directory to preserve sanitize
 The two sanitized captures under `evidence/` are byte-preserved; their provenance and hashes are listed in `evidence/README.md`.
 
 `--through both` requires the two external fixture inputs above and fails if either is missing or its pinned identity differs.
-The selected temporary admission revision is `6d1e406705803a657241295ddf322b4c21fb4ef9`, recorded with the captured manifest digest in `test/artium-fixture.json`.
+The selected temporary admission revision is `7ae4bafb2a60cbb5794459986c2802a333d7857c`, recorded with the captured manifest digest in `test/artium-fixture.json`.
 Prepare it from an exact `git archive` export, install its frozen dependencies offline, and follow its fixture startup guide in task-owned scratch space.
 For a Git-free export, invoke the host compiler, copy its store migrations into `dist/src/server/store/migrations`, and run `scripts/build-cli.mjs`; its aggregate build wrapper requires Git metadata.
 The retained `runtimeHashes` in `test/artium-fixture.json` pin the compiled runtime files from that build, including the fixture builder, session module and bundled public client.
@@ -80,9 +80,8 @@ The driver checks those SHA-256 digests before loading the host, importing the s
 Missing or substituted runtime files fail the check even when the TypeScript source is unchanged.
 Keep the manifest snapshot and its original tarballs together outside this repository.
 The manifest's Proxmox archive is used for both journeys, and its executable, admitted runtime sources and runtime package metadata must match the current build.
-The response-stream error correction changes the shipped transport runtime, so the previously admitted archive cannot validate this build.
-Before `--through both` can pass, the outer executor needs a newly approved package archive and admission inventory/manifest with corresponding reviewed pins.
-The existing archive, manifest and host-runtime pins remain enforced until that fixture refresh is approved.
+The approved refreshed archive includes the response-stream error correction; its SHA-256 and SHA-512 integrity are pinned alongside the refreshed manifest digest.
+The source and compiled host-runtime digests are unchanged and remain enforced.
 The host runs the existing credential store, profile writer, adapter and runner with a synthetic user from its own fixture builder.
 The actual public client authenticates against the listening server and executes the version read over loopback HTTP; the vendor boundary remains trusted HTTPS.
 Evidence includes the host revision, manifest and client digests, startup record, client invocation, real audit outcomes, injected credential-source diagnostics and runner cleanup.
