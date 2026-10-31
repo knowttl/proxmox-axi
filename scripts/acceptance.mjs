@@ -92,11 +92,42 @@ function selection(args) {
   return values
 }
 
-async function verify(values) {
+async function preparePackage(values, out, scratch) {
+  const pkg = await json(join(root, 'package.json'))
+  const archive = join(out, `knowttl-proxmox-axi-${pkg.version}.tgz`)
+  let hostInput
+  if (values['--through'] === 'both') {
+    assert.ok(process.env.PROXMOX_AXI_ARTIUM_FIXTURE && process.env.PROXMOX_AXI_ARTIUM_MANIFEST,
+      '--through both requires PROXMOX_AXI_ARTIUM_FIXTURE and PROXMOX_AXI_ARTIUM_MANIFEST')
+    const pin = await json(join(root, 'test/artium-fixture.json'))
+    const manifestBytes = await readFile(process.env.PROXMOX_AXI_ARTIUM_MANIFEST)
+    assert.equal(digest(manifestBytes), pin.manifestSha256, 'Reviewed host fixture manifest digest')
+    const manifest = JSON.parse(manifestBytes)
+    assert.equal(manifest.fixtureCommit, pin.revision, 'Reviewed temporary admission revision')
+    const fixture = await realpath(process.env.PROXMOX_AXI_ARTIUM_FIXTURE)
+    for (const [path, hash] of Object.entries(pin.sourceHashes)) assert.equal(digest(await readFile(join(fixture, path))), hash, `Host source pin: ${path}`)
+    const runtimeHashes = await verifyHostRuntime(fixture)
+    const admitted = manifest.tools.find(tool => tool.tool === 'proxmox-axi')
+    assert.equal(digest(await readFile(admitted.tarball)), pin.packageSha256, 'Admitted tool archive')
+    assert.equal(`sha512-${digest(await readFile(admitted.tarball), 'sha512')}`, pin.packageIntegrity, 'Admitted tool archive integrity')
+    await copyFile(admitted.tarball, archive)
+    hostInput = { fixture, pin }
+    hostInput.host = { status: 'starting', revision: pin.revision, manifestSha256: pin.manifestSha256,
+      admission: pin.status, sourceHashes: pin.sourceHashes, runtimeHashes,
+      clientSha256: runtimeHashes['dist/cli/artium-axi.mjs'] }
+  } else await checked('pnpm', ['pack', '--pack-destination', out])
+  const consumer = join(scratch, 'consumer')
+  await mkdir(consumer)
+  await save(join(consumer, 'package.json'), { private: true, packageManager: pkg.packageManager,
+    dependencies: { [pkg.name]: `file:${archive}` }, pnpm: pkg.pnpm })
+  await checked('pnpm', ['install', '--ignore-scripts'], { cwd: consumer })
+  const installed = await realpath(join(consumer, 'node_modules', pkg.name))
+  const executable = join(installed, 'bin/proxmox-axi.mjs')
+  return { pkg, archive, consumer, installed, executable, hostInput }
+}
+
+async function verify(values, prepared, scratch) {
   const out = values['--out']
-  // Refuse reuse so stale evidence cannot be mistaken for this run.
-  await mkdir(out, { recursive: false, mode: 0o700 })
-  const scratch = await mkdtemp(join(out, '.private-'))
   const ledger = [], transcripts = [], tlsErrors = []
   const secrets = []
   const publicText = value => {
@@ -135,37 +166,9 @@ async function verify(values) {
     assert.equal(success.body.data.version, '8.2.7', 'Approved fixture version')
     assert.equal(denied.httpStatus, 401, 'Approved denial fixture')
 
-    const pkg = await json(join(root, 'package.json'))
-    const archive = join(out, `knowttl-proxmox-axi-${pkg.version}.tgz`)
-    let hostInput
-    if (values['--through'] === 'both') {
-      assert.ok(process.env.PROXMOX_AXI_ARTIUM_FIXTURE && process.env.PROXMOX_AXI_ARTIUM_MANIFEST,
-        '--through both requires PROXMOX_AXI_ARTIUM_FIXTURE and PROXMOX_AXI_ARTIUM_MANIFEST')
-      const pin = await json(join(root, 'test/artium-fixture.json'))
-      const manifestBytes = await readFile(process.env.PROXMOX_AXI_ARTIUM_MANIFEST)
-      assert.equal(digest(manifestBytes), pin.manifestSha256, 'Reviewed host fixture manifest digest')
-      const manifest = JSON.parse(manifestBytes)
-      assert.equal(manifest.fixtureCommit, pin.revision, 'Reviewed temporary admission revision')
-      const fixture = await realpath(process.env.PROXMOX_AXI_ARTIUM_FIXTURE)
-      for (const [path, hash] of Object.entries(pin.sourceHashes)) assert.equal(digest(await readFile(join(fixture, path))), hash, `Host source pin: ${path}`)
-      const runtimeHashes = await verifyHostRuntime(fixture)
-      const admitted = manifest.tools.find(tool => tool.tool === 'proxmox-axi')
-      assert.equal(digest(await readFile(admitted.tarball)), pin.packageSha256, 'Admitted tool archive')
-      assert.equal(`sha512-${digest(await readFile(admitted.tarball), 'sha512')}`, pin.packageIntegrity, 'Admitted tool archive integrity')
-      await copyFile(admitted.tarball, archive)
-      hostInput = { fixture, pin }
-      result.host = { status: 'starting', revision: pin.revision, manifestSha256: pin.manifestSha256,
-        admission: pin.status, sourceHashes: pin.sourceHashes, runtimeHashes,
-        clientSha256: runtimeHashes['dist/cli/artium-axi.mjs'] }
-    } else await checked('pnpm', ['pack', '--pack-destination', out], { env: { ...process.env, npm_config_offline: 'true' } })
+    const { pkg, archive, consumer, installed, executable, hostInput } = prepared
     const archiveBytes = await readFile(archive)
-    const consumer = join(scratch, 'consumer')
-    await mkdir(consumer)
-    await save(join(consumer, 'package.json'), { private: true, packageManager: pkg.packageManager,
-      dependencies: { [pkg.name]: `file:${archive}` }, pnpm: pkg.pnpm })
-    await checked('pnpm', ['install', '--offline', '--ignore-scripts'], { cwd: consumer })
-    const installed = await realpath(join(consumer, 'node_modules/@knowttl/proxmox-axi'))
-    const executable = join(installed, 'bin/proxmox-axi.mjs')
+    if (hostInput) result.host = hostInput.host
     assert.notEqual(installed, root, 'Must execute the installed archive, not source')
     const installedPackage = await json(join(installed, 'package.json'))
     assert.equal(installedPackage.name, pkg.name)
@@ -538,20 +541,26 @@ async function verify(values) {
     await save(join(out, 'tls-errors.json'), tlsErrors)
     await writeFile(join(out, 'host-startup.txt'), publicText(Buffer.concat(hostLogs).toString()))
     await writeFile(join(out, 'public-output.txt'), publicText(transcripts.join('\n')))
-    await rm(scratch, { recursive: true, force: true })
   }
   console.log(JSON.stringify({ task: result.task, scope: result.scope, status: result.status, cases: result.cases.length,
     failure: result.failure, evidence: join(out, 'result.json') }))
 }
 
+let scratch
+let values
 try {
-  const values = selection(process.argv.slice(2))
+  values = selection(process.argv.slice(2))
   if (!process.env.PROXMOX_AXI_ACCEPTANCE_NETNS) {
+    // Install dependencies before denying network access to the product journeys.
+    await mkdir(values['--out'], { recursive: false, mode: 0o700 })
+    scratch = await mkdtemp(join(values['--out'], '.private-'))
+    const prepared = await preparePackage(values, values['--out'], scratch)
+    await save(join(scratch, 'prepared.json'), prepared)
     const parentNamespace = await readlink('/proc/self/ns/net')
     const isolated = await command('unshare', ['--user', '--map-root-user', '--net', process.execPath,
       fileURLToPath(import.meta.url), ...process.argv.slice(2)],
     { timeoutMs: values['--task'] === 'S2.1' ? 1_800_000 : 300_000,
-      env: { ...process.env, PROXMOX_AXI_ACCEPTANCE_NETNS: parentNamespace } })
+      env: { ...process.env, PROXMOX_AXI_ACCEPTANCE_NETNS: parentNamespace, PROXMOX_AXI_ACCEPTANCE_SCRATCH: scratch } })
     process.stdout.write(isolated.stdout)
     process.stderr.write(isolated.stderr)
     process.exitCode = isolated.code
@@ -559,9 +568,15 @@ try {
     assert.notEqual(await readlink('/proc/self/ns/net'), process.env.PROXMOX_AXI_ACCEPTANCE_NETNS, 'Must create a new network namespace')
     assert.ok(Object.keys(networkInterfaces()).every(name => name === 'lo'), 'Must isolate networking before configuring loopback')
     await checked('ip', ['link', 'set', 'lo', 'up'])
-    await verify(values)
+    const preparedScratch = process.env.PROXMOX_AXI_ACCEPTANCE_SCRATCH
+    await verify(values, await json(join(preparedScratch, 'prepared.json')), preparedScratch)
   }
 } catch (error) {
+  if (scratch) {
+    await save(join(values['--out'], 'result.json'), { status: 'fail', failure: error.message, cases: [], host: { status: 'pending' } })
+  }
   console.log(JSON.stringify({ status: 'fail', error: error.message }))
   process.exitCode = 1
+} finally {
+  if (scratch) await rm(scratch, { recursive: true, force: true })
 }

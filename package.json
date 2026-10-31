@@ -2,6 +2,8 @@
   "name": "@knowttl/proxmox-axi",
   "version": "0.1.0",
   "description": "AXI client for Proxmox VE",
+  "repository": { "type": "git", "url": "https://github.com/knowttl/proxmox-axi.git" },
+  "publishConfig": { "access": "public" },
   "type": "module",
   "bin": { "proxmox-axi": "bin/proxmox-axi.mjs" },
   "files": ["bin", "dist", "axi-credential.schema.json", "inventory.json", "catalogue-diff.json", "artium-invocations.json", "help.json", "README.md"],
