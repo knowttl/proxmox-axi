@@ -74,6 +74,9 @@ The two sanitized captures under `evidence/` are byte-preserved; their provenanc
 The selected temporary admission revision is `6d1e406705803a657241295ddf322b4c21fb4ef9`, recorded with the captured manifest digest in `test/artium-fixture.json`.
 Prepare it from an exact `git archive` export, install its frozen dependencies offline, and follow its fixture startup guide in task-owned scratch space.
 For a Git-free export, invoke the host compiler, copy its store migrations into `dist/src/server/store/migrations`, and run `scripts/build-cli.mjs`; its aggregate build wrapper requires Git metadata.
+The retained `runtimeHashes` in `test/artium-fixture.json` pin the compiled runtime files from that build, including the fixture builder, session module and bundled public client.
+The driver checks those SHA-256 digests before loading the host, importing the session module or invoking the client, and retains them in the host identity evidence.
+Missing or substituted runtime files fail the check even when the TypeScript source is unchanged.
 Keep the manifest snapshot and its original tarballs together outside this repository.
 The manifest's Proxmox archive is used for both journeys, and its executable, admitted runtime sources and runtime package metadata must match the current build.
 The host runs the existing credential store, profile writer, adapter and runner with a synthetic user from its own fixture builder.

@@ -8,6 +8,7 @@ import { chmod, copyFile, mkdir, mkdtemp, readFile, readdir, readlink, realpath,
 import { isAbsolute, join, relative, sep } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 import { decode } from '@toon-format/toon'
+import { verifyHostRuntime } from './host-identity.mjs'
 
 const root = fileURLToPath(new URL('../', import.meta.url))
 const digest = (bytes, algorithm = 'sha256') => createHash(algorithm).update(bytes).digest(algorithm === 'sha512' ? 'base64' : 'hex')
@@ -140,13 +141,14 @@ async function verify(values) {
       assert.equal(manifest.fixtureCommit, pin.revision, 'Reviewed temporary admission revision')
       const fixture = await realpath(process.env.PROXMOX_AXI_ARTIUM_FIXTURE)
       for (const [path, hash] of Object.entries(pin.sourceHashes)) assert.equal(digest(await readFile(join(fixture, path))), hash, `Host source pin: ${path}`)
+      const runtimeHashes = await verifyHostRuntime(fixture)
       const admitted = manifest.tools.find(tool => tool.tool === 'proxmox-axi')
       assert.equal(digest(await readFile(admitted.tarball)), pin.packageSha256, 'Admitted tool archive')
       await copyFile(admitted.tarball, archive)
       hostInput = { fixture, pin }
       result.host = { status: 'starting', revision: pin.revision, manifestSha256: pin.manifestSha256,
-        admission: pin.status, sourceHashes: pin.sourceHashes,
-        clientSha256: digest(await readFile(join(fixture, 'dist/cli/artium-axi.mjs'))) }
+        admission: pin.status, sourceHashes: pin.sourceHashes, runtimeHashes,
+        clientSha256: runtimeHashes['dist/cli/artium-axi.mjs'] }
     } else await checked('pnpm', ['pack', '--pack-destination', out], { env: { ...process.env, npm_config_offline: 'true' } })
     const archiveBytes = await readFile(archive)
     const consumer = join(scratch, 'consumer')
@@ -245,6 +247,7 @@ async function verify(values) {
       await writeFile(diagnostics, '')
       const invocation = ['--import', fileURLToPath(new URL('./transport-observer.mjs', import.meta.url)), entry, ...args]
       const start = performance.now()
+      if (entry !== executable) await verifyHostRuntime(hostInput.fixture)
       const actual = await command(process.execPath, invocation,
         { env: { ...environment, PROXMOX_AXI_TEST_DIAGNOSTICS: diagnostics }, cwd: scratch })
       const record = { id, status: 'fail', expected, actual: { exitCode: actual.code, requests: ledger.length - before },
@@ -341,6 +344,7 @@ async function verify(values) {
       const session = await login.json()
       assert.equal(session.status, 'authenticated')
       secrets.push(session.accessToken, session.refreshToken)
+      await verifyHostRuntime(hostInput.fixture)
       const { SessionStore } = await import(pathToFileURL(join(hostInput.fixture, 'dist/src/cli/session.js')))
       new SessionStore(ready.url, join(base.XDG_CONFIG_HOME, 'artium-axi/session.json')).write(session)
       const client = join(hostInput.fixture, 'dist/cli/artium-axi.mjs')

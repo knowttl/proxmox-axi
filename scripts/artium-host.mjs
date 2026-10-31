@@ -1,8 +1,10 @@
 import { readFileSync, readdirSync, readlinkSync } from 'node:fs'
 import { join } from 'node:path'
 import { pathToFileURL } from 'node:url'
+import { verifyHostRuntime } from './host-identity.mjs'
 
 const [fixture, directory, origin, caFile] = process.argv.slice(2)
+await verifyHostRuntime(fixture)
 const load = path => import(pathToFileURL(join(fixture, 'dist', path)))
 const { createApp } = await load('src/server/app.js')
 const { createProxmoxAdapter } = await load('src/server/adapters/proxmox.js')
