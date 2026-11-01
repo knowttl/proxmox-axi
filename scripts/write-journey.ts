@@ -36,6 +36,7 @@ export async function exerciseWriteJourney(options: Journey): Promise<void> {
   const pools = new Set<string>()
   let mode = 'success', taskState = 'running', taskReads = 0, mutationCount = 0
   let activeCase = ''
+  let activeIntent: string | undefined
   let crashing: ChildProcess | undefined
   let bodyEvidence: Record<string, unknown>[] = []
   const snapshot = () => ({ guests: [...guestState].map(([family, state]) => ({ family, status: state.status, cores: state.cores, memory: state.memory })), pools: [...pools] })
@@ -94,8 +95,9 @@ export async function exerciseWriteJourney(options: Journey): Promise<void> {
       for await (const chunk of request) chunks.push(Buffer.from(chunk))
       const args = Object.fromEntries(new URLSearchParams(Buffer.concat(chunks).toString()))
       const records = await journalRecords()
-      assert.ok(records.some(record => record.status === 'intent'), 'durable intent must precede transmission')
+      assert.ok(records.some(record => record.id === activeIntent && record.status === 'intent' && record.target === url.pathname), 'the matching durable intent must precede each transmission')
       row.intentBeforeTransmission = true
+      row.intentId = activeIntent
       row.parameterNames = Object.keys(args)
       const transmission: Record<string, unknown> = { method, path, args, before: snapshot() }
       bodyEvidence.push(transmission)
@@ -128,6 +130,8 @@ export async function exerciseWriteJourney(options: Journey): Promise<void> {
   await profile()
   const invoke = async (id: string, args: string[], expected: { code?: number, error?: string, status?: string, mutations?: number } = {}, environment = options.hosted ? options.env : env) => {
     activeCase = id
+    const confirmationIndex = args.indexOf('--confirm')
+    activeIntent = confirmationIndex < 0 ? undefined : args[confirmationIndex + 1]?.split('.')[0]
     const before = mutationCount
     const started = performance.now()
     const result = await options.command(process.execPath, [executable, ...(options.hosted ? ['proxmox-axi'] : []), ...args, '--format', 'json'], { env: environment })
@@ -143,7 +147,7 @@ export async function exerciseWriteJourney(options: Journey): Promise<void> {
     assert.equal(mutationCount - before, expected.mutations ?? 0, `${id}: never retry a mutation`)
     assert.ok(performance.now() - started < 10_000, `${id}: bounded command runtime`)
     assert.ok(!result.stdout.includes(options.env.PROXMOX_AXI_TOKEN!), `${id}: credential leak`)
-    cases.push({ id: `${options.hosted ? 'artium' : 'standalone'}/${id}`, hosted: !!options.hosted, expected: { hostBoundary },
+    cases.push({ id: `${options.hosted ? 'artium' : 'standalone'}/${id}`, hosted: !!options.hosted, expected: { hostBoundary, auditExit: hostBoundary ? null : result.code },
       operation: ['create', 'set', 'delete'].includes(args[0]!) ? operationId(({ create: 'POST', set: 'PUT', delete: 'DELETE' } as Record<string, string>)[args[0]!]!, args[1]!) : args.slice(0, 2).join(' '),
       status: 'pass', actual: { exitCode: result.code, mutationTransmissions: mutationCount - before } })
     return value
@@ -182,6 +186,7 @@ export async function exerciseWriteJourney(options: Journey): Promise<void> {
     if (!options.hosted) {
     const crashPreview = await invoke('AC-WRITES/crash-preview', [...start, '--preview'])
     activeCase = 'AC-WRITES/crash-after-commit'
+    activeIntent = crashPreview.id
     mode = 'crash-after-commit'
     crashing = spawn(process.execPath, [executable, ...start, '--confirm', crashPreview.confirmation, '--format', 'json'], { env, stdio: 'ignore' })
     const crashed = await new Promise<NodeJS.Signals | null>((resolve, reject) => { crashing!.once('error', reject); crashing!.once('close', (_code, signal) => resolve(signal)) })

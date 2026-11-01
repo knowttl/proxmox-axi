@@ -535,7 +535,8 @@ async function verify(values, prepared, scratch) {
       result.host.evidence = await snapshot
       assert.deepEqual(result.host.evidence.callsRemaining, [], 'Actual runner cleans its private call directories')
       assert.deepEqual(result.host.evidence.audit.filter(row => row.event === 'run-terminal').map(row => row.exit_code),
-        result.cases.filter(row => row.hosted && !row.expected.hostBoundary).map(row => row.actual.exitCode), 'Actual host audit records public command outcomes')
+        result.cases.filter(row => row.hosted && (!row.expected.hostBoundary || Object.hasOwn(row.expected, 'auditExit')))
+          .map(row => Object.hasOwn(row.expected, 'auditExit') ? row.expected.auditExit : row.actual.exitCode), 'Actual host audit records public command outcomes')
       result.host.status = 'pass'
       result.outcomes = result.outcomes.filter(row => row.journey !== 'artium')
       for (const id of ['AC-HOST', 'AC-VERSION-AUTH', 'AC-VERIFIED-VERSION', 'CRED-05', 'CRED-19', 'CRED-21']) {
