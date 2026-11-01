@@ -279,6 +279,10 @@ export async function exerciseWriteJourney(options: Journey): Promise<void> {
     const secretFresh = await invoke('AC-WRITES/secret-reference-fresh', [...secretArgs, '--preview'])
     await invoke('AC-WRITES/secret-reference-executes', [...secretArgs, '--confirm', secretFresh.confirmation], { status: 'success', mutations: 1 })
     assert.equal(guestState.get('qemu')!.cipassword, 'CANARY-operation-secret-v2')
+    await writeFile(secret, 'pve-test', { mode: 0o600 })
+    const pathRequests = ledger.length
+    await invoke('CRED-13/protected-path-component', [...secretArgs, '--preview'], { code: 2, error: 'INVALID_INPUT' })
+    assert.equal(ledger.length, pathRequests, 'protected path components fail before any provider request')
     for (const secretValue of ['success', 'a']) {
       await writeFile(secret, secretValue, { mode: 0o600 })
       for (const nested of [false, true]) {

@@ -18,6 +18,7 @@ This preserves usable confirmations and status fields when an operation password
 Provider-derived free text remains subject to scanning and redaction.
 UPIDs are provider content even inside task metadata.
 An identifier containing a registered protected value produces an uncertain outcome without retaining the identifier or retrying the mutation.
+Caller-supplied path identifiers containing protected values are refused before creating a preview or transmitting a request.
 Every batch child follows the same protected-input and result rules recursively.
 
 Profiles choose exactly one authentication branch.

@@ -86,6 +86,9 @@ async function invocation(credentials: Credentials, contract: Contract, input: R
     }
     values.commands = JSON.stringify(commands)
   }
+  for (const [name, value] of Object.entries(values)) if (contract.path.includes(`{${name}}`) && typeof value === 'string' && credentials.results.redact(value) !== value) {
+    throw new Failure('INVALID_INPUT', 'A path identifier contains protected data.', 'Select a non-secret resource identifier.', 2)
+  }
   const wire = buildPath(contract, values)
   if (Buffer.byteLength(wire) > 65536) throw new Failure('INVALID_INPUT', 'Resolved request exceeds 65536 bytes.', 'Reduce the complete input size.', 2)
   return { contract, values, wire, children, revisions }
