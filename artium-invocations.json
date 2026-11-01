@@ -37,6 +37,7 @@
       "flags": {
         "help": "boolean",
         "format": "value",
+        "session": "value",
         "api-node": "value",
         "api-upid": "value",
         "preview": "boolean",
@@ -49,6 +50,7 @@
       "flags": {
         "help": "boolean",
         "format": "value",
+        "session": "value",
         "api-node": "value",
         "api-upid": "value",
         "journal": "value"
@@ -60,6 +62,7 @@
       "flags": {
         "help": "boolean",
         "format": "value",
+        "session": "value",
         "api-node": "value",
         "api-upid": "value",
         "journal": "value"
@@ -71,6 +74,7 @@
       "flags": {
         "help": "boolean",
         "format": "value",
+        "session": "value",
         "api-node": "value",
         "api-upid": "value",
         "journal": "value",
@@ -82,7 +86,8 @@
       "effect": "read",
       "flags": {
         "help": "boolean",
-        "format": "value"
+        "format": "value",
+        "session": "value"
       }
     },
     {
@@ -90,7 +95,8 @@
       "effect": "read",
       "flags": {
         "help": "boolean",
-        "format": "value"
+        "format": "value",
+        "session": "value"
       }
     },
     {
@@ -871,7 +877,8 @@
       "effect": "read",
       "flags": {
         "help": "boolean",
-        "format": "value"
+        "format": "value",
+        "session": "value"
       }
     },
     {
@@ -879,7 +886,8 @@
       "effect": "read",
       "flags": {
         "help": "boolean",
-        "format": "value"
+        "format": "value",
+        "session": "value"
       }
     },
     {
@@ -887,7 +895,8 @@
       "effect": "read",
       "flags": {
         "help": "boolean",
-        "format": "value"
+        "format": "value",
+        "session": "value"
       }
     },
     {
@@ -920,6 +929,7 @@
       "flags": {
         "help": "boolean",
         "format": "value",
+        "session": "value",
         "limit": "value",
         "fields": "value",
         "full": "boolean"
@@ -931,6 +941,7 @@
       "flags": {
         "help": "boolean",
         "format": "value",
+        "session": "value",
         "limit": "value",
         "fields": "value",
         "full": "boolean",
@@ -943,6 +954,7 @@
       "flags": {
         "help": "boolean",
         "format": "value",
+        "session": "value",
         "limit": "value",
         "fields": "value",
         "full": "boolean"
@@ -954,6 +966,7 @@
       "flags": {
         "help": "boolean",
         "format": "value",
+        "session": "value",
         "limit": "value",
         "fields": "value",
         "full": "boolean",
@@ -966,6 +979,7 @@
       "flags": {
         "help": "boolean",
         "format": "value",
+        "session": "value",
         "limit": "value",
         "fields": "value",
         "full": "boolean",
@@ -979,6 +993,7 @@
       "flags": {
         "help": "boolean",
         "format": "value",
+        "session": "value",
         "limit": "value",
         "fields": "value",
         "full": "boolean",
@@ -996,6 +1011,7 @@
       "flags": {
         "help": "boolean",
         "format": "value",
+        "session": "value",
         "limit": "value",
         "fields": "value",
         "full": "boolean",
@@ -1018,6 +1034,7 @@
       "flags": {
         "help": "boolean",
         "format": "value",
+        "session": "value",
         "limit": "value",
         "fields": "value",
         "full": "boolean",

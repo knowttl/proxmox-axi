@@ -30,10 +30,11 @@ const operation = (method: string, path: string) => `OP-${method}-${createHash('
 const mint = ['create', '/access/users/{userid}/token/{tokenid}', '--api-userid', 'synthetic@pve', '--api-tokenid', 'minted']
 const minted = 'CANARY-minted+secret/value?S4="private"'
 const password = 'CANARY-operation+password/value-S4'
-const ticket = 'PVE:CANARY-session-ticket-S4'
+const ticket = 'PVE:synthetic@pve:12345678::CANARY-session-ticket-S4'
 const csrf = 'CANARY-session-csrf-S4'
 const challenge = 'PVE:tfa!CANARY-signed-challenge-S4'
 const recovery = 'CANARY-one-time-recovery-S4'
+const taskUpid = 'UPID:pve-test:00000001:00000002:12345678:qmstart:100:root@pam:'
 const version = { version: '8.2.7', release: '8.2', repoid: '3e0176e6bb2ade3b' }
 const object = (value: unknown): Record<string, unknown> => { assert.ok(value && typeof value === 'object' && !Array.isArray(value)); return value as Record<string, unknown> }
 
@@ -92,6 +93,12 @@ export async function exerciseSecretJourney(options: Journey): Promise<void> {
       if (!authorized) { reply.writeHead(401).end(); return }
       if (request.headers.cookie && request.method !== 'GET') assert.ok(request.headers.csrfpreventiontoken === csrf, 'correct CSRF reaches only the selected origin')
       if (url.pathname.endsWith('/version')) data = version
+      else if (url.pathname.endsWith('/access/permissions')) data = {}
+      else if (url.pathname.endsWith('/nodes')) data = []
+      else if (request.method === 'GET' && url.pathname.endsWith('/status')) data = {
+        upid: taskUpid, node: 'pve-test', status: 'stopped', exitstatus: 'OK', starttime: 1, type: 'qmstart', pstart: 2, id: '100', user: 'root@pam', pid: 1,
+      }
+      else if (request.method === 'GET' && url.pathname.endsWith('/log')) data = [{ n: 1, t: 'TASK OK' }]
       else {
         mutations++
         if (mode === 'broken') breakSink()
@@ -104,6 +111,7 @@ export async function exerciseSecretJourney(options: Journey): Promise<void> {
           const batch = JSON.parse(params.commands!) as { method: string, path: string, args: Record<string, string> }[]
           const apply = (items: typeof batch): unknown[] => items.map(child => ({ status: 200, data: child.path === 'execute' ? apply(JSON.parse(child.args.commands!) as typeof batch) :
             child.path.endsWith('/vncproxy') ? { port: 5900, cert: 'synthetic-cert', ticket: minted, password: recovery, user: 'synthetic@pve', upid: 'synthetic-upid' } :
+            child.path.endsWith('/start') ? taskUpid :
               (assert.ok(child.args.cipassword === password, 'nested protected password reaches the vendor'), null) }))
           data = apply(batch)
         } else if (url.pathname.includes('/access/tfa/') && request.method === 'POST') data = { id: 'synthetic-tfa', recovery: [recovery] }
@@ -127,6 +135,8 @@ export async function exerciseSecretJourney(options: Journey): Promise<void> {
   const ids = [operation('POST', mint[1]!), operation('GET', '/nodes/{node}/scan/cifs'), operation('GET', '/nodes/{node}/scan/pbs'),
     operation('POST', '/nodes/{node}/certificates/custom'), operation('POST', '/nodes/{node}/execute'), operation('PUT', '/nodes/{node}/qemu/{vmid}/config'),
     operation('POST', '/nodes/{node}/qemu/{vmid}/vncproxy'), operation('PUT', '/access/password'), operation('POST', '/access/tfa/{userid}'),
+    operation('POST', '/nodes/{node}/qemu/{vmid}/status/start'), operation('PUT', '/nodes/{node}/lxc/{vmid}/config'),
+    operation('DELETE', '/nodes/{node}/tasks/{upid}'),
     operation('PUT', '/access/tfa/{userid}/{id}'), operation('DELETE', '/access/tfa/{userid}/{id}')]
   let auth = 'api-token'
   const env = { ...options.env, PROXMOX_AXI_PROFILE: 'secrets', PROXMOX_AXI_CONFIG: config, PROXMOX_AXI_WRITE_LOG: log,
@@ -214,6 +224,19 @@ export async function exerciseSecretJourney(options: Journey): Promise<void> {
   }
   try {
     await configure('api-token')
+    if (!options.hosted) {
+      env.PVE_NUMERIC_SECRET = '12345678'
+      await invoke('CRED-13/qemu-numeric-path', ['set', '/nodes/{node}/qemu/{vmid}/config', '--preview'], { error: 'INVALID_INPUT' },
+        { node: 'pve-test', vmid: 12345678, cipassword: { env: 'PVE_NUMERIC_SECRET' } })
+      for (const guest of ['qemu', 'lxc']) await invoke(`CRED-13/nested-${guest}-sibling-path`, ['create', '/nodes/{node}/execute', '--preview'], { error: 'INVALID_INPUT' }, {
+        node: 'pve-test', commands: JSON.stringify([
+          { method: 'PUT', path: `${guest}/12345678/config`, args: { description: 'updated' } },
+          { method: 'POST', path: 'execute', args: { commands: JSON.stringify([
+            { method: 'PUT', path: 'qemu/100/config', args: { cipassword: { env: 'PVE_NUMERIC_SECRET' } } },
+          ]) } },
+        ]),
+      })
+    }
     const preview = await invoke('CRED-14/mint-preview', [...mint, '--preview'], { status: 'preview' })
     if (!options.hosted) {
       await invoke('CRED-15/missing-sink', [...mint, '--confirm', String(preview.value.confirmation)], { error: 'PRIVATE_SINK_REQUIRED', sink: 'missing' })
@@ -223,8 +246,7 @@ export async function exerciseSecretJourney(options: Journey): Promise<void> {
     if (created.frame) assert.ok(created.frame.payload.value === minted, 'minted value reaches the authorized private sink')
     if (options.hosted) {
       const handle = object(created.value.result)
-      const denied = await invoke('CRED-18/result-other-actor', ['result', 'take', String(handle.operation), String(handle.id)], { error: 'NOT_FOUND', otherActor: true })
-      assert.ok(denied)
+      await invoke('CRED-18/result-other-actor', ['result', 'take', String(handle.operation), String(handle.id)], { error: 'NOT_FOUND', otherActor: true })
       const delivered = start(['result', 'take', String(handle.operation), String(handle.id)], options.env)
       delivered.child.stdin!.end()
       assert.equal((await delivered.closed).code, 0)
@@ -249,20 +271,39 @@ export async function exerciseSecretJourney(options: Journey): Promise<void> {
     await invoke('AC-SPECIAL-SECRET-INPUTS/private-key-wire', [...certArgs, '--confirm', String(certPreview.value.confirmation)], { status: 'success', mutations: 1 }, certificate)
     const batch = { node: 'pve-test', commands: JSON.stringify([{ method: 'POST', path: 'execute', args: { commands: JSON.stringify([
       { method: 'PUT', path: 'qemu/100/config', args: { cipassword: { env: 'PVE_INPUT_PASSWORD' } } }, { method: 'POST', path: 'qemu/100/vncproxy' },
+      { method: 'POST', path: 'qemu/100/status/start' },
     ]) } }]) }
     const batchArgs = ['create', '/nodes/{node}/execute']
     const batchPreview = await invoke('AC-SPECIAL-BATCH-POLICY/nested-private-preview', [...batchArgs, '--preview'], {}, batch)
-    const batchResult = await invoke('AC-SPECIAL-BATCH-RESULTS/nested-private-results', [...batchArgs, '--confirm', String(batchPreview.value.confirmation)], { mutations: 1, private: true }, batch)
+    const batchResult = await invoke('AC-SPECIAL-BATCH-RESULTS/nested-private-results', [...batchArgs, '--confirm', String(batchPreview.value.confirmation)], { status: 'accepted', mutations: 1, private: true }, batch)
+    assert.equal(object((object((batchResult.value.children as unknown[])[0]).children as unknown[])[2]).upid, taskUpid)
     if (batchResult.frame) assert.ok(JSON.stringify(batchResult.frame.payload).includes(recovery))
 
     if (options.task === 'S4.2') {
     await configure('ticket')
+    if (!options.hosted) {
+      env.PVE_INPUT_TICKET = 'PVE:other@pve:12345678::CANARY-other-ticket'
+      await invoke('CRED-11/supplied-identity-mismatch', ['get', '/version'], { error: 'CONFIG_INVALID' })
+      env.PVE_INPUT_TICKET = ticket
+    }
     await invoke('CRED-16/supplied-ticket', ['get', '/version'])
     await configure('password')
     if (!options.hosted) processSession = start(['auth', 'session'], env, 'pipe', true)
+    await invoke('CRED-16/no-implicit-acquisition', ['get', '/version'], { error: 'AUTH_REQUIRED' })
     const authenticated = await invoke('CRED-16/password-acquire', ['auth', 'acquire'], { status: 'ready', private: true })
     const session = String(authenticated.value.session)
     await invoke('CRED-16/session-read', ['get', '/version', '--session', session])
+    for (const command of ['home', 'doctor', 'ls']) await invoke(`CRED-16/session-${command}`, [command, '--session', session])
+    for (const command of ['status', 'log', 'wait']) await invoke(`CRED-16/session-task-${command}`,
+      ['task', command, '--api-node', 'pve-test', '--api-upid', taskUpid, '--session', session])
+    const sessionBatch = await invoke('CRED-16/session-batch-preview', [...batchArgs, '--preview', '--session', session], {}, batch)
+    await invoke('CRED-16/session-batch-confirm', [...batchArgs, '--confirm', String(sessionBatch.value.confirmation), '--session', session],
+      { status: 'accepted', mutations: 1, private: true }, batch)
+    for (const command of ['show', 'reconcile']) await invoke(`CRED-16/session-journal-${command}`,
+      ['journal', command, String(sessionBatch.value.id), '--session', session])
+    const cancelArgs = ['task', 'cancel', '--api-node', 'pve-test', '--api-upid', taskUpid, '--session', session]
+    const cancelPreview = await invoke('CRED-16/session-task-cancel-preview', [...cancelArgs, '--preview'])
+    await invoke('CRED-16/session-task-cancel-confirm', [...cancelArgs, '--confirm', String(cancelPreview.value.confirmation)], { status: 'success', mutations: 1 })
     for (const [command, path, api] of [
       ['set', '/access/password', { userid: 'synthetic@pve', password: { env: 'PVE_INPUT_PASSWORD' } }],
       ['create', '/access/tfa/{userid}', { userid: 'synthetic@pve', type: 'recovery', password: { env: 'PVE_INPUT_PASSWORD' } }],
@@ -292,10 +333,16 @@ export async function exerciseSecretJourney(options: Journey): Promise<void> {
       { response: { env: 'PVE_INPUT_WEBAUTHN' }, webauthnOrigin: origin })
     await invoke('CRED-17/webauthn-session-cancel', ['auth', 'cancel', '--session', String(verified.value.session)], { status: 'cancelled' })
     mode = 'success'
+    if (!options.hosted) {
+      const profile = object(JSON.parse(await readFile(config, 'utf8')))
+      delete object(object(profile.profiles).secrets).password
+      await writeFile(config, JSON.stringify(profile), { mode: 0o600 })
+    }
     const oidc = await invoke('AC-AUTH/openid-acquire', ['auth', 'acquire'], { status: 'challenge', private: true }, { openid: { realm: 'synthetic', 'redirect-url': origin } })
     const completed = await invoke('AC-AUTH/openid-continue', ['auth', 'continue', '--session', String(oidc.value.session)], { status: 'ready', private: true },
       { openid: { code: { env: 'PVE_INPUT_PASSWORD' }, state: { env: 'PVE_INPUT_OPENID_STATE' }, 'redirect-url': origin } })
     await invoke('CRED-17/openid-session-cancel', ['auth', 'cancel', '--session', String(completed.value.session)], { status: 'cancelled' })
+    if (!options.hosted) await configure('password')
     const expiring = await invoke('CRED-17/expiry-acquire', ['auth', 'acquire'], { status: 'ready', private: true })
     if (options.hosted) await options.hosted.clock(300001)
     else await writeFile(clock, String(now + 300001))

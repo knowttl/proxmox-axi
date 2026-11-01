@@ -52,7 +52,7 @@ process.on('message', async message => {
     const current = store.findCredential('proxmox-axi')
     store.replaceCredential('proxmox-axi', { auth: message.auth, origin: message.origin,
       ...(message.auth === 'api-token' ? { tokenId: 'synthetic@pve!acceptance', token: process.env.PROXMOX_AXI_ACCEPTANCE_HOST_TOKEN } : {
-        userId: 'synthetic@pve', ...(message.auth === 'ticket' ? { ticket: 'PVE:CANARY-session-ticket-S4', csrfPreventionToken: 'CANARY-session-csrf-S4' } : { password: 'CANARY-operation+password/value-S4' }) }),
+        userId: 'synthetic@pve', ...(message.auth === 'ticket' ? { ticket: 'PVE:synthetic@pve:12345678::CANARY-session-ticket-S4', csrfPreventionToken: 'CANARY-session-csrf-S4' } : { password: 'CANARY-operation+password/value-S4' }) }),
       caBundle: readFileSync(caFile, 'utf8'), writes: { operations: message.operations } }, current?.revision ?? 0, 'synthetic-development-user', Date.now())
     db.prepare("UPDATE tools SET native_settings = ? WHERE name = 'proxmox-axi'")
       .run(JSON.stringify({ hostWrites: { allowWrites: true, operations: message.operations } }))

@@ -1,6 +1,9 @@
 import { fstatSync, writeSync } from 'node:fs'
 import { createHash } from 'node:crypto'
+import { Socket } from 'node:net'
 import { Failure } from './errors.js'
+
+const pipes = new Map<number, Socket>()
 
 export interface ResultBinding {
   origin: string
@@ -44,12 +47,16 @@ export class PrivateResults {
     try {
       const info = fstatSync(fd)
       if (!info.isFIFO() && !info.isSocket()) throw sinkFailure()
+      for (const publicFd of [1, 2]) {
+        const publicInfo = fstatSync(publicFd)
+        if (info.dev === publicInfo.dev && info.ino === publicInfo.ino) throw sinkFailure()
+      }
       writeSync(fd, Buffer.alloc(0))
     } catch { throw sinkFailure() }
     return fd
   }
 
-  deliver(binding: ResultBinding, payload: unknown): void {
+  async deliver(binding: ResultBinding, payload: unknown): Promise<void> {
     const bytes = Buffer.from(JSON.stringify({ version: 1, binding, payload }))
     if (bytes.length > 65536) throw deliveryFailure()
     const header = Buffer.alloc(4)
@@ -57,8 +64,23 @@ export class PrivateResults {
     const frame = Buffer.concat([header, bytes])
     try {
       const fd = this.sink()
-      let offset = 0
-      while (offset < frame.length) offset += writeSync(fd, frame, offset, frame.length - offset)
+      let pipe = pipes.get(fd)
+      if (!pipe) {
+        pipe = new Socket({ fd, readable: false, writable: true })
+        pipe.unref()
+        pipe.on('error', () => pipes.delete(fd))
+        pipe.once('close', () => pipes.delete(fd))
+        pipes.set(fd, pipe)
+      }
+      const channel = pipe
+      await new Promise<void>((resolve, reject) => {
+        const deadline = setTimeout(() => { channel.destroy(); reject(deliveryFailure()) }, 5000)
+        channel.write(frame, error => {
+          clearTimeout(deadline)
+          if (error) reject(deliveryFailure())
+          else resolve()
+        })
+      })
     } catch { throw deliveryFailure() }
   }
 }

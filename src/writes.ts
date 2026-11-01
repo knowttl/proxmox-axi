@@ -86,9 +86,6 @@ async function invocation(credentials: Credentials, contract: Contract, input: R
     }
     values.commands = JSON.stringify(commands)
   }
-  for (const [name, value] of Object.entries(values)) if (contract.path.includes(`{${name}}`) && typeof value === 'string' && credentials.results.redact(value) !== value) {
-    throw new Failure('INVALID_INPUT', 'A path identifier contains protected data.', 'Select a non-secret resource identifier.', 2)
-  }
   const wire = buildPath(contract, values)
   if (Buffer.byteLength(wire) > 65536) throw new Failure('INVALID_INPUT', 'Resolved request exceeds 65536 bytes.', 'Reduce the complete input size.', 2)
   return { contract, values, wire, children, revisions }
@@ -98,6 +95,7 @@ export async function writeOperation(credentials: Credentials, initial: Contract
   if (!['write', 'batch'].includes(initial.policy.effect)) throw denied()
   // All policy and input failures happen before any provider request.
   let call = await invocation(credentials, initial, values)
+  checkPaths(call, credentials.results)
   const privateResult = (item: Invocation): boolean => item.contract.policy.secrets === 'private-result' || item.children.some(privateResult)
   if (!options.preview && privateResult(call)) credentials.results.sink()
   const journal = await openJournal()
@@ -115,6 +113,7 @@ export async function writeOperation(credentials: Credentials, initial: Contract
   if (!/^(8|9)\./.test(version.version!)) throw new Failure('CAPABILITY_UNSUPPORTED', 'Writes are disabled on an unknown major.', 'Review the target catalogue before enabling writes.')
   const release = version.version!.startsWith('8.') ? 'legacy-8.2.7' : 'published-current'
   if (release !== initial.release) call = await invocation(credentials, selectContract(initial.method, initial.path, release), values)
+  checkPaths(call, credentials.results)
   const fingerprint = binding()
   if (options.preview) {
     if (options.confirmation) throw new Failure('INVALID_INPUT', 'Preview cannot consume confirmation.', 'Choose preview or execution.', 2)
@@ -153,10 +152,10 @@ export async function writeOperation(credentials: Credentials, initial: Contract
     const [path, body] = call.wire.split('?')
     const query = call.contract.method === 'DELETE' || call.contract.method === 'GET'
     data = await executeRequest(credentials, query ? call.wire : path!, { method: call.contract.method, ...(!query && body ? { body } : {}) })
-    if (privateResult(call)) credentials.results.register(data)
+    if (privateResult(call)) registerResults(call, data, credentials.results)
     validateResponse(data, call.contract.returns)
     outcome = resultStatus(call, data, credentials.results)
-    if (privateResult(call)) credentials.results.deliver(resultBinding(credentials.origin, credentials.tokenId, call.contract.id, fingerprint), data)
+    if (privateResult(call)) await credentials.results.deliver(resultBinding(credentials.origin, credentials.tokenId, call.contract.id, fingerprint), data)
   } catch (error) {
     // Even HTTP failures may follow a partial server-side action. No retry is safe.
     await saveOutcome({ status: 'uncertain' })
@@ -168,6 +167,21 @@ export async function writeOperation(credentials: Credentials, initial: Contract
   return { id, status: saved.status, ...(saved.upid ? { node: saved.node, upid: saved.upid } : {}), children: publicChildren(saved.children),
     ...(call.contract.method === 'GET' && !privateResult(call) ? { data: credentials.results.sanitize(data) } : {}),
     reconciliation: saved.reconciliation, help: saved.upid ? [taskCommand('status'), taskCommand('wait')] : [] }
+}
+
+function checkPaths(call: Invocation, results: Credentials['results']): void {
+  for (const [name, value] of Object.entries(call.values)) {
+    if ((call.contract.path.includes(`{${name}}`) || call.contract.policy.reconciliation?.path?.includes(`{${name}}`)) && results.redact(String(value)) !== String(value)) {
+      throw new Failure('INVALID_INPUT', 'A path identifier contains protected data.', 'Select a non-secret resource identifier.', 2)
+    }
+  }
+  for (const child of call.children) checkPaths(child, results)
+}
+
+function registerResults(call: Invocation, data: unknown, results: Credentials['results']): void {
+  if (call.contract.policy.effect === 'batch' && Array.isArray(data)) {
+    for (const [index, child] of call.children.entries()) registerResults(child, data[index]?.data, results)
+  } else if (call.contract.policy.secrets === 'private-result') results.register(data)
 }
 
 function reconciliationCheck(call: Invocation, journal: Journal): JournalRecord['check'] {

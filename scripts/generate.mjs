@@ -99,10 +99,10 @@ const outputs = {
       help: 'boolean', format: 'value', session: 'value' } })),
     { command: 'task cancel', operationId: contracts.find(operation => operation.method === 'DELETE' && operation.path === '/nodes/{node}/tasks/{upid}').id,
       method: 'DELETE', path: '/nodes/{node}/tasks/{upid}', effect: 'write', flags: {
-        help: 'boolean', format: 'value', 'api-node': 'value', 'api-upid': 'value', preview: 'boolean', confirm: 'value' } },
+        help: 'boolean', format: 'value', session: 'value', 'api-node': 'value', 'api-upid': 'value', preview: 'boolean', confirm: 'value' } },
     ...['status', 'log', 'wait'].map(command => ({ command: `task ${command}`, effect: 'read', flags: {
-      help: 'boolean', format: 'value', 'api-node': 'value', 'api-upid': 'value', journal: 'value', ...(command === 'wait' ? { 'wait-ms': 'value' } : {}) } })),
-    ...['show', 'reconcile'].map(command => ({ command: `journal ${command}`, effect: 'read', flags: { help: 'boolean', format: 'value' } })),
+      help: 'boolean', format: 'value', session: 'value', 'api-node': 'value', 'api-upid': 'value', journal: 'value', ...(command === 'wait' ? { 'wait-ms': 'value' } : {}) } })),
+    ...['show', 'reconcile'].map(command => ({ command: `journal ${command}`, effect: 'read', flags: { help: 'boolean', format: 'value', session: 'value' } })),
     ...[...keys].sort().flatMap(key => {
       const variants = contracts.filter(operation => routeKey(operation) === key && operation.callable && operation.policy.effect !== 'read')
       if (!variants.length) return []
@@ -114,11 +114,11 @@ const outputs = {
         sensitiveInputs: operation.policy.sensitiveInputs ?? [], privateResult: operation.policy.secrets === 'private-result',
         effect: 'write', flags: { help: 'boolean', format: 'value', preview: 'boolean', confirm: 'value', session: 'value', ...flags } }]
     }),
-    { command: 'home', effect: 'read', flags: { help: 'boolean', format: 'value' } },
-    ...['doctor', 'auth status', 'profile list', 'config path', 'help'].map(command => ({ command, effect: 'read', flags: { help: 'boolean', format: 'value' } })),
-    { command: 'ls', effect: 'read', flags: { help: 'boolean', format: 'value', limit: 'value', fields: 'value', full: 'boolean' } },
+    ...['home', 'doctor', 'auth status'].map(command => ({ command, effect: 'read', flags: { help: 'boolean', format: 'value', session: 'value' } })),
+    ...['profile list', 'config path', 'help'].map(command => ({ command, effect: 'read', flags: { help: 'boolean', format: 'value' } })),
+    { command: 'ls', effect: 'read', flags: { help: 'boolean', format: 'value', session: 'value', limit: 'value', fields: 'value', full: 'boolean' } },
     ...contracts.filter(operation => operation.release === 'published-current' && operation.callable && operation.policy.effect === 'read' && operation.returns.type === 'array').map(operation => ({
-      command: `ls ${operation.path}`, effect: 'read', flags: { help: 'boolean', format: 'value', limit: 'value', fields: 'value', full: 'boolean',
+      command: `ls ${operation.path}`, effect: 'read', flags: { help: 'boolean', format: 'value', session: 'value', limit: 'value', fields: 'value', full: 'boolean',
         ...Object.fromEntries(Object.keys(operation.parameters.properties ?? {}).map(name => [`api-${name}`, 'value'])) } })),
     { command: 'inventory', effect: 'read', flags: { help: 'boolean', format: 'value', catalogue: 'value' } },
     ...[...keys].sort().map(key => {

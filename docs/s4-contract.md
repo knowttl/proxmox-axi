@@ -24,7 +24,8 @@ Every batch child follows the same protected-input and result rules recursively.
 Profiles choose exactly one authentication branch.
 `api-token` uses `tokenId` and a `token` SecretRef.
 `ticket` uses `userId`, `ticket` and `csrfPreventionToken` SecretRefs.
-`password` uses `userId`, a `password` SecretRef and an optional `otp` SecretRef.
+`password` uses `userId`, a `password` SecretRef for password acquisition and an optional `otp` SecretRef.
+Explicit OpenID acquisition does not require a password source.
 Omitted required references select `PROXMOX_AXI_TOKEN`, `PROXMOX_AXI_TICKET`, `PROXMOX_AXI_CSRF_PREVENTION_TOKEN` or `PROXMOX_AXI_PASSWORD` respectively.
 Ticket requests send the PVE cookie only to the selected HTTPS origin and include CSRF for non-GET methods.
 API-token failures never fall back to a user identity.
@@ -37,7 +38,6 @@ The caller keeps stdin open while using returned session IDs, then closes it to 
 Acquired tickets, CSRF values and signed challenges remain in memory or the private result channel, with five-minute expiry and explicit cancellation.
 They are never written into profiles, disk caches, keyrings or journals.
 Use `--session <id>` on subsequent operations in that process, including previews and confirmations.
-Automatic password acquisition for a single invocation also requires the private sink; multi-step writes should use an explicitly retained session or supplied ticket profile.
 
 OTP continuation supplies a protected `response` reference in the body object.
 WebAuthn continuation additionally supplies `webauthnOrigin` equal to the selected PVE origin and requires a caller capable of the PVE ceremony.

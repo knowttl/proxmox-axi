@@ -107,6 +107,7 @@ export async function authOperation(credentials: Credentials, action: string, in
     }
     values.set('redirect-url', credentials.origin)
   }
+  if (action === 'acquire' && input.openid === undefined && !credentials.token) throw new Failure('AUTH_REQUIRED', 'Password acquisition requires a protected password source.', 'Supply the selected password SecretRef or use explicit OpenID acquisition.')
   const data = await executeRequest(credentials, `/api2/json${path}`, { method: 'POST', body: values.toString(), unauthenticated: true })
   credentials.results.register(data)
   const openid = path === '/access/openid/auth-url'
@@ -126,7 +127,7 @@ export async function authOperation(credentials: Credentials, action: string, in
     ...(!challenge ? { csrf: result.CSRFPreventionToken as string } : {}) }
   sessions.set(sessionId, session)
   setTimeout(() => sessions.delete(sessionId), 300_000).unref()
-  try { credentials.results.deliver(resultBinding(credentials.origin, credentials.tokenId, `auth ${action}`, values.toString()),
+  try { await credentials.results.deliver(resultBinding(credentials.origin, credentials.tokenId, `auth ${action}`, values.toString()),
     { session: sessionId, expires: session.expires, state: session.state, ticket: session.ticket,
       ...(session.kind ? { kind: session.kind } : {}), ...(session.csrf ? { csrfPreventionToken: session.csrf } : {}) }) }
   catch (error) { sessions.delete(sessionId); throw error }

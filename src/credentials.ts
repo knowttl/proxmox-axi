@@ -83,7 +83,7 @@ export async function resolveCredentials(selection: { config?: string, profile?:
   if (!selected && environmentFields.some(field => env[`PROXMOX_AXI_${field}`] !== undefined)) {
     const auth = env.PROXMOX_AXI_AUTH ?? 'api-token'
     const allowed = auth === 'api-token' ? ['TOKEN_ID', 'TOKEN'] : auth === 'ticket' ? ['USER_ID', 'TICKET', 'CSRF_PREVENTION_TOKEN'] : auth === 'password' ? ['USER_ID', 'PASSWORD', 'OTP'] : []
-    const required = allowed.filter(field => field !== 'OTP')
+    const required = allowed.filter(field => field !== 'OTP' && field !== 'PASSWORD')
     if (!allowed.length || !env.PROXMOX_AXI_ORIGIN || required.some(field => !env[`PROXMOX_AXI_${field}`]) ||
       ['TOKEN_ID', 'TOKEN', 'USER_ID', 'TICKET', 'CSRF_PREVENTION_TOKEN', 'PASSWORD', 'OTP'].some(field => !allowed.includes(field) && env[`PROXMOX_AXI_${field}`] !== undefined)) throw invalid()
     profile = { auth, origin: env.PROXMOX_AXI_ORIGIN,
@@ -113,8 +113,9 @@ export async function resolveCredentials(selection: { config?: string, profile?:
   const field = profile.auth === 'api-token' ? 'token' : profile.auth === 'ticket' ? 'ticket' : 'password'
   const reference = profile[field] ?? { env: `PROXMOX_AXI_${field.toUpperCase()}` }
   const tokenSource = 'env' in reference ? `env:${reference.env}` : `file:${reference.file}`
-  const token = await resolveSecret(reference, selection.verifyAcl)
+  const token = profile.auth === 'password' && !profile.password && !env.PROXMOX_AXI_PASSWORD ? '' : await resolveSecret(reference, selection.verifyAcl)
   if (profile.auth !== 'password' && /[^\x21-\x7e]/.test(token)) throw invalid()
+  if (profile.auth === 'ticket' && !token.startsWith(`PVE:${profile.userId}:`)) throw invalid()
   const csrf = profile.auth === 'ticket' ? await resolveSecret(profile.csrfPreventionToken ?? { env: 'PROXMOX_AXI_CSRF_PREVENTION_TOKEN' }, selection.verifyAcl) : undefined
   if (csrf && /[^\x21-\x7e]/.test(csrf)) throw invalid()
   const otp = profile.otp ? await resolveSecret(profile.otp, selection.verifyAcl) : undefined

@@ -19,7 +19,7 @@ const help = {
   purpose: operations[0]!.help,
   usage: 'proxmox-axi get /version [--config <absolute-path>] [--profile <name>] [--format toon|json]',
   flags: ['--config <absolute-path> (default PROXMOX_AXI_CONFIG or OS config path)',
-    '--profile <name> (default canonical profile selection)', '--format toon|json (default toon)',
+    '--profile <name> (default canonical profile selection)', '--format toon|json (default toon)', '--session <id> (explicit memory session)',
     '--catalogue legacy-8.2.7|published-current (default detect target version; explicit selection is unverified)',
     '--limit <1-1000> (default 100 display rows)', '--fields <comma-separated names>', '--full (all received rows and fields; 65536-byte cap)',
     '--api-<parameter> <value> (vendor parameter)', '--body-file <absolute-path|-> (JSON, 64 KiB, five seconds)', '--help'],
@@ -31,13 +31,18 @@ export async function main(args: string[]): Promise<void> {
     // The caller explicitly owns this bounded process and its stdin command stream.
     let pending = Buffer.alloc(0)
     let count = 0
-    const timer = setTimeout(() => process.stdin.destroy(new Error('Session expired')), 300_000)
+    const expires = performance.now() + 300_000
+    const timer = setTimeout(() => {
+      console.log(encode({ error: { code: 'AUTH_SESSION_INVALID', message: 'Caller-managed session input failed or expired.' } }))
+      process.exit(1)
+    }, 300_000)
     try {
       for await (const chunk of process.stdin) {
         pending = Buffer.concat([pending, Buffer.from(chunk)])
         if (pending.length > 65536) throw new Error('Command limit')
         let newline: number
         while ((newline = pending.indexOf(10)) >= 0) {
+          if (performance.now() >= expires) throw new Error('Session expired')
           const line = pending.subarray(0, newline).toString('utf8')
           pending = pending.subarray(newline + 1)
           const command: unknown = JSON.parse(line)
@@ -102,15 +107,16 @@ export async function main(args: string[]): Promise<void> {
     if (task && !['status', 'log', 'wait', 'cancel'].includes(task)) throw usage('Use task status, log, wait or cancel.')
     if (task && options.help) {
       output({ usage: `proxmox-axi task ${task} --api-node <node> --api-upid <UPID> [--journal <id>] [--wait-ms <1-30000>]`,
-        flags: ['--config <path>', '--profile <name>', '--format toon|json', '--journal <id> (update the associated intent)', '--wait-ms <1-30000> (default 5000)',
+        flags: ['--config <path>', '--profile <name>', '--session <id>', '--format toon|json', '--journal <id> (update the associated intent)', '--wait-ms <1-30000> (default 5000)',
           '--preview (cancel only)', '--confirm <confirmation> (cancel only)'],
         examples: ['proxmox-axi task status --api-node pve --api-upid <UPID>', 'proxmox-axi task wait --api-node pve --api-upid <UPID> --journal <id>'] })
       return
     }
     if (positional[0] === 'journal') {
-      if (options.help) { output({ usage: 'proxmox-axi journal show|reconcile <id>', flags: ['--config <path>', '--profile <name>', '--format toon|json'], examples: ['proxmox-axi journal show <id>', 'proxmox-axi journal reconcile <id>'] }); return }
-      if (positional.length !== 3 || !['show', 'reconcile'].includes(positional[1]!) || Object.keys(options).some(key => !['--config', '--profile', '--format'].includes(key))) throw usage('Use journal show|reconcile <id>.')
+      if (options.help) { output({ usage: 'proxmox-axi journal show|reconcile <id>', flags: ['--config <path>', '--profile <name>', '--session <id>', '--format toon|json'], examples: ['proxmox-axi journal show <id>', 'proxmox-axi journal reconcile <id>'] }); return }
+      if (positional.length !== 3 || !['show', 'reconcile'].includes(positional[1]!) || Object.keys(options).some(key => !['--config', '--profile', '--format', '--session'].includes(key))) throw usage('Use journal show|reconcile <id>.')
       credentials = await resolveCredentials({ ...(options['--config'] ? { config: options['--config'] } : {}), ...(options['--profile'] ? { profile: options['--profile'] } : {}) })
+      if (options['--session']) credentials = useSession(credentials, options['--session'])
       output(redact(await journalOperation(credentials, positional[1]!, positional[2]!), [credentials.token]) as Record<string, unknown>)
       return
     }
@@ -134,12 +140,12 @@ export async function main(args: string[]): Promise<void> {
         schema: 'schema <method> <template> [--catalogue <release>] [--format toon|json]',
         'config path': 'config path [--config <absolute-path>] [--format toon|json]',
         'profile list': 'profile list [--config <absolute-path>] [--format toon|json]',
-        doctor: 'doctor [--config <absolute-path>] [--profile <name>] [--format toon|json]',
-        'auth status': 'auth status [--config <absolute-path>] [--profile <name>] [--format toon|json]',
+        doctor: 'doctor [--config <absolute-path>] [--profile <name>] [--session <id>] [--format toon|json]',
+        'auth status': 'auth status [--config <absolute-path>] [--profile <name>] [--session <id>] [--format toon|json]',
       }
       const key = positional[0] === 'schema' ? 'schema' : command
       const names = ['--format', '--help', ...(['inventory', 'schema'].includes(key) ? ['--catalogue'] :
-        ['doctor', 'auth status'].includes(key) ? ['--config', '--profile'] : ['--config'])]
+        ['doctor', 'auth status'].includes(key) ? ['--config', '--profile', '--session'] : ['--config'])]
       if (Object.keys(options).some(option => option !== 'help' && !names.includes(option))) throw usage(`Valid flags: ${names.join(', ')}.`)
       output({ purpose: key === 'doctor' ? 'Check private-file protection and perform one bounded version read.' : `Inspect ${key}.`,
         usage: `proxmox-axi ${usages[key]}`, examples: key === 'schema' ? ['proxmox-axi schema get /version', 'proxmox-axi schema get /nodes --catalogue published-current'] :
@@ -186,7 +192,7 @@ export async function main(args: string[]): Promise<void> {
       return
     }
     const isLocal = ['', 'home', 'auth status', 'doctor'].includes(command)
-    if (isLocal && Object.keys(options).some(key => !['--config', '--profile', '--format'].includes(key))) throw usage('Valid local flags: --config, --profile, --format, --help.')
+    if (isLocal && Object.keys(options).some(key => !['--config', '--profile', '--format', '--session'].includes(key))) throw usage('Valid local flags: --config, --profile, --format, --session, --help.')
     const contract = authAction ? undefined : ['', 'home', 'doctor'].includes(command) ? selectContract('GET', '/version', release) :
       isLocal ? undefined : positional.length === 2 ? selectContract(positional[0]!, positional[1]!, release) : undefined
     if (!isLocal && !contract && !authAction) throw usage('Select a command from inventory.')
@@ -194,7 +200,7 @@ export async function main(args: string[]): Promise<void> {
       !['--config', '--profile', '--format', '--catalogue', '--body-file', '--preview', '--confirm', '--session'].includes(key) && !key.startsWith('--api-'))) throw usage('Writes accept credential selectors, API inputs, --preview and --confirm only.')
     if (authAction && Object.keys(options).some(key => !['--config', '--profile', '--format', '--session', '--body-file'].includes(key))) throw usage('Invalid authentication option.')
     if (task && task !== 'cancel' && Object.keys(options).some(key =>
-      !['--config', '--profile', '--format', '--body-file', '--journal', ...(task === 'wait' ? ['--wait-ms'] : [])].includes(key) && !key.startsWith('--api-'))) throw usage('Task reads accept API inputs and --journal; task wait also accepts --wait-ms.')
+      !['--config', '--profile', '--format', '--session', '--body-file', '--journal', ...(task === 'wait' ? ['--wait-ms'] : [])].includes(key) && !key.startsWith('--api-'))) throw usage('Task reads accept API inputs, --session and --journal; task wait also accepts --wait-ms.')
     if (contract?.policy.effect === 'read' && (options['--preview'] || options['--confirm'])) throw usage('Preview and confirmation apply to reviewed writes only.')
     if ((!task || task === 'cancel') && (options['--wait-ms'] || options['--journal'])) throw usage('Wait and journal flags apply to task status, log or wait only.')
     const values: Record<string, unknown> = Object.create(null)
@@ -246,11 +252,6 @@ export async function main(args: string[]): Promise<void> {
       return
     }
     if (options['--session']) credentials = useSession(credentials, options['--session'])
-    else if (credentials.auth === 'password' && command !== 'auth status') {
-      const acquired = await authOperation(credentials, 'acquire', {})
-      if (acquired.status !== 'ready' || !('session' in acquired)) throw new Failure('AUTH_CHALLENGE', 'Authentication requires caller continuation.', 'Use auth acquire and auth continue in an explicit caller-managed session.')
-      credentials = useSession(credentials, acquired.session)
-    }
     if (task && task !== 'cancel') {
       const waitMs = Number(options['--wait-ms'] ?? 5000)
       if (!Number.isSafeInteger(waitMs) || waitMs < 1 || waitMs > 30000) throw usage('Task wait must be 1-30000 ms.')
