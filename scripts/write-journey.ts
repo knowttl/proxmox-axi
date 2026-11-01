@@ -132,15 +132,17 @@ export async function exerciseWriteJourney(options: Journey): Promise<void> {
     const result = await options.command(process.execPath, [executable, ...(options.hosted ? ['proxmox-axi'] : []), ...args, '--format', 'json'], { env: environment })
     transcripts.push(`case: ${id}\nexit: ${result.code}\nstdout:\n${result.stdout}stderr:\n${result.stderr}`)
     assert.equal(result.code, expected.code ?? 0, `${id}: ${result.stdout}${result.stderr}`)
-    if (options.hosted && result.code !== 0) assert.match(result.stderr, /^artium-axi: request_id [0-9a-f-]{36}\n$/)
-    else assert.equal(result.stderr, '', id)
     const value = (result.stdout.startsWith('{') ? JSON.parse(result.stdout) : decode(result.stdout)) as Record<string, any>
+    const hostBoundary = !!options.hosted && expected.code === 2 && expected.error === 'FLAG_BLOCKED'
+    if (hostBoundary) { assert.equal(value.error?.source, 'artium-axi'); assert.equal(result.stderr, '', id) }
+    else if (options.hosted && result.code !== 0) assert.match(result.stderr, /^artium-axi: request_id [0-9a-f-]{36}\n$/)
+    else assert.equal(result.stderr, '', id)
     if (expected.error) assert.equal(value.error?.code, expected.error, id)
     if (expected.status) assert.equal(value.status, expected.status, id)
     assert.equal(mutationCount - before, expected.mutations ?? 0, `${id}: never retry a mutation`)
     assert.ok(performance.now() - started < 10_000, `${id}: bounded command runtime`)
     assert.ok(!result.stdout.includes(options.env.PROXMOX_AXI_TOKEN!), `${id}: credential leak`)
-    cases.push({ id: `${options.hosted ? 'artium' : 'standalone'}/${id}`, hosted: !!options.hosted, expected: { hostBoundary: false },
+    cases.push({ id: `${options.hosted ? 'artium' : 'standalone'}/${id}`, hosted: !!options.hosted, expected: { hostBoundary },
       operation: ['create', 'set', 'delete'].includes(args[0]!) ? operationId(({ create: 'POST', set: 'PUT', delete: 'DELETE' } as Record<string, string>)[args[0]!]!, args[1]!) : args.slice(0, 2).join(' '),
       status: 'pass', actual: { exitCode: result.code, mutationTransmissions: mutationCount - before } })
     return value
