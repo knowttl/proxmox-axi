@@ -16,6 +16,8 @@ Generated protocol metadata, including keys, status words and confirmation token
 Those fields and durable journal records exclude protected inputs and results by construction.
 This preserves usable confirmations and status fields when an operation password happens to equal `a` or `success`.
 Provider-derived free text remains subject to scanning and redaction.
+UPIDs are provider content even inside task metadata.
+An identifier containing a registered protected value produces an uncertain outcome without retaining the identifier or retrying the mutation.
 Every batch child follows the same protected-input and result rules recursively.
 
 Profiles choose exactly one authentication branch.

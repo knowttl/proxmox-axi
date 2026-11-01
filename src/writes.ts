@@ -152,7 +152,7 @@ export async function writeOperation(credentials: Credentials, initial: Contract
     data = await executeRequest(credentials, query ? call.wire : path!, { method: call.contract.method, ...(!query && body ? { body } : {}) })
     if (privateResult(call)) credentials.results.register(data)
     validateResponse(data, call.contract.returns)
-    outcome = resultStatus(call, data)
+    outcome = resultStatus(call, data, credentials.results)
     if (privateResult(call)) credentials.results.deliver(resultBinding(credentials.origin, credentials.tokenId, call.contract.id, fingerprint), data)
   } catch (error) {
     // Even HTTP failures may follow a partial server-side action. No retry is safe.
@@ -198,10 +198,10 @@ function mergeOutcomes(records: JournalRecord['children'], outcomes: Outcome[] |
   }
 }
 
-function resultStatus(call: Invocation, data: unknown): Outcome {
+function resultStatus(call: Invocation, data: unknown, results: Credentials['results']): Outcome {
   if (call.contract.policy.effect !== 'batch') {
     if (typeof data === 'string') {
-      if (!/^UPID:[A-Za-z0-9.-]+:[a-fA-F0-9]+:[a-fA-F0-9]+:[a-fA-F0-9]+:[^:\s]+:[^:\s]*:[^:\s]+:$/.test(data)) throw new Failure('INVALID_RESPONSE', 'Mutation returned an invalid task identifier.', 'Inspect the uncertain journal.')
+      if (!/^UPID:[A-Za-z0-9.-]+:[a-fA-F0-9]+:[a-fA-F0-9]+:[a-fA-F0-9]+:[^:\s]+:[^:\s]*:[^:\s]+:$/.test(data) || results.redact(data) !== data) throw new Failure('INVALID_RESPONSE', 'Mutation returned an unsafe task identifier.', 'Inspect the uncertain journal.')
       return { status: 'accepted', upid: data, children: [] }
     }
     return { status: 'success', children: [] }
@@ -211,7 +211,7 @@ function resultStatus(call: Invocation, data: unknown): Outcome {
     const item = data[index] as { status?: unknown, data?: unknown }
     if (!item || typeof item.status !== 'number') return { status: 'uncertain' }
     if (item.status !== 200) return { status: 'failed' }
-    try { validateResponse(item.data, child.contract.returns); return resultStatus(child, item.data) }
+    try { validateResponse(item.data, child.contract.returns); return resultStatus(child, item.data, results) }
     catch { return { status: 'uncertain' } }
   })
   const statuses = children.map(child => child.status)
