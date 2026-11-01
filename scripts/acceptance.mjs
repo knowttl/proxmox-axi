@@ -34,10 +34,17 @@ async function command(executable, args, options = {}) {
   const child = spawn(executable, args, { cwd: root, stdio: ['ignore', 'pipe', 'pipe'], ...spawnOptions })
   const stdout = [], stderr = []
   let bytes = 0
-  const timer = setTimeout(() => child.kill('SIGKILL'), timeoutMs)
+  let terminationReason
+  const timer = setTimeout(() => {
+    terminationReason ??= `deadline of ${timeoutMs} ms`
+    child.kill('SIGKILL')
+  }, timeoutMs)
   for (const [stream, chunks] of [[child.stdout, stdout], [child.stderr, stderr]]) stream.on('data', chunk => {
     bytes += chunk.length
-    if (bytes > 1_048_576) child.kill('SIGKILL')
+    if (bytes > 1_048_576) {
+      terminationReason ??= '1048576-byte output budget'
+      child.kill('SIGKILL')
+    }
     else chunks.push(chunk)
   })
   return await new Promise((resolve, reject) => {
@@ -45,7 +52,7 @@ async function command(executable, args, options = {}) {
     child.once('close', (code, signal) => {
       clearTimeout(timer)
       const result = { code, signal, stdout: Buffer.concat(stdout).toString(), stderr: Buffer.concat(stderr).toString() }
-      if (signal) reject(new Error(`Command terminated by ${signal}`))
+      if (signal) reject(new Error(terminationReason ? `Command exceeded its ${terminationReason} (${signal}).` : `Command terminated by ${signal}.`))
       else resolve(result)
     })
   })
@@ -588,7 +595,9 @@ try {
     const parentNamespace = await readlink('/proc/self/ns/net')
     const isolated = await command('unshare', ['--user', '--map-root-user', '--net', process.execPath,
       fileURLToPath(import.meta.url), ...process.argv.slice(2)],
-    { timeoutMs: values['--task'] === 'S2.1' || values['--repeat-through'] === 'S3' ? 1_800_000 : 300_000,
+    // Full S3.2 replays have run close to the former aggregate 30-minute cap.
+    { timeoutMs: values['--task'] === 'S3.2' && values['--repeat-through'] === 'S3' ? 2_700_000 :
+      values['--task'] === 'S2.1' || values['--repeat-through'] === 'S3' ? 1_800_000 : 300_000,
       env: { ...process.env, PROXMOX_AXI_ACCEPTANCE_NETNS: parentNamespace, PROXMOX_AXI_ACCEPTANCE_SCRATCH: scratch } })
     process.stdout.write(isolated.stdout)
     process.stderr.write(isolated.stderr)
