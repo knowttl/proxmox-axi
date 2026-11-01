@@ -9,9 +9,11 @@ import { Failure } from './errors.js'
 import { redact } from './redact.js'
 import { readOperation, doctor } from './reads.js'
 import { presentRead } from './presentation.js'
+import { writeOperation } from './writes.js'
+import { journalOperation, taskOperation } from './tasks.js'
 import operations from './operations.json' with { type: 'json' }
 
-const flags = ['--config', '--profile', '--format', '--catalogue', '--body-file', '--limit', '--fields', '--full', '--help']
+const flags = ['--config', '--profile', '--format', '--catalogue', '--body-file', '--limit', '--fields', '--full', '--help', '--preview', '--confirm', '--wait-ms', '--journal']
 const help = {
   purpose: operations[0]!.help,
   usage: 'proxmox-axi get /version [--config <absolute-path>] [--profile <name>] [--format toon|json]',
@@ -47,8 +49,8 @@ export async function main(args: string[]): Promise<void> {
       const argument = args[index]!
       if (!argument.startsWith('-')) { positional.push(argument); continue }
       if (!flags.includes(argument) && !argument.startsWith('--api-')) throw usage('Unknown flag; valid flags: --config, --profile, --format, --catalogue, --body-file, --api-<parameter>, --help.')
-      if (/^--api-(?:password|token|ticket|otp|secret|api-key|private-key|vncticket|csrf-prevention-token)$/.test(argument)) throw usage('Secret arguments are not accepted; use a protected credential reference or the operation-specific private input contract.')
-      if (argument === '--help' || argument === '--full') { options[argument === '--help' ? 'help' : '--full'] = 'true'; continue }
+      if (/^--api-(?:password|cipassword|token|ticket|otp|secret|api-key|private-key|vncticket|csrf-prevention-token)$/.test(argument)) throw usage('Secret arguments are not accepted; use a protected credential reference or the operation-specific private input contract.')
+      if (argument === '--help' || argument === '--full' || argument === '--preview') { options[argument === '--help' ? 'help' : argument] = 'true'; continue }
       const value = args[++index]
       if (!value || value.startsWith('--') || (value.startsWith('-') && value !== '-' && !argument.startsWith('--api-'))) throw usage('A flag value is required.')
       if (options[argument]) throw usage('Duplicate flags are not allowed.')
@@ -61,6 +63,33 @@ export async function main(args: string[]): Promise<void> {
       if (positional.length === 1) positional.push('/nodes')
       positional[0] = 'get'
     }
+    if (options.help && positional.length === 1 && ['create', 'set', 'delete', 'post', 'put', 'task'].includes(positional[0]!)) {
+      const command = positional[0]!
+      output({ purpose: command === 'task' ? 'Inspect or explicitly cancel an existing task.' : 'Preview and execute one reviewed, explicitly enabled mutation.',
+        usage: command === 'task' ? 'proxmox-axi task status|log|wait|cancel --api-node <node> --api-upid <UPID>' :
+          `proxmox-axi ${command} <template> [--api-<parameter> <value>] --preview|--confirm <confirmation>`,
+        flags: [...help.flags.filter(flag => !/^--(?:limit|fields|full|catalogue)\b/.test(flag)), '--preview (no mutation)', '--confirm <exact confirmation>',
+          ...(command === 'task' ? ['--journal <intent-id> (task reads)', '--wait-ms <1-30000> (task wait)'] : [])],
+        examples: ['proxmox-axi schema create /nodes/{node}/qemu/{vmid}/status/start', 'proxmox-axi task status --api-node pve-test --api-upid <UPID>'] })
+      return
+    }
+    const task = positional[0] === 'task' && positional.length === 2 ? positional[1] : undefined
+    if (task && !['status', 'log', 'wait', 'cancel'].includes(task)) throw usage('Use task status, log, wait or cancel.')
+    if (task && options.help) {
+      output({ usage: `proxmox-axi task ${task} --api-node <node> --api-upid <UPID> [--journal <id>] [--wait-ms <1-30000>]`,
+        flags: ['--config <path>', '--profile <name>', '--format toon|json', '--journal <id> (update the associated intent)', '--wait-ms <1-30000> (default 5000)',
+          '--preview (cancel only)', '--confirm <confirmation> (cancel only)'],
+        examples: ['proxmox-axi task status --api-node pve --api-upid <UPID>', 'proxmox-axi task wait --api-node pve --api-upid <UPID> --journal <id>'] })
+      return
+    }
+    if (positional[0] === 'journal') {
+      if (options.help) { output({ usage: 'proxmox-axi journal show|reconcile <id>', flags: ['--config <path>', '--profile <name>', '--format toon|json'], examples: ['proxmox-axi journal show <id>', 'proxmox-axi journal reconcile <id>'] }); return }
+      if (positional.length !== 3 || !['show', 'reconcile'].includes(positional[1]!) || Object.keys(options).some(key => !['--config', '--profile', '--format'].includes(key))) throw usage('Use journal show|reconcile <id>.')
+      credentials = await resolveCredentials({ ...(options['--config'] ? { config: options['--config'] } : {}), ...(options['--profile'] ? { profile: options['--profile'] } : {}) })
+      output(redact(await journalOperation(credentials, positional[1]!, positional[2]!), [credentials.token]) as Record<string, unknown>)
+      return
+    }
+    if (task) positional.splice(0, 2, task === 'cancel' ? 'delete' : 'get', `/nodes/{node}/tasks/{upid}${task === 'cancel' ? '' : task === 'log' ? '/log' : '/status'}`)
     const command = positional.join(' ')
     const limit = Number(options['--limit'] ?? 100)
     if (!Number.isSafeInteger(limit) || limit < 1 || limit > 1000) throw usage('Display limit must be an integer from 1 to 1000.')
@@ -105,7 +134,7 @@ export async function main(args: string[]): Promise<void> {
     if (positional[0] === 'schema' && positional.length === 3) {
       if (Object.keys(options).some(key => !['--format', '--catalogue'].includes(key))) throw usage('Invalid schema option.')
       const contract = selectContract(positional[1]!, positional[2]!, release)
-      output({ release, method: contract.method, path: contract.path, callable: contract.callable,
+      output({ id: contract.id, release, method: contract.method, path: contract.path, callable: contract.callable,
         policy: contract.policy, invocation: contract.invocation, parameters: contract.parameters, returns: contract.returns })
       return
     }
@@ -114,7 +143,9 @@ export async function main(args: string[]): Promise<void> {
         const contract = selectContract(positional[0]!, positional[1]!, release)
         output({ purpose: contract.path === '/version' ? help.purpose : contract.description,
           usage: contract.path === '/version' ? help.usage : `proxmox-axi ${command} [--api-<parameter> <value>] [--catalogue ${release}]`,
-          parameters: contract.parameters, policy: contract.policy, flags: help.flags, examples: help.examples })
+          parameters: contract.parameters, policy: contract.policy,
+          flags: [...help.flags.filter(flag => contract.policy.effect === 'read' || !/^--(?:limit|fields|full)\b/.test(flag)),
+            ...(contract.policy.effect === 'read' ? [] : ['--preview (no mutation)', '--confirm <exact preview confirmation>'])], examples: help.examples })
       } else {
         if (!['', 'get', 'auth', 'auth status', 'home', 'doctor', 'inventory', 'schema'].includes(command)) throw usage('Unknown command.')
         output(help)
@@ -126,6 +157,12 @@ export async function main(args: string[]): Promise<void> {
     const contract = ['', 'home', 'doctor'].includes(command) ? selectContract('GET', '/version', release) :
       isLocal ? undefined : positional.length === 2 ? selectContract(positional[0]!, positional[1]!, release) : undefined
     if (!isLocal && !contract) throw usage('Select a command from inventory.')
+    if (contract && ['write', 'batch'].includes(contract.policy.effect) && Object.keys(options).some(key =>
+      !['--config', '--profile', '--format', '--catalogue', '--body-file', '--preview', '--confirm'].includes(key) && !key.startsWith('--api-'))) throw usage('Writes accept credential selectors, API inputs, --preview and --confirm only.')
+    if (task && task !== 'cancel' && Object.keys(options).some(key =>
+      !['--config', '--profile', '--format', '--body-file', '--journal', ...(task === 'wait' ? ['--wait-ms'] : [])].includes(key) && !key.startsWith('--api-'))) throw usage('Task reads accept API inputs and --journal; task wait also accepts --wait-ms.')
+    if (contract?.policy.effect === 'read' && (options['--preview'] || options['--confirm'])) throw usage('Preview and confirmation apply to reviewed writes only.')
+    if ((!task || task === 'cancel') && (options['--wait-ms'] || options['--journal'])) throw usage('Wait and journal flags apply to task status, log or wait only.')
     const values: Record<string, unknown> = Object.create(null)
     if (options['--body-file']) {
       const path = options['--body-file']
@@ -166,11 +203,17 @@ export async function main(args: string[]): Promise<void> {
       }
       throw new Failure('CONTRACT_UNRESOLVED', 'Operation is not admitted by the reviewed policy.', 'Inspect the operation schema and policy before requesting admission.')
     }
-    const wirePath = contract ? buildPath(contract, values) : undefined
+    if (contract && contract.policy.effect === 'read') buildPath(contract, values)
     credentials = await resolveCredentials({ ...(options['--config'] ? { config: options['--config'] } : {}),
       verifyAcl: command === 'auth status' || command === 'doctor',
       ...(options['--profile'] ? { profile: options['--profile'] } : {}) })
-    if (command === 'auth status') {
+    if (task && task !== 'cancel') {
+      const waitMs = Number(options['--wait-ms'] ?? 5000)
+      if (!Number.isSafeInteger(waitMs) || waitMs < 1 || waitMs > 30000) throw usage('Task wait must be 1-30000 ms.')
+      output(redact(await taskOperation(credentials, task, values, waitMs, options['--journal']), [credentials.token]) as Record<string, unknown>)
+    } else if (contract && ['write', 'batch'].includes(contract.policy.effect)) {
+      output(await writeOperation(credentials, contract, values, { preview: !!options['--preview'], ...(options['--confirm'] ? { confirmation: options['--confirm'] } : {}) }))
+    } else if (command === 'auth status') {
       output({ credential: { ...credentials.diagnostics, origin: credentials.origin, tokenId: credentials.tokenId } })
     } else if (command === 'doctor') {
       output(redact(await doctor(credentials), [credentials.token]) as Record<string, unknown>)

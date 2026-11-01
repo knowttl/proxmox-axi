@@ -20,6 +20,7 @@ export interface VendorSchema {
   [key: string]: unknown
 }
 export interface Contract {
+  id: string
   method: string
   path: string
   release: string
@@ -27,14 +28,16 @@ export interface Contract {
   description: string
   parameters: VendorSchema
   returns: VendorSchema
-  policy: { effect: string, transport: string, secrets: string, reason: string }
+  policy: { effect: string, transport: string, secrets: string, reason: string,
+    allowedInputs?: string[], sensitiveInputs?: string[], reconciliation?: { kind: string, path?: string, reason: string } }
   invocation: unknown
 }
 export const contracts: Contract[] = JSON.parse(readFileSync(new URL('./contracts.json', import.meta.url), 'utf8')).contracts
 const invalid = () => new Failure('INVALID_INPUT', 'Input does not match the selected vendor contract.', 'Use schema <method> <template> --catalogue <release> to inspect parameters.', 2)
 
 export function selectContract(method: string, path: string, release: string): Contract {
-  const contract = contracts.find(operation => operation.method === method.toUpperCase() && operation.path === path && operation.release === release)
+  const verb = ({ create: 'POST', set: 'PUT' } as Record<string, string>)[method.toLowerCase()] ?? method.toUpperCase()
+  const contract = contracts.find(operation => operation.method === verb && operation.path === path && operation.release === release)
   if (!contract) throw invalid()
   return contract
 }
@@ -69,6 +72,12 @@ export function validateValue(value: unknown, schema: VendorSchema): void {
       if (!pattern.test(value)) throw invalid()
     }
     if (typeof schema.format === 'string') {
+      if (schema.format === 'pve-command-batch') {
+        let batch: unknown
+        try { batch = JSON.parse(value) } catch { throw invalid() }
+        if (!Array.isArray(batch) || batch.length === 0 || batch.length > 64 || Buffer.byteLength(value) > 32768) throw invalid()
+        return
+      }
       const format = formats[schema.format]
       if (!format) throw unsupported()
       if (!format.test(value)) throw invalid()

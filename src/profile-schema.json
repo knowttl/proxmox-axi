@@ -5,6 +5,9 @@
   "additionalProperties": false,
   "required": ["auth", "origin", "tokenId"],
   "properties": {
+    "writes": { "type": "object", "additionalProperties": false, "required": ["operations"],
+      "properties": { "operations": { "type": "array", "uniqueItems": true, "maxItems": 681,
+        "items": { "type": "string", "pattern": "^OP-(GET|POST|PUT|DELETE)-[A-Za-z0-9-]+$" } } } },
     "auth": { "const": "api-token" },
     "origin": { "type": "string", "pattern": "^https://[^/?#@]+$" },
     "tokenId": { "type": "string", "maxLength": 256, "pattern": "^[^\\s:/@!=]+@[A-Za-z][A-Za-z0-9._-]*![A-Za-z][A-Za-z0-9._-]*$",

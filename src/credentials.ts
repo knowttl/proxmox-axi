@@ -6,12 +6,13 @@ import { Failure } from './errors.js'
 import { readPrivateFile } from './private-file.js'
 
 type SecretRef = { env: string } | { file: string }
-interface Profile { auth: 'api-token', origin: string, tokenId: string, token?: SecretRef, caBundle?: string,
+interface Profile { auth: 'api-token', origin: string, tokenId: string, token?: SecretRef, caBundle?: string, writes?: { operations: string[] },
   certificatePin?: { sha256: string, origin: string, replaceHostname?: boolean } }
 export interface Credentials {
   origin: string
   tokenId: string
   token: string
+  writeOperations: string[]
   ca?: string
   certificatePin?: Profile['certificatePin']
   diagnostics: { profile: string, source: string, tokenSource: string }
@@ -96,7 +97,7 @@ export async function resolveCredentials(selection: { config?: string, profile?:
   if (!token) throw new Failure('AUTH_REQUIRED', 'The selected token reference has no value.', 'Supply the secret through the selected environment or protected-file reference.')
   if (/[^\x21-\x7e]/.test(token)) throw invalid()
   const ca = profile.caBundle ? await readPrivateFile(profile.caBundle, false, selection.verifyAcl) : undefined
-  return { origin: origin.origin, tokenId: profile.tokenId, token, ...(ca ? { ca } : {}),
+  return { origin: origin.origin, tokenId: profile.tokenId, token, writeOperations: profile.writes?.operations ?? [], ...(ca ? { ca } : {}),
     ...(profile.certificatePin ? { certificatePin: profile.certificatePin } : {}),
     diagnostics: { profile: name, source, tokenSource } }
 }

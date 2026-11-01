@@ -2,6 +2,440 @@
   "generated": true,
   "commands": [
     {
+      "command": "task cancel",
+      "operationId": "OP-DELETE-d6b1eb65f2",
+      "method": "DELETE",
+      "path": "/nodes/{node}/tasks/{upid}",
+      "effect": "write",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "api-node": "value",
+        "api-upid": "value",
+        "preview": "boolean",
+        "confirm": "value"
+      }
+    },
+    {
+      "command": "task status",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "api-node": "value",
+        "api-upid": "value",
+        "journal": "value"
+      }
+    },
+    {
+      "command": "task log",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "api-node": "value",
+        "api-upid": "value",
+        "journal": "value"
+      }
+    },
+    {
+      "command": "task wait",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "api-node": "value",
+        "api-upid": "value",
+        "journal": "value",
+        "wait-ms": "value"
+      }
+    },
+    {
+      "command": "journal show",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value"
+      }
+    },
+    {
+      "command": "journal reconcile",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value"
+      }
+    },
+    {
+      "command": "delete /nodes/{node}/lxc/{vmid}",
+      "operationId": "OP-DELETE-db1a319dfa",
+      "method": "DELETE",
+      "path": "/nodes/{node}/lxc/{vmid}",
+      "effect": "write",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "preview": "boolean",
+        "confirm": "value",
+        "api-destroy-unreferenced-disks": "value",
+        "api-force": "value",
+        "api-node": "value",
+        "api-purge": "value",
+        "api-vmid": "value"
+      }
+    },
+    {
+      "command": "delete /nodes/{node}/qemu/{vmid}",
+      "operationId": "OP-DELETE-5e826ea6b0",
+      "method": "DELETE",
+      "path": "/nodes/{node}/qemu/{vmid}",
+      "effect": "write",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "preview": "boolean",
+        "confirm": "value",
+        "api-destroy-unreferenced-disks": "value",
+        "api-node": "value",
+        "api-purge": "value",
+        "api-vmid": "value"
+      }
+    },
+    {
+      "command": "delete /nodes/{node}/tasks/{upid}",
+      "operationId": "OP-DELETE-d6b1eb65f2",
+      "method": "DELETE",
+      "path": "/nodes/{node}/tasks/{upid}",
+      "effect": "write",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "preview": "boolean",
+        "confirm": "value",
+        "api-node": "value",
+        "api-upid": "value"
+      }
+    },
+    {
+      "command": "delete /pools",
+      "operationId": "OP-DELETE-eccba53f33",
+      "method": "DELETE",
+      "path": "/pools",
+      "effect": "write",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "preview": "boolean",
+        "confirm": "value",
+        "api-poolid": "value"
+      }
+    },
+    {
+      "command": "create /nodes/{node}/execute",
+      "operationId": "OP-POST-c4fdd6f30b",
+      "method": "POST",
+      "path": "/nodes/{node}/execute",
+      "effect": "write",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "preview": "boolean",
+        "confirm": "value",
+        "api-commands": "value",
+        "api-node": "value"
+      }
+    },
+    {
+      "command": "create /nodes/{node}/lxc/{vmid}/status/reboot",
+      "operationId": "OP-POST-2bc4d554ca",
+      "method": "POST",
+      "path": "/nodes/{node}/lxc/{vmid}/status/reboot",
+      "effect": "write",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "preview": "boolean",
+        "confirm": "value",
+        "api-node": "value",
+        "api-timeout": "value",
+        "api-vmid": "value"
+      }
+    },
+    {
+      "command": "create /nodes/{node}/lxc/{vmid}/status/resume",
+      "operationId": "OP-POST-411b1766e9",
+      "method": "POST",
+      "path": "/nodes/{node}/lxc/{vmid}/status/resume",
+      "effect": "write",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "preview": "boolean",
+        "confirm": "value",
+        "api-node": "value",
+        "api-vmid": "value"
+      }
+    },
+    {
+      "command": "create /nodes/{node}/lxc/{vmid}/status/shutdown",
+      "operationId": "OP-POST-f9dce48db7",
+      "method": "POST",
+      "path": "/nodes/{node}/lxc/{vmid}/status/shutdown",
+      "effect": "write",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "preview": "boolean",
+        "confirm": "value",
+        "api-forceStop": "value",
+        "api-node": "value",
+        "api-timeout": "value",
+        "api-vmid": "value"
+      }
+    },
+    {
+      "command": "create /nodes/{node}/lxc/{vmid}/status/start",
+      "operationId": "OP-POST-eb7989b072",
+      "method": "POST",
+      "path": "/nodes/{node}/lxc/{vmid}/status/start",
+      "effect": "write",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "preview": "boolean",
+        "confirm": "value",
+        "api-node": "value",
+        "api-skiplock": "value",
+        "api-vmid": "value"
+      }
+    },
+    {
+      "command": "create /nodes/{node}/lxc/{vmid}/status/stop",
+      "operationId": "OP-POST-0c3592c269",
+      "method": "POST",
+      "path": "/nodes/{node}/lxc/{vmid}/status/stop",
+      "effect": "write",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "preview": "boolean",
+        "confirm": "value",
+        "api-node": "value",
+        "api-skiplock": "value",
+        "api-vmid": "value"
+      }
+    },
+    {
+      "command": "create /nodes/{node}/lxc/{vmid}/status/suspend",
+      "operationId": "OP-POST-0c0c166e83",
+      "method": "POST",
+      "path": "/nodes/{node}/lxc/{vmid}/status/suspend",
+      "effect": "write",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "preview": "boolean",
+        "confirm": "value",
+        "api-node": "value",
+        "api-vmid": "value"
+      }
+    },
+    {
+      "command": "create /nodes/{node}/qemu/{vmid}/status/reboot",
+      "operationId": "OP-POST-345014c6ff",
+      "method": "POST",
+      "path": "/nodes/{node}/qemu/{vmid}/status/reboot",
+      "effect": "write",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "preview": "boolean",
+        "confirm": "value",
+        "api-node": "value",
+        "api-timeout": "value",
+        "api-vmid": "value"
+      }
+    },
+    {
+      "command": "create /nodes/{node}/qemu/{vmid}/status/reset",
+      "operationId": "OP-POST-efaca33d25",
+      "method": "POST",
+      "path": "/nodes/{node}/qemu/{vmid}/status/reset",
+      "effect": "write",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "preview": "boolean",
+        "confirm": "value",
+        "api-node": "value",
+        "api-skiplock": "value",
+        "api-vmid": "value"
+      }
+    },
+    {
+      "command": "create /nodes/{node}/qemu/{vmid}/status/resume",
+      "operationId": "OP-POST-1f4b20b40f",
+      "method": "POST",
+      "path": "/nodes/{node}/qemu/{vmid}/status/resume",
+      "effect": "write",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "preview": "boolean",
+        "confirm": "value",
+        "api-node": "value",
+        "api-skiplock": "value",
+        "api-vmid": "value"
+      }
+    },
+    {
+      "command": "create /nodes/{node}/qemu/{vmid}/status/shutdown",
+      "operationId": "OP-POST-1199595650",
+      "method": "POST",
+      "path": "/nodes/{node}/qemu/{vmid}/status/shutdown",
+      "effect": "write",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "preview": "boolean",
+        "confirm": "value",
+        "api-forceStop": "value",
+        "api-keepActive": "value",
+        "api-node": "value",
+        "api-skiplock": "value",
+        "api-timeout": "value",
+        "api-vmid": "value"
+      }
+    },
+    {
+      "command": "create /nodes/{node}/qemu/{vmid}/status/start",
+      "operationId": "OP-POST-f879c7c9f8",
+      "method": "POST",
+      "path": "/nodes/{node}/qemu/{vmid}/status/start",
+      "effect": "write",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "preview": "boolean",
+        "confirm": "value",
+        "api-node": "value",
+        "api-skiplock": "value",
+        "api-timeout": "value",
+        "api-vmid": "value"
+      }
+    },
+    {
+      "command": "create /nodes/{node}/qemu/{vmid}/status/stop",
+      "operationId": "OP-POST-05ab7d9156",
+      "method": "POST",
+      "path": "/nodes/{node}/qemu/{vmid}/status/stop",
+      "effect": "write",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "preview": "boolean",
+        "confirm": "value",
+        "api-keepActive": "value",
+        "api-node": "value",
+        "api-skiplock": "value",
+        "api-timeout": "value",
+        "api-vmid": "value"
+      }
+    },
+    {
+      "command": "create /nodes/{node}/qemu/{vmid}/status/suspend",
+      "operationId": "OP-POST-97afa7ebdb",
+      "method": "POST",
+      "path": "/nodes/{node}/qemu/{vmid}/status/suspend",
+      "effect": "write",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "preview": "boolean",
+        "confirm": "value",
+        "api-node": "value",
+        "api-skiplock": "value",
+        "api-todisk": "value",
+        "api-vmid": "value"
+      }
+    },
+    {
+      "command": "create /pools",
+      "operationId": "OP-POST-73c42b39fb",
+      "method": "POST",
+      "path": "/pools",
+      "effect": "write",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "preview": "boolean",
+        "confirm": "value",
+        "api-comment": "value",
+        "api-poolid": "value"
+      }
+    },
+    {
+      "command": "set /nodes/{node}/lxc/{vmid}/config",
+      "operationId": "OP-PUT-224f55de4f",
+      "method": "PUT",
+      "path": "/nodes/{node}/lxc/{vmid}/config",
+      "effect": "write",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "preview": "boolean",
+        "confirm": "value",
+        "api-cores": "value",
+        "api-description": "value",
+        "api-digest": "value",
+        "api-hostname": "value",
+        "api-memory": "value",
+        "api-node": "value",
+        "api-onboot": "value",
+        "api-vmid": "value"
+      }
+    },
+    {
+      "command": "set /nodes/{node}/qemu/{vmid}/config",
+      "operationId": "OP-PUT-41cd6542bd",
+      "method": "PUT",
+      "path": "/nodes/{node}/qemu/{vmid}/config",
+      "effect": "write",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "preview": "boolean",
+        "confirm": "value",
+        "api-cores": "value",
+        "api-description": "value",
+        "api-digest": "value",
+        "api-memory": "value",
+        "api-name": "value",
+        "api-node": "value",
+        "api-onboot": "value",
+        "api-vmid": "value"
+      }
+    },
+    {
+      "command": "set /pools",
+      "operationId": "OP-PUT-efde0d0880",
+      "method": "PUT",
+      "path": "/pools",
+      "effect": "write",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "preview": "boolean",
+        "confirm": "value",
+        "api-allow-move": "value",
+        "api-comment": "value",
+        "api-delete": "value",
+        "api-poolid": "value",
+        "api-storage": "value",
+        "api-vms": "value"
+      }
+    },
+    {
       "command": "home",
       "effect": "read",
       "flags": {
@@ -6303,6 +6737,9 @@
     },
     {
       "command": "get /access/permissions",
+      "operationId": "OP-GET-15d1ad313b",
+      "method": "GET",
+      "path": "/access/permissions",
       "effect": "read",
       "flags": {
         "help": "boolean",
@@ -6321,6 +6758,9 @@
     },
     {
       "command": "get /cluster/resources",
+      "operationId": "OP-GET-f7c0185058",
+      "method": "GET",
+      "path": "/cluster/resources",
       "effect": "read",
       "flags": {
         "help": "boolean",
@@ -6338,6 +6778,9 @@
     },
     {
       "command": "get /nodes",
+      "operationId": "OP-GET-589742b7f2",
+      "method": "GET",
+      "path": "/nodes",
       "effect": "read",
       "flags": {
         "help": "boolean",
@@ -6354,6 +6797,9 @@
     },
     {
       "command": "get /nodes/{node}/lxc",
+      "operationId": "OP-GET-2b0a4d1f88",
+      "method": "GET",
+      "path": "/nodes/{node}/lxc",
       "effect": "read",
       "flags": {
         "help": "boolean",
@@ -6371,6 +6817,9 @@
     },
     {
       "command": "get /nodes/{node}/qemu",
+      "operationId": "OP-GET-ee0e17bebb",
+      "method": "GET",
+      "path": "/nodes/{node}/qemu",
       "effect": "read",
       "flags": {
         "help": "boolean",
@@ -6389,6 +6838,9 @@
     },
     {
       "command": "get /nodes/{node}/storage",
+      "operationId": "OP-GET-26fbb96ac4",
+      "method": "GET",
+      "path": "/nodes/{node}/storage",
       "effect": "read",
       "flags": {
         "help": "boolean",
@@ -6411,6 +6863,9 @@
     },
     {
       "command": "get /nodes/{node}/tasks",
+      "operationId": "OP-GET-d9cb0ebe59",
+      "method": "GET",
+      "path": "/nodes/{node}/tasks",
       "effect": "read",
       "flags": {
         "help": "boolean",
@@ -6438,6 +6893,9 @@
     },
     {
       "command": "get /nodes/{node}/tasks/{upid}/log",
+      "operationId": "OP-GET-56c10e173f",
+      "method": "GET",
+      "path": "/nodes/{node}/tasks/{upid}/log",
       "effect": "read",
       "flags": {
         "help": "boolean",
@@ -6459,6 +6917,9 @@
     },
     {
       "command": "get /nodes/{node}/tasks/{upid}/status",
+      "operationId": "OP-GET-32aec68edd",
+      "method": "GET",
+      "path": "/nodes/{node}/tasks/{upid}/status",
       "effect": "read",
       "flags": {
         "help": "boolean",
@@ -6477,6 +6938,9 @@
     },
     {
       "command": "get /nodes/{node}/version",
+      "operationId": "OP-GET-22c6caf285",
+      "method": "GET",
+      "path": "/nodes/{node}/version",
       "effect": "read",
       "flags": {
         "help": "boolean",
@@ -6494,6 +6958,9 @@
     },
     {
       "command": "get /version",
+      "operationId": "OP-GET-version",
+      "method": "GET",
+      "path": "/version",
       "effect": "read",
       "flags": {
         "help": "boolean",

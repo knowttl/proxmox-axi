@@ -6,7 +6,14 @@ import type { Credentials } from './credentials.js'
 import { Failure } from './errors.js'
 import operations from './operations.json' with { type: 'json' }
 
-export async function executeRead(credentials: Credentials, wirePath: string, envelope = false): Promise<unknown> {
+export async function executeRead(credentials: Credentials, wirePath: string, envelope = false, deadlineMs = 5000): Promise<unknown> {
+  return executeRequest(credentials, wirePath, { method: 'GET', envelope, deadlineMs })
+}
+
+// Mutation callers must durably record intent and consume confirmation before calling.
+export async function executeRequest(credentials: Credentials, wirePath: string, options: {
+  method: string, envelope?: boolean, body?: string, deadlineMs?: number
+}): Promise<unknown> {
   if (!wirePath.startsWith('/api2/json/') || wirePath.includes('#')) throw new Failure('INVALID_INPUT', 'Invalid API path.', 'Select a reviewed API operation.', 2)
   const body = await new Promise<string>((resolve, reject) => {
     const fail = (error: Error) => reject(error instanceof Failure ? error :
@@ -19,10 +26,10 @@ export async function executeRead(credentials: Credentials, wirePath: string, en
       servername: isIP(hostname) ? '' : hostname,
       ...(credentials.ca ? { ca: credentials.ca } : {}), rejectUnauthorized: !pin })
     const deadline = setTimeout(() => {
-      const error = new Failure('TIMEOUT', 'Request exceeded 5000 ms.', 'Check the server and retry the read explicitly.')
+      const error = new Failure('TIMEOUT', `Request exceeded ${options.deadlineMs ?? 5000} ms.`, 'Check the server and retry the read explicitly.')
       req?.destroy(error)
       socket.destroy(error)
-    }, 5000)
+    }, options.deadlineMs ?? 5000)
     socket.once('close', () => clearTimeout(deadline))
     socket.on('error', fail)
     socket.once('secureConnect', () => {
@@ -40,8 +47,9 @@ export async function executeRead(credentials: Credentials, wirePath: string, en
       const agent = new Agent({ keepAlive: false })
       agent.createConnection = () => socket
       req = request(new URL(wirePath, origin), {
-      method: 'GET', agent,
-      headers: { Authorization: `PVEAPIToken=${credentials.tokenId}=${credentials.token}`, Accept: 'application/json' },
+      method: options.method, agent,
+      headers: { Authorization: `PVEAPIToken=${credentials.tokenId}=${credentials.token}`, Accept: 'application/json',
+        ...(options.body === undefined ? {} : { 'Content-Type': 'application/x-www-form-urlencoded', 'Content-Length': Buffer.byteLength(options.body) }) },
     }, response => {
       response.on('error', fail)
       const status = response.statusCode ?? 0
@@ -61,7 +69,7 @@ export async function executeRead(credentials: Credentials, wirePath: string, en
       response.on('end', () => resolve(Buffer.concat(chunks).toString('utf8')))
     })
     req.on('error', fail)
-    req.end()
+    req.end(options.body)
     })
   })
   let value: unknown
@@ -69,7 +77,7 @@ export async function executeRead(credentials: Credentials, wirePath: string, en
   if (!value || typeof value !== 'object' || Array.isArray(value) || !('data' in value)) throw invalidResponse()
   if ('total' in value && (!Number.isSafeInteger(value.total) || Number(value.total) < 0 || (Array.isArray(value.data) && Number(value.total) < value.data.length))) throw invalidResponse()
   const data: unknown = value.data
-  return envelope ? value : data
+  return options.envelope ? value : data
 }
 
 export async function readVersion(credentials: Credentials, wirePath: string): Promise<Record<string, string>> {

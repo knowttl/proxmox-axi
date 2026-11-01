@@ -1843,23 +1843,73 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "none",
+            "reason": "Destroy guest; absence or filtered inventory cannot prove the outcome.",
+            "allowedInputs": [
+              "node",
+              "vmid",
+              "purge",
+              "destroy-unreferenced-disks",
+              "force"
+            ],
+            "sensitiveInputs": [],
+            "reconciliation": {
+              "kind": "none",
+              "reason": "No safe automated business-outcome proof is admitted for this variant. Use the retained UPID when available; otherwise retain uncertainty and inspect independently."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/vms/{vmid}",
+                [
+                  "VM.Allocate"
+                ]
+              ]
+            },
+            "response": {
+              "type": "string"
+            },
+            "source": "Retained versioned API schema; design.md S3 write/outcome contract; pve-node-batch-source.txt for execute."
           },
           "contract": "dist/contracts.json#/contracts/355"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "none",
+            "reason": "Destroy guest; absence or filtered inventory cannot prove the outcome.",
+            "allowedInputs": [
+              "node",
+              "vmid",
+              "purge",
+              "destroy-unreferenced-disks",
+              "force"
+            ],
+            "sensitiveInputs": [],
+            "reconciliation": {
+              "kind": "none",
+              "reason": "No safe automated business-outcome proof is admitted for this variant. Use the retained UPID when available; otherwise retain uncertainty and inspect independently."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/vms/{vmid}",
+                [
+                  "VM.Allocate"
+                ]
+              ]
+            },
+            "response": {
+              "type": "string"
+            },
+            "source": "Retained versioned API schema; design.md S3 write/outcome contract; pve-node-batch-source.txt for execute."
           },
           "contract": "dist/contracts.json#/contracts/1023"
         }
@@ -2107,23 +2157,73 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "none",
+            "reason": "Destroy guest; absence or filtered inventory cannot prove the outcome.",
+            "allowedInputs": [
+              "node",
+              "vmid",
+              "purge",
+              "destroy-unreferenced-disks",
+              "force"
+            ],
+            "sensitiveInputs": [],
+            "reconciliation": {
+              "kind": "none",
+              "reason": "No safe automated business-outcome proof is admitted for this variant. Use the retained UPID when available; otherwise retain uncertainty and inspect independently."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/vms/{vmid}",
+                [
+                  "VM.Allocate"
+                ]
+              ]
+            },
+            "response": {
+              "type": "string"
+            },
+            "source": "Retained versioned API schema; design.md S3 write/outcome contract; pve-node-batch-source.txt for execute."
           },
           "contract": "dist/contracts.json#/contracts/425"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "none",
+            "reason": "Destroy guest; absence or filtered inventory cannot prove the outcome.",
+            "allowedInputs": [
+              "node",
+              "vmid",
+              "purge",
+              "destroy-unreferenced-disks",
+              "force"
+            ],
+            "sensitiveInputs": [],
+            "reconciliation": {
+              "kind": "none",
+              "reason": "No safe automated business-outcome proof is admitted for this variant. Use the retained UPID when available; otherwise retain uncertainty and inspect independently."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/vms/{vmid}",
+                [
+                  "VM.Allocate"
+                ]
+              ]
+            },
+            "response": {
+              "type": "string"
+            },
+            "source": "Retained versioned API schema; design.md S3 write/outcome contract; pve-node-batch-source.txt for execute."
           },
           "contract": "dist/contracts.json#/contracts/1094"
         }
@@ -2404,23 +2504,49 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "none",
+            "reason": "Stop an existing UPID; cancellation is a separately confirmed mutation.",
+            "sensitiveInputs": [],
+            "reconciliation": {
+              "kind": "none",
+              "reason": "No safe automated business-outcome proof is admitted for this variant. Use the retained UPID when available; otherwise retain uncertainty and inspect independently."
+            },
+            "privileges": {
+              "description": "The user needs 'Sys.Modify' permissions on '/nodes/<node>' if they aren't the owner of the task.",
+              "user": "all"
+            },
+            "response": {
+              "type": "null"
+            },
+            "source": "Retained versioned API schema; design.md S3 write/outcome contract; pve-node-batch-source.txt for execute."
           },
           "contract": "dist/contracts.json#/contracts/578"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "none",
+            "reason": "Stop an existing UPID; cancellation is a separately confirmed mutation.",
+            "sensitiveInputs": [],
+            "reconciliation": {
+              "kind": "none",
+              "reason": "No safe automated business-outcome proof is admitted for this variant. Use the retained UPID when available; otherwise retain uncertainty and inspect independently."
+            },
+            "privileges": {
+              "description": "The user needs 'Sys.Modify' permissions on '/nodes/<node>' if they aren't the owner of the task.",
+              "user": "all"
+            },
+            "response": {
+              "type": "null"
+            },
+            "source": "Retained versioned API schema; design.md S3 write/outcome contract; pve-node-batch-source.txt for execute."
           },
           "contract": "dist/contracts.json#/contracts/1258"
         }
@@ -2437,23 +2563,61 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "none",
+            "reason": "Pool configuration and membership mutation; no automatic retry.",
+            "sensitiveInputs": [],
+            "reconciliation": {
+              "kind": "none",
+              "reason": "No safe automated business-outcome proof is admitted for this variant. Use the retained UPID when available; otherwise retain uncertainty and inspect independently."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/pool/{poolid}",
+                [
+                  "Pool.Allocate"
+                ]
+              ],
+              "description": "You can only delete empty pools (no members)."
+            },
+            "response": {
+              "type": "null"
+            },
+            "source": "Retained versioned API schema; design.md S3 write/outcome contract; pve-node-batch-source.txt for execute."
           },
           "contract": "dist/contracts.json#/contracts/592"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "none",
+            "reason": "Pool configuration and membership mutation; no automatic retry.",
+            "sensitiveInputs": [],
+            "reconciliation": {
+              "kind": "none",
+              "reason": "No safe automated business-outcome proof is admitted for this variant. Use the retained UPID when available; otherwise retain uncertainty and inspect independently."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/pool/{poolid}",
+                [
+                  "Pool.Allocate"
+                ]
+              ],
+              "description": "You can only delete empty pools (no members)."
+            },
+            "response": {
+              "type": "null"
+            },
+            "source": "Retained versioned API schema; design.md S3 write/outcome contract; pve-node-batch-source.txt for execute."
           },
           "contract": "dist/contracts.json#/contracts/1272"
         }
@@ -16088,23 +16252,51 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "batch",
+            "transport": "json",
+            "secrets": "none",
+            "reason": "Vendor execute resolves each ordered node-relative child and reports per-child status; no atomicity.",
+            "sensitiveInputs": [],
+            "reconciliation": {
+              "kind": "none",
+              "reason": "No safe automated business-outcome proof is admitted for this variant. Use the retained UPID when available; otherwise retain uncertainty and inspect independently."
+            },
+            "privileges": null,
+            "response": {
+              "items": {
+                "properties": {},
+                "type": "object"
+              },
+              "type": "array"
+            },
+            "source": "Retained versioned API schema; design.md S3 write/outcome contract; pve-node-batch-source.txt for execute."
           },
           "contract": "dist/contracts.json#/contracts/335"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "batch",
+            "transport": "json",
+            "secrets": "none",
+            "reason": "Vendor execute resolves each ordered node-relative child and reports per-child status; no atomicity.",
+            "sensitiveInputs": [],
+            "reconciliation": {
+              "kind": "none",
+              "reason": "No safe automated business-outcome proof is admitted for this variant. Use the retained UPID when available; otherwise retain uncertainty and inspect independently."
+            },
+            "privileges": null,
+            "response": {
+              "items": {
+                "properties": {},
+                "type": "object"
+              },
+              "type": "array"
+            },
+            "source": "Retained versioned API schema; design.md S3 write/outcome contract; pve-node-batch-source.txt for execute."
           },
           "contract": "dist/contracts.json#/contracts/1003"
         }
@@ -16616,23 +16808,79 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "none",
+            "reason": "Guest power-state operation, asynchronous UPID acceptance does not prove completion.",
+            "allowedInputs": [
+              "node",
+              "vmid",
+              "timeout",
+              "forceStop",
+              "keepActive",
+              "skiplock",
+              "todisk"
+            ],
+            "sensitiveInputs": [],
+            "reconciliation": {
+              "kind": "read",
+              "path": "/nodes/{node}/lxc/{vmid}/status/current",
+              "reason": "Direct guest status observation; only requested stable start/stop states can be confirmed."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/vms/{vmid}",
+                [
+                  "VM.PowerMgmt"
+                ]
+              ]
+            },
+            "response": {
+              "type": "string"
+            },
+            "source": "Retained versioned API schema; design.md S3 write/outcome contract; pve-node-batch-source.txt for execute."
           },
           "contract": "dist/contracts.json#/contracts/404"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "none",
+            "reason": "Guest power-state operation, asynchronous UPID acceptance does not prove completion.",
+            "allowedInputs": [
+              "node",
+              "vmid",
+              "timeout",
+              "forceStop",
+              "keepActive",
+              "skiplock",
+              "todisk"
+            ],
+            "sensitiveInputs": [],
+            "reconciliation": {
+              "kind": "read",
+              "path": "/nodes/{node}/lxc/{vmid}/status/current",
+              "reason": "Direct guest status observation; only requested stable start/stop states can be confirmed."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/vms/{vmid}",
+                [
+                  "VM.PowerMgmt"
+                ]
+              ]
+            },
+            "response": {
+              "type": "string"
+            },
+            "source": "Retained versioned API schema; design.md S3 write/outcome contract; pve-node-batch-source.txt for execute."
           },
           "contract": "dist/contracts.json#/contracts/1073"
         }
@@ -16649,23 +16897,79 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "none",
+            "reason": "Guest power-state operation, asynchronous UPID acceptance does not prove completion.",
+            "allowedInputs": [
+              "node",
+              "vmid",
+              "timeout",
+              "forceStop",
+              "keepActive",
+              "skiplock",
+              "todisk"
+            ],
+            "sensitiveInputs": [],
+            "reconciliation": {
+              "kind": "read",
+              "path": "/nodes/{node}/lxc/{vmid}/status/current",
+              "reason": "Direct guest status observation; only requested stable start/stop states can be confirmed."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/vms/{vmid}",
+                [
+                  "VM.PowerMgmt"
+                ]
+              ]
+            },
+            "response": {
+              "type": "string"
+            },
+            "source": "Retained versioned API schema; design.md S3 write/outcome contract; pve-node-batch-source.txt for execute."
           },
           "contract": "dist/contracts.json#/contracts/405"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "none",
+            "reason": "Guest power-state operation, asynchronous UPID acceptance does not prove completion.",
+            "allowedInputs": [
+              "node",
+              "vmid",
+              "timeout",
+              "forceStop",
+              "keepActive",
+              "skiplock",
+              "todisk"
+            ],
+            "sensitiveInputs": [],
+            "reconciliation": {
+              "kind": "read",
+              "path": "/nodes/{node}/lxc/{vmid}/status/current",
+              "reason": "Direct guest status observation; only requested stable start/stop states can be confirmed."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/vms/{vmid}",
+                [
+                  "VM.PowerMgmt"
+                ]
+              ]
+            },
+            "response": {
+              "type": "string"
+            },
+            "source": "Retained versioned API schema; design.md S3 write/outcome contract; pve-node-batch-source.txt for execute."
           },
           "contract": "dist/contracts.json#/contracts/1074"
         }
@@ -16682,23 +16986,79 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "none",
+            "reason": "Guest power-state operation, asynchronous UPID acceptance does not prove completion.",
+            "allowedInputs": [
+              "node",
+              "vmid",
+              "timeout",
+              "forceStop",
+              "keepActive",
+              "skiplock",
+              "todisk"
+            ],
+            "sensitiveInputs": [],
+            "reconciliation": {
+              "kind": "read",
+              "path": "/nodes/{node}/lxc/{vmid}/status/current",
+              "reason": "Direct guest status observation; only requested stable start/stop states can be confirmed."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/vms/{vmid}",
+                [
+                  "VM.PowerMgmt"
+                ]
+              ]
+            },
+            "response": {
+              "type": "string"
+            },
+            "source": "Retained versioned API schema; design.md S3 write/outcome contract; pve-node-batch-source.txt for execute."
           },
           "contract": "dist/contracts.json#/contracts/406"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "none",
+            "reason": "Guest power-state operation, asynchronous UPID acceptance does not prove completion.",
+            "allowedInputs": [
+              "node",
+              "vmid",
+              "timeout",
+              "forceStop",
+              "keepActive",
+              "skiplock",
+              "todisk"
+            ],
+            "sensitiveInputs": [],
+            "reconciliation": {
+              "kind": "read",
+              "path": "/nodes/{node}/lxc/{vmid}/status/current",
+              "reason": "Direct guest status observation; only requested stable start/stop states can be confirmed."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/vms/{vmid}",
+                [
+                  "VM.PowerMgmt"
+                ]
+              ]
+            },
+            "response": {
+              "type": "string"
+            },
+            "source": "Retained versioned API schema; design.md S3 write/outcome contract; pve-node-batch-source.txt for execute."
           },
           "contract": "dist/contracts.json#/contracts/1075"
         }
@@ -16715,23 +17075,79 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "none",
+            "reason": "Guest power-state operation, asynchronous UPID acceptance does not prove completion.",
+            "allowedInputs": [
+              "node",
+              "vmid",
+              "timeout",
+              "forceStop",
+              "keepActive",
+              "skiplock",
+              "todisk"
+            ],
+            "sensitiveInputs": [],
+            "reconciliation": {
+              "kind": "read",
+              "path": "/nodes/{node}/lxc/{vmid}/status/current",
+              "reason": "Direct guest status observation; only requested stable start/stop states can be confirmed."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/vms/{vmid}",
+                [
+                  "VM.PowerMgmt"
+                ]
+              ]
+            },
+            "response": {
+              "type": "string"
+            },
+            "source": "Retained versioned API schema; design.md S3 write/outcome contract; pve-node-batch-source.txt for execute."
           },
           "contract": "dist/contracts.json#/contracts/407"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "none",
+            "reason": "Guest power-state operation, asynchronous UPID acceptance does not prove completion.",
+            "allowedInputs": [
+              "node",
+              "vmid",
+              "timeout",
+              "forceStop",
+              "keepActive",
+              "skiplock",
+              "todisk"
+            ],
+            "sensitiveInputs": [],
+            "reconciliation": {
+              "kind": "read",
+              "path": "/nodes/{node}/lxc/{vmid}/status/current",
+              "reason": "Direct guest status observation; only requested stable start/stop states can be confirmed."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/vms/{vmid}",
+                [
+                  "VM.PowerMgmt"
+                ]
+              ]
+            },
+            "response": {
+              "type": "string"
+            },
+            "source": "Retained versioned API schema; design.md S3 write/outcome contract; pve-node-batch-source.txt for execute."
           },
           "contract": "dist/contracts.json#/contracts/1076"
         }
@@ -16748,23 +17164,79 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "none",
+            "reason": "Guest power-state operation, asynchronous UPID acceptance does not prove completion.",
+            "allowedInputs": [
+              "node",
+              "vmid",
+              "timeout",
+              "forceStop",
+              "keepActive",
+              "skiplock",
+              "todisk"
+            ],
+            "sensitiveInputs": [],
+            "reconciliation": {
+              "kind": "read",
+              "path": "/nodes/{node}/lxc/{vmid}/status/current",
+              "reason": "Direct guest status observation; only requested stable start/stop states can be confirmed."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/vms/{vmid}",
+                [
+                  "VM.PowerMgmt"
+                ]
+              ]
+            },
+            "response": {
+              "type": "string"
+            },
+            "source": "Retained versioned API schema; design.md S3 write/outcome contract; pve-node-batch-source.txt for execute."
           },
           "contract": "dist/contracts.json#/contracts/408"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "none",
+            "reason": "Guest power-state operation, asynchronous UPID acceptance does not prove completion.",
+            "allowedInputs": [
+              "node",
+              "vmid",
+              "timeout",
+              "forceStop",
+              "keepActive",
+              "skiplock",
+              "todisk"
+            ],
+            "sensitiveInputs": [],
+            "reconciliation": {
+              "kind": "read",
+              "path": "/nodes/{node}/lxc/{vmid}/status/current",
+              "reason": "Direct guest status observation; only requested stable start/stop states can be confirmed."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/vms/{vmid}",
+                [
+                  "VM.PowerMgmt"
+                ]
+              ]
+            },
+            "response": {
+              "type": "string"
+            },
+            "source": "Retained versioned API schema; design.md S3 write/outcome contract; pve-node-batch-source.txt for execute."
           },
           "contract": "dist/contracts.json#/contracts/1077"
         }
@@ -16781,23 +17253,79 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "none",
+            "reason": "Guest power-state operation, asynchronous UPID acceptance does not prove completion.",
+            "allowedInputs": [
+              "node",
+              "vmid",
+              "timeout",
+              "forceStop",
+              "keepActive",
+              "skiplock",
+              "todisk"
+            ],
+            "sensitiveInputs": [],
+            "reconciliation": {
+              "kind": "read",
+              "path": "/nodes/{node}/lxc/{vmid}/status/current",
+              "reason": "Direct guest status observation; only requested stable start/stop states can be confirmed."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/vms/{vmid}",
+                [
+                  "VM.PowerMgmt"
+                ]
+              ]
+            },
+            "response": {
+              "type": "string"
+            },
+            "source": "Retained versioned API schema; design.md S3 write/outcome contract; pve-node-batch-source.txt for execute."
           },
           "contract": "dist/contracts.json#/contracts/409"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "none",
+            "reason": "Guest power-state operation, asynchronous UPID acceptance does not prove completion.",
+            "allowedInputs": [
+              "node",
+              "vmid",
+              "timeout",
+              "forceStop",
+              "keepActive",
+              "skiplock",
+              "todisk"
+            ],
+            "sensitiveInputs": [],
+            "reconciliation": {
+              "kind": "read",
+              "path": "/nodes/{node}/lxc/{vmid}/status/current",
+              "reason": "Direct guest status observation; only requested stable start/stop states can be confirmed."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/vms/{vmid}",
+                [
+                  "VM.PowerMgmt"
+                ]
+              ]
+            },
+            "response": {
+              "type": "string"
+            },
+            "source": "Retained versioned API schema; design.md S3 write/outcome contract; pve-node-batch-source.txt for execute."
           },
           "contract": "dist/contracts.json#/contracts/1078"
         }
@@ -17925,23 +18453,79 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "none",
+            "reason": "Guest power-state operation, asynchronous UPID acceptance does not prove completion.",
+            "allowedInputs": [
+              "node",
+              "vmid",
+              "timeout",
+              "forceStop",
+              "keepActive",
+              "skiplock",
+              "todisk"
+            ],
+            "sensitiveInputs": [],
+            "reconciliation": {
+              "kind": "read",
+              "path": "/nodes/{node}/qemu/{vmid}/status/current",
+              "reason": "Direct guest status observation; only requested stable start/stop states can be confirmed."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/vms/{vmid}",
+                [
+                  "VM.PowerMgmt"
+                ]
+              ]
+            },
+            "response": {
+              "type": "string"
+            },
+            "source": "Retained versioned API schema; design.md S3 write/outcome contract; pve-node-batch-source.txt for execute."
           },
           "contract": "dist/contracts.json#/contracts/507"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "none",
+            "reason": "Guest power-state operation, asynchronous UPID acceptance does not prove completion.",
+            "allowedInputs": [
+              "node",
+              "vmid",
+              "timeout",
+              "forceStop",
+              "keepActive",
+              "skiplock",
+              "todisk"
+            ],
+            "sensitiveInputs": [],
+            "reconciliation": {
+              "kind": "read",
+              "path": "/nodes/{node}/qemu/{vmid}/status/current",
+              "reason": "Direct guest status observation; only requested stable start/stop states can be confirmed."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/vms/{vmid}",
+                [
+                  "VM.PowerMgmt"
+                ]
+              ]
+            },
+            "response": {
+              "type": "string"
+            },
+            "source": "Retained versioned API schema; design.md S3 write/outcome contract; pve-node-batch-source.txt for execute."
           },
           "contract": "dist/contracts.json#/contracts/1177"
         }
@@ -17958,23 +18542,79 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "none",
+            "reason": "Guest power-state operation, asynchronous UPID acceptance does not prove completion.",
+            "allowedInputs": [
+              "node",
+              "vmid",
+              "timeout",
+              "forceStop",
+              "keepActive",
+              "skiplock",
+              "todisk"
+            ],
+            "sensitiveInputs": [],
+            "reconciliation": {
+              "kind": "read",
+              "path": "/nodes/{node}/qemu/{vmid}/status/current",
+              "reason": "Direct guest status observation; only requested stable start/stop states can be confirmed."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/vms/{vmid}",
+                [
+                  "VM.PowerMgmt"
+                ]
+              ]
+            },
+            "response": {
+              "type": "string"
+            },
+            "source": "Retained versioned API schema; design.md S3 write/outcome contract; pve-node-batch-source.txt for execute."
           },
           "contract": "dist/contracts.json#/contracts/508"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "none",
+            "reason": "Guest power-state operation, asynchronous UPID acceptance does not prove completion.",
+            "allowedInputs": [
+              "node",
+              "vmid",
+              "timeout",
+              "forceStop",
+              "keepActive",
+              "skiplock",
+              "todisk"
+            ],
+            "sensitiveInputs": [],
+            "reconciliation": {
+              "kind": "read",
+              "path": "/nodes/{node}/qemu/{vmid}/status/current",
+              "reason": "Direct guest status observation; only requested stable start/stop states can be confirmed."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/vms/{vmid}",
+                [
+                  "VM.PowerMgmt"
+                ]
+              ]
+            },
+            "response": {
+              "type": "string"
+            },
+            "source": "Retained versioned API schema; design.md S3 write/outcome contract; pve-node-batch-source.txt for execute."
           },
           "contract": "dist/contracts.json#/contracts/1178"
         }
@@ -17991,23 +18631,79 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "none",
+            "reason": "Guest power-state operation, asynchronous UPID acceptance does not prove completion.",
+            "allowedInputs": [
+              "node",
+              "vmid",
+              "timeout",
+              "forceStop",
+              "keepActive",
+              "skiplock",
+              "todisk"
+            ],
+            "sensitiveInputs": [],
+            "reconciliation": {
+              "kind": "read",
+              "path": "/nodes/{node}/qemu/{vmid}/status/current",
+              "reason": "Direct guest status observation; only requested stable start/stop states can be confirmed."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/vms/{vmid}",
+                [
+                  "VM.PowerMgmt"
+                ]
+              ]
+            },
+            "response": {
+              "type": "string"
+            },
+            "source": "Retained versioned API schema; design.md S3 write/outcome contract; pve-node-batch-source.txt for execute."
           },
           "contract": "dist/contracts.json#/contracts/509"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "none",
+            "reason": "Guest power-state operation, asynchronous UPID acceptance does not prove completion.",
+            "allowedInputs": [
+              "node",
+              "vmid",
+              "timeout",
+              "forceStop",
+              "keepActive",
+              "skiplock",
+              "todisk"
+            ],
+            "sensitiveInputs": [],
+            "reconciliation": {
+              "kind": "read",
+              "path": "/nodes/{node}/qemu/{vmid}/status/current",
+              "reason": "Direct guest status observation; only requested stable start/stop states can be confirmed."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/vms/{vmid}",
+                [
+                  "VM.PowerMgmt"
+                ]
+              ]
+            },
+            "response": {
+              "type": "string"
+            },
+            "source": "Retained versioned API schema; design.md S3 write/outcome contract; pve-node-batch-source.txt for execute."
           },
           "contract": "dist/contracts.json#/contracts/1179"
         }
@@ -18024,23 +18720,79 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "none",
+            "reason": "Guest power-state operation, asynchronous UPID acceptance does not prove completion.",
+            "allowedInputs": [
+              "node",
+              "vmid",
+              "timeout",
+              "forceStop",
+              "keepActive",
+              "skiplock",
+              "todisk"
+            ],
+            "sensitiveInputs": [],
+            "reconciliation": {
+              "kind": "read",
+              "path": "/nodes/{node}/qemu/{vmid}/status/current",
+              "reason": "Direct guest status observation; only requested stable start/stop states can be confirmed."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/vms/{vmid}",
+                [
+                  "VM.PowerMgmt"
+                ]
+              ]
+            },
+            "response": {
+              "type": "string"
+            },
+            "source": "Retained versioned API schema; design.md S3 write/outcome contract; pve-node-batch-source.txt for execute."
           },
           "contract": "dist/contracts.json#/contracts/510"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "none",
+            "reason": "Guest power-state operation, asynchronous UPID acceptance does not prove completion.",
+            "allowedInputs": [
+              "node",
+              "vmid",
+              "timeout",
+              "forceStop",
+              "keepActive",
+              "skiplock",
+              "todisk"
+            ],
+            "sensitiveInputs": [],
+            "reconciliation": {
+              "kind": "read",
+              "path": "/nodes/{node}/qemu/{vmid}/status/current",
+              "reason": "Direct guest status observation; only requested stable start/stop states can be confirmed."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/vms/{vmid}",
+                [
+                  "VM.PowerMgmt"
+                ]
+              ]
+            },
+            "response": {
+              "type": "string"
+            },
+            "source": "Retained versioned API schema; design.md S3 write/outcome contract; pve-node-batch-source.txt for execute."
           },
           "contract": "dist/contracts.json#/contracts/1180"
         }
@@ -18057,23 +18809,79 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "none",
+            "reason": "Guest power-state operation, asynchronous UPID acceptance does not prove completion.",
+            "allowedInputs": [
+              "node",
+              "vmid",
+              "timeout",
+              "forceStop",
+              "keepActive",
+              "skiplock",
+              "todisk"
+            ],
+            "sensitiveInputs": [],
+            "reconciliation": {
+              "kind": "read",
+              "path": "/nodes/{node}/qemu/{vmid}/status/current",
+              "reason": "Direct guest status observation; only requested stable start/stop states can be confirmed."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/vms/{vmid}",
+                [
+                  "VM.PowerMgmt"
+                ]
+              ]
+            },
+            "response": {
+              "type": "string"
+            },
+            "source": "Retained versioned API schema; design.md S3 write/outcome contract; pve-node-batch-source.txt for execute."
           },
           "contract": "dist/contracts.json#/contracts/511"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "none",
+            "reason": "Guest power-state operation, asynchronous UPID acceptance does not prove completion.",
+            "allowedInputs": [
+              "node",
+              "vmid",
+              "timeout",
+              "forceStop",
+              "keepActive",
+              "skiplock",
+              "todisk"
+            ],
+            "sensitiveInputs": [],
+            "reconciliation": {
+              "kind": "read",
+              "path": "/nodes/{node}/qemu/{vmid}/status/current",
+              "reason": "Direct guest status observation; only requested stable start/stop states can be confirmed."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/vms/{vmid}",
+                [
+                  "VM.PowerMgmt"
+                ]
+              ]
+            },
+            "response": {
+              "type": "string"
+            },
+            "source": "Retained versioned API schema; design.md S3 write/outcome contract; pve-node-batch-source.txt for execute."
           },
           "contract": "dist/contracts.json#/contracts/1181"
         }
@@ -18090,23 +18898,79 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "none",
+            "reason": "Guest power-state operation, asynchronous UPID acceptance does not prove completion.",
+            "allowedInputs": [
+              "node",
+              "vmid",
+              "timeout",
+              "forceStop",
+              "keepActive",
+              "skiplock",
+              "todisk"
+            ],
+            "sensitiveInputs": [],
+            "reconciliation": {
+              "kind": "read",
+              "path": "/nodes/{node}/qemu/{vmid}/status/current",
+              "reason": "Direct guest status observation; only requested stable start/stop states can be confirmed."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/vms/{vmid}",
+                [
+                  "VM.PowerMgmt"
+                ]
+              ]
+            },
+            "response": {
+              "type": "string"
+            },
+            "source": "Retained versioned API schema; design.md S3 write/outcome contract; pve-node-batch-source.txt for execute."
           },
           "contract": "dist/contracts.json#/contracts/512"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "none",
+            "reason": "Guest power-state operation, asynchronous UPID acceptance does not prove completion.",
+            "allowedInputs": [
+              "node",
+              "vmid",
+              "timeout",
+              "forceStop",
+              "keepActive",
+              "skiplock",
+              "todisk"
+            ],
+            "sensitiveInputs": [],
+            "reconciliation": {
+              "kind": "read",
+              "path": "/nodes/{node}/qemu/{vmid}/status/current",
+              "reason": "Direct guest status observation; only requested stable start/stop states can be confirmed."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/vms/{vmid}",
+                [
+                  "VM.PowerMgmt"
+                ]
+              ]
+            },
+            "response": {
+              "type": "string"
+            },
+            "source": "Retained versioned API schema; design.md S3 write/outcome contract; pve-node-batch-source.txt for execute."
           },
           "contract": "dist/contracts.json#/contracts/1182"
         }
@@ -18123,23 +18987,81 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "none",
+            "reason": "Guest power-state operation, asynchronous UPID acceptance does not prove completion.",
+            "allowedInputs": [
+              "node",
+              "vmid",
+              "timeout",
+              "forceStop",
+              "keepActive",
+              "skiplock",
+              "todisk"
+            ],
+            "sensitiveInputs": [],
+            "reconciliation": {
+              "kind": "read",
+              "path": "/nodes/{node}/qemu/{vmid}/status/current",
+              "reason": "Direct guest status observation; only requested stable start/stop states can be confirmed."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/vms/{vmid}",
+                [
+                  "VM.PowerMgmt"
+                ]
+              ],
+              "description": "You need 'VM.PowerMgmt' on /vms/{vmid}, and if you have set 'todisk', you need also 'VM.Config.Disk' on /vms/{vmid} and 'Datastore.AllocateSpace' on the storage for the vmstate."
+            },
+            "response": {
+              "type": "string"
+            },
+            "source": "Retained versioned API schema; design.md S3 write/outcome contract; pve-node-batch-source.txt for execute."
           },
           "contract": "dist/contracts.json#/contracts/513"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "none",
+            "reason": "Guest power-state operation, asynchronous UPID acceptance does not prove completion.",
+            "allowedInputs": [
+              "node",
+              "vmid",
+              "timeout",
+              "forceStop",
+              "keepActive",
+              "skiplock",
+              "todisk"
+            ],
+            "sensitiveInputs": [],
+            "reconciliation": {
+              "kind": "read",
+              "path": "/nodes/{node}/qemu/{vmid}/status/current",
+              "reason": "Direct guest status observation; only requested stable start/stop states can be confirmed."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/vms/{vmid}",
+                [
+                  "VM.PowerMgmt"
+                ]
+              ],
+              "description": "You need 'VM.PowerMgmt' on /vms/{vmid}, and if you have set 'todisk', you need also 'VM.Config.Disk' on /vms/{vmid} and 'Datastore.AllocateSpace' on the storage for the vmstate."
+            },
+            "response": {
+              "type": "string"
+            },
+            "source": "Retained versioned API schema; design.md S3 write/outcome contract; pve-node-batch-source.txt for execute."
           },
           "contract": "dist/contracts.json#/contracts/1183"
         }
@@ -18904,23 +19826,59 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "none",
+            "reason": "Pool configuration and membership mutation; no automatic retry.",
+            "sensitiveInputs": [],
+            "reconciliation": {
+              "kind": "none",
+              "reason": "No safe automated business-outcome proof is admitted for this variant. Use the retained UPID when available; otherwise retain uncertainty and inspect independently."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/pool/{poolid}",
+                [
+                  "Pool.Allocate"
+                ]
+              ]
+            },
+            "response": {
+              "type": "null"
+            },
+            "source": "Retained versioned API schema; design.md S3 write/outcome contract; pve-node-batch-source.txt for execute."
           },
           "contract": "dist/contracts.json#/contracts/594"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "none",
+            "reason": "Pool configuration and membership mutation; no automatic retry.",
+            "sensitiveInputs": [],
+            "reconciliation": {
+              "kind": "none",
+              "reason": "No safe automated business-outcome proof is admitted for this variant. Use the retained UPID when available; otherwise retain uncertainty and inspect independently."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/pool/{poolid}",
+                [
+                  "Pool.Allocate"
+                ]
+              ]
+            },
+            "response": {
+              "type": "null"
+            },
+            "source": "Retained versioned API schema; design.md S3 write/outcome contract; pve-node-batch-source.txt for execute."
           },
           "contract": "dist/contracts.json#/contracts/1274"
         }
@@ -20829,23 +21787,107 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "input-refs",
+            "reason": "Reviewed scalar configuration branches only; credential fields require SecretRefs. Other supplied branches stay refused.",
+            "allowedInputs": [
+              "node",
+              "vmid",
+              "description",
+              "name",
+              "hostname",
+              "memory",
+              "cores",
+              "onboot",
+              "digest",
+              "cipassword",
+              "password"
+            ],
+            "sensitiveInputs": [
+              "cipassword",
+              "password"
+            ],
+            "reconciliation": {
+              "kind": "read",
+              "path": "/nodes/{node}/lxc/{vmid}/config",
+              "reason": "Direct configuration observation may confirm supplied fields; missing fields never prove failure."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/vms/{vmid}",
+                [
+                  "VM.Config.Disk",
+                  "VM.Config.CPU",
+                  "VM.Config.Memory",
+                  "VM.Config.Network",
+                  "VM.Config.Options"
+                ],
+                "any",
+                1
+              ],
+              "description": "non-volume mount points in rootfs and mp[n] are restricted to root@pam"
+            },
+            "response": {
+              "type": "null"
+            },
+            "source": "Retained versioned API schema; design.md S3 write/outcome contract; pve-node-batch-source.txt for execute."
           },
           "contract": "dist/contracts.json#/contracts/359"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "input-refs",
+            "reason": "Reviewed scalar configuration branches only; credential fields require SecretRefs. Other supplied branches stay refused.",
+            "allowedInputs": [
+              "node",
+              "vmid",
+              "description",
+              "name",
+              "hostname",
+              "memory",
+              "cores",
+              "onboot",
+              "digest",
+              "cipassword",
+              "password"
+            ],
+            "sensitiveInputs": [
+              "cipassword",
+              "password"
+            ],
+            "reconciliation": {
+              "kind": "read",
+              "path": "/nodes/{node}/lxc/{vmid}/config",
+              "reason": "Direct configuration observation may confirm supplied fields; missing fields never prove failure."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/vms/{vmid}",
+                [
+                  "VM.Config.Disk",
+                  "VM.Config.CPU",
+                  "VM.Config.Memory",
+                  "VM.Config.Network",
+                  "VM.Config.Options"
+                ],
+                "any",
+                1
+              ],
+              "description": "non-volume mount points in rootfs and mp[n] are restricted to root@pam"
+            },
+            "response": {
+              "type": "null"
+            },
+            "source": "Retained versioned API schema; design.md S3 write/outcome contract; pve-node-batch-source.txt for execute."
           },
           "contract": "dist/contracts.json#/contracts/1027"
         }
@@ -21159,23 +22201,111 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "input-refs",
+            "reason": "Reviewed scalar configuration branches only; credential fields require SecretRefs. Other supplied branches stay refused.",
+            "allowedInputs": [
+              "node",
+              "vmid",
+              "description",
+              "name",
+              "hostname",
+              "memory",
+              "cores",
+              "onboot",
+              "digest",
+              "cipassword",
+              "password"
+            ],
+            "sensitiveInputs": [
+              "cipassword",
+              "password"
+            ],
+            "reconciliation": {
+              "kind": "read",
+              "path": "/nodes/{node}/qemu/{vmid}/config",
+              "reason": "Direct configuration observation may confirm supplied fields; missing fields never prove failure."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/vms/{vmid}",
+                [
+                  "VM.Config.Disk",
+                  "VM.Config.CDROM",
+                  "VM.Config.CPU",
+                  "VM.Config.Memory",
+                  "VM.Config.Network",
+                  "VM.Config.HWType",
+                  "VM.Config.Options",
+                  "VM.Config.Cloudinit"
+                ],
+                "any",
+                1
+              ]
+            },
+            "response": {
+              "type": "null"
+            },
+            "source": "Retained versioned API schema; design.md S3 write/outcome contract; pve-node-batch-source.txt for execute."
           },
           "contract": "dist/contracts.json#/contracts/460"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "input-refs",
+            "reason": "Reviewed scalar configuration branches only; credential fields require SecretRefs. Other supplied branches stay refused.",
+            "allowedInputs": [
+              "node",
+              "vmid",
+              "description",
+              "name",
+              "hostname",
+              "memory",
+              "cores",
+              "onboot",
+              "digest",
+              "cipassword",
+              "password"
+            ],
+            "sensitiveInputs": [
+              "cipassword",
+              "password"
+            ],
+            "reconciliation": {
+              "kind": "read",
+              "path": "/nodes/{node}/qemu/{vmid}/config",
+              "reason": "Direct configuration observation may confirm supplied fields; missing fields never prove failure."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/vms/{vmid}",
+                [
+                  "VM.Config.Disk",
+                  "VM.Config.CDROM",
+                  "VM.Config.CPU",
+                  "VM.Config.Memory",
+                  "VM.Config.Network",
+                  "VM.Config.HWType",
+                  "VM.Config.Options",
+                  "VM.Config.Cloudinit"
+                ],
+                "any",
+                1
+              ]
+            },
+            "response": {
+              "type": "null"
+            },
+            "source": "Retained versioned API schema; design.md S3 write/outcome contract; pve-node-batch-source.txt for execute."
           },
           "contract": "dist/contracts.json#/contracts/1129"
         }
@@ -21555,23 +22685,61 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "none",
+            "reason": "Pool configuration and membership mutation; no automatic retry.",
+            "sensitiveInputs": [],
+            "reconciliation": {
+              "kind": "none",
+              "reason": "No safe automated business-outcome proof is admitted for this variant. Use the retained UPID when available; otherwise retain uncertainty and inspect independently."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/pool/{poolid}",
+                [
+                  "Pool.Allocate"
+                ]
+              ],
+              "description": "You also need the right to modify permissions on any object you add/delete."
+            },
+            "response": {
+              "type": "null"
+            },
+            "source": "Retained versioned API schema; design.md S3 write/outcome contract; pve-node-batch-source.txt for execute."
           },
           "contract": "dist/contracts.json#/contracts/595"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "none",
+            "reason": "Pool configuration and membership mutation; no automatic retry.",
+            "sensitiveInputs": [],
+            "reconciliation": {
+              "kind": "none",
+              "reason": "No safe automated business-outcome proof is admitted for this variant. Use the retained UPID when available; otherwise retain uncertainty and inspect independently."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/pool/{poolid}",
+                [
+                  "Pool.Allocate"
+                ]
+              ],
+              "description": "You also need the right to modify permissions on any object you add/delete."
+            },
+            "response": {
+              "type": "null"
+            },
+            "source": "Retained versioned API schema; design.md S3 write/outcome contract; pve-node-batch-source.txt for execute."
           },
           "contract": "dist/contracts.json#/contracts/1275"
         }
