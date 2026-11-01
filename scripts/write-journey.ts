@@ -65,7 +65,7 @@ export async function exerciseWriteJourney(options: Journey): Promise<void> {
     guestState.get(family)!.status = path.endsWith('/start') ? 'running' : 'stopped'
     taskState = 'running'
     taskReads = 0
-    return upid
+    return mode === 'unsafe-upid' ? upid.replace('synthetic@pve', '$(id)@pve') : upid
   }
   const serve = async (request: IncomingMessage, reply: ServerResponse) => {
     const url = new URL(request.url!, 'https://fake.invalid')
@@ -118,6 +118,7 @@ export async function exerciseWriteJourney(options: Journey): Promise<void> {
   const env: Record<string, string> = { ...options.env, PROXMOX_AXI_CONFIG: config, PROXMOX_AXI_PROFILE: 'writes', PROXMOX_AXI_WRITE_LOG: log }
   const ids = ['qemu', 'lxc'].flatMap(family => [
     operationId('POST', `/nodes/{node}/${family}/{vmid}/status/start`), operationId('POST', `/nodes/{node}/${family}/{vmid}/status/stop`),
+    operationId('POST', `/nodes/{node}/${family}/{vmid}/status/shutdown`),
     operationId('PUT', `/nodes/{node}/${family}/{vmid}/config`), operationId('DELETE', `/nodes/{node}/${family}/{vmid}`),
   ]).concat(operationId('POST', '/nodes/{node}/execute'), operationId('DELETE', '/nodes/{node}/tasks/{upid}'),
     operationId('POST', '/pools'), operationId('PUT', '/pools'), operationId('DELETE', '/pools'))
@@ -167,6 +168,17 @@ export async function exerciseWriteJourney(options: Journey): Promise<void> {
     mode = 'unknown-major'
     await invoke('AC-WRITE/unknown-major', [...start, '--preview'], { code: 1, error: 'CAPABILITY_UNSUPPORTED' })
     mode = 'success'
+    const unsafePreview = await invoke('AC-ASYNC/untrusted-upid-preview', [...start, '--preview'])
+    mode = 'unsafe-upid'
+    const unsafeResult = await invoke('AC-ASYNC/safe-follow-up-templates', [...start, '--confirm', unsafePreview.confirmation], { status: 'accepted', mutations: 1 })
+    assert.equal(unsafeResult.node, 'pve-test')
+    assert.equal(unsafeResult.upid, upid.replace('synthetic@pve', '$(id)@pve'))
+    assert.deepEqual(unsafeResult.help, ['proxmox-axi task status --api-node <node> --api-upid <UPID>', 'proxmox-axi task wait --api-node <node> --api-upid <UPID>'])
+    mode = 'success'
+    const shutdown = [...argsFor('create', 'qemu', '/status/shutdown'), '--api-forceStop', 'true']
+    const forced = await invoke('AC-WRITES/vendor-flag-case-preview', [...shutdown, '--preview'])
+    await invoke('AC-WRITES/vendor-flag-case-wire', [...shutdown, '--confirm', forced.confirmation], { status: 'accepted', mutations: 1 })
+    assert.equal((bodyEvidence.at(-1)!.args as Record<string, string>).forceStop, '1')
     if (!options.hosted) {
     const crashPreview = await invoke('AC-WRITES/crash-preview', [...start, '--preview'])
     activeCase = 'AC-WRITES/crash-after-commit'

@@ -157,8 +157,8 @@ export async function writeOperation(credentials: Credentials, initial: Contract
   }
   await saveOutcome()
   if (record.status === 'failed' || record.status === 'uncertain') process.exitCode = 1
-  return { id, status: record.status, ...(record.upid ? { upid: record.upid } : {}), children: publicChildren(record.children),
-    reconciliation: record.reconciliation, help: record.upid ? [taskCommand('status', record.node!, record.upid), taskCommand('wait', record.node!, record.upid)] : [] }
+  return { id, status: record.status, ...(record.upid ? { node: record.node, upid: record.upid } : {}), children: publicChildren(record.children),
+    reconciliation: record.reconciliation, help: record.upid ? [taskCommand('status'), taskCommand('wait')] : [] }
 }
 
 function reconciliationCheck(call: Invocation, journal: Journal): JournalRecord['check'] {
@@ -222,6 +222,6 @@ export function journalOwner(journal: Journal, credentials: Credentials): string
     actor: process.env.PROXMOX_AXI_ACTOR ?? `uid:${process.getuid?.() ?? 'native'}`, profile: credentials.diagnostics.profile })
 }
 
-export function taskCommand(command: string, node: string, upid: string): string {
-  return `proxmox-axi task ${command} --api-node ${JSON.stringify(node)} --api-upid ${JSON.stringify(upid)}`
+export function taskCommand(command: string): string {
+  return `proxmox-axi task ${command} --api-node <node> --api-upid <UPID>`
 }

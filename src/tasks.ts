@@ -50,7 +50,7 @@ export async function taskOperation(credentials: Credentials, command: string, v
   } while (performance.now() < deadline)
   if (status === 'failed') process.exitCode = 1
   return { upid, status, data, ...(command === 'wait' && status === 'running' ? { wait: 'deadline-reached' } : {}),
-    help: status === 'running' ? [taskCommand('status', node, upid)] : [] }
+    help: status === 'running' ? [taskCommand('status')] : [] }
 }
 
 function containsUpid(children: JournalRecord['children'], upid: string): boolean {
