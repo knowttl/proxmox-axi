@@ -48,7 +48,8 @@ export function* routeCases(catalogues, policy) {
         if (path.includes(placeholder)) path = path.replace(placeholder, encoded)
         else query.push(`${encodeURIComponent(name)}=${encodeURIComponent(typeof value === 'boolean' ? (value ? '1' : '0') : String(value))}`)
       }
-      yield { id: `${catalogue.release}/${routeKey(operation)}/${variant.branch}`, operation, release: catalogue.release, callable, reviewedWrite, args,
+      yield { id: `${catalogue.release}/${routeKey(operation)}/${variant.branch}`, operation, release: catalogue.release, callable, reviewedWrite,
+        managed: reviewWrite(operation)?.transport === 'managed', args,
         values: variant.values,
         response,
         expectedPath: `/api2/json${path}${query.length ? `?${query.join('&')}` : ''}` }

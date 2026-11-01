@@ -16,15 +16,29 @@ const pool = new Set(['create_pool', 'update_pool', 'delete_pool'])
 export function reviewWrite(operation: Operation) {
   const { path, method } = operation
   const name = operation.vendorMetadata.name
+  const upload = path === '/nodes/{node}/storage/{storage}/upload' && method === 'POST'
+  const transferRead = method === 'GET' && (/\/rrd$/.test(path) || ['/nodes/{node}/journal', '/nodes/{node}/qemu/{vmid}/agent/file-read', '/nodes/{node}/storage/{storage}/file-restore/download'].includes(path))
+  const spice = method === 'POST' && /\/(spiceproxy|spiceshell)$/.test(path)
+  if (method === 'POST' && path === '/nodes/{node}/storage/{storage}/download-url') return {
+    effect: 'write', transport: 'json', secrets: 'none', allowedInputs: ['node', 'storage', 'content', 'filename', 'url', 'checksum', 'checksum-algorithm', 'verify-certificates'],
+    reason: 'Confirmed provider-side download from the selected approved HTTPS origin; compression and disabled trust are refused.',
+    reconciliation: { kind: 'none', reason: 'Follow the accepted UPID; never repeat a provider-side download after a lost response.' },
+    privileges: operation.permissions, response: operation.returns, source: 'Pinned storage download-url schema and S5 reviewed target restrictions.' }
+  if (upload || transferRead || spice) return { effect: transferRead ? 'read' : 'write', transport: 'managed', secrets: spice ? 'private-result' : 'none',
+    reason: 'S5 operation-specific formatter and bounded private byte transport; ordinary output contains completion metadata only.',
+    ...(upload ? { allowedInputs: ['node', 'storage', 'filename', 'content', 'checksum', 'checksum-algorithm'] } :
+      spice && path.endsWith('/spiceshell') ? { allowedInputs: ['node'] } : {}),
+    reconciliation: { kind: 'none', reason: 'Byte completion is distinct from provider task completion. Never repeat a partial transfer automatically.' },
+    privileges: operation.permissions, response: operation.returns, source: 'Pinned API catalogues and S5 transport contracts.' }
   const protectedOperation = [
     'generate_token', 'update_token_info', 'add_tfa_entry', 'delete_tfa', 'update_tfa_entry',
-    'change_password', 'cifsscan', 'pbsscan', 'upload_custom_cert', 'vncproxy', 'termproxy', 'mtunnel',
+    'change_password', 'cifsscan', 'pbsscan', 'upload_custom_cert', 'vncproxy', 'termproxy', 'mtunnel', 'vncshell',
   ].includes(name ?? '')
   if (protectedOperation) {
     const sensitiveInputs = Object.keys(operation.parameters.properties ?? {}).filter(key =>
       ['password', 'confirmation-password', 'key', 'value', 'totp', 'challenge'].includes(key))
-    return { effect: 'write', transport: 'json', secrets: ['generate_token', 'update_token_info', 'add_tfa_entry', 'vncproxy', 'termproxy', 'mtunnel'].includes(name!) ? 'private-result' : 'input-refs',
-      ...(name === 'termproxy' && path === '/nodes/{node}/termproxy' ? { allowedInputs: ['node'] } : {}),
+    return { effect: 'write', transport: 'json', secrets: ['generate_token', 'update_token_info', 'add_tfa_entry', 'vncproxy', 'termproxy', 'mtunnel', 'vncshell'].includes(name!) ? 'private-result' : 'input-refs',
+      ...(['termproxy', 'vncshell'].includes(name!) && /^\/nodes\/\{node\}\/[^/]+$/.test(path) ? { allowedInputs: name === 'vncshell' ? ['node', 'websocket'] : ['node'] } : {}),
       sensitiveInputs, reason: 'Explicitly authorized credential and sensitive-input operation; shared preview and confirmation controls apply, including effectful scans.',
       reconciliation: { kind: 'none', reason: 'Never recreate a one-time credential to determine delivery or outcome.' },
       privileges: operation.permissions, response: operation.returns, source: 'Retained versioned API schema and S4 protected credential contract.' }

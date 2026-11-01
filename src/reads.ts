@@ -21,6 +21,7 @@ function inventoryVisibility(path: string, permissions: unknown): string {
 }
 
 export async function readOperation(credentials: Credentials, initial: Contract, values: Record<string, unknown>, explicitCatalogue?: string) {
+  if (initial.policy.transport !== 'json') throw new Failure('INVALID_INPUT', 'This operation requires managed transport.', 'Use proxmox-axi transfer --help.', 2)
   if (initial.policy.effect !== 'read') throw new Failure('WRITE_DISABLED', 'Operation requires the write execution policy.', 'Use create, set or delete with a preview and exact confirmation.')
   // Validate before any version or permission request.
   buildPath(initial, values)

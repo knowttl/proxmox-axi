@@ -12,8 +12,11 @@ import { writeOperation } from './writes.js'
 import { journalOperation, taskOperation } from './tasks.js'
 import operations from './operations.json' with { type: 'json' }
 import { authOperation, useSession } from './auth.js'
+import { byteDescriptor, prepareTransfer } from './transfer.js'
+import { readVersion } from './transport.js'
+import { prepareDuplex } from './duplex.js'
 
-const flags = ['--config', '--profile', '--format', '--catalogue', '--body-file', '--limit', '--fields', '--full', '--help', '--preview', '--confirm', '--wait-ms', '--journal', '--session']
+const flags = ['--config', '--profile', '--format', '--catalogue', '--body-file', '--limit', '--fields', '--full', '--help', '--preview', '--confirm', '--wait-ms', '--journal', '--session', '--response-format', '--input-file', '--raw', '--expected-bytes', '--expected-sha256']
 const help = {
   purpose: operations[0]!.help,
   usage: 'proxmox-axi get /version [--config <absolute-path>] [--profile <name>] [--format toon|json]',
@@ -76,7 +79,7 @@ export async function main(args: string[]): Promise<void> {
       if (!argument.startsWith('-')) { positional.push(argument); continue }
       if (!flags.includes(argument) && !argument.startsWith('--api-')) throw usage('Unknown flag; valid flags: --config, --profile, --format, --catalogue, --body-file, --api-<parameter>, --help.')
       if (/^--api-(?:password|cipassword|token|ticket|otp|secret|api-key|private-key|vncticket|csrf-prevention-token)$/.test(argument)) throw usage('Secret arguments are not accepted; use a protected credential reference or the operation-specific private input contract.')
-      if (argument === '--help' || argument === '--full' || argument === '--preview') { options[argument === '--help' ? 'help' : argument] = 'true'; continue }
+      if (argument === '--help' || argument === '--full' || argument === '--preview' || argument === '--raw') { options[argument === '--help' ? 'help' : argument] = 'true'; continue }
       const value = args[++index]
       if (!value || value.startsWith('--') || (value.startsWith('-') && value !== '-' && !argument.startsWith('--api-'))) throw usage('A flag value is required.')
       if (options[argument]) throw usage('Duplicate flags are not allowed.')
@@ -85,6 +88,27 @@ export async function main(args: string[]): Promise<void> {
     format = options['--format'] ?? 'toon'
     if (!['toon', 'json'].includes(format)) { format = 'toon'; throw usage('Format must be toon or json.') }
     if (positional[0] === 'help') { positional.shift(); options.help = 'true' }
+    const transferring = positional[0] === 'transfer'
+    const duplex = positional[0] === 'duplex'
+    if (duplex && options.help) {
+      output({ usage: 'proxmox-axi duplex create <setup-template> [API inputs] --preview|--confirm <confirmation>',
+        flags: ['--config <path>', '--profile <name>', '--session <id>', '--format toon|json', '--catalogue <release>', '--api-<name> <value>', '--preview', '--confirm <confirmation>'],
+        bytes: 'PROXMOX_AXI_STREAM_FD carries four-byte big-endian lengths and binary messages in each direction. EOF requests a clean protocol close.',
+        examples: ['proxmox-axi duplex create /nodes/{node}/qemu/{vmid}/vncproxy --api-node pve --api-vmid 100 --api-websocket true --preview',
+          'proxmox-axi duplex create /nodes/{node}/qemu/{vmid}/mtunnel --api-node pve --api-vmid 100 --preview'] })
+      return
+    }
+    if (transferring && options.help) {
+      output({ usage: 'proxmox-axi transfer get|create <template> --response-format <formatter> [API inputs]',
+        flags: ['--response-format png|spiceconfig|multipart|guest-file|download|text (operation-specific)', '--input-file <absolute path> (upload)',
+          '--expected-bytes <count>', '--expected-sha256 <hex>', '--raw (guest-file export)', '--preview', '--confirm <confirmation>', '--config <path>', '--profile <name>', '--session <id>', '--format toon|json'],
+        bytes: 'Private pipe/socket PROXMOX_AXI_STREAM_FD; metadata only on stdout. Discard partial bytes unless completion is verified.',
+        examples: ['proxmox-axi transfer get /nodes/{node}/rrd --api-node pve --api-ds cpu --api-timeframe hour --response-format png',
+          'proxmox-axi transfer create /nodes/{node}/storage/{storage}/upload --response-format multipart --input-file /images/test.iso --api-node pve --api-storage local --api-content iso --api-filename test.iso --preview'] })
+      return
+    }
+    if (transferring || duplex) positional.shift()
+    if (!transferring && ['--response-format', '--input-file', '--raw', '--expected-bytes', '--expected-sha256'].some(flag => options[flag])) throw usage('Transport flags require transfer.')
     if (positional[0] === 'ls') {
       if (positional.length === 1) positional.push('/nodes')
       positional[0] = 'get'
@@ -157,7 +181,7 @@ export async function main(args: string[]): Promise<void> {
       }
       return
     }
-    const release = options['--catalogue'] ?? 'legacy-8.2.7'
+    const release = options['--catalogue'] ?? (transferring || duplex ? 'published-current' : 'legacy-8.2.7')
     if (command === 'inventory') {
       if (Object.keys(options).some(key => !['--format', '--catalogue', '--full', '--limit'].includes(key))) throw usage('Invalid inventory option.')
       const selected = contracts.filter(contract => contract.release === release)
@@ -192,8 +216,9 @@ export async function main(args: string[]): Promise<void> {
     const contract = authAction ? undefined : ['', 'home', 'doctor'].includes(command) ? selectContract('GET', '/version', release) :
       isLocal ? undefined : positional.length === 2 ? selectContract(positional[0]!, positional[1]!, release) : undefined
     if (!isLocal && !contract && !authAction) throw usage('Select a command from inventory.')
+    if (contract?.policy.transport === 'managed' && !transferring) throw usage('This operation requires transfer and a private byte channel.')
     if (contract && ['write', 'batch'].includes(contract.policy.effect) && Object.keys(options).some(key =>
-      !['--config', '--profile', '--format', '--catalogue', '--body-file', '--preview', '--confirm', '--session'].includes(key) && !key.startsWith('--api-'))) throw usage('Writes accept credential selectors, API inputs, --preview and --confirm only.')
+      !['--config', '--profile', '--format', '--catalogue', '--body-file', '--preview', '--confirm', '--session', ...(transferring ? ['--response-format', '--input-file', '--raw', '--expected-bytes', '--expected-sha256'] : [])].includes(key) && !key.startsWith('--api-'))) throw usage('Writes accept credential selectors, API inputs, --preview and --confirm only.')
     if (authAction && Object.keys(options).some(key => !['--config', '--profile', '--format', '--session', '--body-file'].includes(key))) throw usage('Invalid authentication option.')
     if (task && task !== 'cancel' && Object.keys(options).some(key =>
       !['--config', '--profile', '--format', '--session', '--body-file', '--journal', ...(task === 'wait' ? ['--wait-ms'] : [])].includes(key) && !key.startsWith('--api-'))) throw usage('Task reads accept API inputs, --session and --journal; task wait also accepts --wait-ms.')
@@ -248,6 +273,35 @@ export async function main(args: string[]): Promise<void> {
       return
     }
     if (options['--session']) credentials = useSession(credentials, options['--session'])
+    if (duplex && contract) {
+      if (!options['--preview']) credentials.results.sink()
+      if (contract.parameters.properties?.websocket) {
+        if (values.websocket === false) throw usage('Duplex setup requires websocket=true.')
+        values.websocket = true
+      }
+      output(await writeOperation(credentials, contract, values, { preview: !!options['--preview'],
+        ...(options['--confirm'] ? { confirmation: options['--confirm'] } : {}), transport: prepareDuplex(contract, !!options['--preview']) }))
+      return
+    }
+    if (transferring && contract) {
+      if (Object.keys(options).some(key => !['--config', '--profile', '--format', '--catalogue', '--body-file', '--preview', '--confirm', '--session', '--response-format', '--input-file', '--raw', '--expected-bytes', '--expected-sha256'].includes(key) && !key.startsWith('--api-'))) throw usage('Invalid transfer option.')
+      if (contract.policy.effect === 'read' && (options['--preview'] || options['--confirm'])) throw usage('Read transfers do not consume write confirmations.')
+      const transfer = await prepareTransfer(contract, values, { formatter: options['--response-format'] ?? '', raw: !!options['--raw'],
+        ...(options['--input-file'] ? { input: options['--input-file'] } : {}),
+        ...(options['--expected-bytes'] ? { expectedBytes: Number(options['--expected-bytes']) } : {}),
+        ...(options['--expected-sha256'] ? { expectedSha256: options['--expected-sha256'] } : {}) })
+      try {
+        if (!options['--preview']) byteDescriptor()
+        if (contract.policy.effect === 'read') {
+          buildPath(contract, values)
+          const version = await readVersion(credentials, buildPath(selectContract('GET', '/nodes/{node}/version', 'published-current'), { node: values.node }))
+          const selected = selectContract(contract.method, contract.path, version.version!.startsWith('8.') ? 'legacy-8.2.7' : 'published-current')
+          output({ transfer: (await transfer.execute(credentials, selected, values)).transfer })
+        } else output(await writeOperation(credentials, contract, values, { preview: !!options['--preview'],
+          ...(options['--confirm'] ? { confirmation: options['--confirm'] } : {}), transport: transfer }))
+      } finally { await transfer.close() }
+      return
+    }
     if (task && task !== 'cancel') {
       const waitMs = Number(options['--wait-ms'] ?? 5000)
       if (!Number.isSafeInteger(waitMs) || waitMs < 1 || waitMs > 30000) throw usage('Task wait must be 1-30000 ms.')

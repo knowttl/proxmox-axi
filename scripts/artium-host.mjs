@@ -44,6 +44,12 @@ const url = await app.listen({ host: '127.0.0.1', port: 0 })
 const actualNow = Date.now
 process.send({ event: 'ready', url, pid: process.pid, executable: toolPaths['proxmox-axi'], namespace: readlinkSync('/proc/self/ns/net') })
 process.on('message', async message => {
+  if (message && typeof message === 'object' && message.event === 'stream-limits') {
+    if (!Number.isSafeInteger(message.bytes) || message.bytes < 1) throw new Error('Invalid test transfer quota')
+    process.env.ARTIUM_PVE_TRANSFER_BYTES = String(message.bytes)
+    process.env.ARTIUM_PVE_DUPLEX_IDLE_MS = String(message.idleMs ?? 30000)
+    process.send({ event: 'stream-limits-changed' })
+  }
   if (message && typeof message === 'object' && message.event === 'clock') {
     Date.now = () => actualNow() + message.offset
     process.send({ event: 'clock-changed' })

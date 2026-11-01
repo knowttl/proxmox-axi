@@ -1550,8 +1550,7 @@
                 "delete": {
                   "type": "string",
                   "maxLength": 4096,
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*(?:[,; ][A-Za-z][A-Za-z0-9._-]*)*$"
                 },
                 "digest": {
                   "type": "string",
@@ -8597,8 +8596,7 @@
                 "delete": {
                   "type": "string",
                   "maxLength": 4096,
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*(?:[,; ][A-Za-z][A-Za-z0-9._-]*)*$"
                 },
                 "digest": {
                   "type": "string",
@@ -10114,8 +10112,7 @@
                 },
                 "delete": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*(?:[,; ][A-Za-z][A-Za-z0-9._-]*)*$"
                 },
                 "dow": {
                   "type": "string",
@@ -14162,8 +14159,7 @@
                 },
                 "delete": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*(?:[,; ][A-Za-z][A-Za-z0-9._-]*)*$"
                 },
                 "dest": {
                   "type": "string",
@@ -15485,8 +15481,7 @@
               "properties": {
                 "delete": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*(?:[,; ][A-Za-z][A-Za-z0-9._-]*)*$"
                 },
                 "digest": {
                   "type": "string",
@@ -16463,8 +16458,7 @@
                 },
                 "delete": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*(?:[,; ][A-Za-z][A-Za-z0-9._-]*)*$"
                 },
                 "dest": {
                   "type": "string",
@@ -17138,8 +17132,7 @@
                 "delete": {
                   "type": "string",
                   "maxLength": 4096,
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*(?:[,; ][A-Za-z][A-Za-z0-9._-]*)*$"
                 },
                 "digest": {
                   "type": "string",
@@ -17785,8 +17778,7 @@
                 "delete": {
                   "type": "string",
                   "maxLength": 4096,
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*(?:[,; ][A-Za-z][A-Za-z0-9._-]*)*$"
                 },
                 "digest": {
                   "type": "string",
@@ -18973,8 +18965,7 @@
                 "delete": {
                   "type": "string",
                   "maxLength": 4096,
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*(?:[,; ][A-Za-z][A-Za-z0-9._-]*)*$"
                 },
                 "enable-new": {
                   "type": "boolean"
@@ -19817,8 +19808,7 @@
                 "delete": {
                   "type": "string",
                   "maxLength": 4096,
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*(?:[,; ][A-Za-z][A-Za-z0-9._-]*)*$"
                 },
                 "description": {
                   "type": "string",
@@ -20466,8 +20456,7 @@
                 "delete": {
                   "type": "string",
                   "maxLength": 4096,
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*(?:[,; ][A-Za-z][A-Za-z0-9._-]*)*$"
                 },
                 "description": {
                   "type": "string",
@@ -21059,8 +21048,7 @@
                 "delete": {
                   "type": "string",
                   "maxLength": 4096,
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*(?:[,; ][A-Za-z][A-Za-z0-9._-]*)*$"
                 },
                 "description": {
                   "type": "string",
@@ -22014,8 +22002,7 @@
                 "delete": {
                   "type": "string",
                   "maxLength": 4096,
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*(?:[,; ][A-Za-z][A-Za-z0-9._-]*)*$"
                 },
                 "digest": {
                   "type": "string",
@@ -27168,8 +27155,7 @@
                 },
                 "delete": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*(?:[,; ][A-Za-z][A-Za-z0-9._-]*)*$"
                 },
                 "description": {
                   "type": "string",
@@ -27889,8 +27875,7 @@
                 "delete": {
                   "type": "string",
                   "maxLength": 4096,
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*(?:[,; ][A-Za-z][A-Za-z0-9._-]*)*$"
                 },
                 "digest": {
                   "type": "string",
@@ -29015,8 +29000,7 @@
                 "delete": {
                   "type": "string",
                   "maxLength": 4096,
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*(?:[,; ][A-Za-z][A-Za-z0-9._-]*)*$"
                 },
                 "digest": {
                   "type": "string",
@@ -29585,8 +29569,7 @@
                 "delete": {
                   "type": "string",
                   "maxLength": 4096,
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*(?:[,; ][A-Za-z][A-Za-z0-9._-]*)*$"
                 },
                 "digest": {
                   "type": "string",
@@ -30130,8 +30113,7 @@
                 "delete": {
                   "type": "string",
                   "maxLength": 4096,
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*(?:[,; ][A-Za-z][A-Za-z0-9._-]*)*$"
                 },
                 "digest": {
                   "type": "string",
@@ -30771,8 +30753,7 @@
                 "delete": {
                   "type": "string",
                   "maxLength": 4096,
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*(?:[,; ][A-Za-z][A-Za-z0-9._-]*)*$"
                 },
                 "digest": {
                   "type": "string",
@@ -31109,8 +31090,7 @@
               "properties": {
                 "delete": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*(?:[,; ][A-Za-z][A-Za-z0-9._-]*)*$"
                 },
                 "digest": {
                   "type": "string",
@@ -32008,8 +31988,7 @@
                 },
                 "delete": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*(?:[,; ][A-Za-z][A-Za-z0-9._-]*)*$"
                 },
                 "dest": {
                   "type": "string",
@@ -33072,8 +33051,7 @@
                 "delete": {
                   "type": "string",
                   "maxLength": 4096,
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*(?:[,; ][A-Za-z][A-Za-z0-9._-]*)*$"
                 },
                 "dhcp-dns-server": {
                   "type": "string",
@@ -34067,8 +34045,7 @@
                 "delete": {
                   "type": "string",
                   "maxLength": 4096,
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*(?:[,; ][A-Za-z][A-Za-z0-9._-]*)*$"
                 },
                 "dhcp": {
                   "enum": [
@@ -42267,8 +42244,7 @@
                 },
                 "delete": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*(?:[,; ][A-Za-z][A-Za-z0-9._-]*)*$"
                 },
                 "description": {
                   "type": "string",
@@ -45624,8 +45600,7 @@
               "properties": {
                 "delete": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*(?:[,; ][A-Za-z][A-Za-z0-9._-]*)*$"
                 },
                 "digest": {
                   "type": "string",
@@ -46637,8 +46612,7 @@
                 },
                 "delete": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*(?:[,; ][A-Za-z][A-Za-z0-9._-]*)*$"
                 },
                 "dest": {
                   "type": "string",
@@ -47618,12 +47592,32 @@
       "id": "OP-GET-3238bae721",
       "release": "legacy-8.2.7",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "read",
+        "transport": "managed",
+        "secrets": "none",
+        "reason": "S5 operation-specific formatter and bounded private byte transport; ordinary output contains completion metadata only.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Byte completion is distinct from provider task completion. Never repeat a partial transfer automatically."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/nodes/{node}",
+            [
+              "Sys.Syslog"
+            ]
+          ]
+        },
+        "response": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "source": "Pinned API catalogues and S5 transport contracts."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "get",
         "/nodes/{node}/journal"
@@ -50645,8 +50639,7 @@
                 },
                 "delete": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*(?:[,; ][A-Za-z][A-Za-z0-9._-]*)*$"
                 },
                 "description": {
                   "type": "string",
@@ -50736,8 +50729,7 @@
                 },
                 "revert": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*(?:[,; ][A-Za-z][A-Za-z0-9._-]*)*$"
                 },
                 "rootfs": {
                   "type": "string",
@@ -53272,8 +53264,7 @@
               "properties": {
                 "delete": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*(?:[,; ][A-Za-z][A-Za-z0-9._-]*)*$"
                 },
                 "dhcp": {
                   "type": "boolean"
@@ -54441,8 +54432,7 @@
                 },
                 "delete": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*(?:[,; ][A-Za-z][A-Za-z0-9._-]*)*$"
                 },
                 "dest": {
                   "type": "string",
@@ -58460,12 +58450,34 @@
       "id": "OP-GET-0c48ad8fae",
       "release": "legacy-8.2.7",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "read",
+        "transport": "managed",
+        "secrets": "none",
+        "reason": "S5 operation-specific formatter and bounded private byte transport; ordinary output contains completion metadata only.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Byte completion is distinct from provider task completion. Never repeat a partial transfer automatically."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/vms/{vmid}",
+            [
+              "VM.Audit"
+            ]
+          ]
+        },
+        "response": {
+          "properties": {
+            "filename": {
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
+        "source": "Pinned API catalogues and S5 transport contracts."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "get",
         "/nodes/{node}/lxc/{vmid}/rrd"
@@ -58491,8 +58503,7 @@
                 },
                 "ds": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*(?:[,; ][A-Za-z][A-Za-z0-9._-]*)*$"
                 },
                 "node": {
                   "type": "string",
@@ -59581,12 +59592,47 @@
       "id": "OP-POST-9a334b54b5",
       "release": "legacy-8.2.7",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "write",
+        "transport": "managed",
+        "secrets": "private-result",
+        "reason": "S5 operation-specific formatter and bounded private byte transport; ordinary output contains completion metadata only.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Byte completion is distinct from provider task completion. Never repeat a partial transfer automatically."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/vms/{vmid}",
+            [
+              "VM.Console"
+            ]
+          ]
+        },
+        "response": {
+          "additionalProperties": 1,
+          "description": "Returned values can be directly passed to the 'remote-viewer' application.",
+          "properties": {
+            "host": {
+              "type": "string"
+            },
+            "password": {
+              "type": "string"
+            },
+            "proxy": {
+              "type": "string"
+            },
+            "tls-port": {
+              "type": "integer"
+            },
+            "type": {
+              "type": "string"
+            }
+          }
+        },
+        "source": "Pinned API catalogues and S5 transport contracts."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "post",
         "/nodes/{node}/lxc/{vmid}/spiceproxy"
@@ -63193,8 +63239,7 @@
                 },
                 "delete": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*(?:[,; ][A-Za-z][A-Za-z0-9._-]*)*$"
                 },
                 "gateway": {
                   "type": "string",
@@ -67407,12 +67452,41 @@
       "id": "OP-GET-4787b8f484",
       "release": "legacy-8.2.7",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "read",
+        "transport": "managed",
+        "secrets": "none",
+        "reason": "S5 operation-specific formatter and bounded private byte transport; ordinary output contains completion metadata only.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Byte completion is distinct from provider task completion. Never repeat a partial transfer automatically."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/vms/{vmid}",
+            [
+              "VM.Monitor"
+            ]
+          ]
+        },
+        "response": {
+          "description": "Returns an object with a `content` property.",
+          "properties": {
+            "content": {
+              "description": "The content of the file, maximum 16777216",
+              "type": "string"
+            },
+            "truncated": {
+              "description": "If set to 1, the output is truncated and not complete",
+              "optional": 1,
+              "type": "boolean"
+            }
+          },
+          "type": "object"
+        },
+        "source": "Pinned API catalogues and S5 transport contracts."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "get",
         "/nodes/{node}/qemu/{vmid}/agent/file-read"
@@ -75378,8 +75452,7 @@
                 },
                 "delete": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*(?:[,; ][A-Za-z][A-Za-z0-9._-]*)*$"
                 },
                 "description": {
                   "type": "string",
@@ -75568,8 +75641,7 @@
                 },
                 "revert": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*(?:[,; ][A-Za-z][A-Za-z0-9._-]*)*$"
                 },
                 "rng0": {
                   "type": "string",
@@ -78450,8 +78522,7 @@
                 },
                 "delete": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*(?:[,; ][A-Za-z][A-Za-z0-9._-]*)*$"
                 },
                 "description": {
                   "type": "string",
@@ -78636,8 +78707,7 @@
                 },
                 "revert": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*(?:[,; ][A-Za-z][A-Za-z0-9._-]*)*$"
                 },
                 "rng0": {
                   "type": "string",
@@ -81268,8 +81338,7 @@
               "properties": {
                 "delete": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*(?:[,; ][A-Za-z][A-Za-z0-9._-]*)*$"
                 },
                 "dhcp": {
                   "type": "boolean"
@@ -82437,8 +82506,7 @@
                 },
                 "delete": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*(?:[,; ][A-Za-z][A-Za-z0-9._-]*)*$"
                 },
                 "dest": {
                   "type": "string",
@@ -85441,12 +85509,34 @@
       "id": "OP-GET-b162eec9bd",
       "release": "legacy-8.2.7",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "read",
+        "transport": "managed",
+        "secrets": "none",
+        "reason": "S5 operation-specific formatter and bounded private byte transport; ordinary output contains completion metadata only.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Byte completion is distinct from provider task completion. Never repeat a partial transfer automatically."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/vms/{vmid}",
+            [
+              "VM.Audit"
+            ]
+          ]
+        },
+        "response": {
+          "properties": {
+            "filename": {
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
+        "source": "Pinned API catalogues and S5 transport contracts."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "get",
         "/nodes/{node}/qemu/{vmid}/rrd"
@@ -85472,8 +85562,7 @@
                 },
                 "ds": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*(?:[,; ][A-Za-z][A-Za-z0-9._-]*)*$"
                 },
                 "node": {
                   "type": "string",
@@ -86691,12 +86780,47 @@
       "id": "OP-POST-6807588e8e",
       "release": "legacy-8.2.7",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "write",
+        "transport": "managed",
+        "secrets": "private-result",
+        "reason": "S5 operation-specific formatter and bounded private byte transport; ordinary output contains completion metadata only.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Byte completion is distinct from provider task completion. Never repeat a partial transfer automatically."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/vms/{vmid}",
+            [
+              "VM.Console"
+            ]
+          ]
+        },
+        "response": {
+          "additionalProperties": 1,
+          "description": "Returned values can be directly passed to the 'remote-viewer' application.",
+          "properties": {
+            "host": {
+              "type": "string"
+            },
+            "password": {
+              "type": "string"
+            },
+            "proxy": {
+              "type": "string"
+            },
+            "tls-port": {
+              "type": "integer"
+            },
+            "type": {
+              "type": "string"
+            }
+          }
+        },
+        "source": "Pinned API catalogues and S5 transport contracts."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "post",
         "/nodes/{node}/qemu/{vmid}/spiceproxy"
@@ -88742,8 +88866,7 @@
                 },
                 "idlist": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*(?:[,; ][A-Za-z][A-Za-z0-9._-]*)*$"
                 },
                 "node": {
                   "type": "string",
@@ -89868,12 +89991,34 @@
       "id": "OP-GET-a61f685df2",
       "release": "legacy-8.2.7",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "read",
+        "transport": "managed",
+        "secrets": "none",
+        "reason": "S5 operation-specific formatter and bounded private byte transport; ordinary output contains completion metadata only.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Byte completion is distinct from provider task completion. Never repeat a partial transfer automatically."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/nodes/{node}",
+            [
+              "Sys.Audit"
+            ]
+          ]
+        },
+        "response": {
+          "properties": {
+            "filename": {
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
+        "source": "Pinned API catalogues and S5 transport contracts."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "get",
         "/nodes/{node}/rrd"
@@ -89899,8 +90044,7 @@
                 },
                 "ds": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*(?:[,; ][A-Za-z][A-Za-z0-9._-]*)*$"
                 },
                 "node": {
                   "type": "string",
@@ -92549,12 +92693,50 @@
       "id": "OP-POST-3764420a92",
       "release": "legacy-8.2.7",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "write",
+        "transport": "managed",
+        "secrets": "private-result",
+        "reason": "S5 operation-specific formatter and bounded private byte transport; ordinary output contains completion metadata only.",
+        "allowedInputs": [
+          "node"
+        ],
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Byte completion is distinct from provider task completion. Never repeat a partial transfer automatically."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/nodes/{node}",
+            [
+              "Sys.Console"
+            ]
+          ]
+        },
+        "response": {
+          "additionalProperties": 1,
+          "description": "Returned values can be directly passed to the 'remote-viewer' application.",
+          "properties": {
+            "host": {
+              "type": "string"
+            },
+            "password": {
+              "type": "string"
+            },
+            "proxy": {
+              "type": "string"
+            },
+            "tls-port": {
+              "type": "integer"
+            },
+            "type": {
+              "type": "string"
+            }
+          }
+        },
+        "source": "Pinned API catalogues and S5 transport contracts."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "post",
         "/nodes/{node}/spiceshell"
@@ -93595,8 +93777,7 @@
               "properties": {
                 "content": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^(?:images|rootdir|vztmpl|backup|iso|snippets|import)$"
                 },
                 "node": {
                   "type": "string",
@@ -94379,12 +94560,61 @@
       "id": "OP-POST-316cd87900",
       "release": "legacy-8.2.7",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "write",
+        "transport": "json",
+        "secrets": "none",
+        "allowedInputs": [
+          "node",
+          "storage",
+          "content",
+          "filename",
+          "url",
+          "checksum",
+          "checksum-algorithm",
+          "verify-certificates"
+        ],
+        "reason": "Confirmed provider-side download from the selected approved HTTPS origin; compression and disabled trust are refused.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Follow the accepted UPID; never repeat a provider-side download after a lost response."
+        },
+        "privileges": {
+          "check": [
+            "and",
+            [
+              "perm",
+              "/storage/{storage}",
+              [
+                "Datastore.AllocateTemplate"
+              ]
+            ],
+            [
+              "or",
+              [
+                "perm",
+                "/",
+                [
+                  "Sys.Audit",
+                  "Sys.Modify"
+                ]
+              ],
+              [
+                "perm",
+                "/nodes/{node}",
+                [
+                  "Sys.AccessNetwork"
+                ]
+              ]
+            ]
+          ],
+          "description": "Requires allocation access on the storage and as this allows one to probe the (local!) host network indirectly it also requires one of Sys.Modify on / (for backwards compatibility) or the newer Sys.AccessNetwork privilege on the node."
+        },
+        "response": {
+          "type": "string"
+        },
+        "source": "Pinned storage download-url schema and S5 reviewed target restrictions."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "post",
         "/nodes/{node}/storage/{storage}/download-url"
@@ -94427,8 +94657,7 @@
                     "import"
                   ],
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^(?:images|rootdir|vztmpl|backup|iso|snippets|import)$"
                 },
                 "filename": {
                   "type": "string",
@@ -94536,12 +94765,24 @@
       "id": "OP-GET-61a01a43a5",
       "release": "legacy-8.2.7",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "read",
+        "transport": "managed",
+        "secrets": "none",
+        "reason": "S5 operation-specific formatter and bounded private byte transport; ordinary output contains completion metadata only.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Byte completion is distinct from provider task completion. Never repeat a partial transfer automatically."
+        },
+        "privileges": {
+          "description": "You need read access for the volume.",
+          "user": "all"
+        },
+        "response": {
+          "type": "any"
+        },
+        "source": "Pinned API catalogues and S5 transport contracts."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "get",
         "/nodes/{node}/storage/{storage}/file-restore/download"
@@ -95284,12 +95525,37 @@
       "id": "OP-GET-8fd6ccab3f",
       "release": "legacy-8.2.7",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "read",
+        "transport": "managed",
+        "secrets": "none",
+        "reason": "S5 operation-specific formatter and bounded private byte transport; ordinary output contains completion metadata only.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Byte completion is distinct from provider task completion. Never repeat a partial transfer automatically."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/storage/{storage}",
+            [
+              "Datastore.Audit",
+              "Datastore.AllocateSpace"
+            ],
+            "any",
+            1
+          ]
+        },
+        "response": {
+          "properties": {
+            "filename": {
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
+        "source": "Pinned API catalogues and S5 transport contracts."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "get",
         "/nodes/{node}/storage/{storage}/rrd"
@@ -95315,8 +95581,7 @@
                 },
                 "ds": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*(?:[,; ][A-Za-z][A-Za-z0-9._-]*)*$"
                 },
                 "node": {
                   "type": "string",
@@ -95680,12 +95945,37 @@
       "id": "OP-POST-c70b1f8290",
       "release": "legacy-8.2.7",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "write",
+        "transport": "managed",
+        "secrets": "none",
+        "reason": "S5 operation-specific formatter and bounded private byte transport; ordinary output contains completion metadata only.",
+        "allowedInputs": [
+          "node",
+          "storage",
+          "filename",
+          "content",
+          "checksum",
+          "checksum-algorithm"
+        ],
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Byte completion is distinct from provider task completion. Never repeat a partial transfer automatically."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/storage/{storage}",
+            [
+              "Datastore.AllocateTemplate"
+            ]
+          ]
+        },
+        "response": {
+          "type": "string"
+        },
+        "source": "Pinned API catalogues and S5 transport contracts."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "post",
         "/nodes/{node}/storage/{storage}/upload"
@@ -95723,8 +96013,7 @@
                     "import"
                   ],
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^(?:images|rootdir|vztmpl|backup|iso|snippets|import)$"
                 },
                 "filename": {
                   "type": "string",
@@ -97652,12 +97941,51 @@
       "id": "OP-POST-9db93dca1d",
       "release": "legacy-8.2.7",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "write",
+        "transport": "json",
+        "secrets": "private-result",
+        "allowedInputs": [
+          "node",
+          "websocket"
+        ],
+        "sensitiveInputs": [],
+        "reason": "Explicitly authorized credential and sensitive-input operation; shared preview and confirmation controls apply, including effectful scans.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Never recreate a one-time credential to determine delivery or outcome."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/nodes/{node}",
+            [
+              "Sys.Console"
+            ]
+          ]
+        },
+        "response": {
+          "additionalProperties": 0,
+          "properties": {
+            "cert": {
+              "type": "string"
+            },
+            "port": {
+              "type": "integer"
+            },
+            "ticket": {
+              "type": "string"
+            },
+            "upid": {
+              "type": "string"
+            },
+            "user": {
+              "type": "string"
+            }
+          }
+        },
+        "source": "Retained versioned API schema and S4 protected credential contract."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "post",
         "/nodes/{node}/vncshell"
@@ -101386,8 +101714,7 @@
                 "delete": {
                   "type": "string",
                   "maxLength": 4096,
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*(?:[,; ][A-Za-z][A-Za-z0-9._-]*)*$"
                 },
                 "digest": {
                   "type": "string",
@@ -103226,8 +103553,7 @@
                 "delete": {
                   "type": "string",
                   "maxLength": 4096,
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*(?:[,; ][A-Za-z][A-Za-z0-9._-]*)*$"
                 },
                 "digest": {
                   "type": "string",
@@ -108207,8 +108533,7 @@
                 },
                 "delete": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*(?:[,; ][A-Za-z][A-Za-z0-9._-]*)*$"
                 },
                 "expire": {
                   "type": "integer",
@@ -110903,8 +111228,7 @@
                 "delete": {
                   "type": "string",
                   "maxLength": 4096,
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*(?:[,; ][A-Za-z][A-Za-z0-9._-]*)*$"
                 },
                 "digest": {
                   "type": "string",
@@ -113012,8 +113336,7 @@
                 },
                 "delete": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*(?:[,; ][A-Za-z][A-Za-z0-9._-]*)*$"
                 },
                 "dow": {
                   "type": "string",
@@ -118210,8 +118533,7 @@
                 },
                 "delete": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*(?:[,; ][A-Za-z][A-Za-z0-9._-]*)*$"
                 },
                 "dest": {
                   "type": "string",
@@ -119544,8 +119866,7 @@
               "properties": {
                 "delete": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*(?:[,; ][A-Za-z][A-Za-z0-9._-]*)*$"
                 },
                 "digest": {
                   "type": "string",
@@ -120627,8 +120948,7 @@
                 },
                 "delete": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*(?:[,; ][A-Za-z][A-Za-z0-9._-]*)*$"
                 },
                 "dest": {
                   "type": "string",
@@ -121302,8 +121622,7 @@
                 "delete": {
                   "type": "string",
                   "maxLength": 4096,
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*(?:[,; ][A-Za-z][A-Za-z0-9._-]*)*$"
                 },
                 "digest": {
                   "type": "string",
@@ -122008,8 +122327,7 @@
                 "delete": {
                   "type": "string",
                   "maxLength": 4096,
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*(?:[,; ][A-Za-z][A-Za-z0-9._-]*)*$"
                 },
                 "digest": {
                   "type": "string",
@@ -124119,8 +124437,7 @@
                 "delete": {
                   "type": "string",
                   "maxLength": 4096,
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*(?:[,; ][A-Za-z][A-Za-z0-9._-]*)*$"
                 },
                 "enable-new": {
                   "type": "boolean"
@@ -124964,8 +125281,7 @@
                 "delete": {
                   "type": "string",
                   "maxLength": 4096,
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*(?:[,; ][A-Za-z][A-Za-z0-9._-]*)*$"
                 },
                 "description": {
                   "type": "string",
@@ -125613,8 +125929,7 @@
                 "delete": {
                   "type": "string",
                   "maxLength": 4096,
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*(?:[,; ][A-Za-z][A-Za-z0-9._-]*)*$"
                 },
                 "description": {
                   "type": "string",
@@ -126206,8 +126521,7 @@
                 "delete": {
                   "type": "string",
                   "maxLength": 4096,
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*(?:[,; ][A-Za-z][A-Za-z0-9._-]*)*$"
                 },
                 "description": {
                   "type": "string",
@@ -127340,8 +127654,7 @@
                 "delete": {
                   "type": "string",
                   "maxLength": 4096,
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*(?:[,; ][A-Za-z][A-Za-z0-9._-]*)*$"
                 },
                 "digest": {
                   "type": "string",
@@ -133135,8 +133448,7 @@
                 },
                 "delete": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*(?:[,; ][A-Za-z][A-Za-z0-9._-]*)*$"
                 },
                 "description": {
                   "type": "string",
@@ -134748,8 +135060,7 @@
                 },
                 "delete": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*(?:[,; ][A-Za-z][A-Za-z0-9._-]*)*$"
                 },
                 "digest": {
                   "type": "string",
@@ -135607,8 +135918,7 @@
                 "delete": {
                   "type": "string",
                   "maxLength": 4096,
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*(?:[,; ][A-Za-z][A-Za-z0-9._-]*)*$"
                 },
                 "digest": {
                   "type": "string",
@@ -137347,8 +137657,7 @@
                 "delete": {
                   "type": "string",
                   "maxLength": 4096,
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*(?:[,; ][A-Za-z][A-Za-z0-9._-]*)*$"
                 },
                 "digest": {
                   "type": "string",
@@ -137971,8 +138280,7 @@
                 "delete": {
                   "type": "string",
                   "maxLength": 4096,
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*(?:[,; ][A-Za-z][A-Za-z0-9._-]*)*$"
                 },
                 "digest": {
                   "type": "string",
@@ -142510,8 +142818,7 @@
                 "delete": {
                   "type": "string",
                   "maxLength": 4096,
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*(?:[,; ][A-Za-z][A-Za-z0-9._-]*)*$"
                 },
                 "digest": {
                   "type": "string",
@@ -146185,8 +146492,7 @@
                 "delete": {
                   "type": "string",
                   "maxLength": 4096,
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*(?:[,; ][A-Za-z][A-Za-z0-9._-]*)*$"
                 },
                 "digest": {
                   "type": "string",
@@ -146534,8 +146840,7 @@
               "properties": {
                 "delete": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*(?:[,; ][A-Za-z][A-Za-z0-9._-]*)*$"
                 },
                 "digest": {
                   "type": "string",
@@ -147543,8 +147848,7 @@
                 },
                 "delete": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*(?:[,; ][A-Za-z][A-Za-z0-9._-]*)*$"
                 },
                 "dest": {
                   "type": "string",
@@ -148650,8 +148954,7 @@
                 "delete": {
                   "type": "string",
                   "maxLength": 4096,
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*(?:[,; ][A-Za-z][A-Za-z0-9._-]*)*$"
                 },
                 "dhcp-dns-server": {
                   "type": "string",
@@ -150340,8 +150643,7 @@
                 "delete": {
                   "type": "string",
                   "maxLength": 4096,
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*(?:[,; ][A-Za-z][A-Za-z0-9._-]*)*$"
                 },
                 "dhcp": {
                   "enum": [
@@ -159492,8 +159794,7 @@
                 },
                 "delete": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*(?:[,; ][A-Za-z][A-Za-z0-9._-]*)*$"
                 },
                 "description": {
                   "type": "string",
@@ -162856,8 +163157,7 @@
               "properties": {
                 "delete": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*(?:[,; ][A-Za-z][A-Za-z0-9._-]*)*$"
                 },
                 "digest": {
                   "type": "string",
@@ -163969,8 +164269,7 @@
                 },
                 "delete": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*(?:[,; ][A-Za-z][A-Za-z0-9._-]*)*$"
                 },
                 "dest": {
                   "type": "string",
@@ -164998,12 +165297,32 @@
       "id": "OP-GET-3238bae721",
       "release": "published-current",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "read",
+        "transport": "managed",
+        "secrets": "none",
+        "reason": "S5 operation-specific formatter and bounded private byte transport; ordinary output contains completion metadata only.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Byte completion is distinct from provider task completion. Never repeat a partial transfer automatically."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/nodes/{node}",
+            [
+              "Sys.Syslog"
+            ]
+          ]
+        },
+        "response": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "source": "Pinned API catalogues and S5 transport contracts."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "get",
         "/nodes/{node}/journal"
@@ -168219,8 +168538,7 @@
                 },
                 "delete": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*(?:[,; ][A-Za-z][A-Za-z0-9._-]*)*$"
                 },
                 "description": {
                   "type": "string",
@@ -168320,8 +168638,7 @@
                 },
                 "revert": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*(?:[,; ][A-Za-z][A-Za-z0-9._-]*)*$"
                 },
                 "rootfs": {
                   "type": "string",
@@ -170871,8 +171188,7 @@
               "properties": {
                 "delete": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*(?:[,; ][A-Za-z][A-Za-z0-9._-]*)*$"
                 },
                 "dhcp": {
                   "type": "boolean"
@@ -172140,8 +172456,7 @@
                 },
                 "delete": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*(?:[,; ][A-Za-z][A-Za-z0-9._-]*)*$"
                 },
                 "dest": {
                   "type": "string",
@@ -176321,12 +176636,34 @@
       "id": "OP-GET-0c48ad8fae",
       "release": "published-current",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "read",
+        "transport": "managed",
+        "secrets": "none",
+        "reason": "S5 operation-specific formatter and bounded private byte transport; ordinary output contains completion metadata only.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Byte completion is distinct from provider task completion. Never repeat a partial transfer automatically."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/vms/{vmid}",
+            [
+              "VM.Audit"
+            ]
+          ]
+        },
+        "response": {
+          "properties": {
+            "filename": {
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
+        "source": "Pinned API catalogues and S5 transport contracts."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "get",
         "/nodes/{node}/lxc/{vmid}/rrd"
@@ -176352,8 +176689,7 @@
                 },
                 "ds": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*(?:[,; ][A-Za-z][A-Za-z0-9._-]*)*$"
                 },
                 "node": {
                   "type": "string",
@@ -177442,12 +177778,47 @@
       "id": "OP-POST-9a334b54b5",
       "release": "published-current",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "write",
+        "transport": "managed",
+        "secrets": "private-result",
+        "reason": "S5 operation-specific formatter and bounded private byte transport; ordinary output contains completion metadata only.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Byte completion is distinct from provider task completion. Never repeat a partial transfer automatically."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/vms/{vmid}",
+            [
+              "VM.Console"
+            ]
+          ]
+        },
+        "response": {
+          "additionalProperties": 1,
+          "description": "Returned values can be directly passed to the 'remote-viewer' application.",
+          "properties": {
+            "host": {
+              "type": "string"
+            },
+            "password": {
+              "type": "string"
+            },
+            "proxy": {
+              "type": "string"
+            },
+            "tls-port": {
+              "type": "integer"
+            },
+            "type": {
+              "type": "string"
+            }
+          }
+        },
+        "source": "Pinned API catalogues and S5 transport contracts."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "post",
         "/nodes/{node}/lxc/{vmid}/spiceproxy"
@@ -181122,8 +181493,7 @@
                 },
                 "delete": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*(?:[,; ][A-Za-z][A-Za-z0-9._-]*)*$"
                 },
                 "gateway": {
                   "type": "string",
@@ -185378,12 +185748,44 @@
       "id": "OP-GET-4787b8f484",
       "release": "published-current",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "read",
+        "transport": "managed",
+        "secrets": "none",
+        "reason": "S5 operation-specific formatter and bounded private byte transport; ordinary output contains completion metadata only.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Byte completion is distinct from provider task completion. Never repeat a partial transfer automatically."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/vms/{vmid}",
+            [
+              "VM.GuestAgent.FileRead",
+              "VM.GuestAgent.Unrestricted"
+            ],
+            "any",
+            1
+          ]
+        },
+        "response": {
+          "description": "Returns an object with a `content` property.",
+          "properties": {
+            "content": {
+              "description": "The content of the file, maximum 16777216",
+              "type": "string"
+            },
+            "truncated": {
+              "description": "If set to 1, the read did not reach the end of the file.",
+              "optional": 1,
+              "type": "boolean"
+            }
+          },
+          "type": "object"
+        },
+        "source": "Pinned API catalogues and S5 transport contracts."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "get",
         "/nodes/{node}/qemu/{vmid}/agent/file-read"
@@ -193436,8 +193838,7 @@
                 },
                 "delete": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*(?:[,; ][A-Za-z][A-Za-z0-9._-]*)*$"
                 },
                 "description": {
                   "type": "string",
@@ -193631,8 +194032,7 @@
                 },
                 "revert": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*(?:[,; ][A-Za-z][A-Za-z0-9._-]*)*$"
                 },
                 "rng0": {
                   "type": "string",
@@ -196474,8 +196874,7 @@
                 },
                 "delete": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*(?:[,; ][A-Za-z][A-Za-z0-9._-]*)*$"
                 },
                 "description": {
                   "type": "string",
@@ -196665,8 +197064,7 @@
                 },
                 "revert": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*(?:[,; ][A-Za-z][A-Za-z0-9._-]*)*$"
                 },
                 "rng0": {
                   "type": "string",
@@ -199426,8 +199824,7 @@
               "properties": {
                 "delete": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*(?:[,; ][A-Za-z][A-Za-z0-9._-]*)*$"
                 },
                 "dhcp": {
                   "type": "boolean"
@@ -200695,8 +201092,7 @@
                 },
                 "delete": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*(?:[,; ][A-Za-z][A-Za-z0-9._-]*)*$"
                 },
                 "dest": {
                   "type": "string",
@@ -203748,12 +204144,34 @@
       "id": "OP-GET-b162eec9bd",
       "release": "published-current",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "read",
+        "transport": "managed",
+        "secrets": "none",
+        "reason": "S5 operation-specific formatter and bounded private byte transport; ordinary output contains completion metadata only.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Byte completion is distinct from provider task completion. Never repeat a partial transfer automatically."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/vms/{vmid}",
+            [
+              "VM.Audit"
+            ]
+          ]
+        },
+        "response": {
+          "properties": {
+            "filename": {
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
+        "source": "Pinned API catalogues and S5 transport contracts."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "get",
         "/nodes/{node}/qemu/{vmid}/rrd"
@@ -203779,8 +204197,7 @@
                 },
                 "ds": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*(?:[,; ][A-Za-z][A-Za-z0-9._-]*)*$"
                 },
                 "node": {
                   "type": "string",
@@ -204998,12 +205415,47 @@
       "id": "OP-POST-6807588e8e",
       "release": "published-current",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "write",
+        "transport": "managed",
+        "secrets": "private-result",
+        "reason": "S5 operation-specific formatter and bounded private byte transport; ordinary output contains completion metadata only.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Byte completion is distinct from provider task completion. Never repeat a partial transfer automatically."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/vms/{vmid}",
+            [
+              "VM.Console"
+            ]
+          ]
+        },
+        "response": {
+          "additionalProperties": 1,
+          "description": "Returned values can be directly passed to the 'remote-viewer' application.",
+          "properties": {
+            "host": {
+              "type": "string"
+            },
+            "password": {
+              "type": "string"
+            },
+            "proxy": {
+              "type": "string"
+            },
+            "tls-port": {
+              "type": "integer"
+            },
+            "type": {
+              "type": "string"
+            }
+          }
+        },
+        "source": "Pinned API catalogues and S5 transport contracts."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "post",
         "/nodes/{node}/qemu/{vmid}/spiceproxy"
@@ -207114,8 +207566,7 @@
                 },
                 "idlist": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*(?:[,; ][A-Za-z][A-Za-z0-9._-]*)*$"
                 },
                 "node": {
                   "type": "string",
@@ -208332,12 +208783,34 @@
       "id": "OP-GET-a61f685df2",
       "release": "published-current",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "read",
+        "transport": "managed",
+        "secrets": "none",
+        "reason": "S5 operation-specific formatter and bounded private byte transport; ordinary output contains completion metadata only.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Byte completion is distinct from provider task completion. Never repeat a partial transfer automatically."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/nodes/{node}",
+            [
+              "Sys.Audit"
+            ]
+          ]
+        },
+        "response": {
+          "properties": {
+            "filename": {
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
+        "source": "Pinned API catalogues and S5 transport contracts."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "get",
         "/nodes/{node}/rrd"
@@ -208363,8 +208836,7 @@
                 },
                 "ds": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*(?:[,; ][A-Za-z][A-Za-z0-9._-]*)*$"
                 },
                 "node": {
                   "type": "string",
@@ -212067,12 +212539,50 @@
       "id": "OP-POST-3764420a92",
       "release": "published-current",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "write",
+        "transport": "managed",
+        "secrets": "private-result",
+        "reason": "S5 operation-specific formatter and bounded private byte transport; ordinary output contains completion metadata only.",
+        "allowedInputs": [
+          "node"
+        ],
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Byte completion is distinct from provider task completion. Never repeat a partial transfer automatically."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/nodes/{node}",
+            [
+              "Sys.Console"
+            ]
+          ]
+        },
+        "response": {
+          "additionalProperties": 1,
+          "description": "Returned values can be directly passed to the 'remote-viewer' application.",
+          "properties": {
+            "host": {
+              "type": "string"
+            },
+            "password": {
+              "type": "string"
+            },
+            "proxy": {
+              "type": "string"
+            },
+            "tls-port": {
+              "type": "integer"
+            },
+            "type": {
+              "type": "string"
+            }
+          }
+        },
+        "source": "Pinned API catalogues and S5 transport contracts."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "post",
         "/nodes/{node}/spiceshell"
@@ -213185,8 +213695,7 @@
               "properties": {
                 "content": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^(?:images|rootdir|vztmpl|backup|iso|snippets|import)$"
                 },
                 "node": {
                   "type": "string",
@@ -213969,12 +214478,61 @@
       "id": "OP-POST-316cd87900",
       "release": "published-current",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "write",
+        "transport": "json",
+        "secrets": "none",
+        "allowedInputs": [
+          "node",
+          "storage",
+          "content",
+          "filename",
+          "url",
+          "checksum",
+          "checksum-algorithm",
+          "verify-certificates"
+        ],
+        "reason": "Confirmed provider-side download from the selected approved HTTPS origin; compression and disabled trust are refused.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Follow the accepted UPID; never repeat a provider-side download after a lost response."
+        },
+        "privileges": {
+          "check": [
+            "and",
+            [
+              "perm",
+              "/storage/{storage}",
+              [
+                "Datastore.AllocateTemplate"
+              ]
+            ],
+            [
+              "or",
+              [
+                "perm",
+                "/",
+                [
+                  "Sys.Audit",
+                  "Sys.Modify"
+                ]
+              ],
+              [
+                "perm",
+                "/nodes/{node}",
+                [
+                  "Sys.AccessNetwork"
+                ]
+              ]
+            ]
+          ],
+          "description": "Requires allocation access on the storage and as this allows one to probe the (local!) host network indirectly it also requires one of Sys.Modify on / (for backwards compatibility) or the newer Sys.AccessNetwork privilege on the node."
+        },
+        "response": {
+          "type": "string"
+        },
+        "source": "Pinned storage download-url schema and S5 reviewed target restrictions."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "post",
         "/nodes/{node}/storage/{storage}/download-url"
@@ -214017,8 +214575,7 @@
                     "import"
                   ],
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^(?:images|rootdir|vztmpl|backup|iso|snippets|import)$"
                 },
                 "filename": {
                   "type": "string",
@@ -214126,12 +214683,24 @@
       "id": "OP-GET-61a01a43a5",
       "release": "published-current",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "read",
+        "transport": "managed",
+        "secrets": "none",
+        "reason": "S5 operation-specific formatter and bounded private byte transport; ordinary output contains completion metadata only.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Byte completion is distinct from provider task completion. Never repeat a partial transfer automatically."
+        },
+        "privileges": {
+          "description": "You need read access for the volume.",
+          "user": "all"
+        },
+        "response": {
+          "type": "any"
+        },
+        "source": "Pinned API catalogues and S5 transport contracts."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "get",
         "/nodes/{node}/storage/{storage}/file-restore/download"
@@ -215125,12 +215694,37 @@
       "id": "OP-GET-8fd6ccab3f",
       "release": "published-current",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "read",
+        "transport": "managed",
+        "secrets": "none",
+        "reason": "S5 operation-specific formatter and bounded private byte transport; ordinary output contains completion metadata only.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Byte completion is distinct from provider task completion. Never repeat a partial transfer automatically."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/storage/{storage}",
+            [
+              "Datastore.Audit",
+              "Datastore.AllocateSpace"
+            ],
+            "any",
+            1
+          ]
+        },
+        "response": {
+          "properties": {
+            "filename": {
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
+        "source": "Pinned API catalogues and S5 transport contracts."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "get",
         "/nodes/{node}/storage/{storage}/rrd"
@@ -215156,8 +215750,7 @@
                 },
                 "ds": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*(?:[,; ][A-Za-z][A-Za-z0-9._-]*)*$"
                 },
                 "node": {
                   "type": "string",
@@ -215565,12 +216158,37 @@
       "id": "OP-POST-c70b1f8290",
       "release": "published-current",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "write",
+        "transport": "managed",
+        "secrets": "none",
+        "reason": "S5 operation-specific formatter and bounded private byte transport; ordinary output contains completion metadata only.",
+        "allowedInputs": [
+          "node",
+          "storage",
+          "filename",
+          "content",
+          "checksum",
+          "checksum-algorithm"
+        ],
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Byte completion is distinct from provider task completion. Never repeat a partial transfer automatically."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/storage/{storage}",
+            [
+              "Datastore.AllocateTemplate"
+            ]
+          ]
+        },
+        "response": {
+          "type": "string"
+        },
+        "source": "Pinned API catalogues and S5 transport contracts."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "post",
         "/nodes/{node}/storage/{storage}/upload"
@@ -215608,8 +216226,7 @@
                     "import"
                   ],
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^(?:images|rootdir|vztmpl|backup|iso|snippets|import)$"
                 },
                 "filename": {
                   "type": "string",
@@ -217565,12 +218182,56 @@
       "id": "OP-POST-9db93dca1d",
       "release": "published-current",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "write",
+        "transport": "json",
+        "secrets": "private-result",
+        "allowedInputs": [
+          "node",
+          "websocket"
+        ],
+        "sensitiveInputs": [],
+        "reason": "Explicitly authorized credential and sensitive-input operation; shared preview and confirmation controls apply, including effectful scans.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Never recreate a one-time credential to determine delivery or outcome."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/nodes/{node}",
+            [
+              "Sys.Console"
+            ]
+          ]
+        },
+        "response": {
+          "additionalProperties": 0,
+          "properties": {
+            "cert": {
+              "type": "string"
+            },
+            "password": {
+              "description": "Password used for authentication within the VNC protocol. Consists of printable ASCII characters ('!' .. '~').",
+              "optional": 1,
+              "type": "string"
+            },
+            "port": {
+              "type": "integer"
+            },
+            "ticket": {
+              "type": "string"
+            },
+            "upid": {
+              "type": "string"
+            },
+            "user": {
+              "type": "string"
+            }
+          }
+        },
+        "source": "Retained versioned API schema and S4 protected credential contract."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "post",
         "/nodes/{node}/vncshell"
@@ -221233,8 +221894,7 @@
                 "delete": {
                   "type": "string",
                   "maxLength": 4096,
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*(?:[,; ][A-Za-z][A-Za-z0-9._-]*)*$"
                 },
                 "digest": {
                   "type": "string",

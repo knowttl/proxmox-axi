@@ -51,7 +51,7 @@ const keys = new Set(catalogues.flatMap(catalogue => catalogue.operations.map(ro
 if (keys.size !== 681 || Object.keys(policy.reviewed).some(key => !keys.has(key))) throw new Error('Policy route coverage mismatch')
 const contracts = catalogues.flatMap(catalogue => catalogue.operations.map(operation => {
   const review = policy.reviewed[routeKey(operation)] ?? reviewWrite(operation) ?? policy.default
-  const callable = policy.captureBindings[catalogue.release] === catalogue.captureSha256 && ['read', 'write', 'batch'].includes(review.effect) && review.transport === 'json' && ['none', 'input-refs', 'private-result'].includes(review.secrets)
+  const callable = policy.captureBindings[catalogue.release] === catalogue.captureSha256 && ['read', 'write', 'batch'].includes(review.effect) && ['json', 'managed'].includes(review.transport) && ['none', 'input-refs', 'private-result'].includes(review.secrets)
   const id = operations.find(item => routeKey(item) === routeKey(operation))?.id ?? `OP-${operation.method}-${createHash('sha256').update(routeKey(operation)).digest('hex').slice(0, 10)}`
   const api = parameterSchema(operation.parameters)
   for (const name of review.sensitiveInputs ?? []) if (api.properties?.[name]) api.properties[name] = {
@@ -64,6 +64,18 @@ const contracts = catalogues.flatMap(catalogue => catalogue.operations.map(opera
       parameterNamespace: '--api-', body: { flag: '--body-file', encoding: 'json', maxBytes: 65536 },
       untranslatedPatterns: 'Perl patterns and named formats are retained in parameters; unsupported supplied values fail closed.' } }
 }))
+const streamCommands = contracts.filter(operation => operation.release === 'published-current' && operation.callable &&
+  (operation.policy.transport === 'managed' || operation.path === '/nodes/{node}/tasks/{upid}/log' || /\/(vncproxy|termproxy|vncshell|mtunnel)$/.test(operation.path)))
+  .flatMap(operation => {
+    const duplex = /\/(vncproxy|termproxy|vncshell|mtunnel)$/.test(operation.path)
+    return [{ command: `${duplex ? 'duplex' : 'transfer'} ${operation.method === 'POST' ? 'create' : 'get'} ${operation.path}`,
+      operationId: operation.id, method: operation.method, path: operation.path, effect: operation.policy.effect, stream: true,
+      flags: { help: 'boolean', format: 'value', session: 'value', catalogue: 'value', ...(operation.policy.effect === 'write' ? { preview: 'boolean', confirm: 'value' } : {}),
+        ...(!duplex ? { 'response-format': 'value', 'expected-bytes': 'value', 'expected-sha256': 'value', raw: 'boolean',
+          ...(operation.path.endsWith('/upload') ? { 'input-file': 'value' } : {}) } : {}),
+        ...Object.fromEntries(Object.keys(operation.parameters.properties ?? {}).filter(name =>
+          !operation.policy.allowedInputs || operation.policy.allowedInputs.includes(name)).map(name => [`api-${name}`, 'value'])) } }]
+  })
 const outputs = {
   'write-policy.json': { generated: true, captures, refusedPolicy: policy.default,
     contractReferences: 'Each contract reference retains the exact vendor privileges, parameter and result schemas. Unclassified variants remain refused.',
@@ -95,6 +107,7 @@ const outputs = {
   'src/contracts.json': { generated: true, captures, contracts },
   'catalogue-diff.json': compareCatalogues(catalogues[0], catalogues[1]),
   'artium-invocations.json': { generated: true, commands: [
+    ...streamCommands,
     ...['acquire', 'continue', 'cancel'].map(action => ({ command: `auth ${action}`, effect: 'read', flags: {
       help: 'boolean', format: 'value', session: 'value' } })),
     { command: 'task cancel', operationId: contracts.find(operation => operation.method === 'DELETE' && operation.path === '/nodes/{node}/tasks/{upid}').id,
@@ -104,7 +117,7 @@ const outputs = {
       help: 'boolean', format: 'value', session: 'value', 'api-node': 'value', 'api-upid': 'value', journal: 'value', ...(command === 'wait' ? { 'wait-ms': 'value' } : {}) } })),
     ...['show', 'reconcile'].map(command => ({ command: `journal ${command}`, effect: 'read', flags: { help: 'boolean', format: 'value', session: 'value' } })),
     ...[...keys].sort().flatMap(key => {
-      const variants = contracts.filter(operation => routeKey(operation) === key && operation.callable && operation.policy.effect !== 'read')
+      const variants = contracts.filter(operation => routeKey(operation) === key && operation.callable && operation.policy.transport === 'json' && operation.policy.effect !== 'read')
       if (!variants.length) return []
       const operation = variants[0]
       const verb = { POST: 'create', PUT: 'set', DELETE: 'delete' }[operation.method]
@@ -117,7 +130,7 @@ const outputs = {
     ...['home', 'doctor', 'auth status'].map(command => ({ command, effect: 'read', flags: { help: 'boolean', format: 'value', session: 'value' } })),
     ...['profile list', 'config path', 'help'].map(command => ({ command, effect: 'read', flags: { help: 'boolean', format: 'value' } })),
     { command: 'ls', effect: 'read', flags: { help: 'boolean', format: 'value', session: 'value', limit: 'value', fields: 'value', full: 'boolean' } },
-    ...contracts.filter(operation => operation.release === 'published-current' && operation.callable && operation.policy.effect === 'read' && operation.returns.type === 'array').map(operation => ({
+    ...contracts.filter(operation => operation.release === 'published-current' && operation.callable && operation.policy.transport === 'json' && operation.policy.effect === 'read' && operation.returns.type === 'array').map(operation => ({
       command: `ls ${operation.path}`, effect: 'read', flags: { help: 'boolean', format: 'value', session: 'value', limit: 'value', fields: 'value', full: 'boolean',
         ...Object.fromEntries(Object.keys(operation.parameters.properties ?? {}).map(name => [`api-${name}`, 'value'])) } })),
     { command: 'inventory', effect: 'read', flags: { help: 'boolean', format: 'value', catalogue: 'value' } },
@@ -126,7 +139,7 @@ const outputs = {
       return { command: `schema ${operation.method.toLowerCase()} ${operation.path}`, effect: 'read', flags: { help: 'boolean', format: 'value', catalogue: 'value' } }
     }),
     ...[...keys].sort().flatMap(key => {
-    const variants = contracts.filter(operation => routeKey(operation) === key && operation.callable && operation.policy.effect === 'read')
+    const variants = contracts.filter(operation => routeKey(operation) === key && operation.callable && operation.policy.transport === 'json' && operation.policy.effect === 'read')
     if (!variants.length) return []
     const flags = Object.fromEntries([...new Set(variants.flatMap(operation => Object.keys(operation.parameters.properties ?? {})))].map(name => [`api-${name}`, 'value']))
     return [{ command: variants[0].command.join(' '), operationId: variants[0].id, method: variants[0].method, path: variants[0].path, effect: 'read', flags: { help: 'boolean', format: 'value', catalogue: 'value', limit: 'value', fields: 'value', full: 'boolean', session: 'value', ...flags },

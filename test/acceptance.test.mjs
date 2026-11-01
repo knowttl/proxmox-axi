@@ -7,6 +7,8 @@ import { fileURLToPath } from 'node:url'
 import test from 'node:test'
 
 for (const scenario of [
+  { name: 'packaged byte transfers satisfy S5.1 with outbound networking denied', task: 'S5.1', through: 'standalone', exitCode: 0, status: 'pass', host: 'pending' },
+  { name: 'packaged console and migration messages satisfy S5.2 with outbound networking denied', task: 'S5.2', through: 'standalone', exitCode: 0, status: 'pass', host: 'pending' },
   { name: 'installed tarball satisfies canonical credentials with external egress denied', task: 'S1.2', through: 'standalone', exitCode: 0, status: 'pass', host: 'pending' },
   { name: 'generated route cases satisfy the checked catalogue and admission policy', task: 'S2.1', through: 'standalone', exitCode: 0, status: 'pass', host: 'pending' },
   { name: 'retained reads preserve permission visibility and bounded output', task: 'S2.2', through: 'standalone', exitCode: 0, status: 'pass', host: 'pending' },

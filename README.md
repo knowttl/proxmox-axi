@@ -2,6 +2,7 @@
 
 Agent-facing Proxmox VE CLI, read-only by default.
 It covers the 681-route Proxmox API union through versioned invocation discovery, with reviewed admission policy for each callable operation.
+This build provides canonical API-token, supplied-ticket and password credentials, protected results, and bounded trusted HTTPS.
 
 [Why this exists](#why-this-exists) | [Quickstart](#quickstart) | [Commands](#commands) | [Safety](#safety) | [Configuration](#configuration) | [Output and exit codes](#output-and-exit-codes) | [Limitations](#limitations) | [Development](#development)
 
@@ -11,8 +12,13 @@ The Proxmox API is large, and most of its routes change state or handle secrets.
 Agents need a bounded, predictable way to inspect a cluster without scraping vendor output.
 `proxmox-axi` returns compact TOON (or JSON) with structured errors and next-step hints, and never includes raw vendor bodies or transport diagnostics.
 Only reviewed operations are callable.
+Ordinary inventory reads, controlled mutations and selected credential/session setup routes have reviewed admission policy.
+Other operations remain discoverable but uncallable until their effects, transport and secret handling are reviewed.
 Writes are disabled by default and need a named operation permission plus an exact, single-use confirmation.
+Hosted verification uses an explicitly approved, unmerged temporary admission fixture; stock Artium remains unsupported.
+Managed transfers and console/migration duplex transports use private inherited byte channels, with metadata-only ordinary output.
 The [S4 contract](docs/s4-contract.md) defines private results and caller-managed memory sessions.
+The [S5 contract](docs/s5-contract.md) defines formatters, transfer limits and binary framing.
 
 ## Quickstart
 
@@ -36,6 +42,13 @@ error:
   message: No API token profile is configured.
 help[1]: "Configure PROXMOX_AXI_ORIGIN, PROXMOX_AXI_TOKEN_ID and PROXMOX_AXI_TOKEN."
 ```
+
+Ordinary JSON reads use trusted HTTPS, a five-second total deadline and a 64 KiB response bound, and reject redirects.
+Managed transfers have separate administrator-controlled byte and elapsed limits.
+`get /version` validates the version response before formatting it as TOON or JSON.
+HTTP 401 returns a nonzero `AUTH_REQUIRED` result; malformed successful responses return `INVALID_RESPONSE`.
+Errors are structured on stdout and never include raw vendor bodies or transport diagnostics.
+An interrupted HTTPS response returns `CONNECTION_FAILED`; the total deadline and response bound retain `TIMEOUT` and `OUTPUT_LIMIT`.
 
 Configure an API token profile, then make the first authenticated read:
 
@@ -118,7 +131,8 @@ An empty filtered or unverified result never establishes that no resources exist
 
 ## Safety
 
-- Reads use trusted HTTPS, a five-second total deadline and a 64 KiB response bound, and reject redirects.
+- Ordinary JSON reads use trusted HTTPS, a five-second total deadline and a 64 KiB response bound, and reject redirects.
+  Managed transfers have separate administrator-controlled byte and elapsed limits.
 - Operations whose effects, transport or secret handling are not reviewed remain discoverable but uncallable.
   Unresolved policy fields deny invocation, and changing a capture never admits new operations automatically.
 - Writes cover guest power operations, guest destruction, selected scalar configuration branches, pool management, task cancellation, node execute batches and the reviewed credential/session setup operations.
@@ -170,6 +184,8 @@ Errors are structured on stdout and never include raw vendor bodies or transport
 Token values never arrive through command arguments.
 `axi-credential.schema.json` rejects unknown fields and inline secrets.
 The tool never reads other clients' configuration or writes credential files.
+Protected values remain in private result and byte channels and never enter ordinary output.
+Only provider free text is scanned; generated metadata and binary messages retain their reviewed channels.
 
 ## Configuration
 
@@ -229,7 +245,7 @@ No insecure-TLS flag or automatic trust update exists.
 - The published 9.2 schema is supported at the contract level, and live commissioning is pending.
   Versions outside 9.2 are labelled unverified.
 - The current documentation capture is bound to documentation version 9.2.13, not to a live-tested server patch.
-- Downloads and duplex transports are deferred.
+- Managed transfers and duplex sessions are verified with fake services only; live release-specific console token compatibility remains pending.
 - Operations outside the reviewed admission policy are discoverable but uncallable.
 - Native Windows proof is pending.
 - Hosted verification uses an explicitly approved, unmerged temporary admission fixture, and stock hosts remain unsupported.
