@@ -260,6 +260,20 @@ No insecure-TLS flag or automatic trust update exists.
 
 ## Development
 
+S6 checks exercise native Linux and immutable package admission against fake services with process-level outbound networking denied.
+Use an absolute output directory outside the checkout:
+
+```sh
+pnpm verify:acceptance -- --task S6.1 --pack "$PWD/evidence" --out "$RUN/S6.1" --network fake-only --through standalone --native-platform current --repeat-through S6
+pnpm verify:acceptance -- --task S6.2 --pack "$PWD/evidence" --out "$RUN/S6.2" --network fake-only --through standalone --all-route-variants --all-outcomes --repeat-through S6
+```
+
+`admission-delta.json` retains installed file hashes, archive integrity, baseline fixture identity and unresolved admission counts for the next release-candidate or nightly Artium fold.
+These gates validate the infrastructure and currently admitted capabilities.
+They do not certify full release completeness: unreviewed operations remain uncallable, and their expected refusals do not prove runtime support.
+Native Windows, live commissioning and the Artium fold remain pending.
+Artium journeys are opt-in through the existing fixture environment variables and `--through both`; configured tests explicitly skip them when no fixture is supplied.
+
 Use Node 24.14.0 (pinned in `.node-version`; the supported minimum is 24.11.0) and pnpm 10.22.0.
 The lockfile pins every transitive dependency and its integrity, and the `fast-uri` override pins 3.1.8.
 

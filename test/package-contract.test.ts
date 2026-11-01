@@ -1,11 +1,12 @@
 import assert from 'node:assert/strict'
 import { execFile } from 'node:child_process'
-import { mkdtemp, readFile, readdir, rm, writeFile } from 'node:fs/promises'
+import { mkdtemp, readFile, readdir, rm, unlink, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { promisify } from 'node:util'
 import test from 'node:test'
+import { verifyPackageAdmission } from '../scripts/package-admission.js'
 
 const execute = promisify(execFile)
 const root = fileURLToPath(new URL('../../', import.meta.url))
@@ -44,7 +45,7 @@ test('packed package installs offline and exposes the CLI and admission contract
       'inventory.json', 'catalogue-diff.json', 'help.json'])
     for (const path of files) {
       assert.ok(allowedRoot.has(path) || path === 'bin/proxmox-axi.mjs' || path === 'docs/s4-contract.md' ||
-        /^dist\/[a-z][a-z-]*(?:\.js|\.d\.ts|\.json)$/.test(path), `unexpected published file: ${path}`)
+        path === 'docs/s5-contract.md' || /^dist\/[a-z][a-z-]*(?:\.js|\.d\.ts|\.json)$/.test(path), `unexpected published file: ${path}`)
       assert.doesNotMatch(path, /(?:^|\/)(?:test|tests|node_modules|src)(?:\/|$)|\.map$|\.test\./)
     }
     await writeFile(join(scratch, 'package.json'), JSON.stringify({ private: true, type: 'module',
@@ -74,5 +75,12 @@ test('packed package installs offline and exposes the CLI and admission contract
         await import(url, { with: { type: 'json' } });
       }
     `])
+    const admission = await verifyPackageAdmission(root, installed, tarball)
+    assert.equal(admission.status, 'pass')
+    assert.equal(admission.completeness.variants, 1285)
+    // pnpm may hardlink package files to its shared store; break that link first.
+    await unlink(join(installed, 'dist/cli.js'))
+    await writeFile(join(installed, 'dist/cli.js'), 'throw new Error("altered executable")\n')
+    await assert.rejects(verifyPackageAdmission(root, installed, tarball), /Installed dist matches the current build/)
   } finally { await rm(scratch, { recursive: true, force: true }) }
 })

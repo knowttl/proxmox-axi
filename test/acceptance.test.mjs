@@ -7,6 +7,8 @@ import { fileURLToPath } from 'node:url'
 import test from 'node:test'
 
 for (const scenario of [
+  { name: 'native Linux paths and private files satisfy S6.1 with outbound networking denied', task: 'S6.1', through: 'standalone', exitCode: 0, status: 'pass', host: 'pending' },
+  { name: 'immutable installed package records S6.2 admission gaps with outbound networking denied', task: 'S6.2', through: 'standalone', exitCode: 0, status: 'pass', host: 'pending' },
   { name: 'packaged byte transfers satisfy S5.1 with outbound networking denied', task: 'S5.1', through: 'standalone', exitCode: 0, status: 'pass', host: 'pending' },
   { name: 'packaged console and migration messages satisfy S5.2 with outbound networking denied', task: 'S5.2', through: 'standalone', exitCode: 0, status: 'pass', host: 'pending' },
   { name: 'installed tarball satisfies canonical credentials with external egress denied', task: 'S1.2', through: 'standalone', exitCode: 0, status: 'pass', host: 'pending' },
@@ -42,6 +44,15 @@ for (const scenario of [
     assert.equal(result.failure, scenario.failure)
     assert.equal(result.host.status, scenario.host)
     assert.equal(result.cases.every(entry => entry.status === 'pass'), true, result.failure)
+    if (scenario.task?.startsWith('S6.')) {
+      assert.deepEqual(result.native, { linux: 'pass', windows: 'pending', reason: 'Native Windows machine unavailable; Linux is not a substitute.' })
+      assert.equal(result.admission.status, 'pass')
+      assert.equal(result.admission.completeness.variants, 1285)
+      assert.equal(result.admission.completeness.status, 'pending')
+      assert.ok(result.admission.completeness.unresolved > 0)
+      assert.equal(result.caseCoverage.find(row => row.id === 'CRED-08').status, 'pass')
+      assert.equal(result.caseCoverage.find(row => row.id === 'CRED-07').status, 'pending')
+    }
     if (scenario.task === 'S3.2' && scenario.through === 'both') {
       assert.deepEqual(result.outcomes.filter(row => row.journey === 'artium' && [
         'AC-WRITES', 'AC-WRITE', 'AC-SPECIAL-BATCH-POLICY', 'AC-ASYNC', 'AC-SPECIAL-BATCH-RESULTS',
