@@ -10,7 +10,7 @@ Use `transfer --help` and the selected operation's schema to inspect parameters.
 | Guest/node SPICE setup | `spiceconfig` | Exact private configuration bytes |
 | Storage upload | `multipart` | Streamed file with source SHA-256 bound into confirmation |
 | Backup file restore download | `download` | Exact bytes through the private channel |
-| Task log with `download=true`, and journal | `text` | Text with optional gzip decoding |
+| Task log with `download=true` and no `start`/`limit`, and journal | `text` | Text with optional gzip decoding |
 | QEMU guest-agent file read | `guest-file` | Managed content export with explicit representation and truncation |
 
 `PROXMOX_AXI_STREAM_FD` must identify an inherited pipe or socket distinct from stdout, stderr and the private result channel.
@@ -34,6 +34,7 @@ Upload task acceptance does not establish that the provider's asynchronous stora
 Use the retained UPID with task status/wait.
 
 Current guest-file `decode=true` preserves representable UTF-8 text.
+`--api-offset` and `--api-count` select the requested range, with a maximum count of 16777216 bytes.
 `decode=false` preserves the provider's concatenated base64 chunks, including padding between individual guest-agent reads.
 `--raw` decodes every padded chunk into bytes rather than stopping at the first padding marker.
 Metadata distinguishes the representation's byte count/hash from the provider's raw byte count and truncation flag.

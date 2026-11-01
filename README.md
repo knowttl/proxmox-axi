@@ -43,8 +43,7 @@ error:
 help[1]: "Configure PROXMOX_AXI_ORIGIN, PROXMOX_AXI_TOKEN_ID and PROXMOX_AXI_TOKEN."
 ```
 
-Ordinary JSON reads use trusted HTTPS, a five-second total deadline and a 64 KiB response bound, and reject redirects.
-Managed transfers have separate administrator-controlled byte and elapsed limits.
+See [Safety](#safety) for ordinary JSON read bounds and the [S5 contract](docs/s5-contract.md) for managed transfer limits.
 `get /version` validates the version response before formatting it as TOON or JSON.
 HTTP 401 returns a nonzero `AUTH_REQUIRED` result; malformed successful responses return `INVALID_RESPONSE`.
 Errors are structured on stdout and never include raw vendor bodies or transport diagnostics.
@@ -99,6 +98,13 @@ proxmox-axi task status|log|wait|cancel --api-node <node> --api-upid <UPID> [--j
 proxmox-axi journal show|reconcile <id>
 ```
 
+Managed byte transports (see the [S5 contract](docs/s5-contract.md) for required private channels, formatters and framing):
+
+```sh
+proxmox-axi transfer get|create <template> --response-format <formatter> [--api-<parameter> <value>]
+proxmox-axi duplex create <setup-template> [--api-<parameter> <value>] --preview|--confirm <confirmation>
+```
+
 Common flags are `--config <absolute-path>`, `--profile <name>`, `--session <id>` and `--format toon|json`.
 
 ```sh
@@ -122,8 +128,9 @@ Notes:
 
 ### Version handling and inventory
 
-Ordinary reads other than `/version` detect the entry version and, for node-specific routes, the selected node version before choosing a catalogue.
-For reads, an explicit `--catalogue` selects a replay contract without version detection, and inventory visibility remains unknown.
+Ordinary JSON reads other than `/version` detect the entry version and, for node-specific routes, the selected node version before choosing a catalogue.
+For ordinary JSON reads, an explicit `--catalogue` selects a replay contract without version detection, and inventory visibility remains unknown.
+Managed read transfers always detect the selected node version and choose its contract, even when `--catalogue` is supplied.
 Writes require a detected major of 8 or 9 and select the corresponding contract, including when an explicit catalogue was supplied.
 Automatic inventory reads check effective root audit permissions and report `complete` or `permission-filtered` visibility.
 Scoped privileges may provide useful rows but do not establish complete inventory.
@@ -135,7 +142,7 @@ An empty filtered or unverified result never establishes that no resources exist
   Managed transfers have separate administrator-controlled byte and elapsed limits.
 - Operations whose effects, transport or secret handling are not reviewed remain discoverable but uncallable.
   Unresolved policy fields deny invocation, and changing a capture never admits new operations automatically.
-- Writes cover guest power operations, guest destruction, selected scalar configuration branches, pool management, task cancellation, node execute batches and the reviewed credential/session setup operations.
+- Writes cover guest power operations, guest destruction, selected scalar configuration branches, pool management, task cancellation, node execute batches, storage uploads and the reviewed credential/session setup operations.
   Effectful CIFS/PBS scans use the same preview and confirmation policy even though their vendor method is GET.
 - Inspect `schema create|set|delete <template>` and the generated `write-policy.json` before enabling an operation.
 - Enable an operation by adding its ID to the selected file profile: `writes: { "operations": ["<operation-id>"] }`.
@@ -311,7 +318,13 @@ pnpm verify:acceptance -- --task S3.1 --pack /absolute/path/to/pack --out /absol
 pnpm verify:acceptance -- --task S3.2 --pack /absolute/path/to/pack --out /absolute/new/run/S3.2 --network fake-only --through both --repeat-through S3
 pnpm verify:acceptance -- --task S4.1 --pack /absolute/path/to/pack --out /absolute/new/run/S4.1 --network fake-only --through both --repeat-through S4
 pnpm verify:acceptance -- --task S4.2 --pack /absolute/path/to/pack --out /absolute/new/run/S4.2 --network fake-only --through both --repeat-through S4
+pnpm verify:acceptance -- --task S5.1 --pack /absolute/path/to/pack --out /absolute/new/run/S5.1 --network fake-only --through standalone --repeat-through S5
+pnpm verify:acceptance -- --task S5.2 --pack /absolute/path/to/pack --out /absolute/new/run/S5.2 --network fake-only --through standalone --repeat-through S5
 ```
+
+The S5 selectors cover transfers/formatters (S5.1) and console/migration duplex sessions (S5.2).
+S5.2 also runs the S5.1 journeys.
+Hosted S5 proof is optional per slice; select `--through both` only when the pinned external fixture is available.
 
 Use this repository's `evidence` directory for `--pack`, and create the parent run directory first.
 The task output directory must be new and outside the checkout.
