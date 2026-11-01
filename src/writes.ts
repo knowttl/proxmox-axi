@@ -35,12 +35,6 @@ async function invocation(credentials: Credentials, contract: Contract, input: R
   if (depth > 0 && contract.policy.transport !== 'json') throw new Failure('INVALID_INPUT', 'Batch children cannot open byte transports.', 'Execute each transfer separately through its managed channel.', 2)
   if (++budget.count > 64 || depth > 4) throw new Failure('INVALID_INPUT', 'Batch exceeds 64 total operations or four nesting levels.', 'Use a smaller reviewed batch.', 2)
   const values = { ...input }
-  if (contract.path.endsWith('/download-url')) {
-    let target: URL
-    try { target = new URL(String(values.url)) } catch { throw new Failure('INVALID_INPUT', 'Invalid download URL.', 'Select a resource at the approved HTTPS origin.', 2) }
-    if (target.origin !== credentials.origin || target.username || target.password || target.hash || values['verify-certificates'] === false ||
-      typeof values.filename !== 'string' || !/^[A-Za-z0-9][A-Za-z0-9._-]{0,254}$/.test(values.filename)) throw new Failure('INVALID_INPUT', 'Download target or trust is not approved.', 'Use the selected HTTPS origin, certificate verification and a safe filename.', 2)
-  }
   const revisions: unknown[] = []
   for (const [name, value] of Object.entries(values)) {
     if (contract.policy.allowedInputs && !contract.policy.allowedInputs.includes(name)) throw new Failure('CONTRACT_UNRESOLVED', 'Supplied parameter branch has not been admitted.', 'Inspect the operation policy and use reviewed branches only.')

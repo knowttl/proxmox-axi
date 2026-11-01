@@ -94560,61 +94560,12 @@
       "id": "OP-POST-316cd87900",
       "release": "legacy-8.2.7",
       "policy": {
-        "effect": "write",
-        "transport": "json",
-        "secrets": "none",
-        "allowedInputs": [
-          "node",
-          "storage",
-          "content",
-          "filename",
-          "url",
-          "checksum",
-          "checksum-algorithm",
-          "verify-certificates"
-        ],
-        "reason": "Confirmed provider-side download from the selected approved HTTPS origin; compression and disabled trust are refused.",
-        "reconciliation": {
-          "kind": "none",
-          "reason": "Follow the accepted UPID; never repeat a provider-side download after a lost response."
-        },
-        "privileges": {
-          "check": [
-            "and",
-            [
-              "perm",
-              "/storage/{storage}",
-              [
-                "Datastore.AllocateTemplate"
-              ]
-            ],
-            [
-              "or",
-              [
-                "perm",
-                "/",
-                [
-                  "Sys.Audit",
-                  "Sys.Modify"
-                ]
-              ],
-              [
-                "perm",
-                "/nodes/{node}",
-                [
-                  "Sys.AccessNetwork"
-                ]
-              ]
-            ]
-          ],
-          "description": "Requires allocation access on the storage and as this allows one to probe the (local!) host network indirectly it also requires one of Sys.Modify on / (for backwards compatibility) or the newer Sys.AccessNetwork privilege on the node."
-        },
-        "response": {
-          "type": "string"
-        },
-        "source": "Pinned storage download-url schema and S5 reviewed target restrictions."
+        "effect": "unresolved",
+        "transport": "unresolved",
+        "secrets": "unresolved",
+        "reason": "Requires operation-specific effect, transport and secret review before admission."
       },
-      "callable": true,
+      "callable": false,
       "command": [
         "post",
         "/nodes/{node}/storage/{storage}/download-url"
@@ -214478,61 +214429,12 @@
       "id": "OP-POST-316cd87900",
       "release": "published-current",
       "policy": {
-        "effect": "write",
-        "transport": "json",
-        "secrets": "none",
-        "allowedInputs": [
-          "node",
-          "storage",
-          "content",
-          "filename",
-          "url",
-          "checksum",
-          "checksum-algorithm",
-          "verify-certificates"
-        ],
-        "reason": "Confirmed provider-side download from the selected approved HTTPS origin; compression and disabled trust are refused.",
-        "reconciliation": {
-          "kind": "none",
-          "reason": "Follow the accepted UPID; never repeat a provider-side download after a lost response."
-        },
-        "privileges": {
-          "check": [
-            "and",
-            [
-              "perm",
-              "/storage/{storage}",
-              [
-                "Datastore.AllocateTemplate"
-              ]
-            ],
-            [
-              "or",
-              [
-                "perm",
-                "/",
-                [
-                  "Sys.Audit",
-                  "Sys.Modify"
-                ]
-              ],
-              [
-                "perm",
-                "/nodes/{node}",
-                [
-                  "Sys.AccessNetwork"
-                ]
-              ]
-            ]
-          ],
-          "description": "Requires allocation access on the storage and as this allows one to probe the (local!) host network indirectly it also requires one of Sys.Modify on / (for backwards compatibility) or the newer Sys.AccessNetwork privilege on the node."
-        },
-        "response": {
-          "type": "string"
-        },
-        "source": "Pinned storage download-url schema and S5 reviewed target restrictions."
+        "effect": "unresolved",
+        "transport": "unresolved",
+        "secrets": "unresolved",
+        "reason": "Requires operation-specific effect, transport and secret review before admission."
       },
-      "callable": true,
+      "callable": false,
       "command": [
         "post",
         "/nodes/{node}/storage/{storage}/download-url"

@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict'
 import { spawn } from 'node:child_process'
 import { createHash } from 'node:crypto'
-import { createServer, get } from 'node:https'
+import { createServer } from 'node:https'
 import { mkdir, readFile, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import type { Socket } from 'node:net'
@@ -22,7 +22,6 @@ const hash = (bytes: Buffer) => createHash('sha256').update(bytes).digest('hex')
 const version = { version: '9.2.0', release: '9.2', repoid: 'synthetic' }
 const uploadPath = '/nodes/{node}/storage/{storage}/upload'
 const consolePath = '/nodes/{node}/qemu/{vmid}/vncproxy'
-const downloadUrlPath = '/nodes/{node}/storage/{storage}/download-url'
 const setupPaths = ['qemu', 'lxc'].flatMap(family => ['vncproxy', 'termproxy', 'mtunnel'].map(action => `/nodes/{node}/${family}/{vmid}/${action}`))
   .concat('/nodes/{node}/termproxy', '/nodes/{node}/vncshell')
 const operation = (path: string) => `OP-POST-${createHash('sha256').update(`POST ${path}`).digest('hex').slice(0, 10)}`
@@ -44,7 +43,7 @@ export async function exerciseStreamJourney(options: Journey) {
   const png = Buffer.concat([Buffer.from('89504e470d0a1a0a', 'hex'), Buffer.from('independent fake PNG transport fixture')])
   const file = join(directory, 'image.iso')
   await writeFile(file, image, { mode: 0o600 })
-  let mode = 'success', active = '', uploadDigest = '', uploads = 0, providerDownloads = 0, providerDownloadDigest = ''
+  let mode = 'success', active = '', uploadDigest = '', uploads = 0
   let cancelCurrent = () => {}
   let peerClosed = Promise.resolve()
   const peers = new Set<Duplex>()
@@ -53,7 +52,6 @@ export async function exerciseStreamJourney(options: Journey) {
   const server = createServer({ key: await readFile(join(options.scratch, 'server.key')), cert: certificate }, async (request, response) => {
     const url = new URL(request.url!, 'https://fake.invalid')
     options.ledger.push({ case: active, method: request.method, path: url.pathname })
-    if (url.pathname === '/fixture.iso') { response.end(image); return }
     if (url.pathname.endsWith('/version')) { response.end(JSON.stringify({ data: mode === 'legacy' ? { ...version, version: '8.2.7' } : version })); return }
     if (url.pathname.endsWith('/upload')) {
       uploads++
@@ -64,22 +62,6 @@ export async function exerciseStreamJourney(options: Journey) {
       const boundary = /boundary=(.+)$/.exec(String(request.headers['content-type']))![1]!
       const end = body.lastIndexOf(Buffer.from(`\r\n--${boundary}--\r\n`))
       uploadDigest = hash(body.subarray(start, end))
-      response.end(JSON.stringify({ data: upid })); return
-    }
-    if (url.pathname.endsWith('/download-url')) {
-      const chunks: Buffer[] = []
-      for await (const chunk of request) chunks.push(Buffer.from(chunk))
-      const params = new URLSearchParams(Buffer.concat(chunks).toString())
-      assert.equal(params.get('url'), origin + '/fixture.iso')
-      providerDownloadDigest = await new Promise<string>((resolve, reject) => {
-        get(params.get('url')!, { ca: certificate }, reply => {
-          const hash = createHash('sha256')
-          reply.on('data', chunk => hash.update(chunk))
-          reply.once('end', () => resolve(hash.digest('hex')))
-          reply.once('error', reject)
-        }).once('error', reject)
-      })
-      providerDownloads++
       response.end(JSON.stringify({ data: upid })); return
     }
     if (/\/(vncproxy|termproxy|vncshell|mtunnel)$/.test(url.pathname)) {
@@ -149,11 +131,11 @@ export async function exerciseStreamJourney(options: Journey) {
   const config = join(directory, 'profile.json')
   await writeFile(config, JSON.stringify({ version: 1, defaultProfile: 'stream', profiles: { stream: {
     auth: 'api-token', origin, tokenId: 'synthetic@pve!stream', token: { env: 'STREAM_TOKEN' }, caBundle: options.caFile,
-    writes: { operations: [operation(uploadPath), operation(downloadUrlPath), operation('/nodes/{node}/execute'), ...setupPaths.map(operation), ...spicePaths.map(operation)] },
+    writes: { operations: [operation(uploadPath), operation('/nodes/{node}/execute'), ...setupPaths.map(operation), ...spicePaths.map(operation)] },
   } } }), { mode: 0o600 })
   const env = { ...options.env, PROXMOX_AXI_CONFIG: config, PROXMOX_AXI_PROFILE: 'stream', STREAM_TOKEN: 'CANARY-S5-auth', PROXMOX_AXI_STREAM_FD: '3', PROXMOX_AXI_RESULT_FD: '4',
     XDG_STATE_HOME: join(directory, 'state') }
-  if (options.hosted) await options.hosted.configure(origin, [operation(uploadPath), operation(downloadUrlPath), operation('/nodes/{node}/execute'), ...setupPaths.map(operation), ...spicePaths.map(operation)])
+  if (options.hosted) await options.hosted.configure(origin, [operation(uploadPath), operation('/nodes/{node}/execute'), ...setupPaths.map(operation), ...spicePaths.map(operation)])
   const run = async (id: string, args: string[], expected: number | null, input?: Buffer, extra: Record<string, string> = {}) => {
     active = `${options.task}/${id}`
     if (options.hosted) await options.hosted.limits(Number(extra.PROXMOX_AXI_TRANSFER_BYTES ?? 8 * 1024 ** 3), Number(extra.PROXMOX_AXI_DUPLEX_IDLE_MS ?? 30000))
@@ -203,14 +185,6 @@ export async function exerciseStreamJourney(options: Journey) {
     await run('batch-cannot-open-byte-channel', ['create', '/nodes/{node}/execute', '--api-node', 'pve-test', '--api-commands', JSON.stringify([
       { method: 'POST', path: 'storage/local/upload', args: { content: 'iso', filename: 'image.iso' } },
     ]), '--preview'], 2)
-    const providerDownload = ['create', downloadUrlPath, '--api-node', 'pve-test', '--api-storage', 'local', '--api-content', 'iso', '--api-filename', 'image.iso', '--api-url', origin + '/fixture.iso']
-    const downloadPreview = await run('provider-download-preview', [...providerDownload, '--preview'], 0)
-    assert.equal(providerDownloads, 0)
-    await run('provider-download-confirm', [...providerDownload, '--confirm', String(downloadPreview.output.confirmation)], 0)
-    assert.equal(providerDownloads, 1)
-    assert.equal(providerDownloadDigest, hash(image), 'Provider-side download completes against the selected fake HTTPS source')
-    await run('provider-download-foreign-origin-denied', [...providerDownload.slice(0, -1), 'https://unapproved.invalid/image.iso', '--preview'], 2)
-    assert.equal(providerDownloads, 1)
     const download = ['transfer', 'get', '/nodes/{node}/rrd', '--api-node', 'pve-test', '--api-ds', 'cpu', '--api-timeframe', 'hour', '--response-format', 'png']
     for (const quota of [png.length - 1, png.length, png.length + 1]) {
       const result = await run(`download-quota-${quota}`, download, quota < png.length ? 1 : 0, undefined, { PROXMOX_AXI_TRANSFER_BYTES: String(quota) })

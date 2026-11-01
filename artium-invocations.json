@@ -1136,30 +1136,6 @@
       }
     },
     {
-      "command": "create /nodes/{node}/storage/{storage}/download-url",
-      "operationId": "OP-POST-316cd87900",
-      "method": "POST",
-      "path": "/nodes/{node}/storage/{storage}/download-url",
-      "sensitiveInputs": [],
-      "privateResult": false,
-      "effect": "write",
-      "flags": {
-        "help": "boolean",
-        "format": "value",
-        "preview": "boolean",
-        "confirm": "value",
-        "session": "value",
-        "api-checksum": "value",
-        "api-checksum-algorithm": "value",
-        "api-content": "value",
-        "api-filename": "value",
-        "api-node": "value",
-        "api-storage": "value",
-        "api-url": "value",
-        "api-verify-certificates": "value"
-      }
-    },
-    {
       "command": "create /nodes/{node}/termproxy",
       "operationId": "OP-POST-04add518d5",
       "method": "POST",

@@ -19,11 +19,6 @@ export function reviewWrite(operation: Operation) {
   const upload = path === '/nodes/{node}/storage/{storage}/upload' && method === 'POST'
   const transferRead = method === 'GET' && (/\/rrd$/.test(path) || ['/nodes/{node}/journal', '/nodes/{node}/qemu/{vmid}/agent/file-read', '/nodes/{node}/storage/{storage}/file-restore/download'].includes(path))
   const spice = method === 'POST' && /\/(spiceproxy|spiceshell)$/.test(path)
-  if (method === 'POST' && path === '/nodes/{node}/storage/{storage}/download-url') return {
-    effect: 'write', transport: 'json', secrets: 'none', allowedInputs: ['node', 'storage', 'content', 'filename', 'url', 'checksum', 'checksum-algorithm', 'verify-certificates'],
-    reason: 'Confirmed provider-side download from the selected approved HTTPS origin; compression and disabled trust are refused.',
-    reconciliation: { kind: 'none', reason: 'Follow the accepted UPID; never repeat a provider-side download after a lost response.' },
-    privileges: operation.permissions, response: operation.returns, source: 'Pinned storage download-url schema and S5 reviewed target restrictions.' }
   if (upload || transferRead || spice) return { effect: transferRead ? 'read' : 'write', transport: 'managed', secrets: spice ? 'private-result' : 'none',
     reason: 'S5 operation-specific formatter and bounded private byte transport; ordinary output contains completion metadata only.',
     ...(upload ? { allowedInputs: ['node', 'storage', 'filename', 'content', 'checksum', 'checksum-algorithm'] } :

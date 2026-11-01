@@ -25,7 +25,6 @@ Source changes detected during transmission produce uncertainty and are never re
 Every effectful setup and upload uses the shared operation allowlist, durable journal and exact single-use confirmation.
 Transfer format, source hash, expected result and selected limits form part of that confirmation.
 Batch children cannot open byte transports.
-Provider-side `download-url` uses the same write policy, permits only the selected HTTPS origin and refuses disabled certificate verification and unreviewed compression.
 
 Administrator environment settings select `PROXMOX_AXI_TRANSFER_BYTES` (default 8 GiB) and `PROXMOX_AXI_TRANSFER_MS` (default 30 minutes, also the maximum).
 File streams use 64 KiB buffers and backpressure.
