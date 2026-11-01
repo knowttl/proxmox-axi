@@ -294,7 +294,7 @@ async function verify(values, prepared, scratch) {
       TMPDIR: scratch, PATH: `${join(scratch, 'decoy-bin')}:/usr/bin:/bin`, DEVELOPER_TOKEN: decoy }
     const env = { ...base, PROXMOX_AXI_ORIGIN: origin, PROXMOX_AXI_TOKEN_ID: tokenId,
       PROXMOX_AXI_TOKEN: token, PROXMOX_AXI_CA_BUNDLE: caFile }
-    if (values['--task'].startsWith('S6.')) await exerciseNativeJourney({ scratch, installed, executable, env, command, cases: result.cases })
+    if (values['--task'].startsWith('S6.')) await exerciseNativeJourney({ scratch, installed, executable, caFile, env, command, cases: result.cases })
 
     const runCase = async (id, args, environment, expected, vendor = success, entry = executable) => {
       activeCase = id

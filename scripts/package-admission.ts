@@ -44,7 +44,7 @@ export async function verifyPackageAdmission(root: string, installed: string, ar
     status: 'pass', files: current, sha256: hash(bytes),
     integrity: `sha512-${createHash('sha512').update(bytes).digest('base64')}`,
     baseline: { revision: baseline.revision, sha256: baseline.packageSha256, integrity: baseline.packageIntegrity },
-    artium: { status: 'pending', reason: 'Package delta retained for the next release-candidate or nightly fold; no fixture re-pin performed.',
+    artium: { status: 'pending', reason: 'Current-package S6 hosted journeys deferred to the Artium fold once per release candidate; no fixture re-pin performed.',
       packageChanged: hash(bytes) !== baseline.packageSha256 },
     completeness: { status: unresolved ? 'pending' : 'pass', routes: inventory.operations.length, variants: variants.length, unresolved,
       reason: 'Unreviewed variants stay uncallable; refusal coverage does not establish full runtime admission.' },

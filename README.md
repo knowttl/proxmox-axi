@@ -268,7 +268,8 @@ pnpm verify:acceptance -- --task S6.1 --pack "$PWD/evidence" --out "$RUN/S6.1" -
 pnpm verify:acceptance -- --task S6.2 --pack "$PWD/evidence" --out "$RUN/S6.2" --network fake-only --through standalone --all-route-variants --all-outcomes --repeat-through S6
 ```
 
-`admission-delta.json` retains installed file hashes, archive integrity, baseline fixture identity and unresolved admission counts for the next release-candidate or nightly Artium fold.
+`admission-delta.json` retains installed file hashes, archive integrity, baseline fixture identity and unresolved admission counts for the next release-candidate Artium fold.
+Current-package S6 `--through both` hosted journeys are deferred to that fold, which runs once per release candidate rather than per slice.
 These gates validate the infrastructure and currently admitted capabilities.
 They do not certify full release completeness: unreviewed operations remain uncallable, and their expected refusals do not prove runtime support.
 Native Windows, live commissioning and the Artium fold remain pending.
