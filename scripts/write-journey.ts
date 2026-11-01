@@ -177,7 +177,8 @@ export async function exerciseWriteJourney(options: Journey): Promise<void> {
     const unsafeResult = await invoke('AC-ASYNC/safe-follow-up-templates', [...start, '--confirm', unsafePreview.confirmation], { status: 'accepted', mutations: 1 })
     assert.equal(unsafeResult.node, 'pve-test')
     assert.equal(unsafeResult.upid, upid.replace('synthetic@pve', '$(id)@pve'))
-    assert.deepEqual(unsafeResult.help, ['proxmox-axi task status --api-node <node> --api-upid <UPID>', 'proxmox-axi task wait --api-node <node> --api-upid <UPID>'])
+    const tool = options.hosted ? 'artium-axi proxmox-axi' : 'proxmox-axi'
+    assert.deepEqual(unsafeResult.help, [`${tool} task status --api-node <node> --api-upid <UPID>`, `${tool} task wait --api-node <node> --api-upid <UPID>`])
     mode = 'success'
     const shutdown = [...argsFor('create', 'qemu', '/status/shutdown'), '--api-forceStop', 'true']
     const forced = await invoke('AC-WRITES/vendor-flag-case-preview', [...shutdown, '--preview'])
