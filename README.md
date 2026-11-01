@@ -266,6 +266,8 @@ Policy and data sources:
 ### Tests
 
 `pnpm test` runs native and offline tests only, including rejection of an explicitly requested hosted journey with missing fixture inputs.
+The package-contract test packs and installs the tarball offline, checks its file list and CLI bin entry, runs `--help` and `--version`, and imports the modules and JSON artifacts consumed by Artium.
+It requires npm, pnpm and tar, with production dependencies already available in the local pnpm store.
 Hosted tests are opt-in and skip with `Artium fixture not supplied` unless an externally prepared, pinned local fixture is selected:
 
 ```sh
