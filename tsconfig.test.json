@@ -1,0 +1,10 @@
+{
+  "extends": "./tsconfig.tooling.json",
+  "compilerOptions": {
+    "noEmit": false,
+    "rootDir": ".",
+    "outDir": ".test-build",
+    "allowImportingTsExtensions": false
+  },
+  "include": ["test/*.ts", "scripts/auth-clock.ts"]
+}

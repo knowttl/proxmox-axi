@@ -12,7 +12,9 @@ Broken delivery after transmission returns an uncertain result and consumes its 
 
 Resolved input values and newly returned protected values are registered before releasing public provider content.
 Provider content is scanned/redacted across raw, URL-encoded, JSON-escaped and base64 forms after response chunks are assembled.
-Generated protocol metadata, including keys, status words and confirmation tokens, stays outside the value scanner.
+Only SecretRef-resolved inputs and minted credentials, challenges and recovery values are registered as protected values.
+Provider identifiers, users and status words are public metadata and are never registered as secrets.
+Object keys and generated protocol metadata, including status words and confirmation tokens, stay outside the value scanner.
 Those fields and durable journal records exclude protected inputs and results by construction.
 This preserves usable confirmations and status fields when an operation password happens to equal `a` or `success`.
 Provider-derived free text remains subject to scanning and redaction.

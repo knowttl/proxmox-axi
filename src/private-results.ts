@@ -4,6 +4,7 @@ import { Socket } from 'node:net'
 import { Failure } from './errors.js'
 
 const pipes = new Map<number, Socket>()
+const protectedField = /^(?:password|passwd|secret|token|ticket|otp|challenge|recovery|value|csrf[-_]?prevention[-_]?token|private[-_]?key|api[-_]?key|access[-_]?token|refresh[-_]?token|authorization|cookie)$/i
 
 export interface ResultBinding {
   origin: string
@@ -25,6 +26,14 @@ export class PrivateResults {
     else if (value && typeof value === 'object') for (const item of Object.values(value)) this.register(item)
   }
 
+  registerMinted(value: unknown): void {
+    if (Array.isArray(value)) for (const item of value) this.registerMinted(item)
+    else if (value && typeof value === 'object') for (const [name, item] of Object.entries(value)) {
+      if (protectedField.test(name)) this.register(item)
+      else this.registerMinted(item)
+    }
+  }
+
   redact(text: string): string {
     for (const secret of [...this.secrets].sort((a, b) => b.length - a.length)) {
       for (const form of [secret, encodeURIComponent(secret), new URLSearchParams({ v: secret }).toString().slice(2),
@@ -36,7 +45,7 @@ export class PrivateResults {
   sanitize(value: unknown): unknown {
     if (typeof value === 'string') return this.redact(value)
     if (Array.isArray(value)) return value.map(item => this.sanitize(item))
-    if (value && typeof value === 'object') return Object.fromEntries(Object.entries(value).map(([key, item]) => [this.redact(key), this.sanitize(item)]))
+    if (value && typeof value === 'object') return Object.fromEntries(Object.entries(value).map(([key, item]) => [key, this.sanitize(item)]))
     return value
   }
 

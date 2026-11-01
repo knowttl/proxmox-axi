@@ -13,7 +13,7 @@
     "build": "node scripts/generate.mjs && tsc",
     "generate": "node scripts/generate.mjs",
     "lint": "node scripts/generate.mjs --check && tsc --noEmit && tsc -p tsconfig.tooling.json",
-    "test": "pnpm build && node --test test/*.test.mjs",
+    "test": "pnpm build && tsc -p tsconfig.test.json && node --test test/*.test.mjs .test-build/test/*.test.js",
     "verify:acceptance": "pnpm build && node scripts/acceptance.mjs",
     "prepack": "pnpm build"
   },

@@ -34,7 +34,7 @@ const ticket = 'PVE:synthetic@pve:12345678::CANARY-session-ticket-S4'
 const csrf = 'CANARY-session-csrf-S4'
 const challenge = 'PVE:tfa!CANARY-signed-challenge-S4'
 const recovery = 'CANARY-one-time-recovery-S4'
-const taskUpid = 'UPID:pve-test:00000001:00000002:12345678:qmstart:100:root@pam:'
+const taskUpid = 'UPID:pve-test:00000001:00000002:12345678:qmstart:100:synthetic@pve:'
 const version = { version: '8.2.7', release: '8.2', repoid: '3e0176e6bb2ade3b' }
 const object = (value: unknown): Record<string, unknown> => { assert.ok(value && typeof value === 'object' && !Array.isArray(value)); return value as Record<string, unknown> }
 
@@ -57,7 +57,7 @@ export async function exerciseSecretJourney(options: Journey): Promise<void> {
   const { scratch, executable, caFile } = options
   const directory = join(scratch, options.hosted ? 'hosted-secrets' : 'secrets')
   await mkdir(directory, { mode: 0o700 })
-  let activeCase = '', mode = 'success', mutations = 0
+  let activeCase = '', mode = 'success', mutations = 0, selectedPassword = password
   let breakSink = () => {}
   const acquired = [ticket, csrf, challenge, minted, recovery, 'CANARY-openid-state-S4']
   const protectedValues = [...acquired, password, 'totp:123456', 'webauthn:synthetic-response', (await readFile(join(scratch, 'server.key'), 'utf8')).trimEnd()]
@@ -80,7 +80,7 @@ export async function exerciseSecretJourney(options: Journey): Promise<void> {
       if (url.pathname.endsWith('/ticket')) {
         assert.equal(params.username, 'synthetic@pve')
         if (params['tfa-challenge']) { assert.ok(params['tfa-challenge'] === challenge, 'signed challenge reaches the vendor'); assert.ok(/^(totp:123456|webauthn:synthetic-response)$/.test(params.password ?? ''), 'challenge response reaches the vendor') }
-        else assert.ok(params.password === password, 'selected password reaches the vendor')
+        else assert.ok(params.password === selectedPassword, 'selected password reaches the vendor')
       } else { assert.ok(params.code === password, 'OpenID code reaches the vendor'); assert.ok(params.state === 'CANARY-openid-state-S4', 'OpenID state reaches the vendor') }
       data = { username: mode === 'wrong-identity' ? 'other@pve' : 'synthetic@pve', ticket: mode === 'challenge' && !params['tfa-challenge'] ? challenge : ticket,
         ...(mode !== 'challenge' || params['tfa-challenge'] ? { CSRFPreventionToken: csrf } : {}) }
@@ -96,9 +96,11 @@ export async function exerciseSecretJourney(options: Journey): Promise<void> {
       else if (url.pathname.endsWith('/access/permissions')) data = {}
       else if (url.pathname.endsWith('/nodes')) data = []
       else if (request.method === 'GET' && url.pathname.endsWith('/status')) data = {
-        upid: taskUpid, node: 'pve-test', status: 'stopped', exitstatus: 'OK', starttime: 1, type: 'qmstart', pstart: 2, id: '100', user: 'root@pam', pid: 1,
+        upid: taskUpid, node: 'pve-test', status: 'stopped', exitstatus: 'OK', starttime: 1, type: 'qmstart', pstart: 2, id: '100', user: 'synthetic@pve', pid: 1,
       }
-      else if (request.method === 'GET' && url.pathname.endsWith('/log')) data = [{ n: 1, t: 'TASK OK' }]
+      else if (request.method === 'GET' && url.pathname.endsWith('/log')) data = [{ n: 1, t: `TASK OK ${selectedPassword}` }]
+      else if (request.method === 'GET' && url.pathname.endsWith('/config')) data = { cipassword: password }
+      else if (request.method === 'GET' && url.pathname.endsWith('/status/current')) data = { status: 'running' }
       else {
         mutations++
         if (mode === 'broken') breakSink()
@@ -110,7 +112,7 @@ export async function exerciseSecretJourney(options: Journey): Promise<void> {
         else if (url.pathname.endsWith('/execute')) {
           const batch = JSON.parse(params.commands!) as { method: string, path: string, args: Record<string, string> }[]
           const apply = (items: typeof batch): unknown[] => items.map(child => ({ status: 200, data: child.path === 'execute' ? apply(JSON.parse(child.args.commands!) as typeof batch) :
-            child.path.endsWith('/vncproxy') ? { port: 5900, cert: 'synthetic-cert', ticket: minted, password: recovery, user: 'synthetic@pve', upid: 'synthetic-upid' } :
+            /\/(vncproxy|termproxy)$/.test(child.path) ? { port: 5900, cert: 'synthetic-cert', ticket: minted, password: recovery, user: 'synthetic@pve', upid: 'synthetic-upid' } :
             child.path.endsWith('/start') ? taskUpid :
               (assert.ok(child.args.cipassword === password, 'nested protected password reaches the vendor'), null) }))
           data = apply(batch)
@@ -137,12 +139,13 @@ export async function exerciseSecretJourney(options: Journey): Promise<void> {
     operation('POST', '/nodes/{node}/qemu/{vmid}/vncproxy'), operation('PUT', '/access/password'), operation('POST', '/access/tfa/{userid}'),
     operation('POST', '/nodes/{node}/qemu/{vmid}/status/start'), operation('PUT', '/nodes/{node}/lxc/{vmid}/config'),
     operation('DELETE', '/nodes/{node}/tasks/{upid}'),
+    operation('POST', '/nodes/{node}/qemu/{vmid}/termproxy'), operation('POST', '/nodes/{node}/lxc/{vmid}/vncproxy'), operation('POST', '/nodes/{node}/lxc/{vmid}/termproxy'),
     operation('PUT', '/access/tfa/{userid}/{id}'), operation('DELETE', '/access/tfa/{userid}/{id}')]
   let auth = 'api-token'
   const env = { ...options.env, PROXMOX_AXI_PROFILE: 'secrets', PROXMOX_AXI_CONFIG: config, PROXMOX_AXI_WRITE_LOG: log,
     PVE_INPUT_PASSWORD: password, PVE_INPUT_TICKET: ticket, PVE_INPUT_CSRF: csrf, PVE_INPUT_OTP: 'totp:123456',
     PVE_INPUT_WEBAUTHN: 'webauthn:synthetic-response', PVE_INPUT_OPENID_STATE: 'CANARY-openid-state-S4',
-    PVE_INPUT_KEY: (await readFile(join(scratch, 'server.key'), 'utf8')).trimEnd(), PROXMOX_AXI_TEST_CLOCK_FILE: clock }
+    PVE_INPUT_KEY: (await readFile(join(scratch, 'server.key'), 'utf8')).trimEnd(), PROXMOX_AXI_TEST_CLOCK_FILE: clock, PVE_NUMERIC_SECRET: '12345678' }
   const configure = async (kind: string) => {
     auth = kind
     if (options.hosted) return options.hosted.configure(origin, kind, ids)
@@ -151,7 +154,7 @@ export async function exerciseSecretJourney(options: Journey): Promise<void> {
         ...(kind === 'password' ? { password: { file: passwordFile } } : { ticket: { env: 'PVE_INPUT_TICKET' }, csrfPreventionToken: { env: 'PVE_INPUT_CSRF' } }) }), writes: { operations: ids } } } }), { mode: 0o600 })
   }
   const start = (args: string[], environment: Record<string, string>, sink: string | number = 'pipe', session = false) => {
-    const child = spawn(process.execPath, [...(!options.hosted && session ? ['--import', fileURLToPath(new URL('./auth-clock.ts', import.meta.url))] : []), executable,
+    const child = spawn(process.execPath, [...(!options.hosted && session ? ['--import', fileURLToPath(new URL(import.meta.url.endsWith('.ts') ? './auth-clock.ts' : './auth-clock.js', import.meta.url))] : []), executable,
       ...(options.hosted ? ['proxmox-axi'] : []), ...args], { env: { ...environment, PROXMOX_AXI_RESULT_FD: sink === 'missing' ? '' : '3' },
       stdio: ['pipe', 'pipe', 'pipe', ...(sink === 'missing' ? [] : [typeof sink === 'number' ? sink : 'pipe' as const])] })
     const frames = queue<Frame>(), lines = queue<Record<string, unknown>>()
@@ -176,7 +179,11 @@ export async function exerciseSecretJourney(options: Journey): Promise<void> {
     })
     const closed = new Promise<{ code: number, stdout: string, stderr: string }>((resolve, reject) => {
       child.once('error', reject)
-      child.once('close', (code, signal) => { clearTimeout(timer); assert.equal(signal, null); resolve({ code: code!, stdout, stderr }) })
+      child.once('close', (code, signal) => {
+        clearTimeout(timer)
+        if (signal) reject(new Error(`Command terminated by ${signal}`))
+        else resolve({ code: code!, stdout, stderr })
+      })
     })
     return { child, frames, lines, closed }
   }
@@ -212,7 +219,7 @@ export async function exerciseSecretJourney(options: Journey): Promise<void> {
         frame = await delivered.frames.next()
       }
     }
-    if (expected.error) assert.ok(object(value.error).code === expected.error, `${id}: unexpected public error code`)
+    if (expected.error) assert.equal(object(value.error).code, expected.error, `${id}: ${safePublic(JSON.stringify(value))}`)
     if (expected.status) assert.ok(value.status === expected.status, `${id}: ${safePublic(JSON.stringify(value))}`)
     assert.equal(mutations - before, expected.mutations ?? 0, `${id}: no mutation retry`)
     assert.ok(safePublic(JSON.stringify(value)) === JSON.stringify(value), `${id}: protected value in public output`)
@@ -225,7 +232,6 @@ export async function exerciseSecretJourney(options: Journey): Promise<void> {
   try {
     await configure('api-token')
     if (!options.hosted) {
-      env.PVE_NUMERIC_SECRET = '12345678'
       await invoke('CRED-13/qemu-numeric-path', ['set', '/nodes/{node}/qemu/{vmid}/config', '--preview'], { error: 'INVALID_INPUT' },
         { node: 'pve-test', vmid: 12345678, cipassword: { env: 'PVE_NUMERIC_SECRET' } })
       for (const guest of ['qemu', 'lxc']) await invoke(`CRED-13/nested-${guest}-sibling-path`, ['create', '/nodes/{node}/execute', '--preview'], { error: 'INVALID_INPUT' }, {
@@ -272,6 +278,7 @@ export async function exerciseSecretJourney(options: Journey): Promise<void> {
     const batch = { node: 'pve-test', commands: JSON.stringify([{ method: 'POST', path: 'execute', args: { commands: JSON.stringify([
       { method: 'PUT', path: 'qemu/100/config', args: { cipassword: { env: 'PVE_INPUT_PASSWORD' } } }, { method: 'POST', path: 'qemu/100/vncproxy' },
       { method: 'POST', path: 'qemu/100/status/start' },
+      { method: 'POST', path: 'qemu/100/termproxy' }, { method: 'POST', path: 'lxc/100/vncproxy' }, { method: 'POST', path: 'lxc/100/termproxy' },
     ]) } }]) }
     const batchArgs = ['create', '/nodes/{node}/execute']
     const batchPreview = await invoke('AC-SPECIAL-BATCH-POLICY/nested-private-preview', [...batchArgs, '--preview'], {}, batch)
@@ -358,6 +365,55 @@ export async function exerciseSecretJourney(options: Journey): Promise<void> {
     await invoke('CRED-11/acquired-identity-mismatch', ['auth', 'acquire'], { error: 'AUTH_SESSION_INVALID' })
     mode = 'success'
     if (processSession) { processSession.child.stdin!.end(); await processSession.closed; processSession = undefined }
+    if (!options.hosted) {
+      for (const secret of ['compatibility', 'success']) {
+        selectedPassword = secret
+        await writeFile(passwordFile, secret)
+        processSession = start(['auth', 'session'], env, 'pipe', true)
+        const acquired = await invoke(`CRED-16/${secret}-acquire`, ['auth', 'acquire'], { status: 'ready', private: true })
+        const id = String(acquired.value.session)
+        const read = await invoke(`CRED-16/${secret}-json-keys`, ['get', '/version', '--session', id])
+        assert.equal(object(read.value.compatibility).status, 'unverified')
+        await invoke(`CRED-16/${secret}-json-status`, ['task', 'status', '--api-node', 'pve-test', '--api-upid', taskUpid, '--session', id], { status: 'success' })
+        const state = JSON.stringify({ ...acquired.frame!.payload, origin, identity: 'synthetic@pve', actor: options.env.PROXMOX_AXI_ACTOR,
+          family: options.env.PROXMOX_AXI_SESSION_FAMILY, revision: options.env.PROXMOX_AXI_CREDENTIAL_REVISION })
+        for (const args of [['get', '/version'], ['task', 'status', '--api-node', 'pve-test', '--api-upid', taskUpid],
+          ['task', 'log', '--api-node', 'pve-test', '--api-upid', taskUpid]]) {
+          const command = start([...args, '--session', id, '--format', 'toon'], { ...env, PROXMOX_AXI_AUTH_STATE: state })
+          command.child.stdin!.end()
+          const result = await command.closed
+          assert.equal(result.code, 0, result.stderr)
+          const value = object(decode(result.stdout))
+          if (args[0] === 'get') assert.equal(object(value.compatibility).status, 'unverified')
+          else if (args[1] === 'status') assert.equal(value.status, 'success')
+          else assert.equal(object((value.data as unknown[])[0]).t, 'TASK OK [REDACTED]')
+        }
+        processSession.child.stdin!.end()
+        await processSession.closed
+        processSession = undefined
+      }
+      selectedPassword = password
+      await writeFile(passwordFile, password)
+      processSession = start(['auth', 'session'], env, 'pipe', true)
+      mode = 'challenge'
+      const oidc = await invoke('CRED-17/capacity-openid-acquire', ['auth', 'acquire'], { status: 'challenge', private: true },
+        { openid: { realm: 'synthetic', 'redirect-url': origin } })
+      const challenges: string[] = []
+      for (let index = 0; index < 63; index++) {
+        const acquired = await invoke(`CRED-17/capacity-acquire-${index}`, ['auth', 'acquire'], { status: 'challenge', private: true })
+        challenges.push(String(acquired.value.session))
+      }
+      await invoke('CRED-17/capacity-reject-acquire', ['auth', 'acquire'], { error: 'AUTH_SESSION_LIMIT' })
+      await invoke('CRED-17/capacity-otp-continue', ['auth', 'continue', '--session', challenges[0]!], { status: 'ready', private: true }, { response: { env: 'PVE_INPUT_OTP' } })
+      await invoke('CRED-17/capacity-webauthn-continue', ['auth', 'continue', '--session', challenges[1]!], { status: 'ready', private: true },
+        { response: { env: 'PVE_INPUT_WEBAUTHN' }, webauthnOrigin: origin })
+      mode = 'success'
+      await invoke('CRED-17/capacity-openid-continue', ['auth', 'continue', '--session', String(oidc.value.session)], { status: 'ready', private: true },
+        { openid: { code: { env: 'PVE_INPUT_PASSWORD' }, state: { env: 'PVE_INPUT_OPENID_STATE' }, 'redirect-url': origin } })
+      processSession.child.stdin!.end()
+      await processSession.closed
+      processSession = undefined
+    }
     }
 
     const scan = async (path: string, journal = false): Promise<void> => {
@@ -382,7 +438,10 @@ export async function exerciseSecretJourney(options: Journey): Promise<void> {
     await writeFile(join(options.out, `${options.hosted ? 'hosted-' : ''}secret-custody.json`), JSON.stringify({ status: 'pass', protectedValuesPersisted: 0, mutationTransmissions: mutations,
       origin, cases: options.cases.filter(row => String(row.id).startsWith(options.hosted ? 'artium/' : 'standalone/')).map(row => row.id) }, null, 2))
   } finally {
-    processSession?.child.kill('SIGKILL')
+    if (processSession) {
+      processSession.child.kill('SIGKILL')
+      await processSession.closed.catch(() => {})
+    }
     await new Promise<void>(resolve => { server.close(() => resolve()); server.closeAllConnections() })
   }
 }

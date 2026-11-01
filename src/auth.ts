@@ -66,7 +66,7 @@ export async function authOperation(credentials: Credentials, action: string, in
   }
   credentials.results.sink()
   if (!['acquire', 'continue'].includes(action) || credentials.auth !== 'password') throw new Failure('AUTH_REQUIRED', 'Acquisition requires an explicitly selected password profile.', 'Select the intended password profile; API token failures never fall back.')
-  if (sessions.size >= 64) throw new Failure('AUTH_SESSION_LIMIT', 'The memory session limit is reached.', 'Cancel an existing session before acquiring another.')
+  if (action === 'acquire' && sessions.size >= 64) throw new Failure('AUTH_SESSION_LIMIT', 'The memory session limit is reached.', 'Cancel an existing session before acquiring another.')
   if (Object.keys(input).some(key => !['response', 'webauthnOrigin', 'openid'].includes(key))) throw denied()
   const values = new URLSearchParams({ username: credentials.tokenId, password: credentials.token })
   let path = '/access/ticket'
@@ -109,8 +109,9 @@ export async function authOperation(credentials: Credentials, action: string, in
   }
   if (action === 'acquire' && input.openid === undefined && !credentials.token) throw new Failure('AUTH_REQUIRED', 'Password acquisition requires a protected password source.', 'Supply the selected password SecretRef or use explicit OpenID acquisition.')
   const data = await executeRequest(credentials, `/api2/json${path}`, { method: 'POST', body: values.toString(), unauthenticated: true })
-  credentials.results.register(data)
   const openid = path === '/access/openid/auth-url'
+  if (openid) credentials.results.register(data)
+  else credentials.results.registerMinted(data)
   if (openid) {
     if (typeof data !== 'string') throw denied()
     let url: URL

@@ -6,7 +6,6 @@ import { isAbsolute } from 'node:path'
 import { configurationPath, listProfiles, resolveCredentials, type Credentials } from './credentials.js'
 import { buildPath, contracts, parseParameter, selectContract } from './contract.js'
 import { Failure } from './errors.js'
-import { redact } from './redact.js'
 import { readOperation, doctor } from './reads.js'
 import { presentRead } from './presentation.js'
 import { writeOperation } from './writes.js'
@@ -60,11 +59,8 @@ export async function main(args: string[]): Promise<void> {
   }
   let format = 'toon'
   let credentials: Credentials | undefined
-  const output = (value: Record<string, unknown>, generated = false) => {
+  const output = (value: Record<string, unknown>) => {
     let text = format === 'json' ? JSON.stringify(value) : encode(value)
-    if (credentials) {
-      if (!generated) text = credentials.results.redact(text)
-    }
     if (Buffer.byteLength(text) > 65536) {
       process.exitCode = 1
       const error = { error: { code: 'OUTPUT_LIMIT', message: 'Rendered output exceeds 65536 bytes.' }, help: ['Request fewer rows or fields.'] }
@@ -117,7 +113,7 @@ export async function main(args: string[]): Promise<void> {
       if (positional.length !== 3 || !['show', 'reconcile'].includes(positional[1]!) || Object.keys(options).some(key => !['--config', '--profile', '--format', '--session'].includes(key))) throw usage('Use journal show|reconcile <id>.')
       credentials = await resolveCredentials({ ...(options['--config'] ? { config: options['--config'] } : {}), ...(options['--profile'] ? { profile: options['--profile'] } : {}) })
       if (options['--session']) credentials = useSession(credentials, options['--session'])
-      output(redact(await journalOperation(credentials, positional[1]!, positional[2]!), [credentials.token]) as Record<string, unknown>)
+      output(await journalOperation(credentials, positional[1]!, positional[2]!))
       return
     }
     if (task) positional.splice(0, 2, task === 'cancel' ? 'delete' : 'get', `/nodes/{node}/tasks/{upid}${task === 'cancel' ? '' : task === 'log' ? '/log' : '/status'}`)
@@ -248,33 +244,35 @@ export async function main(args: string[]): Promise<void> {
       verifyAcl: command === 'auth status' || command === 'doctor',
       ...(options['--profile'] ? { profile: options['--profile'] } : {}) })
     if (authAction) {
-      output(await authOperation(credentials, authAction, values, options['--session']), true)
+      output(await authOperation(credentials, authAction, values, options['--session']))
       return
     }
     if (options['--session']) credentials = useSession(credentials, options['--session'])
     if (task && task !== 'cancel') {
       const waitMs = Number(options['--wait-ms'] ?? 5000)
       if (!Number.isSafeInteger(waitMs) || waitMs < 1 || waitMs > 30000) throw usage('Task wait must be 1-30000 ms.')
-      output(redact(await taskOperation(credentials, task, values, waitMs, options['--journal']), [credentials.token]) as Record<string, unknown>)
+      output(await taskOperation(credentials, task, values, waitMs, options['--journal']))
     } else if (contract && ['write', 'batch'].includes(contract.policy.effect)) {
-      output(await writeOperation(credentials, contract, values, { preview: !!options['--preview'], ...(options['--confirm'] ? { confirmation: options['--confirm'] } : {}) }), true)
+      output(await writeOperation(credentials, contract, values, { preview: !!options['--preview'], ...(options['--confirm'] ? { confirmation: options['--confirm'] } : {}) }))
     } else if (command === 'auth status') {
       output({ credential: { ...credentials.diagnostics, origin: credentials.origin, tokenId: credentials.tokenId } })
     } else if (command === 'doctor') {
-      output(redact(await doctor(credentials), [credentials.token]) as Record<string, unknown>)
+      output(await doctor(credentials))
     } else {
       const selected = contract ?? selectContract('GET', '/version', release)
       const result = await readOperation(credentials, selected, values, options['--catalogue'])
       const nextOptions = ['--config', '--profile', '--catalogue'].filter(key => options[key]).map(key => `${key} ${JSON.stringify(options[key])}`).join(' ')
       const next = `proxmox-axi schema get ${selected.path} ${nextOptions}`.trim()
-      const safeData = redact(presentRead(result, selected.path, { limit, full: !!options['--full'], ...(fields ? { fields } : {}), next }), [credentials.token]) as Record<string, unknown>
+      const safeData = presentRead({ ...result, data: credentials.results.sanitize(result.data),
+        ...(result.compatibility ? { compatibility: { ...result.compatibility, version: credentials.results.redact(result.compatibility.version) } } : {}) },
+        selected.path, { limit, full: !!options['--full'], ...(fields ? { fields } : {}), next }) as Record<string, unknown>
       output({ ...(['', 'home'].includes(command) ? { bin: fileURLToPath(new URL('../bin/proxmox-axi.mjs', import.meta.url)).replace(homedir(), '~'),
         description: 'Read Proxmox VE inventory and task information.', help: ['proxmox-axi ls', 'proxmox-axi doctor', 'proxmox-axi inventory'] } : {}),
         ...(selected.path === '/version' ? { version: safeData.data, compatibility: safeData.compatibility } : safeData), credential: credentials.diagnostics })
     }
   } catch (error) {
     const failure = error instanceof Failure ? error : new Failure('CONFIG_INVALID', 'Unable to read the selected configuration.', 'Check the selected configuration and protected file paths.')
-    output({ error: { code: failure.code, message: failure.message }, help: [failure.next] }, true)
+    output({ error: { code: failure.code, message: failure.message }, help: [failure.next] })
     process.exitCode = failure.exitCode
   }
 }

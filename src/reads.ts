@@ -61,7 +61,8 @@ export async function doctor(credentials: Credentials, node?: string) {
   let release = 'published-current'
   const run = async (path: string, values: Record<string, unknown> = {}) => {
     const result = await readOperation(credentials, selectContract('GET', path, release), values, release)
-    checks.push({ path, ...result })
+    checks.push({ path, ...result, data: credentials.results.sanitize(result.data),
+      ...(result.compatibility ? { compatibility: { ...result.compatibility, version: credentials.results.redact(result.compatibility.version) } } : {}) })
     return result.data
   }
   const entry = await run('/version') as Record<string, string>
@@ -77,7 +78,8 @@ export async function doctor(credentials: Credentials, node?: string) {
     if (tasks[0]) await run('/nodes/{node}/tasks/{upid}/status', { node: selectedNode, upid: tasks[0].upid })
   }
   for (const check of checks) if (inventoryRoutes.has(check.path as string)) check.visibility = inventoryVisibility(check.path as string, permissions)
-  return { compatibility: capability(entry.version!), permissions, checks,
+  return { compatibility: { ...capability(entry.version!), version: credentials.results.redact(entry.version!) },
+    permissions: credentials.results.sanitize(permissions), checks,
     bounds: { maximumRequests: 9, requestDeadlineMs: 5000, maximumResponseBytes: 65536 },
     help: ['Run proxmox-axi doctor before and after an upgrade.', 'Review certificate changes explicitly; trust is never renewed automatically.'] }
 }

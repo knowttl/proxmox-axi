@@ -181,7 +181,7 @@ function checkPaths(call: Invocation, results: Credentials['results']): void {
 function registerResults(call: Invocation, data: unknown, results: Credentials['results']): void {
   if (call.contract.policy.effect === 'batch' && Array.isArray(data)) {
     for (const [index, child] of call.children.entries()) registerResults(child, data[index]?.data, results)
-  } else if (call.contract.policy.secrets === 'private-result') results.register(data)
+  } else if (call.contract.policy.secrets === 'private-result') results.registerMinted(data)
 }
 
 function reconciliationCheck(call: Invocation, journal: Journal): JournalRecord['check'] {
