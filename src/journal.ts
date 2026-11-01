@@ -1,8 +1,10 @@
 import { createHmac, randomBytes, randomUUID } from 'node:crypto'
 import { homedir } from 'node:os'
 import { dirname, isAbsolute, join } from 'node:path'
-import { lstat, mkdir, open, rmdir } from 'node:fs/promises'
+import { lstat, mkdir, open, readFile, readdir, rename, rm, rmdir, unlink } from 'node:fs/promises'
 import { constants, watch } from 'node:fs'
+import { execFile } from 'node:child_process'
+import { promisify } from 'node:util'
 import { Failure } from './errors.js'
 import { readPrivateFile, replacePrivateFile } from './private-file.js'
 import { windowsProtection } from './windows-acl.js'
@@ -39,6 +41,36 @@ export function journalPath(): string {
 }
 
 const unavailable = () => new Failure('JOURNAL_UNAVAILABLE', 'Protected durable journal is unavailable.', 'Restore the owned private state directory before executing a write.')
+const execute = promisify(execFile)
+
+async function processStart(pid: number): Promise<string | undefined> {
+  try {
+    process.kill(pid, 0)
+    if (process.platform === 'linux') {
+      const stat = await readFile(`/proc/${pid}/stat`, 'utf8')
+      const fields = stat.slice(stat.lastIndexOf(')') + 2).split(' ')
+      if (fields[0] === 'Z') return
+      return `${(await readFile('/proc/sys/kernel/random/boot_id', 'utf8')).trim()}:${fields[19]}`
+    }
+    const result = process.platform === 'win32' ? await execute('powershell.exe', ['-NoProfile', '-NonInteractive', '-Command',
+      `[Diagnostics.Process]::GetProcessById(${pid}).StartTime.ToUniversalTime().Ticks`], { timeout: 5000, windowsHide: true }) :
+      await execute('ps', ['-p', String(pid), '-o', 'lstart='], { timeout: 5000, env: { ...process.env, LC_ALL: 'C' } })
+    if (!result.stdout.trim()) throw unavailable()
+    return result.stdout.trim()
+  } catch {
+    try { process.kill(pid, 0) } catch (gone) { if ((gone as NodeJS.ErrnoException).code === 'ESRCH') return }
+    throw unavailable()
+  }
+}
+
+async function removeLockOwner(path: string, owner?: string): Promise<void> {
+  if (owner) {
+    try { await unlink(join(path, owner)) }
+    catch (error) { if ((error as NodeJS.ErrnoException).code !== 'ENOENT') throw error }
+  }
+  try { await rmdir(path) }
+  catch (error) { if (!['ENOENT', 'ENOTEMPTY', 'EEXIST'].includes((error as NodeJS.ErrnoException).code ?? '')) throw error }
+}
 
 // One record per intent avoids lost updates between independent hosted calls.
 // An exclusive durable claim consumes a confirmation even if the caller crashes.
@@ -102,18 +134,32 @@ export class Journal {
 
   private async locked<T>(id: string, action: () => Promise<T>): Promise<T> {
     const path = `${this.path(id)}.lock`
+    const candidate = `${path}.${randomUUID()}`
+    const owner = Buffer.from(JSON.stringify({ pid: process.pid, start: await processStart(process.pid), nonce: randomUUID() })).toString('base64url')
+    await mkdir(candidate, { mode: 0o700 })
     let notify = () => {}, expired = false, watchError: Error | undefined
     const watcher = watch(this.directory, (_event, name) => { if (name === `${id}.json.lock`) notify() })
     watcher.on('error', error => { watchError = error; notify() })
     const deadline = setTimeout(() => { expired = true; notify() }, 5000)
     let acquired = false
     try {
+      const marker = await open(join(candidate, owner), 'wx', 0o600)
+      await marker.close()
       while (!acquired) {
-        if (expired || watchError) throw unavailable()
+        if (watchError) throw unavailable()
         const changed = new Promise<void>(resolve => { notify = resolve })
-        try { await mkdir(path, { mode: 0o700 }); acquired = true }
+        try { await rename(candidate, path); acquired = true }
         catch (error) {
-          if ((error as NodeJS.ErrnoException).code !== 'EEXIST') throw error
+          if (!['EEXIST', 'ENOTEMPTY', ...(process.platform === 'win32' ? ['EPERM'] : [])].includes((error as NodeJS.ErrnoException).code ?? '')) throw error
+          let owners: string[]
+          try { owners = await readdir(path) }
+          catch (missing) { if ((missing as NodeJS.ErrnoException).code === 'ENOENT') continue; throw missing }
+          if (!owners.length) { await removeLockOwner(path); continue }
+          if (owners.length !== 1) throw unavailable()
+          const retained = JSON.parse(Buffer.from(owners[0]!, 'base64url').toString()) as { pid: number, start: string }
+          if (!Number.isSafeInteger(retained.pid) || retained.pid <= 0 || typeof retained.start !== 'string') throw unavailable()
+          if (await processStart(retained.pid) !== retained.start) { await removeLockOwner(path, owners[0]); continue }
+          if (expired) throw unavailable()
           await changed
         }
       }
@@ -121,7 +167,8 @@ export class Journal {
     } finally {
       clearTimeout(deadline)
       watcher.close()
-      if (acquired) await rmdir(path)
+      if (acquired) await removeLockOwner(path, owner)
+      else await rm(candidate, { recursive: true, force: true })
     }
   }
 

@@ -2,7 +2,8 @@ import assert from 'node:assert/strict'
 import { createHash } from 'node:crypto'
 import { createServer } from 'node:https'
 import { mkdir, readFile, readdir, writeFile } from 'node:fs/promises'
-import { join } from 'node:path'
+import { dirname, join } from 'node:path'
+import { fileURLToPath, pathToFileURL } from 'node:url'
 import { spawn, type ChildProcess } from 'node:child_process'
 import type { IncomingMessage, ServerResponse } from 'node:http'
 import { decode } from '@toon-format/toon'
@@ -42,6 +43,7 @@ export async function exerciseWriteJourney(options: Journey): Promise<void> {
   let bodyEvidence: Record<string, unknown>[] = []
   let taskReadStarted = () => {}, releaseTaskRead = () => {}
   let blockedTaskRead = Promise.resolve()
+  let delayNextRead = false
   const snapshot = () => ({ guests: [...guestState].map(([family, state]) => ({ family, status: state.status, cores: state.cores, memory: state.memory })), pools: [...pools] })
   const journalRecords = async (): Promise<Record<string, unknown>[]> => {
     let names: string[]
@@ -85,7 +87,7 @@ export async function exerciseWriteJourney(options: Journey): Promise<void> {
       if (path.endsWith('/version')) data = mode === 'unknown-major' ? { ...version, version: '77.0.0' } : version
       else if (path.endsWith('/status') && path.includes('/tasks/')) {
         const requestedUpid = path.split('/tasks/')[1]!.slice(0, -'/status'.length)
-        if (mode === 'reconcile-unavailable' && requestedUpid === upid) { reply.writeHead(404).end(); return }
+        if (mode === 'all-tasks-unavailable' || (mode === 'reconcile-unavailable' && requestedUpid === upid)) { reply.writeHead(404).end(); return }
         if (mode === 'concurrent-followups' && requestedUpid === upid) { taskReadStarted(); await blockedTaskRead }
         taskReads++
         if (mode === 'task-completes' && taskReads >= 2) taskState = 'success'
@@ -119,6 +121,11 @@ export async function exerciseWriteJourney(options: Journey): Promise<void> {
       transmission.after = snapshot()
       if (mode === 'crash-after-commit') { crashing!.kill('SIGKILL'); reply.destroy(); return }
       if (mode === 'lost-response') { reply.destroy(); return }
+    }
+    if (mode === 'delayed-running' && delayNextRead && path.includes('/tasks/') && path.endsWith('/status')) {
+      delayNextRead = false
+      taskReadStarted()
+      await blockedTaskRead
     }
     reply.writeHead(200, { 'Content-Type': 'application/json' }).end(JSON.stringify({ data }))
   }
@@ -299,6 +306,18 @@ export async function exerciseWriteJourney(options: Journey): Promise<void> {
     const taskPreview = await invoke('AC-ASYNC/preview', [...start, '--preview'])
     await invoke('AC-ASYNC/accepted', [...start, '--confirm', taskPreview.confirmation], { status: 'accepted', mutations: 1 })
     const taskArgs = ['--api-node', 'pve-test', '--api-upid', upid, '--journal', taskPreview.id]
+    if (!options.hosted && process.platform !== 'win32') {
+      const crash = spawn(process.execPath, [fileURLToPath(new URL('./journal-lock-crash.ts', import.meta.url)),
+        pathToFileURL(join(dirname(executable), '../dist/journal.js')).href, taskPreview.id], { env, stdio: ['ignore', 'pipe', 'pipe'] })
+      const errors: Buffer[] = []
+      crash.stderr.on('data', (chunk: Buffer) => errors.push(chunk))
+      const signal = await new Promise<NodeJS.Signals | null>((resolve, reject) => {
+        crash.once('error', reject)
+        crash.once('close', (_code, killed) => resolve(killed))
+      })
+      assert.equal(signal, 'SIGKILL', Buffer.concat(errors).toString())
+      await invoke('AC-ASYNC/killed-journal-writer-restarts', ['task', 'status', ...taskArgs], { status: 'running' })
+    }
     await invoke('AC-ASYNC/running', ['task', 'status', ...taskArgs], { status: 'running' })
     const waiting = await invoke('AC-ASYNC/wait-bounded', ['task', 'wait', ...taskArgs, '--wait-ms', '1000'], { status: 'running' })
     assert.equal(waiting.wait, 'deadline-reached')
@@ -315,6 +334,20 @@ export async function exerciseWriteJourney(options: Journey): Promise<void> {
     const cancellation = await invoke('AC-ASYNC/cancel-preview', [...cancel, '--preview'])
     await invoke('AC-ASYNC/cancel', [...cancel, '--confirm', cancellation.confirmation], { status: 'success', mutations: 1 })
     await invoke('AC-ASYNC/cancelled-task-fails', ['task', 'status', ...taskArgs], { code: 1, status: 'failed' })
+    for (const family of ['qemu', 'lxc']) {
+      for (const action of ['start', 'stop']) {
+        const args = argsFor('create', family, `/status/${action}`)
+        const label = `AC-ASYNC/root-missing-task-${family}-${action}`
+        const preview = await invoke(`${label}-preview`, [...args, '--preview'])
+        await invoke(`${label}-accepted`, [...args, '--confirm', preview.confirmation], { status: 'accepted', mutations: 1 })
+        mode = 'all-tasks-unavailable'
+        const reconciled = await invoke(`${label}-reconcile`, ['journal', 'reconcile', preview.id])
+        assert.equal(reconciled.journal.status, 'accepted')
+        assert.equal(reconciled.journal.observation.desiredStateObserved, true)
+        assert.match(reconciled.journal.observation.task.result, /inconclusive/)
+        mode = 'success'
+      }
+    }
     const commands = JSON.stringify([{ method: 'POST', path: 'qemu/100/status/start' }, { method: 'POST', path: 'lxc/100/status/start' }])
     const batch = ['create', '/nodes/{node}/execute', '--api-node', 'pve-test', '--api-commands', commands]
     await profile(ids.filter(id => id !== operationId('POST', '/nodes/{node}/lxc/{vmid}/status/start')))
@@ -353,6 +386,35 @@ export async function exerciseWriteJourney(options: Journey): Promise<void> {
     assert.equal(wrapperResult.journal.status, 'failed')
     assert.equal(wrapperResult.journal.children[0].status, 'failed')
     if (!options.hosted) {
+      for (const shape of ['root', 'nested']) {
+        for (const terminal of ['success', 'failed']) {
+          const args = shape === 'root' ? start : [...batch.slice(0, -1), JSON.stringify([
+            { method: 'POST', path: 'execute', args: { commands: JSON.stringify([{ method: 'POST', path: 'qemu/100/status/start' }]) } },
+          ])]
+          const label = `AC-ASYNC/monotonic-${shape}-${terminal}`
+          const preview = await invoke(`${label}-preview`, [...args, '--preview'])
+          await invoke(`${label}-accepted`, [...args, '--confirm', preview.confirmation], { status: 'accepted', mutations: 1 })
+          const statusArgs = ['task', 'status', '--api-node', 'pve-test', '--api-upid', upid, '--journal', preview.id]
+          const expected = { status: terminal, code: terminal === 'failed' ? 1 : 0 }
+          const started = new Promise<void>(resolve => { taskReadStarted = resolve })
+          blockedTaskRead = new Promise<void>(resolve => { releaseTaskRead = resolve })
+          mode = 'delayed-running'; delayNextRead = true
+          const delayed = invoke(`${label}-delayed`, statusArgs, expected)
+          try {
+            await Promise.race([started, delayed.then(() => { throw new Error('Status ended before the controlled read') })])
+            taskState = terminal
+            await invoke(`${label}-terminal`, statusArgs, expected)
+          } finally { releaseTaskRead() }
+          await delayed
+          mode = 'success'
+          const retained = await invoke(`${label}-retained`, ['journal', 'show', preview.id])
+          assert.equal(retained.journal.status, terminal)
+          if (shape === 'nested') {
+            assert.equal(retained.journal.children[0].status, terminal)
+            assert.equal(retained.journal.children[0].children[0].status, terminal)
+          }
+        }
+      }
       const concurrent = await invoke('AC-ASYNC/concurrent-preview', [...batch, '--preview'])
       await invoke('AC-ASYNC/concurrent-accepted', [...batch, '--confirm', concurrent.confirmation], { status: 'accepted', mutations: 1 })
       const started = new Promise<void>(resolve => { taskReadStarted = resolve })
@@ -405,6 +467,12 @@ export async function exerciseWriteJourney(options: Journey): Promise<void> {
       const preview = await invoke(`AC-WRITES/${family}-delete-preview`, [...args, '--preview'])
       await invoke(`AC-WRITES/${family}-delete`, [...args, '--confirm', preview.confirmation], { status: 'accepted', mutations: 1 })
       assert.equal(guestState.has(family), false)
+      mode = 'all-tasks-unavailable'
+      const reconciled = await invoke(`AC-WRITES/${family}-delete-missing-task`, ['journal', 'reconcile', preview.id])
+      assert.equal(reconciled.journal.status, 'accepted')
+      assert.match(reconciled.journal.observation.result, /no-safe-automated-reconciliation/)
+      assert.match(reconciled.journal.observation.task.result, /inconclusive/)
+      mode = 'success'
     }
     if (!options.hosted) {
     const broken = join(directory, 'unavailable.log.d')
