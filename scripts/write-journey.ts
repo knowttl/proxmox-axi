@@ -72,7 +72,8 @@ export async function exerciseWriteJourney(options: Journey): Promise<void> {
     guestState.get(family)!.status = path.endsWith('/start') ? 'running' : 'stopped'
     taskState = 'running'
     taskReads = 0
-    return mode === 'unsafe-upid' ? upid.replace('synthetic@pve', '$(id)@pve') : family === 'lxc' ? lxcUpid : upid
+    return mode === 'credential-upid' ? upid.replace(':100:', `:${options.env.PROXMOX_AXI_TOKEN}:`) :
+      mode === 'unsafe-upid' ? upid.replace('synthetic@pve', '$(id)@pve') : family === 'lxc' ? lxcUpid : upid
   }
   const serve = async (request: IncomingMessage, reply: ServerResponse) => {
     const url = new URL(request.url!, 'https://fake.invalid')
@@ -200,6 +201,14 @@ export async function exerciseWriteJourney(options: Journey): Promise<void> {
     const tool = options.hosted ? 'artium-axi proxmox-axi' : 'proxmox-axi'
     assert.deepEqual(unsafeResult.help, [`${tool} task status --api-node <node> --api-upid <UPID>`, `${tool} task wait --api-node <node> --api-upid <UPID>`])
     mode = 'success'
+    const reflected = await invoke('CRED-13/reflected-task-identifier-preview', [...start, '--preview'])
+    mode = 'credential-upid'
+    await invoke('CRED-13/reflected-task-identifier', [...start, '--confirm', reflected.confirmation], { code: 1, error: 'WRITE_UNCERTAIN', mutations: 1 })
+    const reflectedRecord = await readFile(join(`${log}.d`, `${reflected.id}.json`), 'utf8')
+    for (const form of [options.env.PROXMOX_AXI_TOKEN!, encodeURIComponent(options.env.PROXMOX_AXI_TOKEN!), JSON.stringify(options.env.PROXMOX_AXI_TOKEN).slice(1, -1)]) {
+      assert.ok(!reflectedRecord.includes(form), 'provider-reflected credentials must not enter the journal')
+    }
+    mode = 'success'
     const shutdown = [...argsFor('create', 'qemu', '/status/shutdown'), '--api-forceStop', 'true']
     const forced = await invoke('AC-WRITES/vendor-flag-case-preview', [...shutdown, '--preview'])
     await invoke('AC-WRITES/vendor-flag-case-wire', [...shutdown, '--confirm', forced.confirmation], { status: 'accepted', mutations: 1 })
@@ -270,6 +279,10 @@ export async function exerciseWriteJourney(options: Journey): Promise<void> {
     const secretFresh = await invoke('AC-WRITES/secret-reference-fresh', [...secretArgs, '--preview'])
     await invoke('AC-WRITES/secret-reference-executes', [...secretArgs, '--confirm', secretFresh.confirmation], { status: 'success', mutations: 1 })
     assert.equal(guestState.get('qemu')!.cipassword, 'CANARY-operation-secret-v2')
+    await writeFile(secret, 'pve-test', { mode: 0o600 })
+    const pathRequests = ledger.length
+    await invoke('CRED-13/protected-path-component', [...secretArgs, '--preview'], { code: 2, error: 'INVALID_INPUT' })
+    assert.equal(ledger.length, pathRequests, 'protected path components fail before any provider request')
     for (const secretValue of ['success', 'a']) {
       await writeFile(secret, secretValue, { mode: 0o600 })
       for (const nested of [false, true]) {

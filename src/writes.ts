@@ -5,6 +5,7 @@ import { executeRequest, readVersion } from './transport.js'
 import { readPrivateFile } from './private-file.js'
 import { Failure } from './errors.js'
 import { Journal, publicChildren, type JournalRecord } from './journal.js'
+import { resultBinding } from './private-results.js'
 
 interface Invocation {
   contract: Contract
@@ -26,6 +27,7 @@ function checkPolicy(credentials: Credentials, contract: Contract): void {
     try { operations = JSON.parse(process.env.PROXMOX_AXI_HOST_OPERATIONS ?? 'null') } catch { throw denied() }
     if (!Array.isArray(operations) || !operations.every(id => typeof id === 'string') || !operations.includes(contract.id)) throw denied()
   }
+  if (contract.allowtoken === 0 && credentials.auth === 'api-token') throw new Failure('AUTH_SESSION_REQUIRED', 'This operation forbids API tokens.', 'Select an authorized user-session profile.')
 }
 
 async function invocation(credentials: Credentials, contract: Contract, input: Record<string, unknown>, budget = { count: 0 }, depth = 0): Promise<Invocation> {
@@ -46,6 +48,7 @@ async function invocation(credentials: Credentials, contract: Contract, input: R
       revisions.push({ file: ref.file, ino: info.ino, mtime: info.mtimeMs, size: info.size })
     } else throw new Failure('INVALID_INPUT', 'Unsupported secret reference.', 'Use an env or protected file reference.', 2)
     if (!secret) throw new Failure('AUTH_REQUIRED', 'An operation secret reference is empty.', 'Supply the selected secret source.')
+    credentials.results.register(secret)
     revisions.push({ reference: value, secret })
     values[name] = secret
   }
@@ -92,6 +95,9 @@ export async function writeOperation(credentials: Credentials, initial: Contract
   if (!['write', 'batch'].includes(initial.policy.effect)) throw denied()
   // All policy and input failures happen before any provider request.
   let call = await invocation(credentials, initial, values)
+  checkPaths(call, credentials.results)
+  const privateResult = (item: Invocation): boolean => item.contract.policy.secrets === 'private-result' || item.children.some(privateResult)
+  if (!options.preview && privateResult(call)) credentials.results.sink()
   const journal = await openJournal()
   const tokenRevision = credentials.diagnostics.tokenSource.startsWith('file:') ? await lstat(credentials.diagnostics.tokenSource.slice(5)) : undefined
   const binding = () => journal.fingerprint({ origin: credentials.origin, identity: credentials.tokenId,
@@ -107,6 +113,7 @@ export async function writeOperation(credentials: Credentials, initial: Contract
   if (!/^(8|9)\./.test(version.version!)) throw new Failure('CAPABILITY_UNSUPPORTED', 'Writes are disabled on an unknown major.', 'Review the target catalogue before enabling writes.')
   const release = version.version!.startsWith('8.') ? 'legacy-8.2.7' : 'published-current'
   if (release !== initial.release) call = await invocation(credentials, selectContract(initial.method, initial.path, release), values)
+  checkPaths(call, credentials.results)
   const fingerprint = binding()
   if (options.preview) {
     if (options.confirmation) throw new Failure('INVALID_INPUT', 'Preview cannot consume confirmation.', 'Choose preview or execution.', 2)
@@ -145,17 +152,36 @@ export async function writeOperation(credentials: Credentials, initial: Contract
     const [path, body] = call.wire.split('?')
     const query = call.contract.method === 'DELETE' || call.contract.method === 'GET'
     data = await executeRequest(credentials, query ? call.wire : path!, { method: call.contract.method, ...(!query && body ? { body } : {}) })
+    if (privateResult(call)) registerResults(call, data, credentials.results)
     validateResponse(data, call.contract.returns)
-    outcome = resultStatus(call, data)
+    outcome = resultStatus(call, data, credentials.results)
+    if (privateResult(call)) await credentials.results.deliver(resultBinding(credentials.origin, credentials.tokenId, call.contract.id, fingerprint), data)
   } catch (error) {
     // Even HTTP failures may follow a partial server-side action. No retry is safe.
     await saveOutcome({ status: 'uncertain' })
-    throw new Failure('WRITE_UNCERTAIN', `Write outcome is uncertain; journal ${id}.`, `Run proxmox-axi journal reconcile ${id}; do not repeat the mutation.`)
+    throw new Failure(error instanceof Failure && error.code === 'DELIVERY_UNCERTAIN' ? 'DELIVERY_UNCERTAIN' : 'WRITE_UNCERTAIN',
+      `Write or private delivery outcome is uncertain; journal ${id}.`, `Run proxmox-axi journal reconcile ${id}; do not repeat the mutation.`)
   }
   const saved = await saveOutcome(outcome)
   if (saved.status === 'failed' || saved.status === 'uncertain') process.exitCode = 1
   return { id, status: saved.status, ...(saved.upid ? { node: saved.node, upid: saved.upid } : {}), children: publicChildren(saved.children),
+    ...(call.contract.method === 'GET' && !privateResult(call) ? { data: credentials.results.sanitize(data) } : {}),
     reconciliation: saved.reconciliation, help: saved.upid ? [taskCommand('status'), taskCommand('wait')] : [] }
+}
+
+function checkPaths(call: Invocation, results: Credentials['results']): void {
+  for (const [name, value] of Object.entries(call.values)) {
+    if ((call.contract.path.includes(`{${name}}`) || call.contract.policy.reconciliation?.path?.includes(`{${name}}`)) && results.redact(String(value)) !== String(value)) {
+      throw new Failure('INVALID_INPUT', 'A path identifier contains protected data.', 'Select a non-secret resource identifier.', 2)
+    }
+  }
+  for (const child of call.children) checkPaths(child, results)
+}
+
+function registerResults(call: Invocation, data: unknown, results: Credentials['results']): void {
+  if (call.contract.policy.effect === 'batch' && Array.isArray(data)) {
+    for (const [index, child] of call.children.entries()) registerResults(child, data[index]?.data, results)
+  } else if (call.contract.policy.secrets === 'private-result') results.registerMinted(data)
 }
 
 function reconciliationCheck(call: Invocation, journal: Journal): JournalRecord['check'] {
@@ -189,10 +215,10 @@ function mergeOutcomes(records: JournalRecord['children'], outcomes: Outcome[] |
   }
 }
 
-function resultStatus(call: Invocation, data: unknown): Outcome {
+function resultStatus(call: Invocation, data: unknown, results: Credentials['results']): Outcome {
   if (call.contract.policy.effect !== 'batch') {
     if (typeof data === 'string') {
-      if (!/^UPID:[A-Za-z0-9.-]+:[a-fA-F0-9]+:[a-fA-F0-9]+:[a-fA-F0-9]+:[^:\s]+:[^:\s]*:[^:\s]+:$/.test(data)) throw new Failure('INVALID_RESPONSE', 'Mutation returned an invalid task identifier.', 'Inspect the uncertain journal.')
+      if (!/^UPID:[A-Za-z0-9.-]+:[a-fA-F0-9]+:[a-fA-F0-9]+:[a-fA-F0-9]+:[^:\s]+:[^:\s]*:[^:\s]+:$/.test(data) || results.redact(data) !== data) throw new Failure('INVALID_RESPONSE', 'Mutation returned an unsafe task identifier.', 'Inspect the uncertain journal.')
       return { status: 'accepted', upid: data, children: [] }
     }
     return { status: 'success', children: [] }
@@ -202,7 +228,7 @@ function resultStatus(call: Invocation, data: unknown): Outcome {
     const item = data[index] as { status?: unknown, data?: unknown }
     if (!item || typeof item.status !== 'number') return { status: 'uncertain' }
     if (item.status !== 200) return { status: 'failed' }
-    try { validateResponse(item.data, child.contract.returns); return resultStatus(child, item.data) }
+    try { validateResponse(item.data, child.contract.returns); return resultStatus(child, item.data, results) }
     catch { return { status: 'uncertain' } }
   })
   const statuses = children.map(child => child.status)

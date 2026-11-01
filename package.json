@@ -6,14 +6,14 @@
   "publishConfig": { "access": "public" },
   "type": "module",
   "bin": { "proxmox-axi": "bin/proxmox-axi.mjs" },
-  "files": ["bin", "dist", "axi-credential.schema.json", "inventory.json", "write-policy.json", "catalogue-diff.json", "artium-invocations.json", "help.json", "README.md"],
+  "files": ["bin", "dist", "docs/s4-contract.md", "axi-credential.schema.json", "inventory.json", "write-policy.json", "catalogue-diff.json", "artium-invocations.json", "help.json", "README.md"],
   "engines": { "node": ">=24.11.0" },
   "packageManager": "pnpm@10.22.0",
   "scripts": {
     "build": "node scripts/generate.mjs && tsc",
     "generate": "node scripts/generate.mjs",
     "lint": "node scripts/generate.mjs --check && tsc --noEmit && tsc -p tsconfig.tooling.json",
-    "test": "pnpm build && node --test test/*.test.mjs",
+    "test": "pnpm build && tsc -p tsconfig.test.json && node --test test/*.test.mjs .test-build/test/*.test.js",
     "verify:acceptance": "pnpm build && node scripts/acceptance.mjs",
     "prepack": "pnpm build"
   },

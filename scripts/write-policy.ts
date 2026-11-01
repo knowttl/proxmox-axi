@@ -16,6 +16,19 @@ const pool = new Set(['create_pool', 'update_pool', 'delete_pool'])
 export function reviewWrite(operation: Operation) {
   const { path, method } = operation
   const name = operation.vendorMetadata.name
+  const protectedOperation = [
+    'generate_token', 'update_token_info', 'add_tfa_entry', 'delete_tfa', 'update_tfa_entry',
+    'change_password', 'cifsscan', 'pbsscan', 'upload_custom_cert', 'vncproxy', 'termproxy', 'mtunnel',
+  ].includes(name ?? '')
+  if (protectedOperation) {
+    const sensitiveInputs = Object.keys(operation.parameters.properties ?? {}).filter(key =>
+      ['password', 'confirmation-password', 'key', 'value', 'totp', 'challenge'].includes(key))
+    return { effect: 'write', transport: 'json', secrets: ['generate_token', 'update_token_info', 'add_tfa_entry', 'vncproxy', 'termproxy', 'mtunnel'].includes(name!) ? 'private-result' : 'input-refs',
+      ...(name === 'termproxy' && path === '/nodes/{node}/termproxy' ? { allowedInputs: ['node'] } : {}),
+      sensitiveInputs, reason: 'Explicitly authorized credential and sensitive-input operation; shared preview and confirmation controls apply, including effectful scans.',
+      reconciliation: { kind: 'none', reason: 'Never recreate a one-time credential to determine delivery or outcome.' },
+      privileges: operation.permissions, response: operation.returns, source: 'Retained versioned API schema and S4 protected credential contract.' }
+  }
   const guest = /^\/nodes\/\{node\}\/(qemu|lxc)\/\{vmid\}$/.test(path)
   const lifecyclePath = /^\/nodes\/\{node\}\/(qemu|lxc)\/\{vmid\}\/status\/(start|stop|shutdown|reboot|reset|resume|suspend)$/.test(path)
   const config = /^\/nodes\/\{node\}\/(qemu|lxc)\/\{vmid\}\/config$/.test(path)

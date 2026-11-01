@@ -37,7 +37,7 @@ export async function taskOperation(credentials: Credentials, command: string, v
       throw error
     }
     validateResponse(data, contract.returns)
-    if (command === 'log') return { upid, data }
+    if (command === 'log') return { upid, data: credentials.results.sanitize(data) }
     status = outcome(data, node, upid)
     if (record && journal) {
       await journal.update(record.id, current => {
@@ -52,7 +52,7 @@ export async function taskOperation(credentials: Credentials, command: string, v
     await setTimeout(Math.min(250, Math.max(0, deadline - performance.now())))
   } while (performance.now() < deadline)
   if (status === 'failed') process.exitCode = 1
-  return { upid, status, data, ...(command === 'wait' && status === 'running' ? { wait: 'deadline-reached' } : {}),
+  return { upid, status, data: credentials.results.sanitize(data), ...(command === 'wait' && status === 'running' ? { wait: 'deadline-reached' } : {}),
     help: status === 'running' ? [taskCommand('status')] : [] }
 }
 

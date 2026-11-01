@@ -2659,12 +2659,47 @@
       "id": "OP-PUT-58526f2846",
       "release": "legacy-8.2.7",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "write",
+        "transport": "json",
+        "secrets": "input-refs",
+        "sensitiveInputs": [
+          "confirmation-password",
+          "password"
+        ],
+        "reason": "Explicitly authorized credential and sensitive-input operation; shared preview and confirmation controls apply, including effectful scans.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Never recreate a one-time credential to determine delivery or outcome."
+        },
+        "privileges": {
+          "check": [
+            "or",
+            [
+              "userid-param",
+              "self"
+            ],
+            [
+              "and",
+              [
+                "userid-param",
+                "Realm.AllocateUser"
+              ],
+              [
+                "userid-group",
+                [
+                  "User.Modify"
+                ]
+              ]
+            ]
+          ],
+          "description": "Each user is allowed to change their own password. A user can change the password of another user if they have 'Realm.AllocateUser' (on the realm of user <userid>) and 'User.Modify' permission on /access/groups/<group> on a group where user <userid> is member of. For the PAM realm, a password change does not take  effect cluster-wide, but only applies to the local node."
+        },
+        "response": {
+          "type": "null"
+        },
+        "source": "Retained versioned API schema and S4 protected credential contract."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "put",
         "/access/password"
@@ -2682,14 +2717,66 @@
               "additionalProperties": false,
               "properties": {
                 "confirmation-password": {
-                  "type": "string",
-                  "minLength": 5,
-                  "maxLength": 64
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "env"
+                      ],
+                      "properties": {
+                        "env": {
+                          "type": "string",
+                          "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "file"
+                      ],
+                      "properties": {
+                        "file": {
+                          "type": "string",
+                          "minLength": 1
+                        }
+                      }
+                    }
+                  ],
+                  "x-secret": true
                 },
                 "password": {
-                  "type": "string",
-                  "minLength": 8,
-                  "maxLength": 64
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "env"
+                      ],
+                      "properties": {
+                        "env": {
+                          "type": "string",
+                          "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "file"
+                      ],
+                      "properties": {
+                        "file": {
+                          "type": "string",
+                          "minLength": 1
+                        }
+                      }
+                    }
+                  ],
+                  "x-secret": true
                 },
                 "userid": {
                   "type": "string",
@@ -3774,12 +3861,61 @@
       "id": "OP-POST-daaf2db49a",
       "release": "legacy-8.2.7",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "write",
+        "transport": "json",
+        "secrets": "private-result",
+        "sensitiveInputs": [
+          "challenge",
+          "password",
+          "totp",
+          "value"
+        ],
+        "reason": "Explicitly authorized credential and sensitive-input operation; shared preview and confirmation controls apply, including effectful scans.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Never recreate a one-time credential to determine delivery or outcome."
+        },
+        "privileges": {
+          "check": [
+            "or",
+            [
+              "userid-param",
+              "self"
+            ],
+            [
+              "userid-group",
+              [
+                "User.Modify"
+              ]
+            ]
+          ]
+        },
+        "response": {
+          "properties": {
+            "challenge": {
+              "description": "When adding u2f entries, this contains a challenge the user must respond to in order to finish the registration.",
+              "optional": 1,
+              "type": "string"
+            },
+            "id": {
+              "description": "The id of a newly added TFA entry.",
+              "type": "string"
+            },
+            "recovery": {
+              "description": "When adding recovery codes, this contains the list of codes to be displayed to the user",
+              "items": {
+                "description": "A recovery entry.",
+                "type": "string"
+              },
+              "optional": 1,
+              "type": "array"
+            }
+          },
+          "type": "object"
+        },
+        "source": "Retained versioned API schema and S4 protected credential contract."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "post",
         "/access/tfa/{userid}"
@@ -3797,19 +3933,101 @@
               "additionalProperties": false,
               "properties": {
                 "challenge": {
-                  "type": "string"
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "env"
+                      ],
+                      "properties": {
+                        "env": {
+                          "type": "string",
+                          "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "file"
+                      ],
+                      "properties": {
+                        "file": {
+                          "type": "string",
+                          "minLength": 1
+                        }
+                      }
+                    }
+                  ],
+                  "x-secret": true
                 },
                 "description": {
                   "type": "string",
                   "maxLength": 255
                 },
                 "password": {
-                  "type": "string",
-                  "minLength": 5,
-                  "maxLength": 64
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "env"
+                      ],
+                      "properties": {
+                        "env": {
+                          "type": "string",
+                          "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "file"
+                      ],
+                      "properties": {
+                        "file": {
+                          "type": "string",
+                          "minLength": 1
+                        }
+                      }
+                    }
+                  ],
+                  "x-secret": true
                 },
                 "totp": {
-                  "type": "string"
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "env"
+                      ],
+                      "properties": {
+                        "env": {
+                          "type": "string",
+                          "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "file"
+                      ],
+                      "properties": {
+                        "file": {
+                          "type": "string",
+                          "minLength": 1
+                        }
+                      }
+                    }
+                  ],
+                  "x-secret": true
                 },
                 "type": {
                   "enum": [
@@ -3827,7 +4045,35 @@
                   "pattern": "^[^\\s@!/:]+@[^\\s@!/:]+$"
                 },
                 "value": {
-                  "type": "string"
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "env"
+                      ],
+                      "properties": {
+                        "env": {
+                          "type": "string",
+                          "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "file"
+                      ],
+                      "properties": {
+                        "file": {
+                          "type": "string",
+                          "minLength": 1
+                        }
+                      }
+                    }
+                  ],
+                  "x-secret": true
                 }
               },
               "required": [
@@ -3905,12 +4151,38 @@
       "id": "OP-DELETE-931ab3181e",
       "release": "legacy-8.2.7",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "write",
+        "transport": "json",
+        "secrets": "input-refs",
+        "sensitiveInputs": [
+          "password"
+        ],
+        "reason": "Explicitly authorized credential and sensitive-input operation; shared preview and confirmation controls apply, including effectful scans.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Never recreate a one-time credential to determine delivery or outcome."
+        },
+        "privileges": {
+          "check": [
+            "or",
+            [
+              "userid-param",
+              "self"
+            ],
+            [
+              "userid-group",
+              [
+                "User.Modify"
+              ]
+            ]
+          ]
+        },
+        "response": {
+          "type": "null"
+        },
+        "source": "Retained versioned API schema and S4 protected credential contract."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "delete",
         "/access/tfa/{userid}/{id}"
@@ -3931,9 +4203,35 @@
                   "type": "string"
                 },
                 "password": {
-                  "type": "string",
-                  "minLength": 5,
-                  "maxLength": 64
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "env"
+                      ],
+                      "properties": {
+                        "env": {
+                          "type": "string",
+                          "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "file"
+                      ],
+                      "properties": {
+                        "file": {
+                          "type": "string",
+                          "minLength": 1
+                        }
+                      }
+                    }
+                  ],
+                  "x-secret": true
                 },
                 "userid": {
                   "type": "string",
@@ -4160,12 +4458,38 @@
       "id": "OP-PUT-c8c0c420be",
       "release": "legacy-8.2.7",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "write",
+        "transport": "json",
+        "secrets": "input-refs",
+        "sensitiveInputs": [
+          "password"
+        ],
+        "reason": "Explicitly authorized credential and sensitive-input operation; shared preview and confirmation controls apply, including effectful scans.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Never recreate a one-time credential to determine delivery or outcome."
+        },
+        "privileges": {
+          "check": [
+            "or",
+            [
+              "userid-param",
+              "self"
+            ],
+            [
+              "userid-group",
+              [
+                "User.Modify"
+              ]
+            ]
+          ]
+        },
+        "response": {
+          "type": "null"
+        },
+        "source": "Retained versioned API schema and S4 protected credential contract."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "put",
         "/access/tfa/{userid}/{id}"
@@ -4193,9 +4517,35 @@
                   "type": "string"
                 },
                 "password": {
-                  "type": "string",
-                  "minLength": 5,
-                  "maxLength": 64
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "env"
+                      ],
+                      "properties": {
+                        "env": {
+                          "type": "string",
+                          "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "file"
+                      ],
+                      "properties": {
+                        "file": {
+                          "type": "string",
+                          "minLength": 1
+                        }
+                      }
+                    }
+                  ],
+                  "x-secret": true
                 },
                 "userid": {
                   "type": "string",
@@ -5602,8 +5952,7 @@
               "properties": {
                 "tokenid": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "Perl pattern"
+                  "pattern": "^(?:[A-Za-z][A-Za-z0-9._-]+)$"
                 },
                 "userid": {
                   "type": "string",
@@ -5721,8 +6070,7 @@
               "properties": {
                 "tokenid": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "Perl pattern"
+                  "pattern": "^(?:[A-Za-z][A-Za-z0-9._-]+)$"
                 },
                 "userid": {
                   "type": "string",
@@ -5851,12 +6199,70 @@
       "id": "OP-POST-774b7e437e",
       "release": "legacy-8.2.7",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "write",
+        "transport": "json",
+        "secrets": "private-result",
+        "sensitiveInputs": [],
+        "reason": "Explicitly authorized credential and sensitive-input operation; shared preview and confirmation controls apply, including effectful scans.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Never recreate a one-time credential to determine delivery or outcome."
+        },
+        "privileges": {
+          "check": [
+            "or",
+            [
+              "userid-param",
+              "self"
+            ],
+            [
+              "userid-group",
+              [
+                "User.Modify"
+              ]
+            ]
+          ]
+        },
+        "response": {
+          "additionalProperties": 0,
+          "properties": {
+            "full-tokenid": {
+              "description": "The full token id.",
+              "format_description": "<userid>!<tokenid>",
+              "type": "string"
+            },
+            "info": {
+              "properties": {
+                "comment": {
+                  "optional": 1,
+                  "type": "string"
+                },
+                "expire": {
+                  "default": "same as user",
+                  "description": "API token expiration date (seconds since epoch). '0' means no expiration date.",
+                  "minimum": 0,
+                  "optional": 1,
+                  "type": "integer"
+                },
+                "privsep": {
+                  "default": 1,
+                  "description": "Restrict API token privileges with separate ACLs (default), or give full privileges of corresponding user.",
+                  "optional": 1,
+                  "type": "boolean"
+                }
+              },
+              "type": "object"
+            },
+            "value": {
+              "description": "API token value used for authentication.",
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
+        "source": "Retained versioned API schema and S4 protected credential contract."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "post",
         "/access/users/{userid}/token/{tokenid}"
@@ -5885,8 +6291,7 @@
                 },
                 "tokenid": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "Perl pattern"
+                  "pattern": "^(?:[A-Za-z][A-Za-z0-9._-]+)$"
                 },
                 "userid": {
                   "type": "string",
@@ -6001,12 +6406,56 @@
       "id": "OP-PUT-cda6ced4ac",
       "release": "legacy-8.2.7",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "write",
+        "transport": "json",
+        "secrets": "private-result",
+        "sensitiveInputs": [],
+        "reason": "Explicitly authorized credential and sensitive-input operation; shared preview and confirmation controls apply, including effectful scans.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Never recreate a one-time credential to determine delivery or outcome."
+        },
+        "privileges": {
+          "check": [
+            "or",
+            [
+              "userid-param",
+              "self"
+            ],
+            [
+              "userid-group",
+              [
+                "User.Modify"
+              ]
+            ]
+          ]
+        },
+        "response": {
+          "description": "Updated token information.",
+          "properties": {
+            "comment": {
+              "optional": 1,
+              "type": "string"
+            },
+            "expire": {
+              "default": "same as user",
+              "description": "API token expiration date (seconds since epoch). '0' means no expiration date.",
+              "minimum": 0,
+              "optional": 1,
+              "type": "integer"
+            },
+            "privsep": {
+              "default": 1,
+              "description": "Restrict API token privileges with separate ACLs (default), or give full privileges of corresponding user.",
+              "optional": 1,
+              "type": "boolean"
+            }
+          },
+          "type": "object"
+        },
+        "source": "Retained versioned API schema and S4 protected credential contract."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "put",
         "/access/users/{userid}/token/{tokenid}"
@@ -6035,8 +6484,7 @@
                 },
                 "tokenid": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "Perl pattern"
+                  "pattern": "^(?:[A-Za-z][A-Za-z0-9._-]+)$"
                 },
                 "userid": {
                   "type": "string",
@@ -41089,12 +41537,91 @@
       "id": "OP-POST-cc95340692",
       "release": "legacy-8.2.7",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "write",
+        "transport": "json",
+        "secrets": "input-refs",
+        "sensitiveInputs": [
+          "key"
+        ],
+        "reason": "Explicitly authorized credential and sensitive-input operation; shared preview and confirmation controls apply, including effectful scans.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Never recreate a one-time credential to determine delivery or outcome."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/nodes/{node}",
+            [
+              "Sys.Modify"
+            ]
+          ]
+        },
+        "response": {
+          "properties": {
+            "filename": {
+              "optional": 1,
+              "type": "string"
+            },
+            "fingerprint": {
+              "description": "Certificate SHA 256 fingerprint.",
+              "optional": 1,
+              "pattern": "([A-Fa-f0-9]{2}:){31}[A-Fa-f0-9]{2}",
+              "type": "string"
+            },
+            "issuer": {
+              "description": "Certificate issuer name.",
+              "optional": 1,
+              "type": "string"
+            },
+            "notafter": {
+              "description": "Certificate's notAfter timestamp (UNIX epoch).",
+              "optional": 1,
+              "renderer": "timestamp",
+              "type": "integer"
+            },
+            "notbefore": {
+              "description": "Certificate's notBefore timestamp (UNIX epoch).",
+              "optional": 1,
+              "renderer": "timestamp",
+              "type": "integer"
+            },
+            "pem": {
+              "description": "Certificate in PEM format",
+              "format": "pem-certificate",
+              "optional": 1,
+              "type": "string"
+            },
+            "public-key-bits": {
+              "description": "Certificate's public key size",
+              "optional": 1,
+              "type": "integer"
+            },
+            "public-key-type": {
+              "description": "Certificate's public key algorithm",
+              "optional": 1,
+              "type": "string"
+            },
+            "san": {
+              "description": "List of Certificate's SubjectAlternativeName entries.",
+              "items": {
+                "type": "string"
+              },
+              "optional": 1,
+              "renderer": "yaml",
+              "type": "array"
+            },
+            "subject": {
+              "description": "Certificate subject name.",
+              "optional": 1,
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
+        "source": "Retained versioned API schema and S4 protected credential contract."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "post",
         "/nodes/{node}/certificates/custom"
@@ -41113,16 +41640,41 @@
               "properties": {
                 "certificates": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^(?:\\s*-----BEGIN CERTIFICATE-----[\\s\\S]+?-----END CERTIFICATE-----)+\\s*$"
                 },
                 "force": {
                   "type": "boolean"
                 },
                 "key": {
-                  "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "env"
+                      ],
+                      "properties": {
+                        "env": {
+                          "type": "string",
+                          "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "file"
+                      ],
+                      "properties": {
+                        "file": {
+                          "type": "string",
+                          "minLength": 1
+                        }
+                      }
+                    }
+                  ],
+                  "x-secret": true
                 },
                 "node": {
                   "type": "string",
@@ -56642,12 +57194,52 @@
       "id": "OP-POST-45ae134aef",
       "release": "legacy-8.2.7",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "write",
+        "transport": "json",
+        "secrets": "private-result",
+        "sensitiveInputs": [],
+        "reason": "Explicitly authorized credential and sensitive-input operation; shared preview and confirmation controls apply, including effectful scans.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Never recreate a one-time credential to determine delivery or outcome."
+        },
+        "privileges": {
+          "check": [
+            "and",
+            [
+              "perm",
+              "/vms/{vmid}",
+              [
+                "VM.Allocate"
+              ]
+            ],
+            [
+              "perm",
+              "/",
+              [
+                "Sys.Incoming"
+              ]
+            ]
+          ],
+          "description": "You need 'VM.Allocate' permissions on '/vms/{vmid}' and Sys.Incoming on '/'. Further permission checks happen during the actual migration."
+        },
+        "response": {
+          "additionalProperties": 0,
+          "properties": {
+            "socket": {
+              "type": "string"
+            },
+            "ticket": {
+              "type": "string"
+            },
+            "upid": {
+              "type": "string"
+            }
+          }
+        },
+        "source": "Retained versioned API schema and S4 protected credential contract."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "post",
         "/nodes/{node}/lxc/{vmid}/mtunnel"
@@ -60338,12 +60930,44 @@
       "id": "OP-POST-129daba473",
       "release": "legacy-8.2.7",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "write",
+        "transport": "json",
+        "secrets": "private-result",
+        "sensitiveInputs": [],
+        "reason": "Explicitly authorized credential and sensitive-input operation; shared preview and confirmation controls apply, including effectful scans.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Never recreate a one-time credential to determine delivery or outcome."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/vms/{vmid}",
+            [
+              "VM.Console"
+            ]
+          ]
+        },
+        "response": {
+          "additionalProperties": 0,
+          "properties": {
+            "port": {
+              "type": "integer"
+            },
+            "ticket": {
+              "type": "string"
+            },
+            "upid": {
+              "type": "string"
+            },
+            "user": {
+              "type": "string"
+            }
+          }
+        },
+        "source": "Retained versioned API schema and S4 protected credential contract."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "post",
         "/nodes/{node}/lxc/{vmid}/termproxy"
@@ -60473,12 +61097,47 @@
       "id": "OP-POST-660f98e613",
       "release": "legacy-8.2.7",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "write",
+        "transport": "json",
+        "secrets": "private-result",
+        "sensitiveInputs": [],
+        "reason": "Explicitly authorized credential and sensitive-input operation; shared preview and confirmation controls apply, including effectful scans.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Never recreate a one-time credential to determine delivery or outcome."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/vms/{vmid}",
+            [
+              "VM.Console"
+            ]
+          ]
+        },
+        "response": {
+          "additionalProperties": 0,
+          "properties": {
+            "cert": {
+              "type": "string"
+            },
+            "port": {
+              "type": "integer"
+            },
+            "ticket": {
+              "type": "string"
+            },
+            "upid": {
+              "type": "string"
+            },
+            "user": {
+              "type": "string"
+            }
+          }
+        },
+        "source": "Retained versioned API schema and S4 protected credential contract."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "post",
         "/nodes/{node}/lxc/{vmid}/vncproxy"
@@ -83924,12 +84583,52 @@
       "id": "OP-POST-cb6766cea8",
       "release": "legacy-8.2.7",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "write",
+        "transport": "json",
+        "secrets": "private-result",
+        "sensitiveInputs": [],
+        "reason": "Explicitly authorized credential and sensitive-input operation; shared preview and confirmation controls apply, including effectful scans.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Never recreate a one-time credential to determine delivery or outcome."
+        },
+        "privileges": {
+          "check": [
+            "and",
+            [
+              "perm",
+              "/vms/{vmid}",
+              [
+                "VM.Allocate"
+              ]
+            ],
+            [
+              "perm",
+              "/",
+              [
+                "Sys.Incoming"
+              ]
+            ]
+          ],
+          "description": "You need 'VM.Allocate' permissions on '/vms/{vmid}' and Sys.Incoming on '/'. Further permission checks happen during the actual migration."
+        },
+        "response": {
+          "additionalProperties": 0,
+          "properties": {
+            "socket": {
+              "type": "string"
+            },
+            "ticket": {
+              "type": "string"
+            },
+            "upid": {
+              "type": "string"
+            }
+          }
+        },
+        "source": "Retained versioned API schema and S4 protected credential contract."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "post",
         "/nodes/{node}/qemu/{vmid}/mtunnel"
@@ -87866,12 +88565,44 @@
       "id": "OP-POST-792d5f0b19",
       "release": "legacy-8.2.7",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "write",
+        "transport": "json",
+        "secrets": "private-result",
+        "sensitiveInputs": [],
+        "reason": "Explicitly authorized credential and sensitive-input operation; shared preview and confirmation controls apply, including effectful scans.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Never recreate a one-time credential to determine delivery or outcome."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/vms/{vmid}",
+            [
+              "VM.Console"
+            ]
+          ]
+        },
+        "response": {
+          "additionalProperties": 0,
+          "properties": {
+            "port": {
+              "type": "integer"
+            },
+            "ticket": {
+              "type": "string"
+            },
+            "upid": {
+              "type": "string"
+            },
+            "user": {
+              "type": "string"
+            }
+          }
+        },
+        "source": "Retained versioned API schema and S4 protected credential contract."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "post",
         "/nodes/{node}/qemu/{vmid}/termproxy"
@@ -88124,12 +88855,52 @@
       "id": "OP-POST-7b3d9d8def",
       "release": "legacy-8.2.7",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "write",
+        "transport": "json",
+        "secrets": "private-result",
+        "sensitiveInputs": [],
+        "reason": "Explicitly authorized credential and sensitive-input operation; shared preview and confirmation controls apply, including effectful scans.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Never recreate a one-time credential to determine delivery or outcome."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/vms/{vmid}",
+            [
+              "VM.Console"
+            ]
+          ]
+        },
+        "response": {
+          "additionalProperties": 0,
+          "properties": {
+            "cert": {
+              "type": "string"
+            },
+            "password": {
+              "description": "Returned if requested with 'generate-password' param. Consists of printable ASCII characters ('!' .. '~').",
+              "optional": 1,
+              "type": "string"
+            },
+            "port": {
+              "type": "integer"
+            },
+            "ticket": {
+              "type": "string"
+            },
+            "upid": {
+              "type": "string"
+            },
+            "user": {
+              "type": "string"
+            }
+          }
+        },
+        "source": "Retained versioned API schema and S4 protected credential contract."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "post",
         "/nodes/{node}/qemu/{vmid}/vncproxy"
@@ -89452,12 +90223,45 @@
       "id": "OP-GET-48e0b9a8fa",
       "release": "legacy-8.2.7",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "write",
+        "transport": "json",
+        "secrets": "input-refs",
+        "sensitiveInputs": [
+          "password"
+        ],
+        "reason": "Explicitly authorized credential and sensitive-input operation; shared preview and confirmation controls apply, including effectful scans.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Never recreate a one-time credential to determine delivery or outcome."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/storage",
+            [
+              "Datastore.Allocate"
+            ]
+          ]
+        },
+        "response": {
+          "items": {
+            "properties": {
+              "description": {
+                "description": "Descriptive text from server.",
+                "type": "string"
+              },
+              "share": {
+                "description": "The cifs share name.",
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "source": "Retained versioned API schema and S4 protected credential contract."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "get",
         "/nodes/{node}/scan/cifs"
@@ -89482,12 +90286,39 @@
                   "pattern": "^[A-Za-z0-9][A-Za-z0-9.-]*$"
                 },
                 "password": {
-                  "type": "string"
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "env"
+                      ],
+                      "properties": {
+                        "env": {
+                          "type": "string",
+                          "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "file"
+                      ],
+                      "properties": {
+                        "file": {
+                          "type": "string",
+                          "minLength": 1
+                        }
+                      }
+                    }
+                  ],
+                  "x-secret": true
                 },
                 "server": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^[A-Za-z0-9][A-Za-z0-9.:-]*$"
                 },
                 "username": {
                   "type": "string"
@@ -89592,8 +90423,7 @@
                 },
                 "server": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^[A-Za-z0-9][A-Za-z0-9.:-]*$"
                 }
               },
               "required": [
@@ -90000,8 +90830,7 @@
                 },
                 "server": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^[A-Za-z0-9][A-Za-z0-9.:-]*$"
                 }
               },
               "required": [
@@ -90105,12 +90934,46 @@
       "id": "OP-GET-649f0e57fc",
       "release": "legacy-8.2.7",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "write",
+        "transport": "json",
+        "secrets": "input-refs",
+        "sensitiveInputs": [
+          "password"
+        ],
+        "reason": "Explicitly authorized credential and sensitive-input operation; shared preview and confirmation controls apply, including effectful scans.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Never recreate a one-time credential to determine delivery or outcome."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/storage",
+            [
+              "Datastore.Allocate"
+            ]
+          ]
+        },
+        "response": {
+          "items": {
+            "properties": {
+              "comment": {
+                "description": "Comment from server.",
+                "optional": 1,
+                "type": "string"
+              },
+              "store": {
+                "description": "The datastore name.",
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "source": "Retained versioned API schema and S4 protected credential contract."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "get",
         "/nodes/{node}/scan/pbs"
@@ -90136,7 +90999,35 @@
                   "pattern": "^[A-Za-z0-9][A-Za-z0-9.-]*$"
                 },
                 "password": {
-                  "type": "string"
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "env"
+                      ],
+                      "properties": {
+                        "env": {
+                          "type": "string",
+                          "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "file"
+                      ],
+                      "properties": {
+                        "file": {
+                          "type": "string",
+                          "minLength": 1
+                        }
+                      }
+                    }
+                  ],
+                  "x-secret": true
                 },
                 "port": {
                   "type": "integer",
@@ -90145,8 +91036,7 @@
                 },
                 "server": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^[A-Za-z0-9][A-Za-z0-9.:-]*$"
                 },
                 "username": {
                   "type": "string"
@@ -96291,12 +97181,47 @@
       "id": "OP-POST-04add518d5",
       "release": "legacy-8.2.7",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "write",
+        "transport": "json",
+        "secrets": "private-result",
+        "allowedInputs": [
+          "node"
+        ],
+        "sensitiveInputs": [],
+        "reason": "Explicitly authorized credential and sensitive-input operation; shared preview and confirmation controls apply, including effectful scans.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Never recreate a one-time credential to determine delivery or outcome."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/nodes/{node}",
+            [
+              "Sys.Console"
+            ]
+          ]
+        },
+        "response": {
+          "additionalProperties": 0,
+          "properties": {
+            "port": {
+              "type": "integer"
+            },
+            "ticket": {
+              "type": "string"
+            },
+            "upid": {
+              "type": "string"
+            },
+            "user": {
+              "type": "string"
+            }
+          }
+        },
+        "source": "Retained versioned API schema and S4 protected credential contract."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "post",
         "/nodes/{node}/termproxy"
@@ -99660,13 +100585,11 @@
                 },
                 "server": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^[A-Za-z0-9][A-Za-z0-9.:-]*$"
                 },
                 "server2": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^[A-Za-z0-9][A-Za-z0-9.:-]*$"
                 },
                 "share": {
                   "type": "string"
@@ -100589,13 +101512,11 @@
                 },
                 "server": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^[A-Za-z0-9][A-Za-z0-9.:-]*$"
                 },
                 "server2": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^[A-Za-z0-9][A-Za-z0-9.:-]*$"
                 },
                 "shared": {
                   "type": "boolean"
@@ -103414,12 +104335,47 @@
       "id": "OP-PUT-58526f2846",
       "release": "published-current",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "write",
+        "transport": "json",
+        "secrets": "input-refs",
+        "sensitiveInputs": [
+          "confirmation-password",
+          "password"
+        ],
+        "reason": "Explicitly authorized credential and sensitive-input operation; shared preview and confirmation controls apply, including effectful scans.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Never recreate a one-time credential to determine delivery or outcome."
+        },
+        "privileges": {
+          "check": [
+            "or",
+            [
+              "userid-param",
+              "self"
+            ],
+            [
+              "and",
+              [
+                "userid-param",
+                "Realm.AllocateUser"
+              ],
+              [
+                "userid-group",
+                [
+                  "User.Modify"
+                ]
+              ]
+            ]
+          ],
+          "description": "Each user is allowed to change their own password. A user can change the password of another user if they have 'Realm.AllocateUser' (on the realm of user <userid>) and 'User.Modify' permission on /access/groups/<group> on a group where user <userid> is member of. For the PAM realm, a password change does not take  effect cluster-wide, but only applies to the local node."
+        },
+        "response": {
+          "type": "null"
+        },
+        "source": "Retained versioned API schema and S4 protected credential contract."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "put",
         "/access/password"
@@ -103437,14 +104393,66 @@
               "additionalProperties": false,
               "properties": {
                 "confirmation-password": {
-                  "type": "string",
-                  "minLength": 5,
-                  "maxLength": 64
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "env"
+                      ],
+                      "properties": {
+                        "env": {
+                          "type": "string",
+                          "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "file"
+                      ],
+                      "properties": {
+                        "file": {
+                          "type": "string",
+                          "minLength": 1
+                        }
+                      }
+                    }
+                  ],
+                  "x-secret": true
                 },
                 "password": {
-                  "type": "string",
-                  "minLength": 8,
-                  "maxLength": 64
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "env"
+                      ],
+                      "properties": {
+                        "env": {
+                          "type": "string",
+                          "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "file"
+                      ],
+                      "properties": {
+                        "file": {
+                          "type": "string",
+                          "minLength": 1
+                        }
+                      }
+                    }
+                  ],
+                  "x-secret": true
                 },
                 "userid": {
                   "type": "string",
@@ -104549,12 +105557,61 @@
       "id": "OP-POST-daaf2db49a",
       "release": "published-current",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "write",
+        "transport": "json",
+        "secrets": "private-result",
+        "sensitiveInputs": [
+          "challenge",
+          "password",
+          "totp",
+          "value"
+        ],
+        "reason": "Explicitly authorized credential and sensitive-input operation; shared preview and confirmation controls apply, including effectful scans.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Never recreate a one-time credential to determine delivery or outcome."
+        },
+        "privileges": {
+          "check": [
+            "or",
+            [
+              "userid-param",
+              "self"
+            ],
+            [
+              "userid-group",
+              [
+                "User.Modify"
+              ]
+            ]
+          ]
+        },
+        "response": {
+          "properties": {
+            "challenge": {
+              "description": "When adding u2f entries, this contains a challenge the user must respond to in order to finish the registration.",
+              "optional": 1,
+              "type": "string"
+            },
+            "id": {
+              "description": "The id of a newly added TFA entry.",
+              "type": "string"
+            },
+            "recovery": {
+              "description": "When adding recovery codes, this contains the list of codes to be displayed to the user",
+              "items": {
+                "description": "A recovery entry.",
+                "type": "string"
+              },
+              "optional": 1,
+              "type": "array"
+            }
+          },
+          "type": "object"
+        },
+        "source": "Retained versioned API schema and S4 protected credential contract."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "post",
         "/access/tfa/{userid}"
@@ -104572,19 +105629,101 @@
               "additionalProperties": false,
               "properties": {
                 "challenge": {
-                  "type": "string"
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "env"
+                      ],
+                      "properties": {
+                        "env": {
+                          "type": "string",
+                          "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "file"
+                      ],
+                      "properties": {
+                        "file": {
+                          "type": "string",
+                          "minLength": 1
+                        }
+                      }
+                    }
+                  ],
+                  "x-secret": true
                 },
                 "description": {
                   "type": "string",
                   "maxLength": 255
                 },
                 "password": {
-                  "type": "string",
-                  "minLength": 5,
-                  "maxLength": 64
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "env"
+                      ],
+                      "properties": {
+                        "env": {
+                          "type": "string",
+                          "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "file"
+                      ],
+                      "properties": {
+                        "file": {
+                          "type": "string",
+                          "minLength": 1
+                        }
+                      }
+                    }
+                  ],
+                  "x-secret": true
                 },
                 "totp": {
-                  "type": "string"
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "env"
+                      ],
+                      "properties": {
+                        "env": {
+                          "type": "string",
+                          "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "file"
+                      ],
+                      "properties": {
+                        "file": {
+                          "type": "string",
+                          "minLength": 1
+                        }
+                      }
+                    }
+                  ],
+                  "x-secret": true
                 },
                 "type": {
                   "enum": [
@@ -104602,7 +105741,35 @@
                   "pattern": "^[^\\s@!/:]+@[^\\s@!/:]+$"
                 },
                 "value": {
-                  "type": "string"
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "env"
+                      ],
+                      "properties": {
+                        "env": {
+                          "type": "string",
+                          "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "file"
+                      ],
+                      "properties": {
+                        "file": {
+                          "type": "string",
+                          "minLength": 1
+                        }
+                      }
+                    }
+                  ],
+                  "x-secret": true
                 }
               },
               "required": [
@@ -104680,12 +105847,38 @@
       "id": "OP-DELETE-931ab3181e",
       "release": "published-current",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "write",
+        "transport": "json",
+        "secrets": "input-refs",
+        "sensitiveInputs": [
+          "password"
+        ],
+        "reason": "Explicitly authorized credential and sensitive-input operation; shared preview and confirmation controls apply, including effectful scans.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Never recreate a one-time credential to determine delivery or outcome."
+        },
+        "privileges": {
+          "check": [
+            "or",
+            [
+              "userid-param",
+              "self"
+            ],
+            [
+              "userid-group",
+              [
+                "User.Modify"
+              ]
+            ]
+          ]
+        },
+        "response": {
+          "type": "null"
+        },
+        "source": "Retained versioned API schema and S4 protected credential contract."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "delete",
         "/access/tfa/{userid}/{id}"
@@ -104706,9 +105899,35 @@
                   "type": "string"
                 },
                 "password": {
-                  "type": "string",
-                  "minLength": 5,
-                  "maxLength": 64
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "env"
+                      ],
+                      "properties": {
+                        "env": {
+                          "type": "string",
+                          "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "file"
+                      ],
+                      "properties": {
+                        "file": {
+                          "type": "string",
+                          "minLength": 1
+                        }
+                      }
+                    }
+                  ],
+                  "x-secret": true
                 },
                 "userid": {
                   "type": "string",
@@ -104935,12 +106154,38 @@
       "id": "OP-PUT-c8c0c420be",
       "release": "published-current",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "write",
+        "transport": "json",
+        "secrets": "input-refs",
+        "sensitiveInputs": [
+          "password"
+        ],
+        "reason": "Explicitly authorized credential and sensitive-input operation; shared preview and confirmation controls apply, including effectful scans.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Never recreate a one-time credential to determine delivery or outcome."
+        },
+        "privileges": {
+          "check": [
+            "or",
+            [
+              "userid-param",
+              "self"
+            ],
+            [
+              "userid-group",
+              [
+                "User.Modify"
+              ]
+            ]
+          ]
+        },
+        "response": {
+          "type": "null"
+        },
+        "source": "Retained versioned API schema and S4 protected credential contract."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "put",
         "/access/tfa/{userid}/{id}"
@@ -104968,9 +106213,35 @@
                   "type": "string"
                 },
                 "password": {
-                  "type": "string",
-                  "minLength": 5,
-                  "maxLength": 64
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "env"
+                      ],
+                      "properties": {
+                        "env": {
+                          "type": "string",
+                          "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "file"
+                      ],
+                      "properties": {
+                        "file": {
+                          "type": "string",
+                          "minLength": 1
+                        }
+                      }
+                    }
+                  ],
+                  "x-secret": true
                 },
                 "userid": {
                   "type": "string",
@@ -106377,8 +107648,7 @@
               "properties": {
                 "tokenid": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "Perl pattern"
+                  "pattern": "^(?:[A-Za-z][A-Za-z0-9._-]+)$"
                 },
                 "userid": {
                   "type": "string",
@@ -106496,8 +107766,7 @@
               "properties": {
                 "tokenid": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "Perl pattern"
+                  "pattern": "^(?:[A-Za-z][A-Za-z0-9._-]+)$"
                 },
                 "userid": {
                   "type": "string",
@@ -106626,12 +107895,70 @@
       "id": "OP-POST-774b7e437e",
       "release": "published-current",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "write",
+        "transport": "json",
+        "secrets": "private-result",
+        "sensitiveInputs": [],
+        "reason": "Explicitly authorized credential and sensitive-input operation; shared preview and confirmation controls apply, including effectful scans.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Never recreate a one-time credential to determine delivery or outcome."
+        },
+        "privileges": {
+          "check": [
+            "or",
+            [
+              "userid-param",
+              "self"
+            ],
+            [
+              "userid-group",
+              [
+                "User.Modify"
+              ]
+            ]
+          ]
+        },
+        "response": {
+          "additionalProperties": 0,
+          "properties": {
+            "full-tokenid": {
+              "description": "The full token id.",
+              "format_description": "<userid>!<tokenid>",
+              "type": "string"
+            },
+            "info": {
+              "properties": {
+                "comment": {
+                  "optional": 1,
+                  "type": "string"
+                },
+                "expire": {
+                  "default": "same as user",
+                  "description": "API token expiration date (seconds since epoch). '0' means no expiration date.",
+                  "minimum": 0,
+                  "optional": 1,
+                  "type": "integer"
+                },
+                "privsep": {
+                  "default": 1,
+                  "description": "Restrict API token privileges with separate ACLs (default), or give full privileges of corresponding user.",
+                  "optional": 1,
+                  "type": "boolean"
+                }
+              },
+              "type": "object"
+            },
+            "value": {
+              "description": "API token value used for authentication.",
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
+        "source": "Retained versioned API schema and S4 protected credential contract."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "post",
         "/access/users/{userid}/token/{tokenid}"
@@ -106660,8 +107987,7 @@
                 },
                 "tokenid": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "Perl pattern"
+                  "pattern": "^(?:[A-Za-z][A-Za-z0-9._-]+)$"
                 },
                 "userid": {
                   "type": "string",
@@ -106800,12 +108126,66 @@
       "id": "OP-PUT-cda6ced4ac",
       "release": "published-current",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "write",
+        "transport": "json",
+        "secrets": "private-result",
+        "sensitiveInputs": [],
+        "reason": "Explicitly authorized credential and sensitive-input operation; shared preview and confirmation controls apply, including effectful scans.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Never recreate a one-time credential to determine delivery or outcome."
+        },
+        "privileges": {
+          "check": [
+            "or",
+            [
+              "userid-param",
+              "self"
+            ],
+            [
+              "userid-group",
+              [
+                "User.Modify"
+              ]
+            ]
+          ]
+        },
+        "response": {
+          "properties": {
+            "comment": {
+              "optional": 1,
+              "type": "string"
+            },
+            "expire": {
+              "default": "same as user",
+              "description": "API token expiration date (seconds since epoch). '0' means no expiration date.",
+              "minimum": 0,
+              "optional": 1,
+              "type": "integer"
+            },
+            "full-tokenid": {
+              "description": "The full token id. Only set when 'regenerate' was set.",
+              "format_description": "<userid>!<tokenid>",
+              "optional": 1,
+              "type": "string"
+            },
+            "privsep": {
+              "default": 1,
+              "description": "Restrict API token privileges with separate ACLs (default), or give full privileges of corresponding user.",
+              "optional": 1,
+              "type": "boolean"
+            },
+            "value": {
+              "description": "API token value used for authentication. Only set when 'regenerate' was set.",
+              "optional": 1,
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
+        "source": "Retained versioned API schema and S4 protected credential contract."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "put",
         "/access/users/{userid}/token/{tokenid}"
@@ -106842,8 +108222,7 @@
                 },
                 "tokenid": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "Perl pattern"
+                  "pattern": "^(?:[A-Za-z][A-Za-z0-9._-]+)$"
                 },
                 "userid": {
                   "type": "string",
@@ -157368,12 +158747,91 @@
       "id": "OP-POST-cc95340692",
       "release": "published-current",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "write",
+        "transport": "json",
+        "secrets": "input-refs",
+        "sensitiveInputs": [
+          "key"
+        ],
+        "reason": "Explicitly authorized credential and sensitive-input operation; shared preview and confirmation controls apply, including effectful scans.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Never recreate a one-time credential to determine delivery or outcome."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/nodes/{node}",
+            [
+              "Sys.Modify"
+            ]
+          ]
+        },
+        "response": {
+          "properties": {
+            "filename": {
+              "optional": 1,
+              "type": "string"
+            },
+            "fingerprint": {
+              "description": "Certificate SHA 256 fingerprint.",
+              "optional": 1,
+              "pattern": "([A-Fa-f0-9]{2}:){31}[A-Fa-f0-9]{2}",
+              "type": "string"
+            },
+            "issuer": {
+              "description": "Certificate issuer name.",
+              "optional": 1,
+              "type": "string"
+            },
+            "notafter": {
+              "description": "Certificate's notAfter timestamp (UNIX epoch).",
+              "optional": 1,
+              "renderer": "timestamp",
+              "type": "integer"
+            },
+            "notbefore": {
+              "description": "Certificate's notBefore timestamp (UNIX epoch).",
+              "optional": 1,
+              "renderer": "timestamp",
+              "type": "integer"
+            },
+            "pem": {
+              "description": "Certificate in PEM format",
+              "format": "pem-certificate",
+              "optional": 1,
+              "type": "string"
+            },
+            "public-key-bits": {
+              "description": "Certificate's public key size",
+              "optional": 1,
+              "type": "integer"
+            },
+            "public-key-type": {
+              "description": "Certificate's public key algorithm",
+              "optional": 1,
+              "type": "string"
+            },
+            "san": {
+              "description": "List of Certificate's SubjectAlternativeName entries.",
+              "items": {
+                "type": "string"
+              },
+              "optional": 1,
+              "renderer": "yaml",
+              "type": "array"
+            },
+            "subject": {
+              "description": "Certificate subject name.",
+              "optional": 1,
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
+        "source": "Retained versioned API schema and S4 protected credential contract."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "post",
         "/nodes/{node}/certificates/custom"
@@ -157392,16 +158850,41 @@
               "properties": {
                 "certificates": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^(?:\\s*-----BEGIN CERTIFICATE-----[\\s\\S]+?-----END CERTIFICATE-----)+\\s*$"
                 },
                 "force": {
                   "type": "boolean"
                 },
                 "key": {
-                  "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "env"
+                      ],
+                      "properties": {
+                        "env": {
+                          "type": "string",
+                          "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "file"
+                      ],
+                      "properties": {
+                        "file": {
+                          "type": "string",
+                          "minLength": 1
+                        }
+                      }
+                    }
+                  ],
+                  "x-secret": true
                 },
                 "node": {
                   "type": "string",
@@ -173572,12 +175055,52 @@
       "id": "OP-POST-45ae134aef",
       "release": "published-current",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "write",
+        "transport": "json",
+        "secrets": "private-result",
+        "sensitiveInputs": [],
+        "reason": "Explicitly authorized credential and sensitive-input operation; shared preview and confirmation controls apply, including effectful scans.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Never recreate a one-time credential to determine delivery or outcome."
+        },
+        "privileges": {
+          "check": [
+            "and",
+            [
+              "perm",
+              "/vms/{vmid}",
+              [
+                "VM.Allocate"
+              ]
+            ],
+            [
+              "perm",
+              "/",
+              [
+                "Sys.Incoming"
+              ]
+            ]
+          ],
+          "description": "You need 'VM.Allocate' permissions on '/vms/{vmid}' and Sys.Incoming on '/'. Further permission checks happen during the actual migration."
+        },
+        "response": {
+          "additionalProperties": 0,
+          "properties": {
+            "socket": {
+              "type": "string"
+            },
+            "ticket": {
+              "type": "string"
+            },
+            "upid": {
+              "type": "string"
+            }
+          }
+        },
+        "source": "Retained versioned API schema and S4 protected credential contract."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "post",
         "/nodes/{node}/lxc/{vmid}/mtunnel"
@@ -177293,12 +178816,44 @@
       "id": "OP-POST-129daba473",
       "release": "published-current",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "write",
+        "transport": "json",
+        "secrets": "private-result",
+        "sensitiveInputs": [],
+        "reason": "Explicitly authorized credential and sensitive-input operation; shared preview and confirmation controls apply, including effectful scans.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Never recreate a one-time credential to determine delivery or outcome."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/vms/{vmid}",
+            [
+              "VM.Console"
+            ]
+          ]
+        },
+        "response": {
+          "additionalProperties": 0,
+          "properties": {
+            "port": {
+              "type": "integer"
+            },
+            "ticket": {
+              "type": "string"
+            },
+            "upid": {
+              "type": "string"
+            },
+            "user": {
+              "type": "string"
+            }
+          }
+        },
+        "source": "Retained versioned API schema and S4 protected credential contract."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "post",
         "/nodes/{node}/lxc/{vmid}/termproxy"
@@ -177433,12 +178988,52 @@
       "id": "OP-POST-660f98e613",
       "release": "published-current",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "write",
+        "transport": "json",
+        "secrets": "private-result",
+        "sensitiveInputs": [],
+        "reason": "Explicitly authorized credential and sensitive-input operation; shared preview and confirmation controls apply, including effectful scans.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Never recreate a one-time credential to determine delivery or outcome."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/vms/{vmid}",
+            [
+              "VM.Console"
+            ]
+          ]
+        },
+        "response": {
+          "additionalProperties": 0,
+          "properties": {
+            "cert": {
+              "type": "string"
+            },
+            "password": {
+              "description": "Password used for authentication within the VNC protocol. Consists of printable ASCII characters ('!' .. '~').",
+              "optional": 1,
+              "type": "string"
+            },
+            "port": {
+              "type": "integer"
+            },
+            "ticket": {
+              "type": "string"
+            },
+            "upid": {
+              "type": "string"
+            },
+            "user": {
+              "type": "string"
+            }
+          }
+        },
+        "source": "Retained versioned API schema and S4 protected credential contract."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "post",
         "/nodes/{node}/lxc/{vmid}/vncproxy"
@@ -201295,12 +202890,52 @@
       "id": "OP-POST-cb6766cea8",
       "release": "published-current",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "write",
+        "transport": "json",
+        "secrets": "private-result",
+        "sensitiveInputs": [],
+        "reason": "Explicitly authorized credential and sensitive-input operation; shared preview and confirmation controls apply, including effectful scans.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Never recreate a one-time credential to determine delivery or outcome."
+        },
+        "privileges": {
+          "check": [
+            "and",
+            [
+              "perm",
+              "/vms/{vmid}",
+              [
+                "VM.Allocate"
+              ]
+            ],
+            [
+              "perm",
+              "/",
+              [
+                "Sys.Incoming"
+              ]
+            ]
+          ],
+          "description": "You need 'VM.Allocate' permissions on '/vms/{vmid}' and Sys.Incoming on '/'. Further permission checks happen during the actual migration."
+        },
+        "response": {
+          "additionalProperties": 0,
+          "properties": {
+            "socket": {
+              "type": "string"
+            },
+            "ticket": {
+              "type": "string"
+            },
+            "upid": {
+              "type": "string"
+            }
+          }
+        },
+        "source": "Retained versioned API schema and S4 protected credential contract."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "post",
         "/nodes/{node}/qemu/{vmid}/mtunnel"
@@ -205302,12 +206937,44 @@
       "id": "OP-POST-792d5f0b19",
       "release": "published-current",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "write",
+        "transport": "json",
+        "secrets": "private-result",
+        "sensitiveInputs": [],
+        "reason": "Explicitly authorized credential and sensitive-input operation; shared preview and confirmation controls apply, including effectful scans.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Never recreate a one-time credential to determine delivery or outcome."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/vms/{vmid}",
+            [
+              "VM.Console"
+            ]
+          ]
+        },
+        "response": {
+          "additionalProperties": 0,
+          "properties": {
+            "port": {
+              "type": "integer"
+            },
+            "ticket": {
+              "type": "string"
+            },
+            "upid": {
+              "type": "string"
+            },
+            "user": {
+              "type": "string"
+            }
+          }
+        },
+        "source": "Retained versioned API schema and S4 protected credential contract."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "post",
         "/nodes/{node}/qemu/{vmid}/termproxy"
@@ -205560,12 +207227,52 @@
       "id": "OP-POST-7b3d9d8def",
       "release": "published-current",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "write",
+        "transport": "json",
+        "secrets": "private-result",
+        "sensitiveInputs": [],
+        "reason": "Explicitly authorized credential and sensitive-input operation; shared preview and confirmation controls apply, including effectful scans.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Never recreate a one-time credential to determine delivery or outcome."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/vms/{vmid}",
+            [
+              "VM.Console"
+            ]
+          ]
+        },
+        "response": {
+          "additionalProperties": 0,
+          "properties": {
+            "cert": {
+              "type": "string"
+            },
+            "password": {
+              "description": "Password used for authentication within the VNC protocol. Consists of printable ASCII characters ('!' .. '~').",
+              "optional": 1,
+              "type": "string"
+            },
+            "port": {
+              "type": "integer"
+            },
+            "ticket": {
+              "type": "string"
+            },
+            "upid": {
+              "type": "string"
+            },
+            "user": {
+              "type": "string"
+            }
+          }
+        },
+        "source": "Retained versioned API schema and S4 protected credential contract."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "post",
         "/nodes/{node}/qemu/{vmid}/vncproxy"
@@ -206983,12 +208690,45 @@
       "id": "OP-GET-48e0b9a8fa",
       "release": "published-current",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "write",
+        "transport": "json",
+        "secrets": "input-refs",
+        "sensitiveInputs": [
+          "password"
+        ],
+        "reason": "Explicitly authorized credential and sensitive-input operation; shared preview and confirmation controls apply, including effectful scans.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Never recreate a one-time credential to determine delivery or outcome."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/storage",
+            [
+              "Datastore.Allocate"
+            ]
+          ]
+        },
+        "response": {
+          "items": {
+            "properties": {
+              "description": {
+                "description": "Descriptive text from server.",
+                "type": "string"
+              },
+              "share": {
+                "description": "The cifs share name.",
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "source": "Retained versioned API schema and S4 protected credential contract."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "get",
         "/nodes/{node}/scan/cifs"
@@ -207013,12 +208753,39 @@
                   "pattern": "^[A-Za-z0-9][A-Za-z0-9.-]*$"
                 },
                 "password": {
-                  "type": "string"
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "env"
+                      ],
+                      "properties": {
+                        "env": {
+                          "type": "string",
+                          "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "file"
+                      ],
+                      "properties": {
+                        "file": {
+                          "type": "string",
+                          "minLength": 1
+                        }
+                      }
+                    }
+                  ],
+                  "x-secret": true
                 },
                 "server": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^[A-Za-z0-9][A-Za-z0-9.:-]*$"
                 },
                 "username": {
                   "type": "string"
@@ -207428,8 +209195,7 @@
                 },
                 "server": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^[A-Za-z0-9][A-Za-z0-9.:-]*$"
                 }
               },
               "required": [
@@ -207533,12 +209299,46 @@
       "id": "OP-GET-649f0e57fc",
       "release": "published-current",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "write",
+        "transport": "json",
+        "secrets": "input-refs",
+        "sensitiveInputs": [
+          "password"
+        ],
+        "reason": "Explicitly authorized credential and sensitive-input operation; shared preview and confirmation controls apply, including effectful scans.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Never recreate a one-time credential to determine delivery or outcome."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/storage",
+            [
+              "Datastore.Allocate"
+            ]
+          ]
+        },
+        "response": {
+          "items": {
+            "properties": {
+              "comment": {
+                "description": "Comment from server.",
+                "optional": 1,
+                "type": "string"
+              },
+              "store": {
+                "description": "The datastore name.",
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "source": "Retained versioned API schema and S4 protected credential contract."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "get",
         "/nodes/{node}/scan/pbs"
@@ -207564,7 +209364,35 @@
                   "pattern": "^[A-Za-z0-9][A-Za-z0-9.-]*$"
                 },
                 "password": {
-                  "type": "string"
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "env"
+                      ],
+                      "properties": {
+                        "env": {
+                          "type": "string",
+                          "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "file"
+                      ],
+                      "properties": {
+                        "file": {
+                          "type": "string",
+                          "minLength": 1
+                        }
+                      }
+                    }
+                  ],
+                  "x-secret": true
                 },
                 "port": {
                   "type": "integer",
@@ -207573,8 +209401,7 @@
                 },
                 "server": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^[A-Za-z0-9][A-Za-z0-9.:-]*$"
                 },
                 "username": {
                   "type": "string"
@@ -215258,12 +217085,51 @@
       "id": "OP-POST-04add518d5",
       "release": "published-current",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "write",
+        "transport": "json",
+        "secrets": "private-result",
+        "allowedInputs": [
+          "node"
+        ],
+        "sensitiveInputs": [],
+        "reason": "Explicitly authorized credential and sensitive-input operation; shared preview and confirmation controls apply, including effectful scans.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Never recreate a one-time credential to determine delivery or outcome."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/nodes/{node}",
+            [
+              "Sys.Console"
+            ]
+          ]
+        },
+        "response": {
+          "additionalProperties": 0,
+          "properties": {
+            "port": {
+              "description": "port used to bind termproxy to.",
+              "type": "integer"
+            },
+            "ticket": {
+              "description": "VNC ticket used to verify websocket connection.",
+              "type": "string"
+            },
+            "upid": {
+              "description": "UPID for termproxy worker task.",
+              "type": "string"
+            },
+            "user": {
+              "description": "user/token that generated the VNC ticket in `ticket`.",
+              "type": "string"
+            }
+          }
+        },
+        "source": "Retained versioned API schema and S4 protected credential contract."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "post",
         "/nodes/{node}/termproxy"
@@ -218572,8 +220438,7 @@
                 },
                 "server": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^[A-Za-z0-9][A-Za-z0-9.:-]*$"
                 },
                 "share": {
                   "type": "string"
@@ -219501,8 +221366,7 @@
                 },
                 "server": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^[A-Za-z0-9][A-Za-z0-9.:-]*$"
                 },
                 "shared": {
                   "type": "boolean"

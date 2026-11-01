@@ -41,8 +41,23 @@ const app = createApp({ db, audit: new Audit(db, Date.now, () => {}), runner, cr
   resolver: new SharedIdentityResolver(store), environment: {},
   adapters: [createProxmoxAdapter(source, join(directory, 'writes.log'))] })
 const url = await app.listen({ host: '127.0.0.1', port: 0 })
+const actualNow = Date.now
 process.send({ event: 'ready', url, pid: process.pid, executable: toolPaths['proxmox-axi'], namespace: readlinkSync('/proc/self/ns/net') })
 process.on('message', async message => {
+  if (message && typeof message === 'object' && message.event === 'clock') {
+    Date.now = () => actualNow() + message.offset
+    process.send({ event: 'clock-changed' })
+  }
+  if (message && typeof message === 'object' && message.event === 'configure-s4') {
+    const current = store.findCredential('proxmox-axi')
+    store.replaceCredential('proxmox-axi', { auth: message.auth, origin: message.origin,
+      ...(message.auth === 'api-token' ? { tokenId: 'synthetic@pve!acceptance', token: process.env.PROXMOX_AXI_ACCEPTANCE_HOST_TOKEN } : {
+        userId: 'synthetic@pve', ...(message.auth === 'ticket' ? { ticket: 'PVE:synthetic@pve:12345678::CANARY-session-ticket-S4', csrfPreventionToken: 'CANARY-session-csrf-S4' } : { password: 'CANARY-operation+password/value-S4' }) }),
+      caBundle: readFileSync(caFile, 'utf8'), writes: { operations: message.operations } }, current?.revision ?? 0, 'synthetic-development-user', Date.now())
+    db.prepare("UPDATE tools SET native_settings = ? WHERE name = 'proxmox-axi'")
+      .run(JSON.stringify({ hostWrites: { allowWrites: true, operations: message.operations } }))
+    process.send({ event: 'configured-s4' })
+  }
   if (message && typeof message === 'object' && message.event === 'configure-writes') {
     const current = store.findCredential('proxmox-axi')
     store.replaceCredential('proxmox-axi', { auth: 'api-token', origin: message.origin, tokenId: 'synthetic@pve!acceptance',

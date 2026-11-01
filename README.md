@@ -1,12 +1,13 @@
 # proxmox-axi
 
 AXI-standard agent-facing CLI for Proxmox VE.
-This build provides canonical API-token credentials, bounded trusted HTTPS, and versioned invocation discovery for the 681-route Proxmox API union.
+This build provides canonical API-token, supplied-ticket and password credentials, protected results, bounded trusted HTTPS, and versioned invocation discovery for the 681-route Proxmox API union.
 Hosted verification uses an explicitly approved, unmerged temporary admission fixture; stock Artium remains unsupported.
-Eleven ordinary read routes and 22 mutation routes have reviewed admission policy.
+Ordinary inventory reads, controlled mutations and selected credential/session setup routes have reviewed admission policy.
 Other operations remain discoverable but uncallable until their effects, transport and secret handling are reviewed.
 Writes are disabled by default and require named operation permissions plus an exact, single-use confirmation.
-Session authentication, downloads and duplex transports remain deferred.
+Downloads and duplex transports remain deferred.
+The [S4 contract](docs/s4-contract.md) defines private results and caller-managed memory sessions.
 
 Install the npm package with Node 24.11.0 or later:
 
@@ -43,7 +44,7 @@ An interrupted HTTPS response returns `CONNECTION_FAILED`; the total deadline an
 API token profiles use `auth: "api-token"`, an HTTPS `origin`, a full `tokenId` and an optional token SecretRef.
 The shipped `axi-credential.schema.json` rejects unknown fields and inline secrets.
 The default environment profile reads `PROXMOX_AXI_ORIGIN`, `PROXMOX_AXI_TOKEN_ID` and `PROXMOX_AXI_TOKEN`.
-`PROXMOX_AXI_AUTH`, when supplied, must be `api-token`.
+`PROXMOX_AXI_AUTH` selects `api-token`, `ticket` or `password`; see the [S4 contract](docs/s4-contract.md) for branch-specific fields and explicit session acquisition.
 `PROXMOX_AXI_CA_BUNDLE` names an absolute trusted PEM file.
 Token values never arrive through command arguments.
 
@@ -120,7 +121,8 @@ Supplied constraints without a reviewed local validator return `CONTRACT_UNRESOL
 The generated `artium-invocations.json` contains the callable command and flag contracts for a host inventory generator.
 It does not update or authorize an existing host fixture by itself.
 
-Writes cover guest power operations, guest destruction, selected scalar configuration branches, pool management, task cancellation and node execute batches.
+Writes cover guest power operations, guest destruction, selected scalar configuration branches, pool management, task cancellation, node execute batches and the reviewed S4 credential/session setup operations.
+Effectful CIFS/PBS scans use the same preview and confirmation policy even though their vendor method is GET.
 Inspect `schema create|set|delete <template>` and the generated policy table before enabling an operation.
 Add only the required IDs to the selected file profile's `writes: { "operations": ["<operation-id>"] }`.
 Environment-only profiles cannot enable writes.
@@ -139,7 +141,8 @@ proxmox-axi journal reconcile '<intent-id>' --profile lab
 
 Preview may perform bounded version reads but sends no business mutation.
 Confirmations expire after five minutes and bind origin, identity, caller, selected contract, policy, target, complete ordered inputs, trust and secret-source revisions.
-Sensitive configuration inputs require env/file SecretRefs in a body file; literal secret arguments are refused.
+Sensitive operation inputs require env/file SecretRefs in a body file; literal secret arguments are refused.
+The [S4 contract](docs/s4-contract.md) defines protected results and hosted protected-input delivery.
 An execute batch resolves every ordered node-relative child to its reviewed operation and schema before any wrapper transmission.
 Every child requires tool and host permission, including nested batches.
 Limits are 64 total operations, four nesting levels and 32768 bytes per commands string.
@@ -173,6 +176,8 @@ pnpm verify:acceptance -- --task S2.2 --pack /absolute/path/to/pack --out /absol
 pnpm verify:acceptance -- --task S2.3 --pack /absolute/path/to/pack --out /absolute/new/run/S2.3 --network fake-only --through both --repeat-through S2
 pnpm verify:acceptance -- --task S3.1 --pack /absolute/path/to/pack --out /absolute/new/run/S3.1 --network fake-only --through both --repeat-through S3
 pnpm verify:acceptance -- --task S3.2 --pack /absolute/path/to/pack --out /absolute/new/run/S3.2 --network fake-only --through both --repeat-through S3
+pnpm verify:acceptance -- --task S4.1 --pack /absolute/path/to/pack --out /absolute/new/run/S4.1 --network fake-only --through both --repeat-through S4
+pnpm verify:acceptance -- --task S4.2 --pack /absolute/path/to/pack --out /absolute/new/run/S4.2 --network fake-only --through both --repeat-through S4
 ```
 
 Use this repository's `evidence` directory for `--pack`; the normalized read captures are bound by the retained manifest.

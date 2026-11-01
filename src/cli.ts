@@ -6,19 +6,19 @@ import { isAbsolute } from 'node:path'
 import { configurationPath, listProfiles, resolveCredentials, type Credentials } from './credentials.js'
 import { buildPath, contracts, parseParameter, selectContract } from './contract.js'
 import { Failure } from './errors.js'
-import { redact } from './redact.js'
 import { readOperation, doctor } from './reads.js'
 import { presentRead } from './presentation.js'
 import { writeOperation } from './writes.js'
 import { journalOperation, taskOperation } from './tasks.js'
 import operations from './operations.json' with { type: 'json' }
+import { authOperation, useSession } from './auth.js'
 
-const flags = ['--config', '--profile', '--format', '--catalogue', '--body-file', '--limit', '--fields', '--full', '--help', '--preview', '--confirm', '--wait-ms', '--journal']
+const flags = ['--config', '--profile', '--format', '--catalogue', '--body-file', '--limit', '--fields', '--full', '--help', '--preview', '--confirm', '--wait-ms', '--journal', '--session']
 const help = {
   purpose: operations[0]!.help,
   usage: 'proxmox-axi get /version [--config <absolute-path>] [--profile <name>] [--format toon|json]',
   flags: ['--config <absolute-path> (default PROXMOX_AXI_CONFIG or OS config path)',
-    '--profile <name> (default canonical profile selection)', '--format toon|json (default toon)',
+    '--profile <name> (default canonical profile selection)', '--format toon|json (default toon)', '--session <id> (explicit memory session)',
     '--catalogue legacy-8.2.7|published-current (default detect target version; explicit selection is unverified)',
     '--limit <1-1000> (default 100 display rows)', '--fields <comma-separated names>', '--full (all received rows and fields; 65536-byte cap)',
     '--api-<parameter> <value> (vendor parameter)', '--body-file <absolute-path|-> (JSON, 64 KiB, five seconds)', '--help'],
@@ -26,15 +26,41 @@ const help = {
 }
 
 export async function main(args: string[]): Promise<void> {
+  if (args.length === 2 && args[0] === 'auth' && args[1] === 'session') {
+    // The caller explicitly owns this bounded process and its stdin command stream.
+    let pending = Buffer.alloc(0)
+    let count = 0
+    const expires = performance.now() + 300_000
+    const timer = setTimeout(() => {
+      console.log(encode({ error: { code: 'AUTH_SESSION_INVALID', message: 'Caller-managed session input failed or expired.' } }))
+      process.exit(1)
+    }, 300_000)
+    try {
+      for await (const chunk of process.stdin) {
+        pending = Buffer.concat([pending, Buffer.from(chunk)])
+        if (pending.length > 65536) throw new Error('Command limit')
+        let newline: number
+        while ((newline = pending.indexOf(10)) >= 0) {
+          if (performance.now() >= expires) throw new Error('Session expired')
+          const line = pending.subarray(0, newline).toString('utf8')
+          pending = pending.subarray(newline + 1)
+          const command: unknown = JSON.parse(line)
+          if (++count > 256 || !Array.isArray(command) || !command.every(item => typeof item === 'string') || command[0] === 'auth' && command[1] === 'session') throw new Error('Invalid command')
+          process.exitCode = 0
+          await main(command)
+        }
+      }
+      if (pending.length) throw new Error('Incomplete command')
+    } catch {
+      console.log(encode({ error: { code: 'AUTH_SESSION_INVALID', message: 'Caller-managed session input failed or expired.' } }))
+      process.exitCode = 1
+    } finally { clearTimeout(timer) }
+    return
+  }
   let format = 'toon'
   let credentials: Credentials | undefined
   const output = (value: Record<string, unknown>) => {
     let text = format === 'json' ? JSON.stringify(value) : encode(value)
-    if (credentials) {
-      for (const secret of [credentials.token, encodeURIComponent(credentials.token), JSON.stringify(credentials.token).slice(1, -1)]) {
-        text = text.replaceAll(secret, '[REDACTED]')
-      }
-    }
     if (Buffer.byteLength(text) > 65536) {
       process.exitCode = 1
       const error = { error: { code: 'OUTPUT_LIMIT', message: 'Rendered output exceeds 65536 bytes.' }, help: ['Request fewer rows or fields.'] }
@@ -77,20 +103,29 @@ export async function main(args: string[]): Promise<void> {
     if (task && !['status', 'log', 'wait', 'cancel'].includes(task)) throw usage('Use task status, log, wait or cancel.')
     if (task && options.help) {
       output({ usage: `proxmox-axi task ${task} --api-node <node> --api-upid <UPID> [--journal <id>] [--wait-ms <1-30000>]`,
-        flags: ['--config <path>', '--profile <name>', '--format toon|json', '--journal <id> (update the associated intent)', '--wait-ms <1-30000> (default 5000)',
+        flags: ['--config <path>', '--profile <name>', '--session <id>', '--format toon|json', '--journal <id> (update the associated intent)', '--wait-ms <1-30000> (default 5000)',
           '--preview (cancel only)', '--confirm <confirmation> (cancel only)'],
         examples: ['proxmox-axi task status --api-node pve --api-upid <UPID>', 'proxmox-axi task wait --api-node pve --api-upid <UPID> --journal <id>'] })
       return
     }
     if (positional[0] === 'journal') {
-      if (options.help) { output({ usage: 'proxmox-axi journal show|reconcile <id>', flags: ['--config <path>', '--profile <name>', '--format toon|json'], examples: ['proxmox-axi journal show <id>', 'proxmox-axi journal reconcile <id>'] }); return }
-      if (positional.length !== 3 || !['show', 'reconcile'].includes(positional[1]!) || Object.keys(options).some(key => !['--config', '--profile', '--format'].includes(key))) throw usage('Use journal show|reconcile <id>.')
+      if (options.help) { output({ usage: 'proxmox-axi journal show|reconcile <id>', flags: ['--config <path>', '--profile <name>', '--session <id>', '--format toon|json'], examples: ['proxmox-axi journal show <id>', 'proxmox-axi journal reconcile <id>'] }); return }
+      if (positional.length !== 3 || !['show', 'reconcile'].includes(positional[1]!) || Object.keys(options).some(key => !['--config', '--profile', '--format', '--session'].includes(key))) throw usage('Use journal show|reconcile <id>.')
       credentials = await resolveCredentials({ ...(options['--config'] ? { config: options['--config'] } : {}), ...(options['--profile'] ? { profile: options['--profile'] } : {}) })
-      output(redact(await journalOperation(credentials, positional[1]!, positional[2]!), [credentials.token]) as Record<string, unknown>)
+      if (options['--session']) credentials = useSession(credentials, options['--session'])
+      output(await journalOperation(credentials, positional[1]!, positional[2]!))
       return
     }
     if (task) positional.splice(0, 2, task === 'cancel' ? 'delete' : 'get', `/nodes/{node}/tasks/{upid}${task === 'cancel' ? '' : task === 'log' ? '/log' : '/status'}`)
     const command = positional.join(' ')
+    const authAction = positional.length === 2 && positional[0] === 'auth' && ['acquire', 'continue', 'cancel'].includes(positional[1]!) ? positional[1] : undefined
+    if (authAction && options.help) {
+      output({ usage: 'proxmox-axi auth acquire|continue|cancel [--session <id>] [--body-file <protected-refs.json>]',
+        flags: ['--config <path>', '--profile <name>', '--format toon|json', '--session <id>', '--body-file <absolute-path|->'],
+        examples: ['proxmox-axi auth acquire --profile user', 'proxmox-axi auth session (bounded newline-separated JSON argv arrays on stdin)'],
+        privateResults: 'PROXMOX_AXI_RESULT_FD must name an inherited pipe; version 1 length-prefixed JSON frames.' })
+      return
+    }
     const limit = Number(options['--limit'] ?? 100)
     if (!Number.isSafeInteger(limit) || limit < 1 || limit > 1000) throw usage('Display limit must be an integer from 1 to 1000.')
     const fields = options['--fields']?.split(',')
@@ -101,12 +136,12 @@ export async function main(args: string[]): Promise<void> {
         schema: 'schema <method> <template> [--catalogue <release>] [--format toon|json]',
         'config path': 'config path [--config <absolute-path>] [--format toon|json]',
         'profile list': 'profile list [--config <absolute-path>] [--format toon|json]',
-        doctor: 'doctor [--config <absolute-path>] [--profile <name>] [--format toon|json]',
-        'auth status': 'auth status [--config <absolute-path>] [--profile <name>] [--format toon|json]',
+        doctor: 'doctor [--config <absolute-path>] [--profile <name>] [--session <id>] [--format toon|json]',
+        'auth status': 'auth status [--config <absolute-path>] [--profile <name>] [--session <id>] [--format toon|json]',
       }
       const key = positional[0] === 'schema' ? 'schema' : command
       const names = ['--format', '--help', ...(['inventory', 'schema'].includes(key) ? ['--catalogue'] :
-        ['doctor', 'auth status'].includes(key) ? ['--config', '--profile'] : ['--config'])]
+        ['doctor', 'auth status'].includes(key) ? ['--config', '--profile', '--session'] : ['--config'])]
       if (Object.keys(options).some(option => option !== 'help' && !names.includes(option))) throw usage(`Valid flags: ${names.join(', ')}.`)
       output({ purpose: key === 'doctor' ? 'Check private-file protection and perform one bounded version read.' : `Inspect ${key}.`,
         usage: `proxmox-axi ${usages[key]}`, examples: key === 'schema' ? ['proxmox-axi schema get /version', 'proxmox-axi schema get /nodes --catalogue published-current'] :
@@ -153,14 +188,15 @@ export async function main(args: string[]): Promise<void> {
       return
     }
     const isLocal = ['', 'home', 'auth status', 'doctor'].includes(command)
-    if (isLocal && Object.keys(options).some(key => !['--config', '--profile', '--format'].includes(key))) throw usage('Valid local flags: --config, --profile, --format, --help.')
-    const contract = ['', 'home', 'doctor'].includes(command) ? selectContract('GET', '/version', release) :
+    if (isLocal && Object.keys(options).some(key => !['--config', '--profile', '--format', '--session'].includes(key))) throw usage('Valid local flags: --config, --profile, --format, --session, --help.')
+    const contract = authAction ? undefined : ['', 'home', 'doctor'].includes(command) ? selectContract('GET', '/version', release) :
       isLocal ? undefined : positional.length === 2 ? selectContract(positional[0]!, positional[1]!, release) : undefined
-    if (!isLocal && !contract) throw usage('Select a command from inventory.')
+    if (!isLocal && !contract && !authAction) throw usage('Select a command from inventory.')
     if (contract && ['write', 'batch'].includes(contract.policy.effect) && Object.keys(options).some(key =>
-      !['--config', '--profile', '--format', '--catalogue', '--body-file', '--preview', '--confirm'].includes(key) && !key.startsWith('--api-'))) throw usage('Writes accept credential selectors, API inputs, --preview and --confirm only.')
+      !['--config', '--profile', '--format', '--catalogue', '--body-file', '--preview', '--confirm', '--session'].includes(key) && !key.startsWith('--api-'))) throw usage('Writes accept credential selectors, API inputs, --preview and --confirm only.')
+    if (authAction && Object.keys(options).some(key => !['--config', '--profile', '--format', '--session', '--body-file'].includes(key))) throw usage('Invalid authentication option.')
     if (task && task !== 'cancel' && Object.keys(options).some(key =>
-      !['--config', '--profile', '--format', '--body-file', '--journal', ...(task === 'wait' ? ['--wait-ms'] : [])].includes(key) && !key.startsWith('--api-'))) throw usage('Task reads accept API inputs and --journal; task wait also accepts --wait-ms.')
+      !['--config', '--profile', '--format', '--session', '--body-file', '--journal', ...(task === 'wait' ? ['--wait-ms'] : [])].includes(key) && !key.startsWith('--api-'))) throw usage('Task reads accept API inputs, --session and --journal; task wait also accepts --wait-ms.')
     if (contract?.policy.effect === 'read' && (options['--preview'] || options['--confirm'])) throw usage('Preview and confirmation apply to reviewed writes only.')
     if ((!task || task === 'cancel') && (options['--wait-ms'] || options['--journal'])) throw usage('Wait and journal flags apply to task status, log or wait only.')
     const values: Record<string, unknown> = Object.create(null)
@@ -207,22 +243,29 @@ export async function main(args: string[]): Promise<void> {
     credentials = await resolveCredentials({ ...(options['--config'] ? { config: options['--config'] } : {}),
       verifyAcl: command === 'auth status' || command === 'doctor',
       ...(options['--profile'] ? { profile: options['--profile'] } : {}) })
+    if (authAction) {
+      output(await authOperation(credentials, authAction, values, options['--session']))
+      return
+    }
+    if (options['--session']) credentials = useSession(credentials, options['--session'])
     if (task && task !== 'cancel') {
       const waitMs = Number(options['--wait-ms'] ?? 5000)
       if (!Number.isSafeInteger(waitMs) || waitMs < 1 || waitMs > 30000) throw usage('Task wait must be 1-30000 ms.')
-      output(redact(await taskOperation(credentials, task, values, waitMs, options['--journal']), [credentials.token]) as Record<string, unknown>)
+      output(await taskOperation(credentials, task, values, waitMs, options['--journal']))
     } else if (contract && ['write', 'batch'].includes(contract.policy.effect)) {
       output(await writeOperation(credentials, contract, values, { preview: !!options['--preview'], ...(options['--confirm'] ? { confirmation: options['--confirm'] } : {}) }))
     } else if (command === 'auth status') {
       output({ credential: { ...credentials.diagnostics, origin: credentials.origin, tokenId: credentials.tokenId } })
     } else if (command === 'doctor') {
-      output(redact(await doctor(credentials), [credentials.token]) as Record<string, unknown>)
+      output(await doctor(credentials))
     } else {
       const selected = contract ?? selectContract('GET', '/version', release)
       const result = await readOperation(credentials, selected, values, options['--catalogue'])
       const nextOptions = ['--config', '--profile', '--catalogue'].filter(key => options[key]).map(key => `${key} ${JSON.stringify(options[key])}`).join(' ')
       const next = `proxmox-axi schema get ${selected.path} ${nextOptions}`.trim()
-      const safeData = redact(presentRead(result, selected.path, { limit, full: !!options['--full'], ...(fields ? { fields } : {}), next }), [credentials.token]) as Record<string, unknown>
+      const safeData = presentRead({ ...result, data: credentials.results.sanitize(result.data),
+        ...(result.compatibility ? { compatibility: { ...result.compatibility, version: credentials.results.redact(result.compatibility.version) } } : {}) },
+        selected.path, { limit, full: !!options['--full'], ...(fields ? { fields } : {}), next }) as Record<string, unknown>
       output({ ...(['', 'home'].includes(command) ? { bin: fileURLToPath(new URL('../bin/proxmox-axi.mjs', import.meta.url)).replace(homedir(), '~'),
         description: 'Read Proxmox VE inventory and task information.', help: ['proxmox-axi ls', 'proxmox-axi doctor', 'proxmox-axi inventory'] } : {}),
         ...(selected.path === '/version' ? { version: safeData.data, compatibility: safeData.compatibility } : safeData), credential: credentials.diagnostics })
