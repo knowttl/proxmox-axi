@@ -94,8 +94,8 @@ proxmox-axi doctor --format json
 Ordinary reads other than `/version` detect the entry version and, for node-specific routes, the selected node version before choosing a catalogue.
 The published 9.2 schema is supported at the contract level; live commissioning remains pending.
 Versions outside 9.2 are labelled unverified.
-Writes require a detected major of 8 or 9, including when an explicit catalogue was supplied.
-An explicit `--catalogue` selects a replay contract without version detection; inventory visibility remains unknown.
+Writes require a detected major of 8 or 9 and select the corresponding contract, including when an explicit catalogue was supplied.
+For reads, an explicit `--catalogue` selects a replay contract without version detection; inventory visibility remains unknown.
 Before admitting a new schema, compare captures offline with `node scripts/compare-capture.mjs /absolute/previous.txt /absolute/candidate.txt`.
 The comparison parses the JSON schema without executing JavaScript, reports changed contracts and capture hashes, and never updates admission policy or pins.
 Automatic inventory reads check effective root audit permissions and report `complete` or `permission-filtered` visibility.
@@ -113,7 +113,8 @@ Offline `help`, `inventory`, `schema`, `profile list` and `config path` require 
 Invocation paths use catalogue templates and exactly-once parameter encoding.
 Vendor parameters have their own `--api-` namespace, so `--api-format` is distinct from the CLI's output `--format`.
 `--body-file /absolute/file.json` or `--body-file -` supplies one JSON parameter object, bounded to 64 KiB and five seconds.
-Duplicate API parameters, unknown flags, unknown routes, traversal and alternate origins fail before credential resolution or network access.
+Duplicate API parameters, unknown flags and unknown routes fail before credential resolution or network access.
+Read inputs are validated before credential resolution; write inputs and batch children are validated after credential resolution but before provider requests.
 Vendor property strings, alternative branches, numbered parameters, named formats and Perl patterns remain intact in discovery.
 Supplied constraints without a reviewed local validator return `CONTRACT_UNRESOLVED` rather than being silently weakened.
 The generated `artium-invocations.json` contains the callable command and flag contracts for a host inventory generator.
@@ -132,6 +133,7 @@ proxmox-axi create '/nodes/{node}/qemu/{vmid}/status/start' --api-node pve-test 
 proxmox-axi create '/nodes/{node}/qemu/{vmid}/status/start' --api-node pve-test --api-vmid 100 --profile lab --confirm '<confirmation>'
 proxmox-axi task status --api-node pve-test --api-upid '<UPID>' --journal '<intent-id>' --profile lab
 proxmox-axi task wait --api-node pve-test --api-upid '<UPID>' --wait-ms 5000 --journal '<intent-id>' --profile lab
+proxmox-axi journal show '<intent-id>' --profile lab
 proxmox-axi journal reconcile '<intent-id>' --profile lab
 ```
 
@@ -148,8 +150,9 @@ It uses protected per-intent records, flushed replacements and exclusive single-
 Journal failure prevents transmission.
 Records contain request fingerprints and safe metadata rather than credentials or input values.
 An accepted UPID means the action is pending; matching task status distinguishes running, success and failure.
-`task log` retains numbered lines, and `task wait` has a 1-30000 ms elapsed budget.
-Use `--journal` to retain explicit task observations in the associated intent, including batch children.
+`task log` returns numbered lines without storing them in the journal, and `task wait` has a 1-30000 ms elapsed budget, defaulting to 5000 ms.
+Use `--journal` with task status or wait to retain status in the associated intent, including batch children.
+`task cancel` requires its own preview and exact confirmation, using the same operation permission as deleting the task route.
 Lost responses and crashes remain uncertain, with no automatic mutation retry.
 Reconciliation can observe reviewed direct configuration/status fields or inspect retained UPIDs.
 Observation does not attribute an uncertain mutation, and missing or filtered data never proves failure.
@@ -200,7 +203,7 @@ Keep the manifest snapshot and its original tarballs together outside this repos
 The manifest's Proxmox archive is used for both journeys, and its executable, admitted runtime sources and runtime package metadata must match the current build.
 Each fixture refresh pins the archive's SHA-256 and SHA-512 integrity alongside its manifest digest and reviewed source and compiled-runtime digests.
 The host runs the existing credential store, profile writer, adapter and runner with a synthetic user from its own fixture builder.
-The actual public client authenticates against the listening server and executes admitted reads over loopback HTTP; the vendor boundary remains trusted HTTPS.
+The actual public client authenticates against the listening server and executes admitted operations over loopback HTTP; the vendor boundary remains trusted HTTPS.
 Evidence includes the host revision, manifest and client digests, startup record, client invocation, real audit outcomes, injected credential-source diagnostics and runner cleanup.
 The hosted canary differs from the standalone token, while a competing developer profile and environment remain present.
 An adapter substitute cannot satisfy this selection.
