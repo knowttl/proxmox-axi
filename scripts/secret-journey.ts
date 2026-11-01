@@ -59,6 +59,12 @@ export async function exerciseSecretJourney(options: Journey): Promise<void> {
   let activeCase = '', mode = 'success', mutations = 0
   let breakSink = () => {}
   const acquired = [ticket, csrf, challenge, minted, recovery, 'CANARY-openid-state-S4']
+  const protectedValues = [...acquired, password, 'totp:123456', 'webauthn:synthetic-response', (await readFile(join(scratch, 'server.key'), 'utf8')).trimEnd()]
+  const safePublic = (text: string): string => {
+    for (const secret of protectedValues) for (const form of [secret, encodeURIComponent(secret), JSON.stringify(secret).slice(1, -1),
+      Buffer.from(secret).toString('base64'), Buffer.from(secret).toString('base64url')]) text = text.replaceAll(form, '[REDACTED]')
+    return text
+  }
   const server = createServer({ key: await readFile(join(scratch, 'server.key')), cert: await readFile(caFile) }, async (request, reply) => {
     const url = new URL(request.url!, 'https://fake.invalid')
     const chunks: Buffer[] = []
@@ -68,13 +74,13 @@ export async function exerciseSecretJourney(options: Journey): Promise<void> {
       authentication: request.headers.cookie ? 'ticket' : request.headers.authorization ? 'api-token' : 'acquire' })
     let data: unknown
     if (url.pathname === '/api2/json/access/ticket' || url.pathname === '/api2/json/access/openid/login') {
-      assert.equal(request.headers.authorization, undefined)
-      assert.equal(request.headers.cookie, undefined)
+      assert.ok(request.headers.authorization === undefined, 'acquisition must not send token authorization')
+      assert.ok(request.headers.cookie === undefined, 'acquisition must not send a prior cookie')
       if (url.pathname.endsWith('/ticket')) {
         assert.equal(params.username, 'synthetic@pve')
-        if (params['tfa-challenge']) { assert.equal(params['tfa-challenge'], challenge); assert.match(params.password!, /^(totp:123456|webauthn:synthetic-response)$/) }
-        else assert.equal(params.password, password)
-      } else { assert.equal(params.code, password); assert.equal(params.state, 'CANARY-openid-state-S4') }
+        if (params['tfa-challenge']) { assert.ok(params['tfa-challenge'] === challenge, 'signed challenge reaches the vendor'); assert.ok(/^(totp:123456|webauthn:synthetic-response)$/.test(params.password ?? ''), 'challenge response reaches the vendor') }
+        else assert.ok(params.password === password, 'selected password reaches the vendor')
+      } else { assert.ok(params.code === password, 'OpenID code reaches the vendor'); assert.ok(params.state === 'CANARY-openid-state-S4', 'OpenID state reaches the vendor') }
       data = { username: mode === 'wrong-identity' ? 'other@pve' : 'synthetic@pve', ticket: mode === 'challenge' && !params['tfa-challenge'] ? challenge : ticket,
         ...(mode !== 'challenge' || params['tfa-challenge'] ? { CSRFPreventionToken: csrf } : {}) }
     } else if (url.pathname.endsWith('/openid/auth-url')) {
@@ -84,21 +90,21 @@ export async function exerciseSecretJourney(options: Journey): Promise<void> {
       const authorized = request.headers.authorization === `PVEAPIToken=synthetic@pve!acceptance=${options.env.PROXMOX_AXI_TOKEN}` ||
         request.headers.cookie === `PVEAuthCookie=${encodeURIComponent(ticket)}`
       if (!authorized) { reply.writeHead(401).end(); return }
-      if (request.headers.cookie && request.method !== 'GET') assert.equal(request.headers.csrfpreventiontoken, csrf)
+      if (request.headers.cookie && request.method !== 'GET') assert.ok(request.headers.csrfpreventiontoken === csrf, 'correct CSRF reaches only the selected origin')
       if (url.pathname.endsWith('/version')) data = version
       else {
         mutations++
         if (mode === 'broken') breakSink()
         if (url.pathname.includes('/token/')) data = { 'full-tokenid': 'synthetic@pve!minted', info: {}, value: minted }
         else if (url.pathname.endsWith('/scan/cifs') || url.pathname.endsWith('/scan/pbs')) {
-          assert.equal(params.password, password)
+          assert.ok(params.password === password, 'protected scan password reaches the vendor')
           data = url.pathname.endsWith('/cifs') ? [{ share: 'synthetic', description: `raw ${password} encoded ${encodeURIComponent(password)} base64 ${Buffer.from(password).toString('base64')}` }] : [{ comment: password, store: 'synthetic' }]
-        } else if (url.pathname.endsWith('/certificates/custom')) { assert.equal(params.key, (await readFile(join(scratch, 'server.key'), 'utf8')).trimEnd()); data = {} }
+        } else if (url.pathname.endsWith('/certificates/custom')) { assert.ok(params.key === (await readFile(join(scratch, 'server.key'), 'utf8')).trimEnd(), 'protected key reaches the vendor'); data = {} }
         else if (url.pathname.endsWith('/execute')) {
           const batch = JSON.parse(params.commands!) as { method: string, path: string, args: Record<string, string> }[]
           const apply = (items: typeof batch): unknown[] => items.map(child => ({ status: 200, data: child.path === 'execute' ? apply(JSON.parse(child.args.commands!) as typeof batch) :
             child.path.endsWith('/vncproxy') ? { port: 5900, cert: 'synthetic-cert', ticket: minted, password: recovery, user: 'synthetic@pve', upid: 'synthetic-upid' } :
-              (assert.equal(child.args.cipassword, password), null) }))
+              (assert.ok(child.args.cipassword === password, 'nested protected password reaches the vendor'), null) }))
           data = apply(batch)
         } else if (url.pathname.includes('/access/tfa/') && request.method === 'POST') data = { id: 'synthetic-tfa', recovery: [recovery] }
         else data = null
@@ -148,9 +154,13 @@ export async function exerciseSecretJourney(options: Journey): Promise<void> {
     child.stderr!.on('data', (chunk: Buffer) => { stderr += chunk.toString() })
     if (typeof sink !== 'number' && sink !== 'missing') (child.stdio[3] as Readable).on('data', (chunk: Buffer) => {
       privateBytes = Buffer.concat([privateBytes, chunk])
+      if (privateBytes.length > 65540) throw new Error('Oversized private frame')
       while (privateBytes.length >= 4 && privateBytes.length >= 4 + privateBytes.readUInt32BE(0)) {
         const length = privateBytes.readUInt32BE(0)
-        frames.push(JSON.parse(privateBytes.subarray(4, 4 + length).toString()) as Frame)
+        let frame: Frame
+        try { frame = JSON.parse(privateBytes.subarray(4, 4 + length).toString()) as Frame }
+        catch { throw new Error('Malformed private frame') }
+        frames.push(frame)
         privateBytes = privateBytes.subarray(4 + length)
       }
     })
@@ -180,25 +190,26 @@ export async function exerciseSecretJourney(options: Journey): Promise<void> {
       const result = await running.closed
       await fileSink?.close()
       value = object(result.stdout.startsWith('{') ? JSON.parse(result.stdout) : decode(result.stdout))
-      assert.equal(result.code === 0, !expected.error, `${id}: ${result.stdout}${result.stderr}`)
+      assert.equal(result.code === 0, !expected.error, `${id}: ${safePublic(result.stdout + result.stderr)}`)
       if (expected.private && !options.hosted) frame = await running.frames.next()
-      options.transcripts.push(`case: ${id}\nstdout:\n${result.stdout}\nstderr:\n${result.stderr}`)
+      options.transcripts.push(`case: ${id}\nstdout:\n${safePublic(result.stdout)}\nstderr:\n${safePublic(result.stderr)}`)
       if (expected.private && options.hosted && id !== 'CRED-14/private-minted-value') {
         const handle = object(value.result)
         const delivered = start(['result', 'take', String(handle.operation), String(handle.id)], options.env)
         delivered.child.stdin!.end()
         const delivery = await delivered.closed
-        assert.equal(delivery.code, 0, delivery.stdout + delivery.stderr)
+        assert.equal(delivery.code, 0, safePublic(delivery.stdout + delivery.stderr))
         frame = await delivered.frames.next()
       }
     }
-    if (expected.error) assert.equal(object(value.error).code, expected.error, id)
-    if (expected.status) assert.equal(value.status, expected.status, `${id}: ${JSON.stringify(value)}`)
+    if (expected.error) assert.ok(object(value.error).code === expected.error, `${id}: unexpected public error code`)
+    if (expected.status) assert.ok(value.status === expected.status, `${id}: ${safePublic(JSON.stringify(value))}`)
     assert.equal(mutations - before, expected.mutations ?? 0, `${id}: no mutation retry`)
-    for (const secret of [...acquired, password, env.PVE_INPUT_KEY]) assert.ok(!JSON.stringify(value).includes(secret), `${id}: protected value in public output`)
+    assert.ok(safePublic(JSON.stringify(value)) === JSON.stringify(value), `${id}: protected value in public output`)
     if (frame) { assert.equal(frame.version, 1); assert.equal(frame.binding.origin, origin); assert.equal(frame.binding.identity, auth === 'api-token' ? 'synthetic@pve!acceptance' : 'synthetic@pve') }
     options.cases.push({ id: `${options.hosted ? 'artium' : 'standalone'}/${id}`, status: 'pass', hosted: !!options.hosted,
-      expected: { hostBoundary: !!expected.otherActor || args[0] === 'result', ...(args[0] === 'result' ? {} : { auditExit: expected.error === 'NOT_FOUND' ? null : expected.error ? 1 : 0 }) }, actual: { mutationTransmissions: mutations - before, privateFrame: !!frame } })
+      expected: { hostBoundary: !!expected.otherActor || args[0] === 'result', ...(args[0] === 'result' ? {} : { auditExit: expected.error === 'NOT_FOUND' ? null : expected.error ? 1 : 0 }) },
+      actual: { mutationTransmissions: mutations - before, privateFrame: !!frame, privateFrameBytes: frame ? Buffer.byteLength(JSON.stringify(frame)) + 4 : 0 } })
     return { value, frame }
   }
   try {
@@ -209,7 +220,7 @@ export async function exerciseSecretJourney(options: Journey): Promise<void> {
       await invoke('CRED-15/regular-file-sink', [...mint, '--confirm', String(preview.value.confirmation)], { error: 'PRIVATE_SINK_REQUIRED', sink: 'file' })
     }
     const created = await invoke('CRED-14/private-minted-value', [...mint, '--confirm', String(preview.value.confirmation)], { status: 'success', mutations: 1, private: true })
-    if (created.frame) assert.equal(created.frame.payload.value, minted)
+    if (created.frame) assert.ok(created.frame.payload.value === minted, 'minted value reaches the authorized private sink')
     if (options.hosted) {
       const handle = object(created.value.result)
       const denied = await invoke('CRED-18/result-other-actor', ['result', 'take', String(handle.operation), String(handle.id)], { error: 'NOT_FOUND', otherActor: true })
@@ -217,7 +228,7 @@ export async function exerciseSecretJourney(options: Journey): Promise<void> {
       const delivered = start(['result', 'take', String(handle.operation), String(handle.id)], options.env)
       delivered.child.stdin!.end()
       assert.equal((await delivered.closed).code, 0)
-      assert.equal((await delivered.frames.next()).payload.value, minted)
+      assert.ok((await delivered.frames.next()).payload.value === minted, 'host private retrieval preserves the minted value')
       options.cases.push({ id: 'artium/CRED-14/result-owner', status: 'pass', hosted: true, expected: { hostBoundary: true }, actual: { privateFrame: true } })
     } else {
       const next = await invoke('CRED-15/broken-preview', [...mint, '--preview'])
@@ -302,15 +313,25 @@ export async function exerciseSecretJourney(options: Journey): Promise<void> {
     if (processSession) { processSession.child.stdin!.end(); await processSession.closed; processSession = undefined }
     }
 
-    const scan = async (path: string): Promise<void> => {
+    const scan = async (path: string, journal = false): Promise<void> => {
       for (const entry of await readdir(path, { withFileTypes: true })) {
+        // The fixture links its immutable package installation into the host directory.
+        if (entry.isSymbolicLink()) continue
         const file = join(path, entry.name)
-        if (entry.isDirectory()) await scan(file)
-        else for (const secret of acquired) assert.ok(!(await readFile(file)).includes(Buffer.from(secret)), `acquired secret persisted in ${entry.name}`)
+        if (entry.isDirectory()) await scan(file, journal || entry.name.endsWith('.log.d'))
+        else {
+          const text = (await readFile(file)).toString('utf8')
+          if (journal) assert.ok(safePublic(text) === text, 'protected value persisted in a durable journal')
+          for (const secret of acquired) for (const form of [secret, encodeURIComponent(secret), JSON.stringify(secret).slice(1, -1), Buffer.from(secret).toString('base64')]) {
+            assert.ok(!text.includes(form), `acquired secret persisted in ${entry.name}`)
+          }
+        }
       }
     }
     await scan(directory)
     if (options.hosted) await scan(options.hosted.stateDirectory)
+    options.cases.push({ id: `${options.hosted ? 'artium' : 'standalone'}/CRED-13/protected-metadata-and-journal`, status: 'pass', hosted: !!options.hosted,
+      expected: { hostBoundary: true }, actual: { protectedValuesPersisted: 0 } })
     await writeFile(join(options.out, `${options.hosted ? 'hosted-' : ''}secret-custody.json`), JSON.stringify({ status: 'pass', protectedValuesPersisted: 0, mutationTransmissions: mutations,
       origin, cases: options.cases.filter(row => String(row.id).startsWith(options.hosted ? 'artium/' : 'standalone/')).map(row => row.id) }, null, 2))
   } finally {
