@@ -9308,23 +9308,63 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "read",
+            "transport": "managed",
+            "secrets": "none",
+            "reason": "S5 operation-specific formatter and bounded private byte transport; ordinary output contains completion metadata only.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Byte completion is distinct from provider task completion. Never repeat a partial transfer automatically."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/nodes/{node}",
+                [
+                  "Sys.Syslog"
+                ]
+              ]
+            },
+            "response": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "source": "Pinned API catalogues and S5 transport contracts."
           },
           "contract": "dist/contracts.json#/contracts/352"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "read",
+            "transport": "managed",
+            "secrets": "none",
+            "reason": "S5 operation-specific formatter and bounded private byte transport; ordinary output contains completion metadata only.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Byte completion is distinct from provider task completion. Never repeat a partial transfer automatically."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/nodes/{node}",
+                [
+                  "Sys.Syslog"
+                ]
+              ]
+            },
+            "response": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "source": "Pinned API catalogues and S5 transport contracts."
           },
           "contract": "dist/contracts.json#/contracts/1020"
         }
@@ -9957,23 +9997,67 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "read",
+            "transport": "managed",
+            "secrets": "none",
+            "reason": "S5 operation-specific formatter and bounded private byte transport; ordinary output contains completion metadata only.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Byte completion is distinct from provider task completion. Never repeat a partial transfer automatically."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/vms/{vmid}",
+                [
+                  "VM.Audit"
+                ]
+              ]
+            },
+            "response": {
+              "properties": {
+                "filename": {
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            },
+            "source": "Pinned API catalogues and S5 transport contracts."
           },
           "contract": "dist/contracts.json#/contracts/392"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "read",
+            "transport": "managed",
+            "secrets": "none",
+            "reason": "S5 operation-specific formatter and bounded private byte transport; ordinary output contains completion metadata only.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Byte completion is distinct from provider task completion. Never repeat a partial transfer automatically."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/vms/{vmid}",
+                [
+                  "VM.Audit"
+                ]
+              ]
+            },
+            "response": {
+              "properties": {
+                "filename": {
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            },
+            "source": "Pinned API catalogues and S5 transport contracts."
           },
           "contract": "dist/contracts.json#/contracts/1061"
         }
@@ -10452,23 +10536,84 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "read",
+            "transport": "managed",
+            "secrets": "none",
+            "reason": "S5 operation-specific formatter and bounded private byte transport; ordinary output contains completion metadata only.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Byte completion is distinct from provider task completion. Never repeat a partial transfer automatically."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/vms/{vmid}",
+                [
+                  "VM.Monitor"
+                ]
+              ]
+            },
+            "response": {
+              "description": "Returns an object with a `content` property.",
+              "properties": {
+                "content": {
+                  "description": "The content of the file, maximum 16777216",
+                  "type": "string"
+                },
+                "truncated": {
+                  "description": "If set to 1, the output is truncated and not complete",
+                  "optional": 1,
+                  "type": "boolean"
+                }
+              },
+              "type": "object"
+            },
+            "source": "Pinned API catalogues and S5 transport contracts."
           },
           "contract": "dist/contracts.json#/contracts/431"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "read",
+            "transport": "managed",
+            "secrets": "none",
+            "reason": "S5 operation-specific formatter and bounded private byte transport; ordinary output contains completion metadata only.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Byte completion is distinct from provider task completion. Never repeat a partial transfer automatically."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/vms/{vmid}",
+                [
+                  "VM.GuestAgent.FileRead",
+                  "VM.GuestAgent.Unrestricted"
+                ],
+                "any",
+                1
+              ]
+            },
+            "response": {
+              "description": "Returns an object with a `content` property.",
+              "properties": {
+                "content": {
+                  "description": "The content of the file, maximum 16777216",
+                  "type": "string"
+                },
+                "truncated": {
+                  "description": "If set to 1, the read did not reach the end of the file.",
+                  "optional": 1,
+                  "type": "boolean"
+                }
+              },
+              "type": "object"
+            },
+            "source": "Pinned API catalogues and S5 transport contracts."
           },
           "contract": "dist/contracts.json#/contracts/1100"
         }
@@ -11442,23 +11587,67 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "read",
+            "transport": "managed",
+            "secrets": "none",
+            "reason": "S5 operation-specific formatter and bounded private byte transport; ordinary output contains completion metadata only.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Byte completion is distinct from provider task completion. Never repeat a partial transfer automatically."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/vms/{vmid}",
+                [
+                  "VM.Audit"
+                ]
+              ]
+            },
+            "response": {
+              "properties": {
+                "filename": {
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            },
+            "source": "Pinned API catalogues and S5 transport contracts."
           },
           "contract": "dist/contracts.json#/contracts/494"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "read",
+            "transport": "managed",
+            "secrets": "none",
+            "reason": "S5 operation-specific formatter and bounded private byte transport; ordinary output contains completion metadata only.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Byte completion is distinct from provider task completion. Never repeat a partial transfer automatically."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/vms/{vmid}",
+                [
+                  "VM.Audit"
+                ]
+              ]
+            },
+            "response": {
+              "properties": {
+                "filename": {
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            },
+            "source": "Pinned API catalogues and S5 transport contracts."
           },
           "contract": "dist/contracts.json#/contracts/1164"
         }
@@ -11926,23 +12115,67 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "read",
+            "transport": "managed",
+            "secrets": "none",
+            "reason": "S5 operation-specific formatter and bounded private byte transport; ordinary output contains completion metadata only.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Byte completion is distinct from provider task completion. Never repeat a partial transfer automatically."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/nodes/{node}",
+                [
+                  "Sys.Audit"
+                ]
+              ]
+            },
+            "response": {
+              "properties": {
+                "filename": {
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            },
+            "source": "Pinned API catalogues and S5 transport contracts."
           },
           "contract": "dist/contracts.json#/contracts/526"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "read",
+            "transport": "managed",
+            "secrets": "none",
+            "reason": "S5 operation-specific formatter and bounded private byte transport; ordinary output contains completion metadata only.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Byte completion is distinct from provider task completion. Never repeat a partial transfer automatically."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/nodes/{node}",
+                [
+                  "Sys.Audit"
+                ]
+              ]
+            },
+            "response": {
+              "properties": {
+                "filename": {
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            },
+            "source": "Pinned API catalogues and S5 transport contracts."
           },
           "contract": "dist/contracts.json#/contracts/1197"
         }
@@ -12984,23 +13217,47 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "read",
+            "transport": "managed",
+            "secrets": "none",
+            "reason": "S5 operation-specific formatter and bounded private byte transport; ordinary output contains completion metadata only.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Byte completion is distinct from provider task completion. Never repeat a partial transfer automatically."
+            },
+            "privileges": {
+              "description": "You need read access for the volume.",
+              "user": "all"
+            },
+            "response": {
+              "type": "any"
+            },
+            "source": "Pinned API catalogues and S5 transport contracts."
           },
           "contract": "dist/contracts.json#/contracts/562"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "read",
+            "transport": "managed",
+            "secrets": "none",
+            "reason": "S5 operation-specific formatter and bounded private byte transport; ordinary output contains completion metadata only.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Byte completion is distinct from provider task completion. Never repeat a partial transfer automatically."
+            },
+            "privileges": {
+              "description": "You need read access for the volume.",
+              "user": "all"
+            },
+            "response": {
+              "type": "any"
+            },
+            "source": "Pinned API catalogues and S5 transport contracts."
           },
           "contract": "dist/contracts.json#/contracts/1240"
         }
@@ -13138,23 +13395,73 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "read",
+            "transport": "managed",
+            "secrets": "none",
+            "reason": "S5 operation-specific formatter and bounded private byte transport; ordinary output contains completion metadata only.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Byte completion is distinct from provider task completion. Never repeat a partial transfer automatically."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/storage/{storage}",
+                [
+                  "Datastore.Audit",
+                  "Datastore.AllocateSpace"
+                ],
+                "any",
+                1
+              ]
+            },
+            "response": {
+              "properties": {
+                "filename": {
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            },
+            "source": "Pinned API catalogues and S5 transport contracts."
           },
           "contract": "dist/contracts.json#/contracts/567"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "read",
+            "transport": "managed",
+            "secrets": "none",
+            "reason": "S5 operation-specific formatter and bounded private byte transport; ordinary output contains completion metadata only.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Byte completion is distinct from provider task completion. Never repeat a partial transfer automatically."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/storage/{storage}",
+                [
+                  "Datastore.Audit",
+                  "Datastore.AllocateSpace"
+                ],
+                "any",
+                1
+              ]
+            },
+            "response": {
+              "properties": {
+                "filename": {
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            },
+            "source": "Pinned API catalogues and S5 transport contracts."
           },
           "contract": "dist/contracts.json#/contracts/1247"
         }
@@ -17413,23 +17720,93 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "managed",
+            "secrets": "private-result",
+            "reason": "S5 operation-specific formatter and bounded private byte transport; ordinary output contains completion metadata only.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Byte completion is distinct from provider task completion. Never repeat a partial transfer automatically."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/vms/{vmid}",
+                [
+                  "VM.Console"
+                ]
+              ]
+            },
+            "response": {
+              "additionalProperties": 1,
+              "description": "Returned values can be directly passed to the 'remote-viewer' application.",
+              "properties": {
+                "host": {
+                  "type": "string"
+                },
+                "password": {
+                  "type": "string"
+                },
+                "proxy": {
+                  "type": "string"
+                },
+                "tls-port": {
+                  "type": "integer"
+                },
+                "type": {
+                  "type": "string"
+                }
+              }
+            },
+            "source": "Pinned API catalogues and S5 transport contracts."
           },
           "contract": "dist/contracts.json#/contracts/401"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "managed",
+            "secrets": "private-result",
+            "reason": "S5 operation-specific formatter and bounded private byte transport; ordinary output contains completion metadata only.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Byte completion is distinct from provider task completion. Never repeat a partial transfer automatically."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/vms/{vmid}",
+                [
+                  "VM.Console"
+                ]
+              ]
+            },
+            "response": {
+              "additionalProperties": 1,
+              "description": "Returned values can be directly passed to the 'remote-viewer' application.",
+              "properties": {
+                "host": {
+                  "type": "string"
+                },
+                "password": {
+                  "type": "string"
+                },
+                "proxy": {
+                  "type": "string"
+                },
+                "tls-port": {
+                  "type": "integer"
+                },
+                "type": {
+                  "type": "string"
+                }
+              }
+            },
+            "source": "Pinned API catalogues and S5 transport contracts."
           },
           "contract": "dist/contracts.json#/contracts/1070"
         }
@@ -19277,23 +19654,93 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "managed",
+            "secrets": "private-result",
+            "reason": "S5 operation-specific formatter and bounded private byte transport; ordinary output contains completion metadata only.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Byte completion is distinct from provider task completion. Never repeat a partial transfer automatically."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/vms/{vmid}",
+                [
+                  "VM.Console"
+                ]
+              ]
+            },
+            "response": {
+              "additionalProperties": 1,
+              "description": "Returned values can be directly passed to the 'remote-viewer' application.",
+              "properties": {
+                "host": {
+                  "type": "string"
+                },
+                "password": {
+                  "type": "string"
+                },
+                "proxy": {
+                  "type": "string"
+                },
+                "tls-port": {
+                  "type": "integer"
+                },
+                "type": {
+                  "type": "string"
+                }
+              }
+            },
+            "source": "Pinned API catalogues and S5 transport contracts."
           },
           "contract": "dist/contracts.json#/contracts/504"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "managed",
+            "secrets": "private-result",
+            "reason": "S5 operation-specific formatter and bounded private byte transport; ordinary output contains completion metadata only.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Byte completion is distinct from provider task completion. Never repeat a partial transfer automatically."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/vms/{vmid}",
+                [
+                  "VM.Console"
+                ]
+              ]
+            },
+            "response": {
+              "additionalProperties": 1,
+              "description": "Returned values can be directly passed to the 'remote-viewer' application.",
+              "properties": {
+                "host": {
+                  "type": "string"
+                },
+                "password": {
+                  "type": "string"
+                },
+                "proxy": {
+                  "type": "string"
+                },
+                "tls-port": {
+                  "type": "integer"
+                },
+                "type": {
+                  "type": "string"
+                }
+              }
+            },
+            "source": "Pinned API catalogues and S5 transport contracts."
           },
           "contract": "dist/contracts.json#/contracts/1174"
         }
@@ -20343,23 +20790,99 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "managed",
+            "secrets": "private-result",
+            "reason": "S5 operation-specific formatter and bounded private byte transport; ordinary output contains completion metadata only.",
+            "allowedInputs": [
+              "node"
+            ],
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Byte completion is distinct from provider task completion. Never repeat a partial transfer automatically."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/nodes/{node}",
+                [
+                  "Sys.Console"
+                ]
+              ]
+            },
+            "response": {
+              "additionalProperties": 1,
+              "description": "Returned values can be directly passed to the 'remote-viewer' application.",
+              "properties": {
+                "host": {
+                  "type": "string"
+                },
+                "password": {
+                  "type": "string"
+                },
+                "proxy": {
+                  "type": "string"
+                },
+                "tls-port": {
+                  "type": "integer"
+                },
+                "type": {
+                  "type": "string"
+                }
+              }
+            },
+            "source": "Pinned API catalogues and S5 transport contracts."
           },
           "contract": "dist/contracts.json#/contracts/548"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "managed",
+            "secrets": "private-result",
+            "reason": "S5 operation-specific formatter and bounded private byte transport; ordinary output contains completion metadata only.",
+            "allowedInputs": [
+              "node"
+            ],
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Byte completion is distinct from provider task completion. Never repeat a partial transfer automatically."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/nodes/{node}",
+                [
+                  "Sys.Console"
+                ]
+              ]
+            },
+            "response": {
+              "additionalProperties": 1,
+              "description": "Returned values can be directly passed to the 'remote-viewer' application.",
+              "properties": {
+                "host": {
+                  "type": "string"
+                },
+                "password": {
+                  "type": "string"
+                },
+                "proxy": {
+                  "type": "string"
+                },
+                "tls-port": {
+                  "type": "integer"
+                },
+                "type": {
+                  "type": "string"
+                }
+              }
+            },
+            "source": "Pinned API catalogues and S5 transport contracts."
           },
           "contract": "dist/contracts.json#/contracts/1226"
         }
@@ -20596,23 +21119,73 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "managed",
+            "secrets": "none",
+            "reason": "S5 operation-specific formatter and bounded private byte transport; ordinary output contains completion metadata only.",
+            "allowedInputs": [
+              "node",
+              "storage",
+              "filename",
+              "content",
+              "checksum",
+              "checksum-algorithm"
+            ],
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Byte completion is distinct from provider task completion. Never repeat a partial transfer automatically."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/storage/{storage}",
+                [
+                  "Datastore.AllocateTemplate"
+                ]
+              ]
+            },
+            "response": {
+              "type": "string"
+            },
+            "source": "Pinned API catalogues and S5 transport contracts."
           },
           "contract": "dist/contracts.json#/contracts/570"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "managed",
+            "secrets": "none",
+            "reason": "S5 operation-specific formatter and bounded private byte transport; ordinary output contains completion metadata only.",
+            "allowedInputs": [
+              "node",
+              "storage",
+              "filename",
+              "content",
+              "checksum",
+              "checksum-algorithm"
+            ],
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Byte completion is distinct from provider task completion. Never repeat a partial transfer automatically."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/storage/{storage}",
+                [
+                  "Datastore.AllocateTemplate"
+                ]
+              ]
+            },
+            "response": {
+              "type": "string"
+            },
+            "source": "Pinned API catalogues and S5 transport contracts."
           },
           "contract": "dist/contracts.json#/contracts/1250"
         }
@@ -20802,23 +21375,106 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "private-result",
+            "allowedInputs": [
+              "node",
+              "websocket"
+            ],
+            "sensitiveInputs": [],
+            "reason": "Explicitly authorized credential and sensitive-input operation; shared preview and confirmation controls apply, including effectful scans.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Never recreate a one-time credential to determine delivery or outcome."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/nodes/{node}",
+                [
+                  "Sys.Console"
+                ]
+              ]
+            },
+            "response": {
+              "additionalProperties": 0,
+              "properties": {
+                "cert": {
+                  "type": "string"
+                },
+                "port": {
+                  "type": "integer"
+                },
+                "ticket": {
+                  "type": "string"
+                },
+                "upid": {
+                  "type": "string"
+                },
+                "user": {
+                  "type": "string"
+                }
+              }
+            },
+            "source": "Retained versioned API schema and S4 protected credential contract."
           },
           "contract": "dist/contracts.json#/contracts/586"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "private-result",
+            "allowedInputs": [
+              "node",
+              "websocket"
+            ],
+            "sensitiveInputs": [],
+            "reason": "Explicitly authorized credential and sensitive-input operation; shared preview and confirmation controls apply, including effectful scans.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Never recreate a one-time credential to determine delivery or outcome."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/nodes/{node}",
+                [
+                  "Sys.Console"
+                ]
+              ]
+            },
+            "response": {
+              "additionalProperties": 0,
+              "properties": {
+                "cert": {
+                  "type": "string"
+                },
+                "password": {
+                  "description": "Password used for authentication within the VNC protocol. Consists of printable ASCII characters ('!' .. '~').",
+                  "optional": 1,
+                  "type": "string"
+                },
+                "port": {
+                  "type": "integer"
+                },
+                "ticket": {
+                  "type": "string"
+                },
+                "upid": {
+                  "type": "string"
+                },
+                "user": {
+                  "type": "string"
+                }
+              }
+            },
+            "source": "Retained versioned API schema and S4 protected credential contract."
           },
           "contract": "dist/contracts.json#/contracts/1266"
         }

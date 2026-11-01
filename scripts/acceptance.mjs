@@ -14,6 +14,7 @@ import { routeCases, verifyDiscovery } from './route-cases.mjs'
 import { exerciseReadJourney } from './read-journey.mjs'
 import { exerciseWriteJourney } from './write-journey.ts'
 import { exerciseSecretJourney } from './secret-journey.ts'
+import { exerciseStreamJourney } from './stream-journey.ts'
 
 const root = fileURLToPath(new URL('../', import.meta.url))
 const digest = (bytes, algorithm = 'sha256') => createHash(algorithm).update(bytes).digest(algorithm === 'sha512' ? 'base64' : 'hex')
@@ -90,8 +91,8 @@ function selection(args) {
     assert.ok(value && !value.startsWith('--'), `Missing value for ${key}`)
     values[key] = value
   }
-  assert.ok(['S1.1', 'S1.2', 'S2.1', 'S2.2', 'S2.3', 'S3.1', 'S3.2', 'S4.1', 'S4.2'].includes(values['--task']), 'Select a task from S1.1 through S4.2')
-  if (values['--repeat-through']) assert.ok(['S1', 'S2', 'S3', 'S4'].includes(values['--repeat-through']))
+  assert.ok(['S1.1', 'S1.2', 'S2.1', 'S2.2', 'S2.3', 'S3.1', 'S3.2', 'S4.1', 'S4.2', 'S5.1', 'S5.2'].includes(values['--task']), 'Select a task from S1.1 through S5.2')
+  if (values['--repeat-through']) assert.ok(['S1', 'S2', 'S3', 'S4', 'S5'].includes(values['--repeat-through']))
   if (values['--available-through']) assert.equal(values['--available-through'], 'S2')
   assert.equal(values['--network'], 'fake-only', 'Only fake-only networking is permitted')
   assert.ok(['standalone', 'both'].includes(values['--through']), 'Select --through standalone or both')
@@ -214,6 +215,14 @@ async function verify(values, prepared, scratch) {
     await checked('openssl', ['req', '-x509', '-newkey', 'rsa:2048', '-nodes', '-days', '1',
       '-keyout', join(scratch, 'server.key'), '-out', join(scratch, 'server.crt'),
       '-subj', '/CN=localhost', '-addext', 'subjectAltName=IP:127.0.0.1', '-addext', 'basicConstraints=critical,CA:TRUE'])
+    // Broad fixed validity prevents cross-process clock skew from making a new
+    // synthetic certificate not-yet-valid. Production TLS validation is unchanged.
+    await writeFile(join(scratch, 'certificate-index'), '')
+    await writeFile(join(scratch, 'certificate.cnf'), `[ca]\ndefault_ca = synthetic\n[synthetic]\ndatabase = ${join(scratch, 'certificate-index')}\nserial = ${join(scratch, 'certificate-serial')}\nnew_certs_dir = ${scratch}\nprivate_key = ${join(scratch, 'server.key')}\ncertificate = ${join(scratch, 'server.crt')}\ndefault_md = sha256\npolicy = subject\n[subject]\ncommonName = supplied\n[server]\nsubjectAltName = IP:127.0.0.1\nbasicConstraints = critical,CA:TRUE\n`)
+    await checked('openssl', ['req', '-new', '-key', join(scratch, 'server.key'), '-out', join(scratch, 'server.csr'), '-subj', '/CN=localhost'])
+    await checked('openssl', ['ca', '-batch', '-notext', '-rand_serial', '-selfsign', '-config', join(scratch, 'certificate.cnf'),
+      '-extensions', 'server', '-in', join(scratch, 'server.csr'), '-out', join(scratch, 'stable.crt'), '-startdate', '20200101000000Z', '-enddate', '20991231235959Z'])
+    await copyFile(join(scratch, 'stable.crt'), join(scratch, 'server.crt'))
     const caFile = join(scratch, 'server.crt')
     await chmod(caFile, 0o600)
     const token = 'CANARY-proxmox+token/S1-1?value="x"'
@@ -429,7 +438,7 @@ async function verify(values, prepared, scratch) {
     const operationPolicy = await json(join(root, 'src/operation-policy.json'))
     const readJourney = (environment, entry = executable) => exerciseReadJourney({ runCase, pack: values['--pack'], retained,
       contracts: catalogues.flatMap(catalogue => catalogue.operations.map(operation => ({ ...operation, release: catalogue.release }))),
-      env: environment, entry, hosted: entry !== executable, task: ['S3.1', 'S3.2', 'S4.1', 'S4.2'].includes(values['--task']) ? 'S2.3' : values['--task'] })
+      env: environment, entry, hosted: entry !== executable, task: /^S[345]\./.test(values['--task']) ? 'S2.3' : values['--task'] })
     const exerciseRoutes = async (environment, entry = executable) => {
       const hosted = entry !== executable
       const coverage = { union: 681, variants: 1285, admitted: 0, denied: 0 }
@@ -439,7 +448,7 @@ async function verify(values, prepared, scratch) {
         const expected = route.callable ? route.operation.path === '/version' ?
           { exitCode: 0, requests: 1, version: true, identity } :
           { exitCode: 0, requests: 1, path: route.expectedPath, data: route.response, identity } :
-          { exitCode: hosted ? 2 : 1, requests: 0, error: hosted ? 'INVALID_INPUT' : route.reviewedWrite ? 'WRITE_DISABLED' : 'CONTRACT_UNRESOLVED', hostBoundary: hosted }
+          { exitCode: hosted || route.managed ? 2 : 1, requests: 0, error: hosted || route.managed ? 'INVALID_INPUT' : route.reviewedWrite ? 'WRITE_DISABLED' : 'CONTRACT_UNRESOLVED', hostBoundary: hosted }
         await runCase(`${hosted ? 'artium' : 'standalone'}/contract/${route.id}/valid`, args, environment, expected,
           route.operation.path === '/version' ? success : { httpStatus: 200, body: { data: route.response } }, entry)
         await runCase(`${hosted ? 'artium' : 'standalone'}/contract/${route.id}/invalid`, [...args, '--api-constructor', 'invalid'], environment,
@@ -448,7 +457,7 @@ async function verify(values, prepared, scratch) {
       }
       return coverage
     }
-    if (values['--task'] === 'S2.1' || (['S3.1', 'S3.2', 'S4.1', 'S4.2'].includes(values['--task']) && ['S3', 'S4'].includes(values['--repeat-through']))) {
+    if (values['--task'] === 'S2.1' || (/^S[345]\./.test(values['--task']) && ['S3', 'S4', 'S5'].includes(values['--repeat-through']))) {
       verifyDiscovery(inventory, catalogues, (await json(join(installed, 'dist/contracts.json'))).contracts, operationPolicy)
       const bodyRoute = [...routeCases(catalogues, operationPolicy)].find(route => route.callable && route.operation.path === '/nodes/{node}/tasks')
       const bodyFile = join(scratch, 'parameters.json')
@@ -461,11 +470,12 @@ async function verify(values, prepared, scratch) {
         { exitCode: 2, requests: 0, error: 'INVALID_INPUT' })
       result.routeCoverage = await exerciseRoutes(env)
     }
-    if (['S2.2', 'S2.3', 'S3.1', 'S3.2', 'S4.1', 'S4.2'].includes(values['--task'])) await readJourney(env)
-    if (['S3.1', 'S3.2', 'S4.1', 'S4.2'].includes(values['--task'])) {
+    if (['S2.2', 'S2.3'].includes(values['--task']) || /^S[345]\./.test(values['--task'])) await readJourney(env)
+    if (/^S[345]\./.test(values['--task'])) {
       await exerciseWriteJourney({ scratch, out, executable, caFile, env, command, cases: result.cases, ledger, transcripts })
     }
-    if (values['--task'].startsWith('S4.')) await exerciseSecretJourney({ task: values['--task'], scratch, out, executable, caFile, env, cases: result.cases, ledger, transcripts })
+    if (/^S[45]\./.test(values['--task'])) await exerciseSecretJourney({ task: values['--task'].startsWith('S5.') ? 'S4.2' : values['--task'], scratch, out, executable, caFile, env, cases: result.cases, ledger, transcripts })
+    if (values['--task'].startsWith('S5.')) await exerciseStreamJourney({ task: values['--task'], scratch, out, executable, caFile, env, cases: result.cases, ledger, transcripts })
     result.outcomes = [
       { id: 'AC-VERIFIED-VERSION', journey: 'standalone', status: 'pass', basis: 'Reviewed 8.2.7 fixture' },
       { id: 'AC-VERSION-AUTH', journey: 'standalone', status: 'pass', basis: 'Controlled 401 and invalid shapes fail' },
@@ -525,9 +535,9 @@ async function verify(values, prepared, scratch) {
         { exitCode: 1, requests: 1, error: 'AUTH_REQUIRED', identity: 'hosted-canary' }, denied, client)
       await runCase('AC-HOST/invalid-shape', ['proxmox-axi', 'get', '/version', '--format', 'json'], clientEnvironment,
         { exitCode: 1, requests: 1, error: 'INVALID_RESPONSE', identity: 'hosted-canary' }, { httpStatus: 200, body: { data: null } }, client)
-      if (values['--task'] === 'S2.1' || (['S3.1', 'S3.2', 'S4.1', 'S4.2'].includes(values['--task']) && ['S3', 'S4'].includes(values['--repeat-through']))) result.host.routeCoverage = await exerciseRoutes(clientEnvironment, client)
-      if (['S2.2', 'S2.3', 'S3.1', 'S3.2', 'S4.1', 'S4.2'].includes(values['--task'])) await readJourney(clientEnvironment, client)
-      if (['S3.1', 'S3.2', 'S4.1', 'S4.2'].includes(values['--task'])) {
+      if (values['--task'] === 'S2.1' || (/^S[345]\./.test(values['--task']) && ['S3', 'S4', 'S5'].includes(values['--repeat-through']))) result.host.routeCoverage = await exerciseRoutes(clientEnvironment, client)
+      if (['S2.2', 'S2.3'].includes(values['--task']) || /^S[345]\./.test(values['--task'])) await readJourney(clientEnvironment, client)
+      if (/^S[345]\./.test(values['--task'])) {
         await exerciseWriteJourney({ scratch, out, executable: client, caFile, env: { ...clientEnvironment, PROXMOX_AXI_TOKEN: hostedToken },
           command, cases: result.cases, ledger, transcripts, hosted: { log: join(hostDirectory, 'writes.log'), otherActorEnv: secondaryEnvironment,
             configure: async (origin, toolOperations, hostOperations, enabled) => {
@@ -539,7 +549,7 @@ async function verify(values, prepared, scratch) {
           result.outcomes.push({ id, journey: 'artium', status: 'pass', basis: 'Actual public client/server/runner, independent host policy and retained native journals across disposable calls.' })
         }
       }
-      if (values['--task'].startsWith('S4.')) await exerciseSecretJourney({ task: values['--task'], scratch, out, executable: client, caFile,
+      if (/^S[45]\./.test(values['--task'])) await exerciseSecretJourney({ task: values['--task'].startsWith('S5.') ? 'S4.2' : values['--task'], scratch, out, executable: client, caFile,
         env: { ...clientEnvironment, PROXMOX_AXI_TOKEN: hostedToken }, cases: result.cases, ledger, transcripts,
         hosted: { otherActorEnv: secondaryEnvironment, stateDirectory: hostDirectory,
           configure: async (origin, auth, operations) => {
@@ -549,6 +559,17 @@ async function verify(values, prepared, scratch) {
           }, clock: async offset => {
             const changed = hostMessage(hostChild, 'clock-changed')
             hostChild.send({ event: 'clock', offset })
+            await changed
+          } } })
+      if (values['--task'].startsWith('S5.')) await exerciseStreamJourney({ task: values['--task'], scratch, out, executable: client, caFile,
+        env: clientEnvironment, cases: result.cases, ledger, transcripts, hosted: { otherActorEnv: secondaryEnvironment,
+          configure: async (origin, operations) => {
+            const configured = hostMessage(hostChild, 'configured-s4')
+            hostChild.send({ event: 'configure-s4', origin, auth: 'api-token', operations })
+            await configured
+          }, limits: async (bytes, idleMs) => {
+            const changed = hostMessage(hostChild, 'stream-limits-changed')
+            hostChild.send({ event: 'stream-limits', bytes, idleMs })
             await changed
           } } })
       const snapshot = hostMessage(hostChild, 'snapshot')
@@ -572,6 +593,11 @@ async function verify(values, prepared, scratch) {
         values['--task'] === 'S2.3' ? ['AC-READ', 'AC-PERMISSIONS', 'AC-VERSIONS', 'VP-01', 'VP-02', 'VP-03', 'VP-04', 'VP-05', 'VP-06', 'VP-07', 'VP-08'] : ['AC-READ', 'AC-PERMISSIONS']) {
         result.outcomes.push({ id, journey, status: 'pass', basis: 'Retained fixture replay, bounded presentation, permission visibility and version capability cases; TLS rotation remains explicit.' })
       }
+    }
+    if (values['--task'].startsWith('S5.')) for (const journey of hostInput ? ['standalone', 'artium'] : ['standalone']) {
+      for (const id of ['AC-TRANSFER', 'AC-TRANSPORT', 'AC-SPECIAL-BATCH-POLICY', 'AC-SPECIAL-GUEST-FILE',
+        ...(values['--task'] === 'S5.2' ? ['AC-STREAM', 'CRED-17', 'CRED-18'] : [])]) result.outcomes.push({ id, journey, status: 'pass',
+        basis: 'Independent fake bytes, formatter fixtures, guest chunk padding, shared confirmations and protected setup; duplex checks include ownership, expiry, cancellation and peer cleanup. Live commissioning and native Windows remain pending.' })
     }
     result.status = 'pass'
     result.scope = hostInput ? `${result.task} through both journeys using the unmerged admission fixture; stock Artium is unsupported.` : `Standalone subset only; full ${result.task} requires --through both.`
@@ -610,7 +636,7 @@ try {
     const isolated = await command('unshare', ['--user', '--map-root-user', '--net', process.execPath,
       fileURLToPath(import.meta.url), ...process.argv.slice(2)],
     // Full S3.2 replays have run close to the former aggregate 30-minute cap.
-    { timeoutMs: values['--task'].startsWith('S4.') ? 3_600_000 : values['--task'] === 'S3.2' && values['--repeat-through'] === 'S3' ? 2_700_000 :
+    { timeoutMs: /^S[45]\./.test(values['--task']) ? 3_600_000 : values['--task'] === 'S3.2' && values['--repeat-through'] === 'S3' ? 2_700_000 :
       values['--task'] === 'S2.1' || values['--repeat-through'] === 'S3' ? 1_800_000 : 300_000,
       env: { ...process.env, PROXMOX_AXI_ACCEPTANCE_NETNS: parentNamespace, PROXMOX_AXI_ACCEPTANCE_SCRATCH: scratch } })
     process.stdout.write(isolated.stdout)

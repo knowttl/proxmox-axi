@@ -32,6 +32,7 @@ function checkPolicy(credentials: Credentials, contract: Contract): void {
 
 async function invocation(credentials: Credentials, contract: Contract, input: Record<string, unknown>, budget = { count: 0 }, depth = 0): Promise<Invocation> {
   checkPolicy(credentials, contract)
+  if (depth > 0 && contract.policy.transport !== 'json') throw new Failure('INVALID_INPUT', 'Batch children cannot open byte transports.', 'Execute each transfer separately through its managed channel.', 2)
   if (++budget.count > 64 || depth > 4) throw new Failure('INVALID_INPUT', 'Batch exceeds 64 total operations or four nesting levels.', 'Use a smaller reviewed batch.', 2)
   const values = { ...input }
   const revisions: unknown[] = []
@@ -91,13 +92,18 @@ async function invocation(credentials: Credentials, contract: Contract, input: R
   return { contract, values, wire, children, revisions }
 }
 
-export async function writeOperation(credentials: Credentials, initial: Contract, values: Record<string, unknown>, options: { preview: boolean, confirmation?: string }) {
+export interface EffectTransport {
+  binding: unknown
+  execute: (credentials: Credentials, contract: Contract, values: Record<string, unknown>) => Promise<{ data: unknown, transfer: unknown }>
+}
+
+export async function writeOperation(credentials: Credentials, initial: Contract, values: Record<string, unknown>, options: { preview: boolean, confirmation?: string, transport?: EffectTransport }) {
   if (!['write', 'batch'].includes(initial.policy.effect)) throw denied()
   // All policy and input failures happen before any provider request.
   let call = await invocation(credentials, initial, values)
   checkPaths(call, credentials.results)
   const privateResult = (item: Invocation): boolean => item.contract.policy.secrets === 'private-result' || item.children.some(privateResult)
-  if (!options.preview && privateResult(call)) credentials.results.sink()
+  if (!options.preview && privateResult(call) && !options.transport) credentials.results.sink()
   const journal = await openJournal()
   const tokenRevision = credentials.diagnostics.tokenSource.startsWith('file:') ? await lstat(credentials.diagnostics.tokenSource.slice(5)) : undefined
   const binding = () => journal.fingerprint({ origin: credentials.origin, identity: credentials.tokenId,
@@ -106,7 +112,7 @@ export async function writeOperation(credentials: Credentials, initial: Contract
     operation: call.contract.id, release: call.contract.release, wire: call.wire, revisions: call.revisions,
     credentialRevision: process.env.PROXMOX_AXI_CREDENTIAL_REVISION,
     permissions: { tool: credentials.writeOperations, host: process.env.PROXMOX_AXI_HOST_OPERATIONS, readOnly: process.env.PROXMOX_AXI_READ_ONLY },
-    trust: { ca: credentials.ca, pin: credentials.certificatePin }, policy: call.contract.policy })
+    trust: { ca: credentials.ca, pin: credentials.certificatePin }, policy: call.contract.policy, transport: options.transport?.binding })
   // Version selectors are never a write bypass, even for explicit --catalogue.
   const version = await readVersion(credentials, typeof values.node === 'string' ?
     buildPath(selectContract('GET', '/nodes/{node}/version', 'published-current'), { node: values.node }) : '/api2/json/version')
@@ -126,7 +132,7 @@ export async function writeOperation(credentials: Credentials, initial: Contract
     if (check) record.check = check
     await journal.save(record)
     return { status: 'preview', id, operation: record.operation, confirmation: `${id}.${fingerprint}`,
-      expiresInSeconds: 300, reconciliation: record.reconciliation, children: publicChildren(record.children) }
+      expiresInSeconds: 300, reconciliation: record.reconciliation, children: publicChildren(record.children), ...(options.transport ? { transport: options.transport.binding } : {}) }
   }
   const [id, approval, extra] = (options.confirmation ?? '').split('.')
   if (!id || !approval || extra) throw new Failure('CONFIRMATION_REQUIRED', 'Execution requires an exact preview confirmation.', 'Run the same command with --preview first.')
@@ -148,23 +154,28 @@ export async function writeOperation(credentials: Credentials, initial: Contract
   }
   let data: unknown
   let outcome: Outcome
+  let transfer: unknown
   try {
     const [path, body] = call.wire.split('?')
     const query = call.contract.method === 'DELETE' || call.contract.method === 'GET'
-    data = await executeRequest(credentials, query ? call.wire : path!, { method: call.contract.method, ...(!query && body ? { body } : {}) })
+    if (options.transport) {
+      const result = await options.transport.execute(credentials, call.contract, call.values)
+      data = result.data
+      transfer = result.transfer
+    } else data = await executeRequest(credentials, query ? call.wire : path!, { method: call.contract.method, ...(!query && body ? { body } : {}) })
     if (privateResult(call)) registerResults(call, data, credentials.results)
-    validateResponse(data, call.contract.returns)
+    if (!options.transport || data !== null) validateResponse(data, call.contract.returns)
     outcome = resultStatus(call, data, credentials.results)
-    if (privateResult(call)) await credentials.results.deliver(resultBinding(credentials.origin, credentials.tokenId, call.contract.id, fingerprint), data)
+    if (privateResult(call) && !options.transport) await credentials.results.deliver(resultBinding(credentials.origin, credentials.tokenId, call.contract.id, fingerprint), data)
   } catch (error) {
     // Even HTTP failures may follow a partial server-side action. No retry is safe.
     await saveOutcome({ status: 'uncertain' })
     throw new Failure(error instanceof Failure && error.code === 'DELIVERY_UNCERTAIN' ? 'DELIVERY_UNCERTAIN' : 'WRITE_UNCERTAIN',
-      `Write or private delivery outcome is uncertain; journal ${id}.`, `Run proxmox-axi journal reconcile ${id}; do not repeat the mutation.`)
+      `Write or private delivery outcome is uncertain; journal ${id}.${error instanceof Failure && error.code === 'DUPLEX_FAILED' ? ` ${error.message}` : ''}`, `Run proxmox-axi journal reconcile ${id}; do not repeat the mutation.`)
   }
   const saved = await saveOutcome(outcome)
   if (saved.status === 'failed' || saved.status === 'uncertain') process.exitCode = 1
-  return { id, status: saved.status, ...(saved.upid ? { node: saved.node, upid: saved.upid } : {}), children: publicChildren(saved.children),
+  return { id, status: saved.status, ...(transfer ? { transfer } : {}), ...(saved.upid ? { node: saved.node, upid: saved.upid } : {}), children: publicChildren(saved.children),
     ...(call.contract.method === 'GET' && !privateResult(call) ? { data: credentials.results.sanitize(data) } : {}),
     reconciliation: saved.reconciliation, help: saved.upid ? [taskCommand('status'), taskCommand('wait')] : [] }
 }

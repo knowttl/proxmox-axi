@@ -2,6 +2,7 @@
 
 Agent-facing Proxmox VE CLI, read-only by default.
 It covers the 681-route Proxmox API union through versioned invocation discovery, with reviewed admission policy for each callable operation.
+This build provides canonical API-token, supplied-ticket and password credentials, protected results, and bounded trusted HTTPS.
 
 [Why this exists](#why-this-exists) | [Quickstart](#quickstart) | [Commands](#commands) | [Safety](#safety) | [Configuration](#configuration) | [Output and exit codes](#output-and-exit-codes) | [Limitations](#limitations) | [Development](#development)
 
@@ -11,8 +12,13 @@ The Proxmox API is large, and most of its routes change state or handle secrets.
 Agents need a bounded, predictable way to inspect a cluster without scraping vendor output.
 `proxmox-axi` returns compact TOON (or JSON) with structured errors and next-step hints, and never includes raw vendor bodies or transport diagnostics.
 Only reviewed operations are callable.
+Ordinary inventory reads, controlled mutations and selected credential/session setup routes have reviewed admission policy.
+Other operations remain discoverable but uncallable until their effects, transport and secret handling are reviewed.
 Writes are disabled by default and need a named operation permission plus an exact, single-use confirmation.
+Hosted verification uses an explicitly approved, unmerged temporary admission fixture; stock Artium remains unsupported.
+Managed transfers and console/migration duplex transports use private inherited byte channels, with metadata-only ordinary output.
 The [S4 contract](docs/s4-contract.md) defines private results and caller-managed memory sessions.
+The [S5 contract](docs/s5-contract.md) defines formatters, transfer limits and binary framing.
 
 ## Quickstart
 
@@ -36,6 +42,12 @@ error:
   message: No API token profile is configured.
 help[1]: "Configure PROXMOX_AXI_ORIGIN, PROXMOX_AXI_TOKEN_ID and PROXMOX_AXI_TOKEN."
 ```
+
+See [Safety](#safety) for ordinary JSON read bounds and the [S5 contract](docs/s5-contract.md) for managed transfer limits.
+`get /version` validates the version response before formatting it as TOON or JSON.
+HTTP 401 returns a nonzero `AUTH_REQUIRED` result; malformed successful responses return `INVALID_RESPONSE`.
+Errors are structured on stdout and never include raw vendor bodies or transport diagnostics.
+An interrupted HTTPS response returns `CONNECTION_FAILED`; the total deadline and response bound retain `TIMEOUT` and `OUTPUT_LIMIT`.
 
 Configure an API token profile, then make the first authenticated read:
 
@@ -86,6 +98,13 @@ proxmox-axi task status|log|wait|cancel --api-node <node> --api-upid <UPID> [--j
 proxmox-axi journal show|reconcile <id>
 ```
 
+Managed byte transports (see the [S5 contract](docs/s5-contract.md) for required private channels, formatters and framing):
+
+```sh
+proxmox-axi transfer get|create <template> --response-format <formatter> [--api-<parameter> <value>]
+proxmox-axi duplex create <setup-template> [--api-<parameter> <value>] --preview|--confirm <confirmation>
+```
+
 Common flags are `--config <absolute-path>`, `--profile <name>`, `--session <id>` and `--format toon|json`.
 
 ```sh
@@ -109,8 +128,9 @@ Notes:
 
 ### Version handling and inventory
 
-Ordinary reads other than `/version` detect the entry version and, for node-specific routes, the selected node version before choosing a catalogue.
-For reads, an explicit `--catalogue` selects a replay contract without version detection, and inventory visibility remains unknown.
+Ordinary JSON reads other than `/version` detect the entry version and, for node-specific routes, the selected node version before choosing a catalogue.
+For ordinary JSON reads, an explicit `--catalogue` selects a replay contract without version detection, and inventory visibility remains unknown.
+Managed read transfers always detect the selected node version and choose its contract, even when `--catalogue` is supplied.
 Writes require a detected major of 8 or 9 and select the corresponding contract, including when an explicit catalogue was supplied.
 Automatic inventory reads check effective root audit permissions and report `complete` or `permission-filtered` visibility.
 Scoped privileges may provide useful rows but do not establish complete inventory.
@@ -118,10 +138,11 @@ An empty filtered or unverified result never establishes that no resources exist
 
 ## Safety
 
-- Reads use trusted HTTPS, a five-second total deadline and a 64 KiB response bound, and reject redirects.
+- Ordinary JSON reads use trusted HTTPS, a five-second total deadline and a 64 KiB response bound, and reject redirects.
+  Managed transfers have separate administrator-controlled byte and elapsed limits.
 - Operations whose effects, transport or secret handling are not reviewed remain discoverable but uncallable.
   Unresolved policy fields deny invocation, and changing a capture never admits new operations automatically.
-- Writes cover guest power operations, guest destruction, selected scalar configuration branches, pool management, task cancellation, node execute batches and the reviewed credential/session setup operations.
+- Writes cover guest power operations, guest destruction, selected scalar configuration branches, pool management, task cancellation, node execute batches, storage uploads and the reviewed credential/session setup operations.
   Effectful CIFS/PBS scans use the same preview and confirmation policy even though their vendor method is GET.
 - Inspect `schema create|set|delete <template>` and the generated `write-policy.json` before enabling an operation.
 - Enable an operation by adding its ID to the selected file profile: `writes: { "operations": ["<operation-id>"] }`.
@@ -170,6 +191,8 @@ Errors are structured on stdout and never include raw vendor bodies or transport
 Token values never arrive through command arguments.
 `axi-credential.schema.json` rejects unknown fields and inline secrets.
 The tool never reads other clients' configuration or writes credential files.
+Protected values remain in private result and byte channels and never enter ordinary output.
+Only provider free text is scanned; generated metadata and binary messages retain their reviewed channels.
 
 ## Configuration
 
@@ -229,7 +252,7 @@ No insecure-TLS flag or automatic trust update exists.
 - The published 9.2 schema is supported at the contract level, and live commissioning is pending.
   Versions outside 9.2 are labelled unverified.
 - The current documentation capture is bound to documentation version 9.2.13, not to a live-tested server patch.
-- Downloads and duplex transports are deferred.
+- Managed transfers and duplex sessions are verified with fake services only; live release-specific console token compatibility remains pending.
 - Operations outside the reviewed admission policy are discoverable but uncallable.
 - Native Windows proof is pending.
 - Hosted verification uses an explicitly approved, unmerged temporary admission fixture, and stock hosts remain unsupported.
@@ -297,7 +320,13 @@ pnpm verify:acceptance -- --task S3.1 --pack /absolute/path/to/pack --out /absol
 pnpm verify:acceptance -- --task S3.2 --pack /absolute/path/to/pack --out /absolute/new/run/S3.2 --network fake-only --through both --repeat-through S3
 pnpm verify:acceptance -- --task S4.1 --pack /absolute/path/to/pack --out /absolute/new/run/S4.1 --network fake-only --through both --repeat-through S4
 pnpm verify:acceptance -- --task S4.2 --pack /absolute/path/to/pack --out /absolute/new/run/S4.2 --network fake-only --through both --repeat-through S4
+pnpm verify:acceptance -- --task S5.1 --pack /absolute/path/to/pack --out /absolute/new/run/S5.1 --network fake-only --through standalone --repeat-through S5
+pnpm verify:acceptance -- --task S5.2 --pack /absolute/path/to/pack --out /absolute/new/run/S5.2 --network fake-only --through standalone --repeat-through S5
 ```
+
+The S5 selectors cover transfers/formatters (S5.1) and console/migration duplex sessions (S5.2).
+S5.2 also runs the S5.1 journeys.
+Hosted S5 proof is optional per slice; select `--through both` only when the pinned external fixture is available.
 
 Use this repository's `evidence` directory for `--pack`, and create the parent run directory first.
 The task output directory must be new and outside the checkout.

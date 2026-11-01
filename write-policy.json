@@ -3417,14 +3417,6 @@
       "contract": "dist/contracts.json#/contracts/351"
     },
     {
-      "id": "OP-GET-3238bae721",
-      "method": "GET",
-      "path": "/nodes/{node}/journal",
-      "release": "legacy-8.2.7",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/352"
-    },
-    {
       "id": "OP-POST-0b2e040aa1",
       "method": "POST",
       "path": "/nodes/{node}/lxc",
@@ -4092,14 +4084,6 @@
       "contract": "dist/contracts.json#/contracts/391"
     },
     {
-      "id": "OP-GET-0c48ad8fae",
-      "method": "GET",
-      "path": "/nodes/{node}/lxc/{vmid}/rrd",
-      "release": "legacy-8.2.7",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/392"
-    },
-    {
       "id": "OP-GET-7ebdcfff82",
       "method": "GET",
       "path": "/nodes/{node}/lxc/{vmid}/rrddata",
@@ -4168,8 +4152,70 @@
       "method": "POST",
       "path": "/nodes/{node}/lxc/{vmid}/spiceproxy",
       "release": "legacy-8.2.7",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/401"
+      "admitted": true,
+      "contract": "dist/contracts.json#/contracts/401",
+      "policy": {
+        "effect": "write",
+        "transport": "managed",
+        "secrets": "private-result",
+        "reason": "S5 operation-specific formatter and bounded private byte transport; ordinary output contains completion metadata only.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Byte completion is distinct from provider task completion. Never repeat a partial transfer automatically."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/vms/{vmid}",
+            [
+              "VM.Console"
+            ]
+          ]
+        },
+        "response": {
+          "additionalProperties": 1,
+          "description": "Returned values can be directly passed to the 'remote-viewer' application.",
+          "properties": {
+            "host": {
+              "type": "string"
+            },
+            "password": {
+              "type": "string"
+            },
+            "proxy": {
+              "type": "string"
+            },
+            "tls-port": {
+              "type": "integer"
+            },
+            "type": {
+              "type": "string"
+            }
+          }
+        },
+        "source": "Pinned API catalogues and S5 transport contracts."
+      },
+      "inputs": [
+        {
+          "name": "node",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "proxy",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "vmid",
+          "admitted": true,
+          "sensitive": false
+        }
+      ],
+      "results": {
+        "type": "unresolved",
+        "handling": "versioned inherited private pipe; public metadata only"
+      }
     },
     {
       "id": "OP-GET-e47a1588b7",
@@ -4917,14 +4963,6 @@
       "release": "legacy-8.2.7",
       "admitted": false,
       "contract": "dist/contracts.json#/contracts/430"
-    },
-    {
-      "id": "OP-GET-4787b8f484",
-      "method": "GET",
-      "path": "/nodes/{node}/qemu/{vmid}/agent/file-read",
-      "release": "legacy-8.2.7",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/431"
     },
     {
       "id": "OP-POST-7ee3321116",
@@ -5981,14 +6019,6 @@
       "contract": "dist/contracts.json#/contracts/493"
     },
     {
-      "id": "OP-GET-b162eec9bd",
-      "method": "GET",
-      "path": "/nodes/{node}/qemu/{vmid}/rrd",
-      "release": "legacy-8.2.7",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/494"
-    },
-    {
       "id": "OP-GET-635c61d304",
       "method": "GET",
       "path": "/nodes/{node}/qemu/{vmid}/rrddata",
@@ -6065,8 +6095,70 @@
       "method": "POST",
       "path": "/nodes/{node}/qemu/{vmid}/spiceproxy",
       "release": "legacy-8.2.7",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/504"
+      "admitted": true,
+      "contract": "dist/contracts.json#/contracts/504",
+      "policy": {
+        "effect": "write",
+        "transport": "managed",
+        "secrets": "private-result",
+        "reason": "S5 operation-specific formatter and bounded private byte transport; ordinary output contains completion metadata only.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Byte completion is distinct from provider task completion. Never repeat a partial transfer automatically."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/vms/{vmid}",
+            [
+              "VM.Console"
+            ]
+          ]
+        },
+        "response": {
+          "additionalProperties": 1,
+          "description": "Returned values can be directly passed to the 'remote-viewer' application.",
+          "properties": {
+            "host": {
+              "type": "string"
+            },
+            "password": {
+              "type": "string"
+            },
+            "proxy": {
+              "type": "string"
+            },
+            "tls-port": {
+              "type": "integer"
+            },
+            "type": {
+              "type": "string"
+            }
+          }
+        },
+        "source": "Pinned API catalogues and S5 transport contracts."
+      },
+      "inputs": [
+        {
+          "name": "node",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "proxy",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "vmid",
+          "admitted": true,
+          "sensitive": false
+        }
+      ],
+      "results": {
+        "type": "unresolved",
+        "handling": "versioned inherited private pipe; public metadata only"
+      }
     },
     {
       "id": "OP-GET-c13a32333f",
@@ -6844,14 +6936,6 @@
       "contract": "dist/contracts.json#/contracts/525"
     },
     {
-      "id": "OP-GET-a61f685df2",
-      "method": "GET",
-      "path": "/nodes/{node}/rrd",
-      "release": "legacy-8.2.7",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/526"
-    },
-    {
       "id": "OP-GET-5339c2f9ff",
       "method": "GET",
       "path": "/nodes/{node}/rrddata",
@@ -7170,8 +7254,78 @@
       "method": "POST",
       "path": "/nodes/{node}/spiceshell",
       "release": "legacy-8.2.7",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/548"
+      "admitted": true,
+      "contract": "dist/contracts.json#/contracts/548",
+      "policy": {
+        "effect": "write",
+        "transport": "managed",
+        "secrets": "private-result",
+        "reason": "S5 operation-specific formatter and bounded private byte transport; ordinary output contains completion metadata only.",
+        "allowedInputs": [
+          "node"
+        ],
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Byte completion is distinct from provider task completion. Never repeat a partial transfer automatically."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/nodes/{node}",
+            [
+              "Sys.Console"
+            ]
+          ]
+        },
+        "response": {
+          "additionalProperties": 1,
+          "description": "Returned values can be directly passed to the 'remote-viewer' application.",
+          "properties": {
+            "host": {
+              "type": "string"
+            },
+            "password": {
+              "type": "string"
+            },
+            "proxy": {
+              "type": "string"
+            },
+            "tls-port": {
+              "type": "integer"
+            },
+            "type": {
+              "type": "string"
+            }
+          }
+        },
+        "source": "Pinned API catalogues and S5 transport contracts."
+      },
+      "inputs": [
+        {
+          "name": "cmd",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "cmd-opts",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "node",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "proxy",
+          "admitted": false,
+          "sensitive": false
+        }
+      ],
+      "results": {
+        "type": "unresolved",
+        "handling": "versioned inherited private pipe; public metadata only"
+      }
     },
     {
       "id": "OP-POST-760c83ef2b",
@@ -7270,14 +7424,6 @@
       "contract": "dist/contracts.json#/contracts/561"
     },
     {
-      "id": "OP-GET-61a01a43a5",
-      "method": "GET",
-      "path": "/nodes/{node}/storage/{storage}/file-restore/download",
-      "release": "legacy-8.2.7",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/562"
-    },
-    {
       "id": "OP-GET-ae094f73f5",
       "method": "GET",
       "path": "/nodes/{node}/storage/{storage}/file-restore/list",
@@ -7310,14 +7456,6 @@
       "contract": "dist/contracts.json#/contracts/566"
     },
     {
-      "id": "OP-GET-8fd6ccab3f",
-      "method": "GET",
-      "path": "/nodes/{node}/storage/{storage}/rrd",
-      "release": "legacy-8.2.7",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/567"
-    },
-    {
       "id": "OP-GET-d0f9deb278",
       "method": "GET",
       "path": "/nodes/{node}/storage/{storage}/rrddata",
@@ -7338,8 +7476,80 @@
       "method": "POST",
       "path": "/nodes/{node}/storage/{storage}/upload",
       "release": "legacy-8.2.7",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/570"
+      "admitted": true,
+      "contract": "dist/contracts.json#/contracts/570",
+      "policy": {
+        "effect": "write",
+        "transport": "managed",
+        "secrets": "none",
+        "reason": "S5 operation-specific formatter and bounded private byte transport; ordinary output contains completion metadata only.",
+        "allowedInputs": [
+          "node",
+          "storage",
+          "filename",
+          "content",
+          "checksum",
+          "checksum-algorithm"
+        ],
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Byte completion is distinct from provider task completion. Never repeat a partial transfer automatically."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/storage/{storage}",
+            [
+              "Datastore.AllocateTemplate"
+            ]
+          ]
+        },
+        "response": {
+          "type": "string"
+        },
+        "source": "Pinned API catalogues and S5 transport contracts."
+      },
+      "inputs": [
+        {
+          "name": "checksum",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "checksum-algorithm",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "content",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "filename",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "node",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "storage",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "tmpfilename",
+          "admitted": false,
+          "sensitive": false
+        }
+      ],
+      "results": {
+        "type": "string",
+        "handling": "public metadata; protected inputs excluded"
+      }
     },
     {
       "id": "OP-DELETE-82c07e21ca",
@@ -7531,8 +7741,89 @@
       "method": "POST",
       "path": "/nodes/{node}/vncshell",
       "release": "legacy-8.2.7",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/586"
+      "admitted": true,
+      "contract": "dist/contracts.json#/contracts/586",
+      "policy": {
+        "effect": "write",
+        "transport": "json",
+        "secrets": "private-result",
+        "allowedInputs": [
+          "node",
+          "websocket"
+        ],
+        "sensitiveInputs": [],
+        "reason": "Explicitly authorized credential and sensitive-input operation; shared preview and confirmation controls apply, including effectful scans.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Never recreate a one-time credential to determine delivery or outcome."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/nodes/{node}",
+            [
+              "Sys.Console"
+            ]
+          ]
+        },
+        "response": {
+          "additionalProperties": 0,
+          "properties": {
+            "cert": {
+              "type": "string"
+            },
+            "port": {
+              "type": "integer"
+            },
+            "ticket": {
+              "type": "string"
+            },
+            "upid": {
+              "type": "string"
+            },
+            "user": {
+              "type": "string"
+            }
+          }
+        },
+        "source": "Retained versioned API schema and S4 protected credential contract."
+      },
+      "inputs": [
+        {
+          "name": "cmd",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "cmd-opts",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "height",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "node",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "websocket",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "width",
+          "admitted": false,
+          "sensitive": false
+        }
+      ],
+      "results": {
+        "type": "unresolved",
+        "handling": "versioned inherited private pipe; public metadata only"
+      }
     },
     {
       "id": "OP-GET-633d4276c5",
@@ -11726,14 +12017,6 @@
       "contract": "dist/contracts.json#/contracts/1019"
     },
     {
-      "id": "OP-GET-3238bae721",
-      "method": "GET",
-      "path": "/nodes/{node}/journal",
-      "release": "published-current",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/1020"
-    },
-    {
       "id": "OP-POST-0b2e040aa1",
       "method": "POST",
       "path": "/nodes/{node}/lxc",
@@ -12419,14 +12702,6 @@
       "contract": "dist/contracts.json#/contracts/1060"
     },
     {
-      "id": "OP-GET-0c48ad8fae",
-      "method": "GET",
-      "path": "/nodes/{node}/lxc/{vmid}/rrd",
-      "release": "published-current",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/1061"
-    },
-    {
       "id": "OP-GET-7ebdcfff82",
       "method": "GET",
       "path": "/nodes/{node}/lxc/{vmid}/rrddata",
@@ -12495,8 +12770,70 @@
       "method": "POST",
       "path": "/nodes/{node}/lxc/{vmid}/spiceproxy",
       "release": "published-current",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/1070"
+      "admitted": true,
+      "contract": "dist/contracts.json#/contracts/1070",
+      "policy": {
+        "effect": "write",
+        "transport": "managed",
+        "secrets": "private-result",
+        "reason": "S5 operation-specific formatter and bounded private byte transport; ordinary output contains completion metadata only.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Byte completion is distinct from provider task completion. Never repeat a partial transfer automatically."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/vms/{vmid}",
+            [
+              "VM.Console"
+            ]
+          ]
+        },
+        "response": {
+          "additionalProperties": 1,
+          "description": "Returned values can be directly passed to the 'remote-viewer' application.",
+          "properties": {
+            "host": {
+              "type": "string"
+            },
+            "password": {
+              "type": "string"
+            },
+            "proxy": {
+              "type": "string"
+            },
+            "tls-port": {
+              "type": "integer"
+            },
+            "type": {
+              "type": "string"
+            }
+          }
+        },
+        "source": "Pinned API catalogues and S5 transport contracts."
+      },
+      "inputs": [
+        {
+          "name": "node",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "proxy",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "vmid",
+          "admitted": true,
+          "sensitive": false
+        }
+      ],
+      "results": {
+        "type": "unresolved",
+        "handling": "versioned inherited private pipe; public metadata only"
+      }
     },
     {
       "id": "OP-GET-e47a1588b7",
@@ -13249,14 +13586,6 @@
       "release": "published-current",
       "admitted": false,
       "contract": "dist/contracts.json#/contracts/1099"
-    },
-    {
-      "id": "OP-GET-4787b8f484",
-      "method": "GET",
-      "path": "/nodes/{node}/qemu/{vmid}/agent/file-read",
-      "release": "published-current",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/1100"
     },
     {
       "id": "OP-POST-7ee3321116",
@@ -14331,14 +14660,6 @@
       "contract": "dist/contracts.json#/contracts/1163"
     },
     {
-      "id": "OP-GET-b162eec9bd",
-      "method": "GET",
-      "path": "/nodes/{node}/qemu/{vmid}/rrd",
-      "release": "published-current",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/1164"
-    },
-    {
       "id": "OP-GET-635c61d304",
       "method": "GET",
       "path": "/nodes/{node}/qemu/{vmid}/rrddata",
@@ -14415,8 +14736,70 @@
       "method": "POST",
       "path": "/nodes/{node}/qemu/{vmid}/spiceproxy",
       "release": "published-current",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/1174"
+      "admitted": true,
+      "contract": "dist/contracts.json#/contracts/1174",
+      "policy": {
+        "effect": "write",
+        "transport": "managed",
+        "secrets": "private-result",
+        "reason": "S5 operation-specific formatter and bounded private byte transport; ordinary output contains completion metadata only.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Byte completion is distinct from provider task completion. Never repeat a partial transfer automatically."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/vms/{vmid}",
+            [
+              "VM.Console"
+            ]
+          ]
+        },
+        "response": {
+          "additionalProperties": 1,
+          "description": "Returned values can be directly passed to the 'remote-viewer' application.",
+          "properties": {
+            "host": {
+              "type": "string"
+            },
+            "password": {
+              "type": "string"
+            },
+            "proxy": {
+              "type": "string"
+            },
+            "tls-port": {
+              "type": "integer"
+            },
+            "type": {
+              "type": "string"
+            }
+          }
+        },
+        "source": "Pinned API catalogues and S5 transport contracts."
+      },
+      "inputs": [
+        {
+          "name": "node",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "proxy",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "vmid",
+          "admitted": true,
+          "sensitive": false
+        }
+      ],
+      "results": {
+        "type": "unresolved",
+        "handling": "versioned inherited private pipe; public metadata only"
+      }
     },
     {
       "id": "OP-GET-c13a32333f",
@@ -15212,14 +15595,6 @@
       "contract": "dist/contracts.json#/contracts/1196"
     },
     {
-      "id": "OP-GET-a61f685df2",
-      "method": "GET",
-      "path": "/nodes/{node}/rrd",
-      "release": "published-current",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/1197"
-    },
-    {
       "id": "OP-GET-5339c2f9ff",
       "method": "GET",
       "path": "/nodes/{node}/rrddata",
@@ -15594,8 +15969,78 @@
       "method": "POST",
       "path": "/nodes/{node}/spiceshell",
       "release": "published-current",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/1226"
+      "admitted": true,
+      "contract": "dist/contracts.json#/contracts/1226",
+      "policy": {
+        "effect": "write",
+        "transport": "managed",
+        "secrets": "private-result",
+        "reason": "S5 operation-specific formatter and bounded private byte transport; ordinary output contains completion metadata only.",
+        "allowedInputs": [
+          "node"
+        ],
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Byte completion is distinct from provider task completion. Never repeat a partial transfer automatically."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/nodes/{node}",
+            [
+              "Sys.Console"
+            ]
+          ]
+        },
+        "response": {
+          "additionalProperties": 1,
+          "description": "Returned values can be directly passed to the 'remote-viewer' application.",
+          "properties": {
+            "host": {
+              "type": "string"
+            },
+            "password": {
+              "type": "string"
+            },
+            "proxy": {
+              "type": "string"
+            },
+            "tls-port": {
+              "type": "integer"
+            },
+            "type": {
+              "type": "string"
+            }
+          }
+        },
+        "source": "Pinned API catalogues and S5 transport contracts."
+      },
+      "inputs": [
+        {
+          "name": "cmd",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "cmd-opts",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "node",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "proxy",
+          "admitted": false,
+          "sensitive": false
+        }
+      ],
+      "results": {
+        "type": "unresolved",
+        "handling": "versioned inherited private pipe; public metadata only"
+      }
     },
     {
       "id": "OP-POST-760c83ef2b",
@@ -15694,14 +16139,6 @@
       "contract": "dist/contracts.json#/contracts/1239"
     },
     {
-      "id": "OP-GET-61a01a43a5",
-      "method": "GET",
-      "path": "/nodes/{node}/storage/{storage}/file-restore/download",
-      "release": "published-current",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/1240"
-    },
-    {
       "id": "OP-GET-ae094f73f5",
       "method": "GET",
       "path": "/nodes/{node}/storage/{storage}/file-restore/list",
@@ -15750,14 +16187,6 @@
       "contract": "dist/contracts.json#/contracts/1246"
     },
     {
-      "id": "OP-GET-8fd6ccab3f",
-      "method": "GET",
-      "path": "/nodes/{node}/storage/{storage}/rrd",
-      "release": "published-current",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/1247"
-    },
-    {
       "id": "OP-GET-d0f9deb278",
       "method": "GET",
       "path": "/nodes/{node}/storage/{storage}/rrddata",
@@ -15778,8 +16207,80 @@
       "method": "POST",
       "path": "/nodes/{node}/storage/{storage}/upload",
       "release": "published-current",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/1250"
+      "admitted": true,
+      "contract": "dist/contracts.json#/contracts/1250",
+      "policy": {
+        "effect": "write",
+        "transport": "managed",
+        "secrets": "none",
+        "reason": "S5 operation-specific formatter and bounded private byte transport; ordinary output contains completion metadata only.",
+        "allowedInputs": [
+          "node",
+          "storage",
+          "filename",
+          "content",
+          "checksum",
+          "checksum-algorithm"
+        ],
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Byte completion is distinct from provider task completion. Never repeat a partial transfer automatically."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/storage/{storage}",
+            [
+              "Datastore.AllocateTemplate"
+            ]
+          ]
+        },
+        "response": {
+          "type": "string"
+        },
+        "source": "Pinned API catalogues and S5 transport contracts."
+      },
+      "inputs": [
+        {
+          "name": "checksum",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "checksum-algorithm",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "content",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "filename",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "node",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "storage",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "tmpfilename",
+          "admitted": false,
+          "sensitive": false
+        }
+      ],
+      "results": {
+        "type": "string",
+        "handling": "public metadata; protected inputs excluded"
+      }
     },
     {
       "id": "OP-DELETE-82c07e21ca",
@@ -15975,8 +16476,94 @@
       "method": "POST",
       "path": "/nodes/{node}/vncshell",
       "release": "published-current",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/1266"
+      "admitted": true,
+      "contract": "dist/contracts.json#/contracts/1266",
+      "policy": {
+        "effect": "write",
+        "transport": "json",
+        "secrets": "private-result",
+        "allowedInputs": [
+          "node",
+          "websocket"
+        ],
+        "sensitiveInputs": [],
+        "reason": "Explicitly authorized credential and sensitive-input operation; shared preview and confirmation controls apply, including effectful scans.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Never recreate a one-time credential to determine delivery or outcome."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/nodes/{node}",
+            [
+              "Sys.Console"
+            ]
+          ]
+        },
+        "response": {
+          "additionalProperties": 0,
+          "properties": {
+            "cert": {
+              "type": "string"
+            },
+            "password": {
+              "description": "Password used for authentication within the VNC protocol. Consists of printable ASCII characters ('!' .. '~').",
+              "optional": 1,
+              "type": "string"
+            },
+            "port": {
+              "type": "integer"
+            },
+            "ticket": {
+              "type": "string"
+            },
+            "upid": {
+              "type": "string"
+            },
+            "user": {
+              "type": "string"
+            }
+          }
+        },
+        "source": "Retained versioned API schema and S4 protected credential contract."
+      },
+      "inputs": [
+        {
+          "name": "cmd",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "cmd-opts",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "height",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "node",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "websocket",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "width",
+          "admitted": false,
+          "sensitive": false
+        }
+      ],
+      "results": {
+        "type": "unresolved",
+        "handling": "versioned inherited private pipe; public metadata only"
+      }
     },
     {
       "id": "OP-GET-633d4276c5",

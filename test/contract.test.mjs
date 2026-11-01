@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict'
+import { spawnSync } from 'node:child_process'
 import { readFile } from 'node:fs/promises'
 import test from 'node:test'
 import { buildPath, selectContract } from '../dist/contract.js'
@@ -29,3 +30,14 @@ test('parameter boundary rejects a task limit below the vendor minimum', () => {
 test('unknown route has no invocation contract', () => {
   assert.throws(() => selectContract('GET', '/unknown-new-route', 'published-current'), { code: 'INVALID_INPUT' })
 })
+
+for (const release of ['legacy-8.2.7', 'published-current']) {
+  test(`provider-side download remains discoverable but refused in ${release}`, () => {
+    const path = '/nodes/{node}/storage/{storage}/download-url'
+    const contract = selectContract('POST', path, release)
+    assert.equal(contract.callable, false)
+    const result = spawnSync(process.execPath, ['bin/proxmox-axi.mjs', 'create', path, '--catalogue', release, '--preview', '--format', 'json'], { encoding: 'utf8' })
+    assert.equal(result.status, 1, result.stdout + result.stderr)
+    assert.equal(JSON.parse(result.stdout).error.code, 'CONTRACT_UNRESOLVED')
+  })
+}
