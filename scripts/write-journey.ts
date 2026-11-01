@@ -37,6 +37,7 @@ export async function exerciseWriteJourney(options: Journey): Promise<void> {
   ])
   const pools = new Set<string>()
   let mode = 'success', taskState = 'running', taskReads = 0, mutationCount = 0
+  let releaseVersion = version
   let activeCase = ''
   let activeIntent: string | undefined
   let crashing: ChildProcess | undefined
@@ -64,7 +65,7 @@ export async function exerciseWriteJourney(options: Journey): Promise<void> {
     if (path.includes('/tasks/')) { taskState = 'cancelled'; return null }
     const family = path.includes('/lxc/') ? 'lxc' : 'qemu'
     if (path.endsWith('/config')) {
-      for (const [name, value] of Object.entries(args)) guestState.get(family)![name] = name === 'cores' ? Number(value) : value
+      for (const [name, value] of Object.entries(args)) guestState.get(family)![name] = ['cores', 'onboot'].includes(name) ? Number(value) : value
       return null
     }
     if (method === 'DELETE') { guestState.delete(family); return upid }
@@ -84,7 +85,7 @@ export async function exerciseWriteJourney(options: Journey): Promise<void> {
     }
     let data: unknown
     if (method === 'GET') {
-      if (path.endsWith('/version')) data = mode === 'unknown-major' ? { ...version, version: '77.0.0' } : version
+      if (path.endsWith('/version')) data = mode === 'unknown-major' ? { ...releaseVersion, version: '77.0.0' } : releaseVersion
       else if (path.endsWith('/status') && path.includes('/tasks/')) {
         const requestedUpid = path.split('/tasks/')[1]!.slice(0, -'/status'.length)
         if (mode === 'all-tasks-unavailable' || (mode === 'reconcile-unavailable' && requestedUpid === upid)) { reply.writeHead(404).end(); return }
@@ -234,6 +235,29 @@ export async function exerciseWriteJourney(options: Journey): Promise<void> {
       const observation = await invoke(`AC-WRITES/${family}-config-reconcile`, ['journal', 'reconcile', preview.id])
       assert.equal(observation.journal.observation.desiredStateObserved, true)
     }
+    for (const catalogue of ['8.2.7', '9.2.0']) {
+      releaseVersion = { ...version, version: catalogue }
+      for (const family of ['qemu', 'lxc']) {
+        for (const nested of [false, true]) {
+          const label = `AC-WRITES/boolean-${catalogue}-${family}-${nested}`
+          const args = nested ? ['create', '/nodes/{node}/execute', '--api-node', 'pve-test', '--api-commands', JSON.stringify([
+            { method: 'POST', path: 'execute', args: { commands: JSON.stringify([
+              { method: 'PUT', path: `${family}/100/config`, args: { onboot: true } },
+            ]) } },
+          ])] : [...argsFor('set', family, '/config'), '--api-onboot', 'true']
+          const preview = await invoke(`${label}-preview`, [...args, '--preview'])
+          await invoke(`${label}-execute`, [...args, '--confirm', preview.confirmation], { status: 'success', mutations: 1 })
+          assert.equal(guestState.get(family)!.onboot, 1)
+          for (const observed of [1, 0]) {
+            guestState.get(family)!.onboot = observed
+            const result = await invoke(`${label}-observed-${observed}`, ['journal', 'reconcile', preview.id])
+            const record = nested ? result.journal.children[0].children[0] : result.journal
+            assert.equal(record.observation.desiredStateObserved, observed === 1)
+          }
+        }
+      }
+    }
+    releaseVersion = version
     if (!options.hosted) {
     const secret = join(directory, 'password.txt')
     const body = join(directory, 'config-body.json')

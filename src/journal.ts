@@ -28,7 +28,7 @@ export interface JournalRecord {
     check?: JournalRecord['check'], observation?: unknown, reconciliation?: JournalRecord['reconciliation'] }[]
   reconciliation?: { kind: string, path?: string, reason: string }
   observation?: unknown
-  check?: { path: string, expected: Record<string, string> }
+  check?: { path: string, expected: Record<string, string>, booleans?: string[] }
 }
 
 export function journalPath(): string {

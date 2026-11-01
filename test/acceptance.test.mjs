@@ -38,6 +38,15 @@ for (const scenario of [
     assert.equal(result.failure, scenario.failure)
     assert.equal(result.host.status, scenario.host)
     assert.equal(result.cases.every(entry => entry.status === 'pass'), true, result.failure)
+    if (scenario.task === 'S3.2' && scenario.through === 'both') {
+      assert.deepEqual(result.outcomes.filter(row => row.journey === 'artium' && [
+        'AC-WRITES', 'AC-WRITE', 'AC-SPECIAL-BATCH-POLICY', 'AC-ASYNC', 'AC-SPECIAL-BATCH-RESULTS',
+      ].includes(row.id)).map(row => ({ id: row.id, status: row.status })), [
+        { id: 'AC-WRITES', status: 'pass' }, { id: 'AC-WRITE', status: 'pass' },
+        { id: 'AC-SPECIAL-BATCH-POLICY', status: 'pass' }, { id: 'AC-ASYNC', status: 'pass' },
+        { id: 'AC-SPECIAL-BATCH-RESULTS', status: 'pass' },
+      ])
+    }
   } catch (error) {
     if (process.env.PROXMOX_AXI_TEST_FAILURE_DIR) {
       await mkdir(process.env.PROXMOX_AXI_TEST_FAILURE_DIR, { recursive: true, mode: 0o700 })

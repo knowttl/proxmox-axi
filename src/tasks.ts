@@ -153,8 +153,12 @@ async function observeCheck(credentials: Credentials, check: NonNullable<Journal
   let data: unknown
   try { data = await executeRead(credentials, check.path) }
   catch { return inconclusive() }
-  const matched = !!data && typeof data === 'object' && Object.entries(check.expected).every(([name, digest]) =>
-    Object.hasOwn(data, name) && journal.fingerprint((data as Record<string, unknown>)[name]) === digest)
+  const matched = !!data && typeof data === 'object' && Object.entries(check.expected).every(([name, digest]) => {
+    if (!Object.hasOwn(data, name)) return false
+    const value = (data as Record<string, unknown>)[name]
+    const normalized = check.booleans?.includes(name) && (value === 0 || value === 1) ? value === 1 : value
+    return journal.fingerprint(normalized) === digest
+  })
   return { at: Date.now(), desiredStateObserved: matched,
     result: matched ? 'requested-state-observed; attribution not established' : 'inconclusive; absence never proves failure' }
 }
