@@ -47,6 +47,9 @@ for (const scenario of [
     if (scenario.task?.startsWith('S6.')) {
       assert.deepEqual(result.native, { linux: 'pass', windows: 'pending', reason: 'Native Windows machine unavailable; Linux is not a substitute.' })
       assert.equal(result.admission.status, 'pass')
+      assert.equal(result.admission.baseline.version, '0.0.1')
+      assert.equal(result.admission.coexistence.status, 'pass')
+      assert.equal(result.admission.coexistence.ownedVersion, result.package.version)
       assert.equal(result.admission.completeness.variants, 1285)
       assert.equal(result.admission.completeness.status, 'pending')
       assert.ok(result.admission.completeness.unresolved > 0)

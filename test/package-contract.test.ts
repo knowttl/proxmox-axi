@@ -76,8 +76,14 @@ test('packed package installs offline and exposes the CLI and admission contract
         await import(url, { with: { type: 'json' } });
       }
     `])
-    const admission = await verifyPackageAdmission(root, installed, tarball)
+    const admission = await verifyPackageAdmission(root, installed, tarball, scratch)
     assert.equal(admission.status, 'pass')
+    assert.equal(admission.baseline.version, '0.0.1')
+    assert.equal(admission.coexistence.status, 'pass')
+    assert.deepEqual(admission.coexistence.selections, [
+      { order: 'baseline-first', unqualified: '0.0.1', owned: manifest.version },
+      { order: 'owned-first', unqualified: manifest.version, owned: manifest.version },
+    ])
     assert.equal(admission.completeness.variants, 1285)
     if (process.platform === 'linux') {
       const caFile = join(scratch, 'server.crt')
@@ -97,6 +103,6 @@ test('packed package installs offline and exposes the CLI and admission contract
     // pnpm may hardlink package files to its shared store; break that link first.
     await unlink(join(installed, 'dist/cli.js'))
     await writeFile(join(installed, 'dist/cli.js'), 'throw new Error("altered executable")\n')
-    await assert.rejects(verifyPackageAdmission(root, installed, tarball), /Installed dist matches the current build/)
+    await assert.rejects(verifyPackageAdmission(root, installed, tarball, scratch), /Installed dist matches the current build/)
   } finally { await rm(scratch, { recursive: true, force: true }) }
 })

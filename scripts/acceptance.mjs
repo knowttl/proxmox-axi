@@ -217,7 +217,7 @@ async function verify(values, prepared, scratch) {
     await writeFile(join(out, 'installed-lock.yaml'), await readFile(join(consumer, 'pnpm-lock.yaml')))
     if (values['--task'].startsWith('S6.')) {
       await checked(process.execPath, ['scripts/generate.mjs', '--check'])
-      result.admission = await verifyPackageAdmission(root, installed, archive)
+      result.admission = await verifyPackageAdmission(root, installed, archive, scratch)
       await save(join(out, 'admission-delta.json'), result.admission)
     }
 

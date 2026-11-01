@@ -269,6 +269,8 @@ pnpm verify:acceptance -- --task S6.2 --pack "$PWD/evidence" --out "$RUN/S6.2" -
 ```
 
 `admission-delta.json` retains installed file hashes, archive integrity, baseline fixture identity and unresolved admission counts for the next release-candidate Artium fold.
+S6 installs the sealed 0.0.1 baseline beside the owned package offline and records both executed versions and archive identities.
+Use `node /absolute/owned-package/bin/proxmox-axi.mjs --version` to select the owned executable when a baseline `proxmox-axi` is on PATH.
 Current-package S6 `--through both` hosted journeys are deferred to that fold, which runs once per release candidate rather than per slice.
 These gates validate the infrastructure and currently admitted capabilities.
 They do not certify full release completeness: unreviewed operations remain uncallable, and their expected refusals do not prove runtime support.
