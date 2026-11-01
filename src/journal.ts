@@ -1,8 +1,8 @@
 import { createHmac, randomBytes, randomUUID } from 'node:crypto'
 import { homedir } from 'node:os'
 import { dirname, isAbsolute, join } from 'node:path'
-import { lstat, mkdir, open } from 'node:fs/promises'
-import { constants } from 'node:fs'
+import { lstat, mkdir, open, rmdir } from 'node:fs/promises'
+import { constants, watch } from 'node:fs'
 import { Failure } from './errors.js'
 import { readPrivateFile, replacePrivateFile } from './private-file.js'
 import { windowsProtection } from './windows-acl.js'
@@ -82,8 +82,47 @@ export class Journal {
   newId(): string { return randomUUID() }
 
   async save(record: JournalRecord): Promise<void> {
-    await replacePrivateFile(this.path(record.id), JSON.stringify({ ...record, updated: Date.now() }) + '\n')
+    await this.locked(record.id, () => this.replace(record))
+  }
+
+  async update(id: string, change: (record: JournalRecord) => void): Promise<JournalRecord> {
+    return this.locked(id, async () => {
+      const record = await this.read(id)
+      change(record)
+      await this.replace(record)
+      return record
+    })
+  }
+
+  private async replace(record: JournalRecord): Promise<void> {
+    record.updated = Date.now()
+    await replacePrivateFile(this.path(record.id), JSON.stringify(record) + '\n')
     await this.syncDirectory()
+  }
+
+  private async locked<T>(id: string, action: () => Promise<T>): Promise<T> {
+    const path = `${this.path(id)}.lock`
+    let notify = () => {}, expired = false, watchError: Error | undefined
+    const watcher = watch(this.directory, (_event, name) => { if (name === `${id}.json.lock`) notify() })
+    watcher.on('error', error => { watchError = error; notify() })
+    const deadline = setTimeout(() => { expired = true; notify() }, 5000)
+    let acquired = false
+    try {
+      while (!acquired) {
+        if (expired || watchError) throw unavailable()
+        const changed = new Promise<void>(resolve => { notify = resolve })
+        try { await mkdir(path, { mode: 0o700 }); acquired = true }
+        catch (error) {
+          if ((error as NodeJS.ErrnoException).code !== 'EEXIST') throw error
+          await changed
+        }
+      }
+      return await action()
+    } finally {
+      clearTimeout(deadline)
+      watcher.close()
+      if (acquired) await rmdir(path)
+    }
   }
 
   async read(id: string): Promise<JournalRecord> {

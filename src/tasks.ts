@@ -38,12 +38,13 @@ export async function taskOperation(credentials: Credentials, command: string, v
     if (command === 'log') return { upid, data }
     status = outcome(data, node, upid)
     if (record && journal) {
-      if (record.upid === upid) record.status = status
-      else {
-        updateChildren(record.children, upid, status)
-        record.status = aggregate(record.children)
-      }
-      await journal.save(record)
+      await journal.update(record.id, current => {
+        if (current.upid === upid) current.status = status
+        else {
+          updateChildren(current.children, upid, status)
+          if (current.status !== 'failed') current.status = aggregate(current.children)
+        }
+      })
     }
     if (command !== 'wait' || status !== 'running' || performance.now() >= deadline) break
     await setTimeout(Math.min(250, Math.max(0, deadline - performance.now())))
@@ -60,7 +61,10 @@ function containsUpid(children: JournalRecord['children'], upid: string): boolea
 function updateChildren(children: JournalRecord['children'], upid: string, status: string): void {
   for (const child of children ?? []) {
     if (child.upid === upid) child.status = status
-    if (child.children?.length) { updateChildren(child.children, upid, status); child.status = aggregate(child.children) }
+    if (child.children?.length) {
+      updateChildren(child.children, upid, status)
+      if (child.status !== 'failed') child.status = aggregate(child.children)
+    }
   }
 }
 
@@ -89,25 +93,48 @@ export async function journalOperation(credentials: Credentials, command: string
       const collect = (children: JournalRecord['children']): string[] => (children ?? []).flatMap(child => [
         ...(child.upid ? [child.upid] : []), ...collect(child.children),
       ])
-      for (const upid of new Set(collect(record.children))) await taskOperation(credentials, 'status', { node: record.node, upid }, 1, id)
-      const fresh = await journal.read(id)
-      const observe = async (children: JournalRecord['children']): Promise<void> => {
-        for (const child of children ?? []) {
-          if (child.check && Object.keys(child.check.expected).length) child.observation = await observeCheck(credentials, child.check, journal)
-          await observe(child.children)
+      const unavailable = new Set<string>()
+      for (const upid of new Set(collect(record.children))) {
+        try { await taskOperation(credentials, 'status', { node: record.node, upid }, 1, id) }
+        catch (error) {
+          if (!(error instanceof Failure) || !['AUTH_REQUIRED', 'PERMISSION_DENIED', 'NOT_FOUND_OR_HIDDEN', 'HTTP_ERROR',
+            'CONNECTION_FAILED', 'TIMEOUT', 'OUTPUT_LIMIT', 'INVALID_RESPONSE'].includes(error.code)) throw error
+          unavailable.add(upid)
         }
       }
-      await observe(fresh.children)
-      await journal.save(fresh)
+      const observations: { path: number[], value: unknown }[] = []
+      const observe = async (children: JournalRecord['children'], parent: number[] = []): Promise<void> => {
+        for (const [index, child] of (children ?? []).entries()) {
+          const path = [...parent, index]
+          const taskUnavailable = child.upid && unavailable.has(child.upid)
+          if (child.check && Object.keys(child.check.expected).length) {
+            const value = await observeCheck(credentials, child.check, journal)
+            observations.push({ path, value: { ...value, ...(taskUnavailable ? { task: inconclusive() } : {}) } })
+          } else if (taskUnavailable) observations.push({ path, value: inconclusive() })
+          await observe(child.children, path)
+        }
+      }
+      await observe(record.children)
+      await journal.update(id, current => {
+        for (const observation of observations) {
+          let children = current.children
+          for (const [depth, index] of observation.path.entries()) {
+            const child = children![index]!
+            if (depth === observation.path.length - 1) child.observation = observation.value
+            children = child.children
+          }
+        }
+      })
       return journalOperation(credentials, 'show', id)
     }
     if (record.check && Object.keys(record.check.expected).length) {
-      record.observation = await observeCheck(credentials, record.check, journal)
+      const observation = await observeCheck(credentials, record.check, journal)
       // Observation cannot establish task completion or attribute an uncertain write.
-      await journal.save(record)
+      Object.assign(record, await journal.update(id, current => { current.observation = observation }))
     } else {
-      record.observation = { at: Date.now(), result: 'no-safe-automated-reconciliation; retain current outcome' }
-      await journal.save(record)
+      Object.assign(record, await journal.update(id, current => {
+        current.observation = { at: Date.now(), result: 'no-safe-automated-reconciliation; retain current outcome' }
+      }))
     }
   }
   const { owner, fingerprint, check, ...safe } = record
@@ -115,9 +142,15 @@ export async function journalOperation(credentials: Credentials, command: string
 }
 
 async function observeCheck(credentials: Credentials, check: NonNullable<JournalRecord['check']>, journal: Awaited<ReturnType<typeof openJournal>>) {
-  const data = await executeRead(credentials, check.path)
+  let data: unknown
+  try { data = await executeRead(credentials, check.path) }
+  catch { return inconclusive() }
   const matched = !!data && typeof data === 'object' && Object.entries(check.expected).every(([name, digest]) =>
     Object.hasOwn(data, name) && journal.fingerprint((data as Record<string, unknown>)[name]) === digest)
   return { at: Date.now(), desiredStateObserved: matched,
     result: matched ? 'requested-state-observed; attribution not established' : 'inconclusive; absence never proves failure' }
+}
+
+function inconclusive() {
+  return { at: Date.now(), result: 'inconclusive; reconciliation read unavailable; retain current outcome' }
 }

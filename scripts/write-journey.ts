@@ -22,6 +22,7 @@ interface Journey {
 }
 const operationId = (method: string, path: string) => `OP-${method}-${createHash('sha256').update(`${method} ${path}`).digest('hex').slice(0, 10)}`
 const upid = 'UPID:pve-test:00000001:00000002:00000003:qmstart:100:synthetic@pve:'
+const lxcUpid = upid.replace('qmstart', 'vzstart')
 const version = { version: '8.2.7', release: '8.2', repoid: '3e0176e6bb2ade3b' }
 
 export async function exerciseWriteJourney(options: Journey): Promise<void> {
@@ -39,6 +40,8 @@ export async function exerciseWriteJourney(options: Journey): Promise<void> {
   let activeIntent: string | undefined
   let crashing: ChildProcess | undefined
   let bodyEvidence: Record<string, unknown>[] = []
+  let taskReadStarted = () => {}, releaseTaskRead = () => {}
+  let blockedTaskRead = Promise.resolve()
   const snapshot = () => ({ guests: [...guestState].map(([family, state]) => ({ family, status: state.status, cores: state.cores, memory: state.memory })), pools: [...pools] })
   const journalRecords = async (): Promise<Record<string, unknown>[]> => {
     let names: string[]
@@ -48,7 +51,7 @@ export async function exerciseWriteJourney(options: Journey): Promise<void> {
   const apply = (method: string, path: string, args: Record<string, string>): unknown => {
     if (path.endsWith('/execute')) {
       const commands = JSON.parse(args.commands!) as { method: string, path: string, args?: Record<string, string> }[]
-      return commands.map((child, index) => mode === 'partial-batch' && index === 1 ? { status: 500, message: 'controlled child failure' } :
+      return commands.map((child, index) => (mode === 'partial-batch' && index === 1) || (mode === 'failed-wrapper' && child.path === 'execute') ? { status: 500, message: 'controlled child failure' } :
         { status: 200, data: apply(child.method, `/api2/json/nodes/pve-test/${child.path}`, child.args ?? {}) })
     }
     if (path === '/api2/json/pools') {
@@ -66,7 +69,7 @@ export async function exerciseWriteJourney(options: Journey): Promise<void> {
     guestState.get(family)!.status = path.endsWith('/start') ? 'running' : 'stopped'
     taskState = 'running'
     taskReads = 0
-    return mode === 'unsafe-upid' ? upid.replace('synthetic@pve', '$(id)@pve') : upid
+    return mode === 'unsafe-upid' ? upid.replace('synthetic@pve', '$(id)@pve') : family === 'lxc' ? lxcUpid : upid
   }
   const serve = async (request: IncomingMessage, reply: ServerResponse) => {
     const url = new URL(request.url!, 'https://fake.invalid')
@@ -81,19 +84,28 @@ export async function exerciseWriteJourney(options: Journey): Promise<void> {
     if (method === 'GET') {
       if (path.endsWith('/version')) data = mode === 'unknown-major' ? { ...version, version: '77.0.0' } : version
       else if (path.endsWith('/status') && path.includes('/tasks/')) {
+        const requestedUpid = path.split('/tasks/')[1]!.slice(0, -'/status'.length)
+        if (mode === 'reconcile-unavailable' && requestedUpid === upid) { reply.writeHead(404).end(); return }
+        if (mode === 'concurrent-followups' && requestedUpid === upid) { taskReadStarted(); await blockedTaskRead }
         taskReads++
         if (mode === 'task-completes' && taskReads >= 2) taskState = 'success'
-        data = { upid: mode === 'wrong-upid' ? upid.replace('qmstart', 'qmstop') : upid, node: 'pve-test',
-          status: taskState === 'running' ? 'running' : 'stopped', exitstatus: taskState === 'success' ? 'OK' : 'controlled task failure',
+        const state = mode === 'concurrent-followups' ? requestedUpid === upid ? 'success' : 'failed' : taskState
+        data = { upid: mode === 'wrong-upid' ? upid.replace('qmstart', 'qmstop') : requestedUpid, node: 'pve-test',
+          status: state === 'running' ? 'running' : 'stopped', exitstatus: state === 'success' ? 'OK' : 'controlled task failure',
           starttime: 1, type: 'qmstart', pstart: 2, id: '100', user: 'synthetic@pve', pid: 1 }
       } else if (path.endsWith('/log')) data = [{ n: 1, t: 'started' }, { n: 2, t: 'TASK OK' }]
-      else if (path.endsWith('/config')) data = mode === 'filtered' ? {} : guestState.get(path.includes('/lxc/') ? 'lxc' : 'qemu') ?? {}
+      else if (path.endsWith('/config')) {
+        if (mode === 'reconcile-unavailable' && path.includes('/qemu/')) { reply.writeHead(404).end(); return }
+        data = mode === 'filtered' ? {} : guestState.get(path.includes('/lxc/') ? 'lxc' : 'qemu') ?? {}
+      }
       else if (path.endsWith('/status/current')) data = { ...guestState.get(path.includes('/lxc/') ? 'lxc' : 'qemu'), vmid: 100, ha: {} }
       else data = []
     } else {
       const chunks: Buffer[] = []
       for await (const chunk of request) chunks.push(Buffer.from(chunk))
-      const args = Object.fromEntries(new URLSearchParams(Buffer.concat(chunks).toString()))
+      const body = Buffer.concat(chunks).toString()
+      if (method === 'DELETE' && body) { reply.writeHead(501).end(); return }
+      const args = Object.fromEntries(method === 'DELETE' ? url.searchParams : new URLSearchParams(body))
       const records = await journalRecords()
       assert.ok(records.some(record => record.id === activeIntent && record.status === 'intent' && record.target === url.pathname), 'the matching durable intent must precede each transmission')
       row.intentBeforeTransmission = true
@@ -227,6 +239,28 @@ export async function exerciseWriteJourney(options: Journey): Promise<void> {
     const secretFresh = await invoke('AC-WRITES/secret-reference-fresh', [...secretArgs, '--preview'])
     await invoke('AC-WRITES/secret-reference-executes', [...secretArgs, '--confirm', secretFresh.confirmation], { status: 'success', mutations: 1 })
     assert.equal(guestState.get('qemu')!.cipassword, 'CANARY-operation-secret-v2')
+    for (const secretValue of ['success', 'a']) {
+      await writeFile(secret, secretValue, { mode: 0o600 })
+      for (const nested of [false, true]) {
+        const args = nested ? ['create', '/nodes/{node}/execute', '--api-node', 'pve-test', '--api-commands', JSON.stringify([
+          { method: 'POST', path: 'execute', args: { commands: JSON.stringify([{ method: 'PUT', path: 'qemu/100/config', args: { cipassword: { file: secret } } }]) } },
+        ])] : secretArgs
+        for (const lost of [false, true]) {
+          const label = `AC-WRITES/structural-secret-${secretValue}-${nested}-${lost}`
+          const preview = await invoke(`${label}-preview`, [...args, '--preview'])
+          const before = JSON.parse(await readFile(join(`${log}.d`, `${preview.id}.json`), 'utf8'))
+          mode = lost ? 'lost-response' : 'success'
+          await invoke(label, [...args, '--confirm', preview.confirmation], lost ? { code: 1, error: 'WRITE_UNCERTAIN', mutations: 1 } : { status: 'success', mutations: 1 })
+          mode = 'success'
+          const after = JSON.parse(await readFile(join(`${log}.d`, `${preview.id}.json`), 'utf8'))
+          for (const field of ['id', 'fingerprint', 'owner', 'origin', 'identity', 'operation', 'path', 'target', 'check']) assert.deepEqual(after[field], before[field])
+          assert.equal(after.status, lost ? 'uncertain' : 'success')
+          const shown = await invoke(`${label}-show`, ['journal', 'show', preview.id])
+          assert.equal(shown.journal.status, after.status)
+          if (nested) assert.equal(after.children[0].children[0].status, after.status)
+        }
+      }
+    }
     const actorEnv = { ...env, PROXMOX_AXI_ACTOR: 'actor-a', PROXMOX_AXI_HOST_OPERATIONS: JSON.stringify(ids) }
     const actorPreview = await invoke('AC-WRITES/actor-preview', [...start, '--preview'], {}, actorEnv)
     await invoke('AC-WRITES/cross-actor', [...start, '--confirm', actorPreview.confirmation], { code: 1, error: 'CONFIRMATION_MISMATCH' }, { ...actorEnv, PROXMOX_AXI_ACTOR: 'actor-b' })
@@ -307,6 +341,47 @@ export async function exerciseWriteJourney(options: Journey): Promise<void> {
     const nested = [...batch.slice(0, -1), nestedCommands]
     const nestedPreview = await invoke('AC-SPECIAL-BATCH-POLICY/nested-preview', [...nested, '--preview'])
     await invoke('AC-SPECIAL-BATCH-POLICY/nested', [...nested, '--confirm', nestedPreview.confirmation], { status: 'accepted', mutations: 1 })
+    const failedWrapperArgs = [...batch.slice(0, -1), JSON.stringify([
+      { method: 'POST', path: 'execute', args: { commands } }, { method: 'POST', path: 'lxc/100/status/start' },
+    ])]
+    const failedWrapper = await invoke('AC-SPECIAL-BATCH-RESULTS/failed-wrapper-preview', [...failedWrapperArgs, '--preview'])
+    mode = 'failed-wrapper'
+    await invoke('AC-SPECIAL-BATCH-RESULTS/failed-wrapper', [...failedWrapperArgs, '--confirm', failedWrapper.confirmation], { code: 1, status: 'failed', mutations: 1 })
+    mode = 'success'; taskState = 'success'
+    await invoke('AC-SPECIAL-BATCH-RESULTS/failed-wrapper-follow-up', ['task', 'status', '--api-node', 'pve-test', '--api-upid', lxcUpid, '--journal', failedWrapper.id], { status: 'success' })
+    const wrapperResult = await invoke('AC-SPECIAL-BATCH-RESULTS/failed-wrapper-reconcile', ['journal', 'reconcile', failedWrapper.id])
+    assert.equal(wrapperResult.journal.status, 'failed')
+    assert.equal(wrapperResult.journal.children[0].status, 'failed')
+    if (!options.hosted) {
+      const concurrent = await invoke('AC-ASYNC/concurrent-preview', [...batch, '--preview'])
+      await invoke('AC-ASYNC/concurrent-accepted', [...batch, '--confirm', concurrent.confirmation], { status: 'accepted', mutations: 1 })
+      const started = new Promise<void>(resolve => { taskReadStarted = resolve })
+      blockedTaskRead = new Promise<void>(resolve => { releaseTaskRead = resolve })
+      mode = 'concurrent-followups'
+      const waiting = invoke('AC-ASYNC/concurrent-wait', ['task', 'wait', '--api-node', 'pve-test', '--api-upid', upid, '--journal', concurrent.id], { status: 'success' })
+      try {
+        await Promise.race([started, waiting.then(() => { throw new Error('Task wait ended before the controlled read') })])
+        await invoke('AC-ASYNC/concurrent-status', ['task', 'status', '--api-node', 'pve-test', '--api-upid', lxcUpid, '--journal', concurrent.id], { code: 1, status: 'failed' })
+      } finally { releaseTaskRead() }
+      await waiting
+      mode = 'success'
+      const concurrentResult = await invoke('AC-ASYNC/concurrent-retained', ['journal', 'show', concurrent.id])
+      assert.deepEqual(concurrentResult.journal.children.map((child: { status: string }) => child.status), ['success', 'failed'])
+      assert.equal(concurrentResult.journal.status, 'failed')
+    }
+    const unavailableArgs = [...batch.slice(0, -1), JSON.stringify([
+      ...JSON.parse(commands), { method: 'PUT', path: 'qemu/100/config', args: { cores: 3 } }, { method: 'PUT', path: 'lxc/100/config', args: { cores: 4 } },
+    ])]
+    const unavailable = await invoke('AC-SPECIAL-BATCH-RESULTS/unavailable-preview', [...unavailableArgs, '--preview'])
+    await invoke('AC-SPECIAL-BATCH-RESULTS/unavailable-accepted', [...unavailableArgs, '--confirm', unavailable.confirmation], { status: 'accepted', mutations: 1 })
+    mode = 'reconcile-unavailable'; taskState = 'success'
+    const available = await invoke('AC-SPECIAL-BATCH-RESULTS/unavailable-reconcile', ['journal', 'reconcile', unavailable.id])
+    assert.equal(available.journal.children[0].status, 'accepted')
+    assert.match(available.journal.children[0].observation.task.result, /inconclusive/)
+    assert.equal(available.journal.children[1].status, 'success')
+    assert.match(available.journal.children[2].observation.result, /inconclusive/)
+    assert.equal(available.journal.children[3].observation.desiredStateObserved, true)
+    mode = 'success'
     const configurationBatch = [...batch.slice(0, -1), JSON.stringify([
       { method: 'PUT', path: 'qemu/100/config', args: { cores: 3 } },
       { method: 'PUT', path: 'lxc/100/config', args: { cores: 4 } },
@@ -325,7 +400,8 @@ export async function exerciseWriteJourney(options: Journey): Promise<void> {
       assert.equal(pools.has('acceptance'), method !== 'DELETE')
     }
     for (const family of ['qemu', 'lxc']) {
-      const args = argsFor('delete', family)
+      const args = [...argsFor('delete', family), '--api-purge', 'true', '--api-destroy-unreferenced-disks', 'true',
+        ...(family === 'lxc' ? ['--api-force', 'true'] : [])]
       const preview = await invoke(`AC-WRITES/${family}-delete-preview`, [...args, '--preview'])
       await invoke(`AC-WRITES/${family}-delete`, [...args, '--confirm', preview.confirmation], { status: 'accepted', mutations: 1 })
       assert.equal(guestState.has(family), false)

@@ -4,8 +4,7 @@ import type { Credentials } from './credentials.js'
 import { executeRequest, readVersion } from './transport.js'
 import { readPrivateFile } from './private-file.js'
 import { Failure } from './errors.js'
-import { Journal, markUncertain, publicChildren, type JournalRecord } from './journal.js'
-import { redact } from './redact.js'
+import { Journal, publicChildren, type JournalRecord } from './journal.js'
 
 interface Invocation {
   contract: Contract
@@ -13,7 +12,6 @@ interface Invocation {
   wire: string
   children: Invocation[]
   revisions: unknown[]
-  secrets: string[]
 }
 
 function denied(): Failure {
@@ -35,7 +33,6 @@ async function invocation(credentials: Credentials, contract: Contract, input: R
   if (++budget.count > 64 || depth > 4) throw new Failure('INVALID_INPUT', 'Batch exceeds 64 total operations or four nesting levels.', 'Use a smaller reviewed batch.', 2)
   const values = { ...input }
   const revisions: unknown[] = []
-  const secrets: string[] = []
   for (const [name, value] of Object.entries(values)) {
     if (contract.policy.allowedInputs && !contract.policy.allowedInputs.includes(name)) throw new Failure('CONTRACT_UNRESOLVED', 'Supplied parameter branch has not been admitted.', 'Inspect the operation policy and use reviewed branches only.')
     if (!contract.policy.sensitiveInputs?.includes(name)) continue
@@ -50,7 +47,6 @@ async function invocation(credentials: Credentials, contract: Contract, input: R
     } else throw new Failure('INVALID_INPUT', 'Unsupported secret reference.', 'Use an env or protected file reference.', 2)
     if (!secret) throw new Failure('AUTH_REQUIRED', 'An operation secret reference is empty.', 'Supply the selected secret source.')
     revisions.push({ reference: value, secret })
-    secrets.push(secret)
     values[name] = secret
   }
   const children: Invocation[] = []
@@ -84,13 +80,12 @@ async function invocation(credentials: Credentials, contract: Contract, input: R
       // The vendor gets resolved inputs only after the whole tree passes policy.
       command.args = Object.fromEntries(Object.entries(child.values).filter(([key]) => !Object.hasOwn(pathValues, key)))
       revisions.push(...child.revisions)
-      secrets.push(...child.secrets)
     }
     values.commands = JSON.stringify(commands)
   }
   const wire = buildPath(contract, values)
   if (Buffer.byteLength(wire) > 65536) throw new Failure('INVALID_INPUT', 'Resolved request exceeds 65536 bytes.', 'Reduce the complete input size.', 2)
-  return { contract, values, wire, children, revisions, secrets }
+  return { contract, values, wire, children, revisions }
 }
 
 export async function writeOperation(credentials: Credentials, initial: Contract, values: Record<string, unknown>, options: { preview: boolean, confirmation?: string }) {
@@ -133,32 +128,34 @@ export async function writeOperation(credentials: Credentials, initial: Contract
   if (record.status !== 'preview') throw new Failure('CONFIRMATION_USED', 'Confirmation has already been consumed.', 'Inspect the retained journal; never replay an uncertain request.')
   if (record.fingerprint !== fingerprint || approval !== fingerprint || Date.now() - record.created > 300_000) throw new Failure('CONFIRMATION_MISMATCH', 'Confirmation is stale or bound to a different request or secret revision.', 'Create and approve a new preview.')
   await journal.claim(id)
-  record.status = 'intent'
-  await journal.save(record)
-  const saveOutcome = async () => {
-    try { await journal.save(redact(record, [credentials.token, ...call.secrets]) as JournalRecord) }
+  await journal.update(id, current => { current.status = 'intent' })
+  const saveOutcome = async (outcome: Outcome) => {
+    try {
+      return await journal.update(id, current => {
+        current.status = outcome.status
+        if (outcome.upid) current.upid = outcome.upid
+        mergeOutcomes(current.children, outcome.children)
+      })
+    }
     catch { throw new Failure('WRITE_UNCERTAIN', `Terminal journal update failed; intent ${id} remains durable.`, `Run proxmox-axi journal reconcile ${id}; do not repeat the mutation.`) }
   }
   let data: unknown
+  let outcome: Outcome
   try {
     const [path, body] = call.wire.split('?')
-    data = await executeRequest(credentials, path!, { method: call.contract.method, ...(body ? { body } : {}) })
+    const query = call.contract.method === 'DELETE' || call.contract.method === 'GET'
+    data = await executeRequest(credentials, query ? call.wire : path!, { method: call.contract.method, ...(!query && body ? { body } : {}) })
     validateResponse(data, call.contract.returns)
-    const outcome = resultStatus(call, data)
-    record.status = outcome.status
-    mergeOutcomes(record.children, outcome.children)
-    if (outcome.upid) record.upid = outcome.upid
+    outcome = resultStatus(call, data)
   } catch (error) {
     // Even HTTP failures may follow a partial server-side action. No retry is safe.
-    record.status = 'uncertain'
-    markUncertain(record.children)
-    await saveOutcome()
+    await saveOutcome({ status: 'uncertain' })
     throw new Failure('WRITE_UNCERTAIN', `Write outcome is uncertain; journal ${id}.`, `Run proxmox-axi journal reconcile ${id}; do not repeat the mutation.`)
   }
-  await saveOutcome()
-  if (record.status === 'failed' || record.status === 'uncertain') process.exitCode = 1
-  return { id, status: record.status, ...(record.upid ? { node: record.node, upid: record.upid } : {}), children: publicChildren(record.children),
-    reconciliation: record.reconciliation, help: record.upid ? [taskCommand('status'), taskCommand('wait')] : [] }
+  const saved = await saveOutcome(outcome)
+  if (saved.status === 'failed' || saved.status === 'uncertain') process.exitCode = 1
+  return { id, status: saved.status, ...(saved.upid ? { node: saved.node, upid: saved.upid } : {}), children: publicChildren(saved.children),
+    reconciliation: saved.reconciliation, help: saved.upid ? [taskCommand('status'), taskCommand('wait')] : [] }
 }
 
 function reconciliationCheck(call: Invocation, journal: Journal): JournalRecord['check'] {
