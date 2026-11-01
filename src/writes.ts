@@ -21,13 +21,13 @@ function denied(): Failure {
 
 function checkPolicy(credentials: Credentials, contract: Contract): void {
   if (!contract.callable || !['write', 'batch', 'read'].includes(contract.policy.effect)) throw denied()
-  if (contract.allowtoken === 0 && credentials.auth === 'api-token') throw new Failure('AUTH_SESSION_REQUIRED', 'This operation forbids API tokens.', 'Select an authorized user-session profile.')
   if (!credentials.writeOperations.includes(contract.id) || /^(true|1)$/i.test(process.env.PROXMOX_AXI_READ_ONLY ?? '')) throw denied()
   if (process.env.PROXMOX_AXI_HOST_OPERATIONS !== undefined || process.env.PROXMOX_AXI_ACTOR !== undefined) {
     let operations: unknown
     try { operations = JSON.parse(process.env.PROXMOX_AXI_HOST_OPERATIONS ?? 'null') } catch { throw denied() }
     if (!Array.isArray(operations) || !operations.every(id => typeof id === 'string') || !operations.includes(contract.id)) throw denied()
   }
+  if (contract.allowtoken === 0 && credentials.auth === 'api-token') throw new Failure('AUTH_SESSION_REQUIRED', 'This operation forbids API tokens.', 'Select an authorized user-session profile.')
 }
 
 async function invocation(credentials: Credentials, contract: Contract, input: Record<string, unknown>, budget = { count: 0 }, depth = 0): Promise<Invocation> {
