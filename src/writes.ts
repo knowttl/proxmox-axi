@@ -166,7 +166,8 @@ function reconciliationCheck(call: Invocation, journal: Journal): JournalRecord[
   const expected = target.endsWith('/status/current') ?
     call.contract.path.endsWith('/start') ? { status: 'running' } : /\/(stop|shutdown)$/.test(call.contract.path) ? { status: 'stopped' } : {} :
     Object.fromEntries(Object.entries(call.values).filter(([name]) => !['node', 'vmid', 'digest'].includes(name)))
-  return { path: buildPath(read, paths), expected: Object.fromEntries(Object.entries(expected).map(([name, value]) => [name, journal.fingerprint(value)])) }
+  return { path: buildPath(read, paths), expected: Object.fromEntries(Object.entries(expected).map(([name, value]) => [name, journal.fingerprint(value)])),
+    booleans: Object.keys(expected).filter(name => read.returns.properties?.[name]?.type === 'boolean') }
 }
 
 function childRecords(call: Invocation, journal: Journal): NonNullable<JournalRecord['children']> {

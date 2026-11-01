@@ -155,6 +155,7 @@ Use `--journal` with task status or wait to retain status in the associated inte
 `task cancel` requires its own preview and exact confirmation, using the same operation permission as deleting the task route.
 Lost responses and crashes remain uncertain, with no automatic mutation retry.
 Reconciliation can observe reviewed direct configuration/status fields or inspect retained UPIDs.
+New previews retain the response schema's Boolean fields so numeric 0/1 configuration observations compare with false/true inputs.
 Observation does not attribute an uncertain mutation, and missing or filtered data never proves failure.
 Variants without a safe reconciliation read say so explicitly.
 

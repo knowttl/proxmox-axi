@@ -545,7 +545,7 @@ async function verify(values, prepared, scratch) {
         result.cases.filter(row => row.hosted && (!row.expected.hostBoundary || Object.hasOwn(row.expected, 'auditExit')))
           .map(row => Object.hasOwn(row.expected, 'auditExit') ? row.expected.auditExit : row.actual.exitCode), 'Actual host audit records public command outcomes')
       result.host.status = 'pass'
-      result.outcomes = result.outcomes.filter(row => row.journey !== 'artium')
+      result.outcomes = result.outcomes.filter(row => row.journey !== 'artium' || row.status !== 'pending')
       for (const id of ['AC-HOST', 'AC-VERSION-AUTH', 'AC-VERIFIED-VERSION', 'CRED-05', 'CRED-19', 'CRED-21']) {
         result.outcomes.push({ id, journey: 'artium', status: 'pass', basis: 'Actual public client/server/runner with private injected artium profile and distinct vendor canary' })
       }
