@@ -12,8 +12,9 @@ export async function executeRead(credentials: Credentials, wirePath: string, en
 
 // Mutation callers must durably record intent and consume confirmation before calling.
 export async function executeRequest(credentials: Credentials, wirePath: string, options: {
-  method: string, envelope?: boolean, body?: string, deadlineMs?: number
+  method: string, envelope?: boolean, body?: string, deadlineMs?: number, unauthenticated?: boolean
 }): Promise<unknown> {
+  if (!options.unauthenticated && credentials.auth === 'password') throw new Failure('AUTH_REQUIRED', 'A completed user session is required.', 'Use explicit authentication acquisition before provider operations.')
   if (!wirePath.startsWith('/api2/json/') || wirePath.includes('#')) throw new Failure('INVALID_INPUT', 'Invalid API path.', 'Select a reviewed API operation.', 2)
   const body = await new Promise<string>((resolve, reject) => {
     const fail = (error: Error) => reject(error instanceof Failure ? error :
@@ -48,7 +49,9 @@ export async function executeRequest(credentials: Credentials, wirePath: string,
       agent.createConnection = () => socket
       req = request(new URL(wirePath, origin), {
       method: options.method, agent,
-      headers: { Authorization: `PVEAPIToken=${credentials.tokenId}=${credentials.token}`, Accept: 'application/json',
+      headers: { ...(!options.unauthenticated ? credentials.auth === 'api-token' ? { Authorization: `PVEAPIToken=${credentials.tokenId}=${credentials.token}` } :
+        credentials.auth === 'ticket' ? { Cookie: `PVEAuthCookie=${encodeURIComponent(credentials.token)}`,
+          ...(options.method !== 'GET' && credentials.csrf ? { CSRFPreventionToken: credentials.csrf } : {}) } : {} : {}), Accept: 'application/json',
         ...(options.body === undefined ? {} : { 'Content-Type': 'application/x-www-form-urlencoded', 'Content-Length': Buffer.byteLength(options.body) }) },
     }, response => {
       response.on('error', fail)

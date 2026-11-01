@@ -5,6 +5,7 @@ import { executeRequest, readVersion } from './transport.js'
 import { readPrivateFile } from './private-file.js'
 import { Failure } from './errors.js'
 import { Journal, publicChildren, type JournalRecord } from './journal.js'
+import { resultBinding } from './private-results.js'
 
 interface Invocation {
   contract: Contract
@@ -20,6 +21,7 @@ function denied(): Failure {
 
 function checkPolicy(credentials: Credentials, contract: Contract): void {
   if (!contract.callable || !['write', 'batch', 'read'].includes(contract.policy.effect)) throw denied()
+  if (contract.allowtoken === 0 && credentials.auth === 'api-token') throw new Failure('AUTH_SESSION_REQUIRED', 'This operation forbids API tokens.', 'Select an authorized user-session profile.')
   if (!credentials.writeOperations.includes(contract.id) || /^(true|1)$/i.test(process.env.PROXMOX_AXI_READ_ONLY ?? '')) throw denied()
   if (process.env.PROXMOX_AXI_HOST_OPERATIONS !== undefined || process.env.PROXMOX_AXI_ACTOR !== undefined) {
     let operations: unknown
@@ -46,6 +48,7 @@ async function invocation(credentials: Credentials, contract: Contract, input: R
       revisions.push({ file: ref.file, ino: info.ino, mtime: info.mtimeMs, size: info.size })
     } else throw new Failure('INVALID_INPUT', 'Unsupported secret reference.', 'Use an env or protected file reference.', 2)
     if (!secret) throw new Failure('AUTH_REQUIRED', 'An operation secret reference is empty.', 'Supply the selected secret source.')
+    credentials.results.register(secret)
     revisions.push({ reference: value, secret })
     values[name] = secret
   }
@@ -92,6 +95,8 @@ export async function writeOperation(credentials: Credentials, initial: Contract
   if (!['write', 'batch'].includes(initial.policy.effect)) throw denied()
   // All policy and input failures happen before any provider request.
   let call = await invocation(credentials, initial, values)
+  const privateResult = (item: Invocation): boolean => item.contract.policy.secrets === 'private-result' || item.children.some(privateResult)
+  if (!options.preview && privateResult(call)) credentials.results.sink()
   const journal = await openJournal()
   const tokenRevision = credentials.diagnostics.tokenSource.startsWith('file:') ? await lstat(credentials.diagnostics.tokenSource.slice(5)) : undefined
   const binding = () => journal.fingerprint({ origin: credentials.origin, identity: credentials.tokenId,
@@ -145,16 +150,20 @@ export async function writeOperation(credentials: Credentials, initial: Contract
     const [path, body] = call.wire.split('?')
     const query = call.contract.method === 'DELETE' || call.contract.method === 'GET'
     data = await executeRequest(credentials, query ? call.wire : path!, { method: call.contract.method, ...(!query && body ? { body } : {}) })
+    if (privateResult(call)) credentials.results.register(data)
     validateResponse(data, call.contract.returns)
     outcome = resultStatus(call, data)
+    if (privateResult(call)) credentials.results.deliver(resultBinding(credentials.origin, credentials.tokenId, call.contract.id, fingerprint), data)
   } catch (error) {
     // Even HTTP failures may follow a partial server-side action. No retry is safe.
     await saveOutcome({ status: 'uncertain' })
-    throw new Failure('WRITE_UNCERTAIN', `Write outcome is uncertain; journal ${id}.`, `Run proxmox-axi journal reconcile ${id}; do not repeat the mutation.`)
+    throw new Failure(error instanceof Failure && error.code === 'DELIVERY_UNCERTAIN' ? 'DELIVERY_UNCERTAIN' : 'WRITE_UNCERTAIN',
+      `Write or private delivery outcome is uncertain; journal ${id}.`, `Run proxmox-axi journal reconcile ${id}; do not repeat the mutation.`)
   }
   const saved = await saveOutcome(outcome)
   if (saved.status === 'failed' || saved.status === 'uncertain') process.exitCode = 1
   return { id, status: saved.status, ...(saved.upid ? { node: saved.node, upid: saved.upid } : {}), children: publicChildren(saved.children),
+    ...(call.contract.method === 'GET' && !privateResult(call) ? { data: credentials.results.sanitize(data) } : {}),
     reconciliation: saved.reconciliation, help: saved.upid ? [taskCommand('status'), taskCommand('wait')] : [] }
 }
 

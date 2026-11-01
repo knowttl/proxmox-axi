@@ -1,4 +1,5 @@
 import { readFileSync } from 'node:fs'
+import { createPrivateKey, X509Certificate } from 'node:crypto'
 import { Failure } from './errors.js'
 import constraints from './vendor-constraints.json' with { type: 'json' }
 
@@ -25,6 +26,7 @@ export interface Contract {
   path: string
   release: string
   callable: boolean
+  allowtoken?: number
   description: string
   parameters: VendorSchema
   returns: VendorSchema
@@ -62,16 +64,29 @@ export function validateValue(value: unknown, schema: VendorSchema): void {
   if (schema.type === 'boolean' && typeof value !== 'boolean') throw invalid()
   if (typeof value === 'number' && ((schema.minimum !== undefined && value < schema.minimum) || (schema.maximum !== undefined && value > schema.maximum))) throw invalid()
   if (schema.type === 'string') {
-    if (typeof value !== 'string' || /[\x00-\x1f\x7f]/.test(value)) throw invalid()
+    const pem = schema.format === 'pem-string' || schema.format === 'pem-certificate-chain'
+    if (typeof value !== 'string' || (pem ? /[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]/ : /[\x00-\x1f\x7f]/).test(value)) throw invalid()
     if ((schema.minLength !== undefined && value.length < schema.minLength) || (schema.maxLength !== undefined && value.length > schema.maxLength)) throw invalid()
     if (schema.pattern) {
       // Perl's scoped modifiers are not ECMAScript. Keep the original and refuse use.
-      if (constraints.unsupportedPatternMarkers.some(marker => schema.pattern!.includes(marker))) throw unsupported()
+      const translated = (constraints.patterns as Record<string, string>)[schema.pattern] ?? schema.pattern
+      if (constraints.unsupportedPatternMarkers.some(marker => translated.includes(marker))) throw unsupported()
       let pattern: RegExp
-      try { pattern = new RegExp(`^(?:${schema.pattern})$`, 'u') } catch { throw unsupported() }
+      try { pattern = new RegExp(`^(?:${translated})$`, 'u') } catch { throw unsupported() }
       if (!pattern.test(value)) throw invalid()
     }
     if (typeof schema.format === 'string') {
+      if (pem) {
+        try {
+          if (schema.format === 'pem-string') createPrivateKey(value)
+          else {
+            const certificates = value.match(/-----BEGIN CERTIFICATE-----[\s\S]+?-----END CERTIFICATE-----/g)
+            if (!certificates?.length || value.replace(/-----BEGIN CERTIFICATE-----[\s\S]+?-----END CERTIFICATE-----/g, '').trim()) throw invalid()
+            for (const certificate of certificates) new X509Certificate(certificate)
+          }
+        } catch { throw invalid() }
+        return
+      }
       if (schema.format === 'pve-command-batch') {
         let batch: unknown
         try { batch = JSON.parse(value) } catch { throw invalid() }
@@ -144,7 +159,7 @@ export function validateResponse(value: unknown, schema: VendorSchema): void {
   if (schema.type === 'array') {
     if (!Array.isArray(value)) throw fail()
     if (schema.items) for (const item of value) validateResponse(item, schema.items)
-  } else if (schema.type === 'object') {
+  } else if (schema.type === 'object' || schema.properties) {
     if (!value || typeof value !== 'object' || Array.isArray(value)) throw fail()
     for (const [name, constraint] of Object.entries(schema.properties ?? {})) {
       if (!Object.hasOwn(value, name)) { if (!constraint.optional) throw fail(); continue }

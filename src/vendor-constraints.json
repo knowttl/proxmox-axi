@@ -1,6 +1,10 @@
 {
   "unsupportedPatternMarkers": ["(?", "\\p", "\\A", "\\z"],
+  "patterns": { "(?^:[A-Za-z][A-Za-z0-9\\.\\-_]+)": "[A-Za-z][A-Za-z0-9._-]+" },
   "formats": {
+    "pve-storage-server": "^[A-Za-z0-9][A-Za-z0-9.:-]*$",
+    "pem-string": "^-----BEGIN [A-Z ]*PRIVATE KEY-----[\\s\\S]+-----END [A-Z ]*PRIVATE KEY-----\\s*$",
+    "pem-certificate-chain": "^(?:\\s*-----BEGIN CERTIFICATE-----[\\s\\S]+?-----END CERTIFICATE-----)+\\s*$",
     "pve-poolid": "^[A-Za-z][A-Za-z0-9._-]*$",
     "pve-node": "^[A-Za-z0-9][A-Za-z0-9.-]*$",
     "pve-vmid": "^[1-9][0-9]*$",

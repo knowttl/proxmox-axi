@@ -12,6 +12,8 @@ for (const scenario of [
   { name: 'retained reads preserve permission visibility and bounded output', task: 'S2.2', through: 'standalone', exitCode: 0, status: 'pass', host: 'pending' },
   { name: 'mixed node capabilities and bounded doctor use selected contracts', task: 'S2.3', through: 'standalone', exitCode: 0, status: 'pass', host: 'pending' },
   { name: 'packaged writes preserve confirmations and durable outcomes with outbound networking denied', task: 'S3.2', through: 'standalone', exitCode: 0, status: 'pass', host: 'pending' },
+  { name: 'packaged private results and memory authentication satisfy S4 with outbound networking denied', task: 'S4.2', through: 'standalone', exitCode: 0, status: 'pass', host: 'pending' },
+  { name: 'actual pinned Artium private results and memory authentication satisfy S4', task: 'S4.2', through: 'both', exitCode: 0, status: 'pass', host: 'pass' },
   { name: 'actual pinned Artium write policy and durable journals satisfy S3', task: 'S3.2', through: 'both', exitCode: 0, status: 'pass', host: 'pass' },
   { name: 'actual pinned Artium client server and runner satisfy S1.1', through: 'both', exitCode: 0, status: 'pass', host: 'pass' },
   { name: 'both journeys reject missing host fixture inputs', through: 'both', exitCode: 1, status: 'fail', host: 'pending', missingHost: true,

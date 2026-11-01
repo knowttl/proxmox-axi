@@ -6,7 +6,7 @@
   "publishConfig": { "access": "public" },
   "type": "module",
   "bin": { "proxmox-axi": "bin/proxmox-axi.mjs" },
-  "files": ["bin", "dist", "axi-credential.schema.json", "inventory.json", "write-policy.json", "catalogue-diff.json", "artium-invocations.json", "help.json", "README.md"],
+  "files": ["bin", "dist", "docs/s4-contract.md", "axi-credential.schema.json", "inventory.json", "write-policy.json", "catalogue-diff.json", "artium-invocations.json", "help.json", "README.md"],
   "engines": { "node": ">=24.11.0" },
   "packageManager": "pnpm@10.22.0",
   "scripts": {

@@ -2,6 +2,33 @@
   "generated": true,
   "commands": [
     {
+      "command": "auth acquire",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "session": "value"
+      }
+    },
+    {
+      "command": "auth continue",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "session": "value"
+      }
+    },
+    {
+      "command": "auth cancel",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "session": "value"
+      }
+    },
+    {
       "command": "task cancel",
       "operationId": "OP-DELETE-d6b1eb65f2",
       "method": "DELETE",
@@ -67,16 +94,39 @@
       }
     },
     {
-      "command": "delete /nodes/{node}/lxc/{vmid}",
-      "operationId": "OP-DELETE-db1a319dfa",
+      "command": "delete /access/tfa/{userid}/{id}",
+      "operationId": "OP-DELETE-931ab3181e",
       "method": "DELETE",
-      "path": "/nodes/{node}/lxc/{vmid}",
+      "path": "/access/tfa/{userid}/{id}",
+      "sensitiveInputs": [
+        "password"
+      ],
+      "privateResult": false,
       "effect": "write",
       "flags": {
         "help": "boolean",
         "format": "value",
         "preview": "boolean",
         "confirm": "value",
+        "session": "value",
+        "api-id": "value",
+        "api-userid": "value"
+      }
+    },
+    {
+      "command": "delete /nodes/{node}/lxc/{vmid}",
+      "operationId": "OP-DELETE-db1a319dfa",
+      "method": "DELETE",
+      "path": "/nodes/{node}/lxc/{vmid}",
+      "sensitiveInputs": [],
+      "privateResult": false,
+      "effect": "write",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "preview": "boolean",
+        "confirm": "value",
+        "session": "value",
         "api-destroy-unreferenced-disks": "value",
         "api-force": "value",
         "api-node": "value",
@@ -89,12 +139,15 @@
       "operationId": "OP-DELETE-5e826ea6b0",
       "method": "DELETE",
       "path": "/nodes/{node}/qemu/{vmid}",
+      "sensitiveInputs": [],
+      "privateResult": false,
       "effect": "write",
       "flags": {
         "help": "boolean",
         "format": "value",
         "preview": "boolean",
         "confirm": "value",
+        "session": "value",
         "api-destroy-unreferenced-disks": "value",
         "api-node": "value",
         "api-purge": "value",
@@ -106,12 +159,15 @@
       "operationId": "OP-DELETE-d6b1eb65f2",
       "method": "DELETE",
       "path": "/nodes/{node}/tasks/{upid}",
+      "sensitiveInputs": [],
+      "privateResult": false,
       "effect": "write",
       "flags": {
         "help": "boolean",
         "format": "value",
         "preview": "boolean",
         "confirm": "value",
+        "session": "value",
         "api-node": "value",
         "api-upid": "value"
       }
@@ -121,13 +177,128 @@
       "operationId": "OP-DELETE-eccba53f33",
       "method": "DELETE",
       "path": "/pools",
+      "sensitiveInputs": [],
+      "privateResult": false,
       "effect": "write",
       "flags": {
         "help": "boolean",
         "format": "value",
         "preview": "boolean",
         "confirm": "value",
+        "session": "value",
         "api-poolid": "value"
+      }
+    },
+    {
+      "command": "get /nodes/{node}/scan/cifs",
+      "operationId": "OP-GET-48e0b9a8fa",
+      "method": "GET",
+      "path": "/nodes/{node}/scan/cifs",
+      "sensitiveInputs": [
+        "password"
+      ],
+      "privateResult": false,
+      "effect": "write",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "preview": "boolean",
+        "confirm": "value",
+        "session": "value",
+        "api-domain": "value",
+        "api-node": "value",
+        "api-server": "value",
+        "api-username": "value"
+      }
+    },
+    {
+      "command": "get /nodes/{node}/scan/pbs",
+      "operationId": "OP-GET-649f0e57fc",
+      "method": "GET",
+      "path": "/nodes/{node}/scan/pbs",
+      "sensitiveInputs": [
+        "password"
+      ],
+      "privateResult": false,
+      "effect": "write",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "preview": "boolean",
+        "confirm": "value",
+        "session": "value",
+        "api-fingerprint": "value",
+        "api-node": "value",
+        "api-port": "value",
+        "api-server": "value",
+        "api-username": "value"
+      }
+    },
+    {
+      "command": "create /access/tfa/{userid}",
+      "operationId": "OP-POST-daaf2db49a",
+      "method": "POST",
+      "path": "/access/tfa/{userid}",
+      "sensitiveInputs": [
+        "challenge",
+        "password",
+        "totp",
+        "value"
+      ],
+      "privateResult": true,
+      "effect": "write",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "preview": "boolean",
+        "confirm": "value",
+        "session": "value",
+        "api-description": "value",
+        "api-type": "value",
+        "api-userid": "value"
+      }
+    },
+    {
+      "command": "create /access/users/{userid}/token/{tokenid}",
+      "operationId": "OP-POST-774b7e437e",
+      "method": "POST",
+      "path": "/access/users/{userid}/token/{tokenid}",
+      "sensitiveInputs": [],
+      "privateResult": true,
+      "effect": "write",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "preview": "boolean",
+        "confirm": "value",
+        "session": "value",
+        "api-comment": "value",
+        "api-expire": "value",
+        "api-privsep": "value",
+        "api-tokenid": "value",
+        "api-userid": "value"
+      }
+    },
+    {
+      "command": "create /nodes/{node}/certificates/custom",
+      "operationId": "OP-POST-cc95340692",
+      "method": "POST",
+      "path": "/nodes/{node}/certificates/custom",
+      "sensitiveInputs": [
+        "key"
+      ],
+      "privateResult": false,
+      "effect": "write",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "preview": "boolean",
+        "confirm": "value",
+        "session": "value",
+        "api-certificates": "value",
+        "api-force": "value",
+        "api-node": "value",
+        "api-restart": "value"
       }
     },
     {
@@ -135,14 +306,37 @@
       "operationId": "OP-POST-c4fdd6f30b",
       "method": "POST",
       "path": "/nodes/{node}/execute",
+      "sensitiveInputs": [],
+      "privateResult": false,
       "effect": "write",
       "flags": {
         "help": "boolean",
         "format": "value",
         "preview": "boolean",
         "confirm": "value",
+        "session": "value",
         "api-commands": "value",
         "api-node": "value"
+      }
+    },
+    {
+      "command": "create /nodes/{node}/lxc/{vmid}/mtunnel",
+      "operationId": "OP-POST-45ae134aef",
+      "method": "POST",
+      "path": "/nodes/{node}/lxc/{vmid}/mtunnel",
+      "sensitiveInputs": [],
+      "privateResult": true,
+      "effect": "write",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "preview": "boolean",
+        "confirm": "value",
+        "session": "value",
+        "api-bridges": "value",
+        "api-node": "value",
+        "api-storages": "value",
+        "api-vmid": "value"
       }
     },
     {
@@ -150,12 +344,15 @@
       "operationId": "OP-POST-2bc4d554ca",
       "method": "POST",
       "path": "/nodes/{node}/lxc/{vmid}/status/reboot",
+      "sensitiveInputs": [],
+      "privateResult": false,
       "effect": "write",
       "flags": {
         "help": "boolean",
         "format": "value",
         "preview": "boolean",
         "confirm": "value",
+        "session": "value",
         "api-node": "value",
         "api-timeout": "value",
         "api-vmid": "value"
@@ -166,12 +363,15 @@
       "operationId": "OP-POST-411b1766e9",
       "method": "POST",
       "path": "/nodes/{node}/lxc/{vmid}/status/resume",
+      "sensitiveInputs": [],
+      "privateResult": false,
       "effect": "write",
       "flags": {
         "help": "boolean",
         "format": "value",
         "preview": "boolean",
         "confirm": "value",
+        "session": "value",
         "api-node": "value",
         "api-vmid": "value"
       }
@@ -181,12 +381,15 @@
       "operationId": "OP-POST-f9dce48db7",
       "method": "POST",
       "path": "/nodes/{node}/lxc/{vmid}/status/shutdown",
+      "sensitiveInputs": [],
+      "privateResult": false,
       "effect": "write",
       "flags": {
         "help": "boolean",
         "format": "value",
         "preview": "boolean",
         "confirm": "value",
+        "session": "value",
         "api-forceStop": "value",
         "api-node": "value",
         "api-timeout": "value",
@@ -198,12 +401,15 @@
       "operationId": "OP-POST-eb7989b072",
       "method": "POST",
       "path": "/nodes/{node}/lxc/{vmid}/status/start",
+      "sensitiveInputs": [],
+      "privateResult": false,
       "effect": "write",
       "flags": {
         "help": "boolean",
         "format": "value",
         "preview": "boolean",
         "confirm": "value",
+        "session": "value",
         "api-node": "value",
         "api-skiplock": "value",
         "api-vmid": "value"
@@ -214,12 +420,15 @@
       "operationId": "OP-POST-0c3592c269",
       "method": "POST",
       "path": "/nodes/{node}/lxc/{vmid}/status/stop",
+      "sensitiveInputs": [],
+      "privateResult": false,
       "effect": "write",
       "flags": {
         "help": "boolean",
         "format": "value",
         "preview": "boolean",
         "confirm": "value",
+        "session": "value",
         "api-node": "value",
         "api-skiplock": "value",
         "api-vmid": "value"
@@ -230,13 +439,75 @@
       "operationId": "OP-POST-0c0c166e83",
       "method": "POST",
       "path": "/nodes/{node}/lxc/{vmid}/status/suspend",
+      "sensitiveInputs": [],
+      "privateResult": false,
       "effect": "write",
       "flags": {
         "help": "boolean",
         "format": "value",
         "preview": "boolean",
         "confirm": "value",
+        "session": "value",
         "api-node": "value",
+        "api-vmid": "value"
+      }
+    },
+    {
+      "command": "create /nodes/{node}/lxc/{vmid}/termproxy",
+      "operationId": "OP-POST-129daba473",
+      "method": "POST",
+      "path": "/nodes/{node}/lxc/{vmid}/termproxy",
+      "sensitiveInputs": [],
+      "privateResult": true,
+      "effect": "write",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "preview": "boolean",
+        "confirm": "value",
+        "session": "value",
+        "api-node": "value",
+        "api-vmid": "value"
+      }
+    },
+    {
+      "command": "create /nodes/{node}/lxc/{vmid}/vncproxy",
+      "operationId": "OP-POST-660f98e613",
+      "method": "POST",
+      "path": "/nodes/{node}/lxc/{vmid}/vncproxy",
+      "sensitiveInputs": [],
+      "privateResult": true,
+      "effect": "write",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "preview": "boolean",
+        "confirm": "value",
+        "session": "value",
+        "api-height": "value",
+        "api-node": "value",
+        "api-vmid": "value",
+        "api-websocket": "value",
+        "api-width": "value"
+      }
+    },
+    {
+      "command": "create /nodes/{node}/qemu/{vmid}/mtunnel",
+      "operationId": "OP-POST-cb6766cea8",
+      "method": "POST",
+      "path": "/nodes/{node}/qemu/{vmid}/mtunnel",
+      "sensitiveInputs": [],
+      "privateResult": true,
+      "effect": "write",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "preview": "boolean",
+        "confirm": "value",
+        "session": "value",
+        "api-bridges": "value",
+        "api-node": "value",
+        "api-storages": "value",
         "api-vmid": "value"
       }
     },
@@ -245,12 +516,15 @@
       "operationId": "OP-POST-345014c6ff",
       "method": "POST",
       "path": "/nodes/{node}/qemu/{vmid}/status/reboot",
+      "sensitiveInputs": [],
+      "privateResult": false,
       "effect": "write",
       "flags": {
         "help": "boolean",
         "format": "value",
         "preview": "boolean",
         "confirm": "value",
+        "session": "value",
         "api-node": "value",
         "api-timeout": "value",
         "api-vmid": "value"
@@ -261,12 +535,15 @@
       "operationId": "OP-POST-efaca33d25",
       "method": "POST",
       "path": "/nodes/{node}/qemu/{vmid}/status/reset",
+      "sensitiveInputs": [],
+      "privateResult": false,
       "effect": "write",
       "flags": {
         "help": "boolean",
         "format": "value",
         "preview": "boolean",
         "confirm": "value",
+        "session": "value",
         "api-node": "value",
         "api-skiplock": "value",
         "api-vmid": "value"
@@ -277,12 +554,15 @@
       "operationId": "OP-POST-1f4b20b40f",
       "method": "POST",
       "path": "/nodes/{node}/qemu/{vmid}/status/resume",
+      "sensitiveInputs": [],
+      "privateResult": false,
       "effect": "write",
       "flags": {
         "help": "boolean",
         "format": "value",
         "preview": "boolean",
         "confirm": "value",
+        "session": "value",
         "api-node": "value",
         "api-skiplock": "value",
         "api-vmid": "value"
@@ -293,12 +573,15 @@
       "operationId": "OP-POST-1199595650",
       "method": "POST",
       "path": "/nodes/{node}/qemu/{vmid}/status/shutdown",
+      "sensitiveInputs": [],
+      "privateResult": false,
       "effect": "write",
       "flags": {
         "help": "boolean",
         "format": "value",
         "preview": "boolean",
         "confirm": "value",
+        "session": "value",
         "api-forceStop": "value",
         "api-keepActive": "value",
         "api-node": "value",
@@ -312,12 +595,15 @@
       "operationId": "OP-POST-f879c7c9f8",
       "method": "POST",
       "path": "/nodes/{node}/qemu/{vmid}/status/start",
+      "sensitiveInputs": [],
+      "privateResult": false,
       "effect": "write",
       "flags": {
         "help": "boolean",
         "format": "value",
         "preview": "boolean",
         "confirm": "value",
+        "session": "value",
         "api-node": "value",
         "api-skiplock": "value",
         "api-timeout": "value",
@@ -329,12 +615,15 @@
       "operationId": "OP-POST-05ab7d9156",
       "method": "POST",
       "path": "/nodes/{node}/qemu/{vmid}/status/stop",
+      "sensitiveInputs": [],
+      "privateResult": false,
       "effect": "write",
       "flags": {
         "help": "boolean",
         "format": "value",
         "preview": "boolean",
         "confirm": "value",
+        "session": "value",
         "api-keepActive": "value",
         "api-node": "value",
         "api-skiplock": "value",
@@ -347,12 +636,15 @@
       "operationId": "OP-POST-97afa7ebdb",
       "method": "POST",
       "path": "/nodes/{node}/qemu/{vmid}/status/suspend",
+      "sensitiveInputs": [],
+      "privateResult": false,
       "effect": "write",
       "flags": {
         "help": "boolean",
         "format": "value",
         "preview": "boolean",
         "confirm": "value",
+        "session": "value",
         "api-node": "value",
         "api-skiplock": "value",
         "api-todisk": "value",
@@ -360,18 +652,142 @@
       }
     },
     {
-      "command": "create /pools",
-      "operationId": "OP-POST-73c42b39fb",
+      "command": "create /nodes/{node}/qemu/{vmid}/termproxy",
+      "operationId": "OP-POST-792d5f0b19",
       "method": "POST",
-      "path": "/pools",
+      "path": "/nodes/{node}/qemu/{vmid}/termproxy",
+      "sensitiveInputs": [],
+      "privateResult": true,
       "effect": "write",
       "flags": {
         "help": "boolean",
         "format": "value",
         "preview": "boolean",
         "confirm": "value",
+        "session": "value",
+        "api-node": "value",
+        "api-serial": "value",
+        "api-vmid": "value"
+      }
+    },
+    {
+      "command": "create /nodes/{node}/qemu/{vmid}/vncproxy",
+      "operationId": "OP-POST-7b3d9d8def",
+      "method": "POST",
+      "path": "/nodes/{node}/qemu/{vmid}/vncproxy",
+      "sensitiveInputs": [],
+      "privateResult": true,
+      "effect": "write",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "preview": "boolean",
+        "confirm": "value",
+        "session": "value",
+        "api-generate-password": "value",
+        "api-node": "value",
+        "api-vmid": "value",
+        "api-websocket": "value"
+      }
+    },
+    {
+      "command": "create /nodes/{node}/termproxy",
+      "operationId": "OP-POST-04add518d5",
+      "method": "POST",
+      "path": "/nodes/{node}/termproxy",
+      "sensitiveInputs": [],
+      "privateResult": true,
+      "effect": "write",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "preview": "boolean",
+        "confirm": "value",
+        "session": "value",
+        "api-node": "value"
+      }
+    },
+    {
+      "command": "create /pools",
+      "operationId": "OP-POST-73c42b39fb",
+      "method": "POST",
+      "path": "/pools",
+      "sensitiveInputs": [],
+      "privateResult": false,
+      "effect": "write",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "preview": "boolean",
+        "confirm": "value",
+        "session": "value",
         "api-comment": "value",
         "api-poolid": "value"
+      }
+    },
+    {
+      "command": "set /access/password",
+      "operationId": "OP-PUT-58526f2846",
+      "method": "PUT",
+      "path": "/access/password",
+      "sensitiveInputs": [
+        "confirmation-password",
+        "password"
+      ],
+      "privateResult": false,
+      "effect": "write",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "preview": "boolean",
+        "confirm": "value",
+        "session": "value",
+        "api-userid": "value"
+      }
+    },
+    {
+      "command": "set /access/tfa/{userid}/{id}",
+      "operationId": "OP-PUT-c8c0c420be",
+      "method": "PUT",
+      "path": "/access/tfa/{userid}/{id}",
+      "sensitiveInputs": [
+        "password"
+      ],
+      "privateResult": false,
+      "effect": "write",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "preview": "boolean",
+        "confirm": "value",
+        "session": "value",
+        "api-description": "value",
+        "api-enable": "value",
+        "api-id": "value",
+        "api-userid": "value"
+      }
+    },
+    {
+      "command": "set /access/users/{userid}/token/{tokenid}",
+      "operationId": "OP-PUT-cda6ced4ac",
+      "method": "PUT",
+      "path": "/access/users/{userid}/token/{tokenid}",
+      "sensitiveInputs": [],
+      "privateResult": true,
+      "effect": "write",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "preview": "boolean",
+        "confirm": "value",
+        "session": "value",
+        "api-comment": "value",
+        "api-expire": "value",
+        "api-privsep": "value",
+        "api-tokenid": "value",
+        "api-userid": "value",
+        "api-delete": "value",
+        "api-regenerate": "value"
       }
     },
     {
@@ -379,12 +795,18 @@
       "operationId": "OP-PUT-224f55de4f",
       "method": "PUT",
       "path": "/nodes/{node}/lxc/{vmid}/config",
+      "sensitiveInputs": [
+        "cipassword",
+        "password"
+      ],
+      "privateResult": false,
       "effect": "write",
       "flags": {
         "help": "boolean",
         "format": "value",
         "preview": "boolean",
         "confirm": "value",
+        "session": "value",
         "api-cores": "value",
         "api-description": "value",
         "api-digest": "value",
@@ -400,12 +822,18 @@
       "operationId": "OP-PUT-41cd6542bd",
       "method": "PUT",
       "path": "/nodes/{node}/qemu/{vmid}/config",
+      "sensitiveInputs": [
+        "cipassword",
+        "password"
+      ],
+      "privateResult": false,
       "effect": "write",
       "flags": {
         "help": "boolean",
         "format": "value",
         "preview": "boolean",
         "confirm": "value",
+        "session": "value",
         "api-cores": "value",
         "api-description": "value",
         "api-digest": "value",
@@ -421,12 +849,15 @@
       "operationId": "OP-PUT-efde0d0880",
       "method": "PUT",
       "path": "/pools",
+      "sensitiveInputs": [],
+      "privateResult": false,
       "effect": "write",
       "flags": {
         "help": "boolean",
         "format": "value",
         "preview": "boolean",
         "confirm": "value",
+        "session": "value",
         "api-allow-move": "value",
         "api-comment": "value",
         "api-delete": "value",
@@ -6748,6 +7179,7 @@
         "limit": "value",
         "fields": "value",
         "full": "boolean",
+        "session": "value",
         "api-path": "value",
         "api-userid": "value"
       },
@@ -6769,6 +7201,7 @@
         "limit": "value",
         "fields": "value",
         "full": "boolean",
+        "session": "value",
         "api-type": "value"
       },
       "catalogues": [
@@ -6788,7 +7221,8 @@
         "catalogue": "value",
         "limit": "value",
         "fields": "value",
-        "full": "boolean"
+        "full": "boolean",
+        "session": "value"
       },
       "catalogues": [
         "legacy-8.2.7",
@@ -6808,6 +7242,7 @@
         "limit": "value",
         "fields": "value",
         "full": "boolean",
+        "session": "value",
         "api-node": "value"
       },
       "catalogues": [
@@ -6828,6 +7263,7 @@
         "limit": "value",
         "fields": "value",
         "full": "boolean",
+        "session": "value",
         "api-full": "value",
         "api-node": "value"
       },
@@ -6849,6 +7285,7 @@
         "limit": "value",
         "fields": "value",
         "full": "boolean",
+        "session": "value",
         "api-content": "value",
         "api-enabled": "value",
         "api-format": "value",
@@ -6874,6 +7311,7 @@
         "limit": "value",
         "fields": "value",
         "full": "boolean",
+        "session": "value",
         "api-errors": "value",
         "api-limit": "value",
         "api-node": "value",
@@ -6904,6 +7342,7 @@
         "limit": "value",
         "fields": "value",
         "full": "boolean",
+        "session": "value",
         "api-download": "value",
         "api-limit": "value",
         "api-node": "value",
@@ -6928,6 +7367,7 @@
         "limit": "value",
         "fields": "value",
         "full": "boolean",
+        "session": "value",
         "api-node": "value",
         "api-upid": "value"
       },
@@ -6949,6 +7389,7 @@
         "limit": "value",
         "fields": "value",
         "full": "boolean",
+        "session": "value",
         "api-node": "value"
       },
       "catalogues": [
@@ -6968,7 +7409,8 @@
         "catalogue": "value",
         "limit": "value",
         "fields": "value",
-        "full": "boolean"
+        "full": "boolean",
+        "session": "value"
       },
       "catalogues": [
         "legacy-8.2.7",

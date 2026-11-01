@@ -127,23 +127,75 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "input-refs",
+            "sensitiveInputs": [
+              "password"
+            ],
+            "reason": "Explicitly authorized credential and sensitive-input operation; shared preview and confirmation controls apply, including effectful scans.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Never recreate a one-time credential to determine delivery or outcome."
+            },
+            "privileges": {
+              "check": [
+                "or",
+                [
+                  "userid-param",
+                  "self"
+                ],
+                [
+                  "userid-group",
+                  [
+                    "User.Modify"
+                  ]
+                ]
+              ]
+            },
+            "response": {
+              "type": "null"
+            },
+            "source": "Retained versioned API schema and S4 protected credential contract."
           },
           "contract": "dist/contracts.json#/contracts/27"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "input-refs",
+            "sensitiveInputs": [
+              "password"
+            ],
+            "reason": "Explicitly authorized credential and sensitive-input operation; shared preview and confirmation controls apply, including effectful scans.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Never recreate a one-time credential to determine delivery or outcome."
+            },
+            "privileges": {
+              "check": [
+                "or",
+                [
+                  "userid-param",
+                  "self"
+                ],
+                [
+                  "userid-group",
+                  [
+                    "User.Modify"
+                  ]
+                ]
+              ]
+            },
+            "response": {
+              "type": "null"
+            },
+            "source": "Retained versioned API schema and S4 protected credential contract."
           },
           "contract": "dist/contracts.json#/contracts/632"
         }
@@ -11973,23 +12025,89 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "input-refs",
+            "sensitiveInputs": [
+              "password"
+            ],
+            "reason": "Explicitly authorized credential and sensitive-input operation; shared preview and confirmation controls apply, including effectful scans.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Never recreate a one-time credential to determine delivery or outcome."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/storage",
+                [
+                  "Datastore.Allocate"
+                ]
+              ]
+            },
+            "response": {
+              "items": {
+                "properties": {
+                  "description": {
+                    "description": "Descriptive text from server.",
+                    "type": "string"
+                  },
+                  "share": {
+                    "description": "The cifs share name.",
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              },
+              "type": "array"
+            },
+            "source": "Retained versioned API schema and S4 protected credential contract."
           },
           "contract": "dist/contracts.json#/contracts/529"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "input-refs",
+            "sensitiveInputs": [
+              "password"
+            ],
+            "reason": "Explicitly authorized credential and sensitive-input operation; shared preview and confirmation controls apply, including effectful scans.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Never recreate a one-time credential to determine delivery or outcome."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/storage",
+                [
+                  "Datastore.Allocate"
+                ]
+              ]
+            },
+            "response": {
+              "items": {
+                "properties": {
+                  "description": {
+                    "description": "Descriptive text from server.",
+                    "type": "string"
+                  },
+                  "share": {
+                    "description": "The cifs share name.",
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              },
+              "type": "array"
+            },
+            "source": "Retained versioned API schema and S4 protected credential contract."
           },
           "contract": "dist/contracts.json#/contracts/1200"
         }
@@ -12160,23 +12278,91 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "input-refs",
+            "sensitiveInputs": [
+              "password"
+            ],
+            "reason": "Explicitly authorized credential and sensitive-input operation; shared preview and confirmation controls apply, including effectful scans.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Never recreate a one-time credential to determine delivery or outcome."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/storage",
+                [
+                  "Datastore.Allocate"
+                ]
+              ]
+            },
+            "response": {
+              "items": {
+                "properties": {
+                  "comment": {
+                    "description": "Comment from server.",
+                    "optional": 1,
+                    "type": "string"
+                  },
+                  "store": {
+                    "description": "The datastore name.",
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              },
+              "type": "array"
+            },
+            "source": "Retained versioned API schema and S4 protected credential contract."
           },
           "contract": "dist/contracts.json#/contracts/535"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "input-refs",
+            "sensitiveInputs": [
+              "password"
+            ],
+            "reason": "Explicitly authorized credential and sensitive-input operation; shared preview and confirmation controls apply, including effectful scans.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Never recreate a one-time credential to determine delivery or outcome."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/storage",
+                [
+                  "Datastore.Allocate"
+                ]
+              ]
+            },
+            "response": {
+              "items": {
+                "properties": {
+                  "comment": {
+                    "description": "Comment from server.",
+                    "optional": 1,
+                    "type": "string"
+                  },
+                  "store": {
+                    "description": "The datastore name.",
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              },
+              "type": "array"
+            },
+            "source": "Retained versioned API schema and S4 protected credential contract."
           },
           "contract": "dist/contracts.json#/contracts/1205"
         }
@@ -13777,23 +13963,121 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "private-result",
+            "sensitiveInputs": [
+              "challenge",
+              "password",
+              "totp",
+              "value"
+            ],
+            "reason": "Explicitly authorized credential and sensitive-input operation; shared preview and confirmation controls apply, including effectful scans.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Never recreate a one-time credential to determine delivery or outcome."
+            },
+            "privileges": {
+              "check": [
+                "or",
+                [
+                  "userid-param",
+                  "self"
+                ],
+                [
+                  "userid-group",
+                  [
+                    "User.Modify"
+                  ]
+                ]
+              ]
+            },
+            "response": {
+              "properties": {
+                "challenge": {
+                  "description": "When adding u2f entries, this contains a challenge the user must respond to in order to finish the registration.",
+                  "optional": 1,
+                  "type": "string"
+                },
+                "id": {
+                  "description": "The id of a newly added TFA entry.",
+                  "type": "string"
+                },
+                "recovery": {
+                  "description": "When adding recovery codes, this contains the list of codes to be displayed to the user",
+                  "items": {
+                    "description": "A recovery entry.",
+                    "type": "string"
+                  },
+                  "optional": 1,
+                  "type": "array"
+                }
+              },
+              "type": "object"
+            },
+            "source": "Retained versioned API schema and S4 protected credential contract."
           },
           "contract": "dist/contracts.json#/contracts/26"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "private-result",
+            "sensitiveInputs": [
+              "challenge",
+              "password",
+              "totp",
+              "value"
+            ],
+            "reason": "Explicitly authorized credential and sensitive-input operation; shared preview and confirmation controls apply, including effectful scans.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Never recreate a one-time credential to determine delivery or outcome."
+            },
+            "privileges": {
+              "check": [
+                "or",
+                [
+                  "userid-param",
+                  "self"
+                ],
+                [
+                  "userid-group",
+                  [
+                    "User.Modify"
+                  ]
+                ]
+              ]
+            },
+            "response": {
+              "properties": {
+                "challenge": {
+                  "description": "When adding u2f entries, this contains a challenge the user must respond to in order to finish the registration.",
+                  "optional": 1,
+                  "type": "string"
+                },
+                "id": {
+                  "description": "The id of a newly added TFA entry.",
+                  "type": "string"
+                },
+                "recovery": {
+                  "description": "When adding recovery codes, this contains the list of codes to be displayed to the user",
+                  "items": {
+                    "description": "A recovery entry.",
+                    "type": "string"
+                  },
+                  "optional": 1,
+                  "type": "array"
+                }
+              },
+              "type": "object"
+            },
+            "source": "Retained versioned API schema and S4 protected credential contract."
           },
           "contract": "dist/contracts.json#/contracts/631"
         }
@@ -13876,23 +14160,139 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "private-result",
+            "sensitiveInputs": [],
+            "reason": "Explicitly authorized credential and sensitive-input operation; shared preview and confirmation controls apply, including effectful scans.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Never recreate a one-time credential to determine delivery or outcome."
+            },
+            "privileges": {
+              "check": [
+                "or",
+                [
+                  "userid-param",
+                  "self"
+                ],
+                [
+                  "userid-group",
+                  [
+                    "User.Modify"
+                  ]
+                ]
+              ]
+            },
+            "response": {
+              "additionalProperties": 0,
+              "properties": {
+                "full-tokenid": {
+                  "description": "The full token id.",
+                  "format_description": "<userid>!<tokenid>",
+                  "type": "string"
+                },
+                "info": {
+                  "properties": {
+                    "comment": {
+                      "optional": 1,
+                      "type": "string"
+                    },
+                    "expire": {
+                      "default": "same as user",
+                      "description": "API token expiration date (seconds since epoch). '0' means no expiration date.",
+                      "minimum": 0,
+                      "optional": 1,
+                      "type": "integer"
+                    },
+                    "privsep": {
+                      "default": 1,
+                      "description": "Restrict API token privileges with separate ACLs (default), or give full privileges of corresponding user.",
+                      "optional": 1,
+                      "type": "boolean"
+                    }
+                  },
+                  "type": "object"
+                },
+                "value": {
+                  "description": "API token value used for authentication.",
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            },
+            "source": "Retained versioned API schema and S4 protected credential contract."
           },
           "contract": "dist/contracts.json#/contracts/41"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "private-result",
+            "sensitiveInputs": [],
+            "reason": "Explicitly authorized credential and sensitive-input operation; shared preview and confirmation controls apply, including effectful scans.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Never recreate a one-time credential to determine delivery or outcome."
+            },
+            "privileges": {
+              "check": [
+                "or",
+                [
+                  "userid-param",
+                  "self"
+                ],
+                [
+                  "userid-group",
+                  [
+                    "User.Modify"
+                  ]
+                ]
+              ]
+            },
+            "response": {
+              "additionalProperties": 0,
+              "properties": {
+                "full-tokenid": {
+                  "description": "The full token id.",
+                  "format_description": "<userid>!<tokenid>",
+                  "type": "string"
+                },
+                "info": {
+                  "properties": {
+                    "comment": {
+                      "optional": 1,
+                      "type": "string"
+                    },
+                    "expire": {
+                      "default": "same as user",
+                      "description": "API token expiration date (seconds since epoch). '0' means no expiration date.",
+                      "minimum": 0,
+                      "optional": 1,
+                      "type": "integer"
+                    },
+                    "privsep": {
+                      "default": 1,
+                      "description": "Restrict API token privileges with separate ACLs (default), or give full privileges of corresponding user.",
+                      "optional": 1,
+                      "type": "boolean"
+                    }
+                  },
+                  "type": "object"
+                },
+                "value": {
+                  "description": "API token value used for authentication.",
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            },
+            "source": "Retained versioned API schema and S4 protected credential contract."
           },
           "contract": "dist/contracts.json#/contracts/646"
         }
@@ -16054,23 +16454,181 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "input-refs",
+            "sensitiveInputs": [
+              "key"
+            ],
+            "reason": "Explicitly authorized credential and sensitive-input operation; shared preview and confirmation controls apply, including effectful scans.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Never recreate a one-time credential to determine delivery or outcome."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/nodes/{node}",
+                [
+                  "Sys.Modify"
+                ]
+              ]
+            },
+            "response": {
+              "properties": {
+                "filename": {
+                  "optional": 1,
+                  "type": "string"
+                },
+                "fingerprint": {
+                  "description": "Certificate SHA 256 fingerprint.",
+                  "optional": 1,
+                  "pattern": "([A-Fa-f0-9]{2}:){31}[A-Fa-f0-9]{2}",
+                  "type": "string"
+                },
+                "issuer": {
+                  "description": "Certificate issuer name.",
+                  "optional": 1,
+                  "type": "string"
+                },
+                "notafter": {
+                  "description": "Certificate's notAfter timestamp (UNIX epoch).",
+                  "optional": 1,
+                  "renderer": "timestamp",
+                  "type": "integer"
+                },
+                "notbefore": {
+                  "description": "Certificate's notBefore timestamp (UNIX epoch).",
+                  "optional": 1,
+                  "renderer": "timestamp",
+                  "type": "integer"
+                },
+                "pem": {
+                  "description": "Certificate in PEM format",
+                  "format": "pem-certificate",
+                  "optional": 1,
+                  "type": "string"
+                },
+                "public-key-bits": {
+                  "description": "Certificate's public key size",
+                  "optional": 1,
+                  "type": "integer"
+                },
+                "public-key-type": {
+                  "description": "Certificate's public key algorithm",
+                  "optional": 1,
+                  "type": "string"
+                },
+                "san": {
+                  "description": "List of Certificate's SubjectAlternativeName entries.",
+                  "items": {
+                    "type": "string"
+                  },
+                  "optional": 1,
+                  "renderer": "yaml",
+                  "type": "array"
+                },
+                "subject": {
+                  "description": "Certificate subject name.",
+                  "optional": 1,
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            },
+            "source": "Retained versioned API schema and S4 protected credential contract."
           },
           "contract": "dist/contracts.json#/contracts/311"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "input-refs",
+            "sensitiveInputs": [
+              "key"
+            ],
+            "reason": "Explicitly authorized credential and sensitive-input operation; shared preview and confirmation controls apply, including effectful scans.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Never recreate a one-time credential to determine delivery or outcome."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/nodes/{node}",
+                [
+                  "Sys.Modify"
+                ]
+              ]
+            },
+            "response": {
+              "properties": {
+                "filename": {
+                  "optional": 1,
+                  "type": "string"
+                },
+                "fingerprint": {
+                  "description": "Certificate SHA 256 fingerprint.",
+                  "optional": 1,
+                  "pattern": "([A-Fa-f0-9]{2}:){31}[A-Fa-f0-9]{2}",
+                  "type": "string"
+                },
+                "issuer": {
+                  "description": "Certificate issuer name.",
+                  "optional": 1,
+                  "type": "string"
+                },
+                "notafter": {
+                  "description": "Certificate's notAfter timestamp (UNIX epoch).",
+                  "optional": 1,
+                  "renderer": "timestamp",
+                  "type": "integer"
+                },
+                "notbefore": {
+                  "description": "Certificate's notBefore timestamp (UNIX epoch).",
+                  "optional": 1,
+                  "renderer": "timestamp",
+                  "type": "integer"
+                },
+                "pem": {
+                  "description": "Certificate in PEM format",
+                  "format": "pem-certificate",
+                  "optional": 1,
+                  "type": "string"
+                },
+                "public-key-bits": {
+                  "description": "Certificate's public key size",
+                  "optional": 1,
+                  "type": "integer"
+                },
+                "public-key-type": {
+                  "description": "Certificate's public key algorithm",
+                  "optional": 1,
+                  "type": "string"
+                },
+                "san": {
+                  "description": "List of Certificate's SubjectAlternativeName entries.",
+                  "items": {
+                    "type": "string"
+                  },
+                  "optional": 1,
+                  "renderer": "yaml",
+                  "type": "array"
+                },
+                "subject": {
+                  "description": "Certificate subject name.",
+                  "optional": 1,
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            },
+            "source": "Retained versioned API schema and S4 protected credential contract."
           },
           "contract": "dist/contracts.json#/contracts/979"
         }
@@ -16643,23 +17201,103 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "private-result",
+            "sensitiveInputs": [],
+            "reason": "Explicitly authorized credential and sensitive-input operation; shared preview and confirmation controls apply, including effectful scans.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Never recreate a one-time credential to determine delivery or outcome."
+            },
+            "privileges": {
+              "check": [
+                "and",
+                [
+                  "perm",
+                  "/vms/{vmid}",
+                  [
+                    "VM.Allocate"
+                  ]
+                ],
+                [
+                  "perm",
+                  "/",
+                  [
+                    "Sys.Incoming"
+                  ]
+                ]
+              ],
+              "description": "You need 'VM.Allocate' permissions on '/vms/{vmid}' and Sys.Incoming on '/'. Further permission checks happen during the actual migration."
+            },
+            "response": {
+              "additionalProperties": 0,
+              "properties": {
+                "socket": {
+                  "type": "string"
+                },
+                "ticket": {
+                  "type": "string"
+                },
+                "upid": {
+                  "type": "string"
+                }
+              }
+            },
+            "source": "Retained versioned API schema and S4 protected credential contract."
           },
           "contract": "dist/contracts.json#/contracts/387"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "private-result",
+            "sensitiveInputs": [],
+            "reason": "Explicitly authorized credential and sensitive-input operation; shared preview and confirmation controls apply, including effectful scans.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Never recreate a one-time credential to determine delivery or outcome."
+            },
+            "privileges": {
+              "check": [
+                "and",
+                [
+                  "perm",
+                  "/vms/{vmid}",
+                  [
+                    "VM.Allocate"
+                  ]
+                ],
+                [
+                  "perm",
+                  "/",
+                  [
+                    "Sys.Incoming"
+                  ]
+                ]
+              ],
+              "description": "You need 'VM.Allocate' permissions on '/vms/{vmid}' and Sys.Incoming on '/'. Further permission checks happen during the actual migration."
+            },
+            "response": {
+              "additionalProperties": 0,
+              "properties": {
+                "socket": {
+                  "type": "string"
+                },
+                "ticket": {
+                  "type": "string"
+                },
+                "upid": {
+                  "type": "string"
+                }
+              }
+            },
+            "source": "Retained versioned API schema and S4 protected credential contract."
           },
           "contract": "dist/contracts.json#/contracts/1056"
         }
@@ -17375,23 +18013,87 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "private-result",
+            "sensitiveInputs": [],
+            "reason": "Explicitly authorized credential and sensitive-input operation; shared preview and confirmation controls apply, including effectful scans.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Never recreate a one-time credential to determine delivery or outcome."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/vms/{vmid}",
+                [
+                  "VM.Console"
+                ]
+              ]
+            },
+            "response": {
+              "additionalProperties": 0,
+              "properties": {
+                "port": {
+                  "type": "integer"
+                },
+                "ticket": {
+                  "type": "string"
+                },
+                "upid": {
+                  "type": "string"
+                },
+                "user": {
+                  "type": "string"
+                }
+              }
+            },
+            "source": "Retained versioned API schema and S4 protected credential contract."
           },
           "contract": "dist/contracts.json#/contracts/411"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "private-result",
+            "sensitiveInputs": [],
+            "reason": "Explicitly authorized credential and sensitive-input operation; shared preview and confirmation controls apply, including effectful scans.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Never recreate a one-time credential to determine delivery or outcome."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/vms/{vmid}",
+                [
+                  "VM.Console"
+                ]
+              ]
+            },
+            "response": {
+              "additionalProperties": 0,
+              "properties": {
+                "port": {
+                  "type": "integer"
+                },
+                "ticket": {
+                  "type": "string"
+                },
+                "upid": {
+                  "type": "string"
+                },
+                "user": {
+                  "type": "string"
+                }
+              }
+            },
+            "source": "Retained versioned API schema and S4 protected credential contract."
           },
           "contract": "dist/contracts.json#/contracts/1080"
         }
@@ -17408,23 +18110,98 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "private-result",
+            "sensitiveInputs": [],
+            "reason": "Explicitly authorized credential and sensitive-input operation; shared preview and confirmation controls apply, including effectful scans.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Never recreate a one-time credential to determine delivery or outcome."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/vms/{vmid}",
+                [
+                  "VM.Console"
+                ]
+              ]
+            },
+            "response": {
+              "additionalProperties": 0,
+              "properties": {
+                "cert": {
+                  "type": "string"
+                },
+                "port": {
+                  "type": "integer"
+                },
+                "ticket": {
+                  "type": "string"
+                },
+                "upid": {
+                  "type": "string"
+                },
+                "user": {
+                  "type": "string"
+                }
+              }
+            },
+            "source": "Retained versioned API schema and S4 protected credential contract."
           },
           "contract": "dist/contracts.json#/contracts/412"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "private-result",
+            "sensitiveInputs": [],
+            "reason": "Explicitly authorized credential and sensitive-input operation; shared preview and confirmation controls apply, including effectful scans.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Never recreate a one-time credential to determine delivery or outcome."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/vms/{vmid}",
+                [
+                  "VM.Console"
+                ]
+              ]
+            },
+            "response": {
+              "additionalProperties": 0,
+              "properties": {
+                "cert": {
+                  "type": "string"
+                },
+                "password": {
+                  "description": "Password used for authentication within the VNC protocol. Consists of printable ASCII characters ('!' .. '~').",
+                  "optional": 1,
+                  "type": "string"
+                },
+                "port": {
+                  "type": "integer"
+                },
+                "ticket": {
+                  "type": "string"
+                },
+                "upid": {
+                  "type": "string"
+                },
+                "user": {
+                  "type": "string"
+                }
+              }
+            },
+            "source": "Retained versioned API schema and S4 protected credential contract."
           },
           "contract": "dist/contracts.json#/contracts/1081"
         }
@@ -18288,23 +19065,103 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "private-result",
+            "sensitiveInputs": [],
+            "reason": "Explicitly authorized credential and sensitive-input operation; shared preview and confirmation controls apply, including effectful scans.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Never recreate a one-time credential to determine delivery or outcome."
+            },
+            "privileges": {
+              "check": [
+                "and",
+                [
+                  "perm",
+                  "/vms/{vmid}",
+                  [
+                    "VM.Allocate"
+                  ]
+                ],
+                [
+                  "perm",
+                  "/",
+                  [
+                    "Sys.Incoming"
+                  ]
+                ]
+              ],
+              "description": "You need 'VM.Allocate' permissions on '/vms/{vmid}' and Sys.Incoming on '/'. Further permission checks happen during the actual migration."
+            },
+            "response": {
+              "additionalProperties": 0,
+              "properties": {
+                "socket": {
+                  "type": "string"
+                },
+                "ticket": {
+                  "type": "string"
+                },
+                "upid": {
+                  "type": "string"
+                }
+              }
+            },
+            "source": "Retained versioned API schema and S4 protected credential contract."
           },
           "contract": "dist/contracts.json#/contracts/489"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "private-result",
+            "sensitiveInputs": [],
+            "reason": "Explicitly authorized credential and sensitive-input operation; shared preview and confirmation controls apply, including effectful scans.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Never recreate a one-time credential to determine delivery or outcome."
+            },
+            "privileges": {
+              "check": [
+                "and",
+                [
+                  "perm",
+                  "/vms/{vmid}",
+                  [
+                    "VM.Allocate"
+                  ]
+                ],
+                [
+                  "perm",
+                  "/",
+                  [
+                    "Sys.Incoming"
+                  ]
+                ]
+              ],
+              "description": "You need 'VM.Allocate' permissions on '/vms/{vmid}' and Sys.Incoming on '/'. Further permission checks happen during the actual migration."
+            },
+            "response": {
+              "additionalProperties": 0,
+              "properties": {
+                "socket": {
+                  "type": "string"
+                },
+                "ticket": {
+                  "type": "string"
+                },
+                "upid": {
+                  "type": "string"
+                }
+              }
+            },
+            "source": "Retained versioned API schema and S4 protected credential contract."
           },
           "contract": "dist/contracts.json#/contracts/1159"
         }
@@ -19111,23 +19968,87 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "private-result",
+            "sensitiveInputs": [],
+            "reason": "Explicitly authorized credential and sensitive-input operation; shared preview and confirmation controls apply, including effectful scans.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Never recreate a one-time credential to determine delivery or outcome."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/vms/{vmid}",
+                [
+                  "VM.Console"
+                ]
+              ]
+            },
+            "response": {
+              "additionalProperties": 0,
+              "properties": {
+                "port": {
+                  "type": "integer"
+                },
+                "ticket": {
+                  "type": "string"
+                },
+                "upid": {
+                  "type": "string"
+                },
+                "user": {
+                  "type": "string"
+                }
+              }
+            },
+            "source": "Retained versioned API schema and S4 protected credential contract."
           },
           "contract": "dist/contracts.json#/contracts/515"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "private-result",
+            "sensitiveInputs": [],
+            "reason": "Explicitly authorized credential and sensitive-input operation; shared preview and confirmation controls apply, including effectful scans.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Never recreate a one-time credential to determine delivery or outcome."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/vms/{vmid}",
+                [
+                  "VM.Console"
+                ]
+              ]
+            },
+            "response": {
+              "additionalProperties": 0,
+              "properties": {
+                "port": {
+                  "type": "integer"
+                },
+                "ticket": {
+                  "type": "string"
+                },
+                "upid": {
+                  "type": "string"
+                },
+                "user": {
+                  "type": "string"
+                }
+              }
+            },
+            "source": "Retained versioned API schema and S4 protected credential contract."
           },
           "contract": "dist/contracts.json#/contracts/1185"
         }
@@ -19144,23 +20065,103 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "private-result",
+            "sensitiveInputs": [],
+            "reason": "Explicitly authorized credential and sensitive-input operation; shared preview and confirmation controls apply, including effectful scans.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Never recreate a one-time credential to determine delivery or outcome."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/vms/{vmid}",
+                [
+                  "VM.Console"
+                ]
+              ]
+            },
+            "response": {
+              "additionalProperties": 0,
+              "properties": {
+                "cert": {
+                  "type": "string"
+                },
+                "password": {
+                  "description": "Returned if requested with 'generate-password' param. Consists of printable ASCII characters ('!' .. '~').",
+                  "optional": 1,
+                  "type": "string"
+                },
+                "port": {
+                  "type": "integer"
+                },
+                "ticket": {
+                  "type": "string"
+                },
+                "upid": {
+                  "type": "string"
+                },
+                "user": {
+                  "type": "string"
+                }
+              }
+            },
+            "source": "Retained versioned API schema and S4 protected credential contract."
           },
           "contract": "dist/contracts.json#/contracts/517"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "private-result",
+            "sensitiveInputs": [],
+            "reason": "Explicitly authorized credential and sensitive-input operation; shared preview and confirmation controls apply, including effectful scans.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Never recreate a one-time credential to determine delivery or outcome."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/vms/{vmid}",
+                [
+                  "VM.Console"
+                ]
+              ]
+            },
+            "response": {
+              "additionalProperties": 0,
+              "properties": {
+                "cert": {
+                  "type": "string"
+                },
+                "password": {
+                  "description": "Password used for authentication within the VNC protocol. Consists of printable ASCII characters ('!' .. '~').",
+                  "optional": 1,
+                  "type": "string"
+                },
+                "port": {
+                  "type": "integer"
+                },
+                "ticket": {
+                  "type": "string"
+                },
+                "upid": {
+                  "type": "string"
+                },
+                "user": {
+                  "type": "string"
+                }
+              }
+            },
+            "source": "Retained versioned API schema and S4 protected credential contract."
           },
           "contract": "dist/contracts.json#/contracts/1187"
         }
@@ -19694,23 +20695,97 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "private-result",
+            "allowedInputs": [
+              "node"
+            ],
+            "sensitiveInputs": [],
+            "reason": "Explicitly authorized credential and sensitive-input operation; shared preview and confirmation controls apply, including effectful scans.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Never recreate a one-time credential to determine delivery or outcome."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/nodes/{node}",
+                [
+                  "Sys.Console"
+                ]
+              ]
+            },
+            "response": {
+              "additionalProperties": 0,
+              "properties": {
+                "port": {
+                  "type": "integer"
+                },
+                "ticket": {
+                  "type": "string"
+                },
+                "upid": {
+                  "type": "string"
+                },
+                "user": {
+                  "type": "string"
+                }
+              }
+            },
+            "source": "Retained versioned API schema and S4 protected credential contract."
           },
           "contract": "dist/contracts.json#/contracts/582"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "private-result",
+            "allowedInputs": [
+              "node"
+            ],
+            "sensitiveInputs": [],
+            "reason": "Explicitly authorized credential and sensitive-input operation; shared preview and confirmation controls apply, including effectful scans.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Never recreate a one-time credential to determine delivery or outcome."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/nodes/{node}",
+                [
+                  "Sys.Console"
+                ]
+              ]
+            },
+            "response": {
+              "additionalProperties": 0,
+              "properties": {
+                "port": {
+                  "description": "port used to bind termproxy to.",
+                  "type": "integer"
+                },
+                "ticket": {
+                  "description": "VNC ticket used to verify websocket connection.",
+                  "type": "string"
+                },
+                "upid": {
+                  "description": "UPID for termproxy worker task.",
+                  "type": "string"
+                },
+                "user": {
+                  "description": "user/token that generated the VNC ticket in `ticket`.",
+                  "type": "string"
+                }
+              }
+            },
+            "source": "Retained versioned API schema and S4 protected credential contract."
           },
           "contract": "dist/contracts.json#/contracts/1262"
         }
@@ -20027,23 +21102,93 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "input-refs",
+            "sensitiveInputs": [
+              "confirmation-password",
+              "password"
+            ],
+            "reason": "Explicitly authorized credential and sensitive-input operation; shared preview and confirmation controls apply, including effectful scans.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Never recreate a one-time credential to determine delivery or outcome."
+            },
+            "privileges": {
+              "check": [
+                "or",
+                [
+                  "userid-param",
+                  "self"
+                ],
+                [
+                  "and",
+                  [
+                    "userid-param",
+                    "Realm.AllocateUser"
+                  ],
+                  [
+                    "userid-group",
+                    [
+                      "User.Modify"
+                    ]
+                  ]
+                ]
+              ],
+              "description": "Each user is allowed to change their own password. A user can change the password of another user if they have 'Realm.AllocateUser' (on the realm of user <userid>) and 'User.Modify' permission on /access/groups/<group> on a group where user <userid> is member of. For the PAM realm, a password change does not take  effect cluster-wide, but only applies to the local node."
+            },
+            "response": {
+              "type": "null"
+            },
+            "source": "Retained versioned API schema and S4 protected credential contract."
           },
           "contract": "dist/contracts.json#/contracts/17"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "input-refs",
+            "sensitiveInputs": [
+              "confirmation-password",
+              "password"
+            ],
+            "reason": "Explicitly authorized credential and sensitive-input operation; shared preview and confirmation controls apply, including effectful scans.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Never recreate a one-time credential to determine delivery or outcome."
+            },
+            "privileges": {
+              "check": [
+                "or",
+                [
+                  "userid-param",
+                  "self"
+                ],
+                [
+                  "and",
+                  [
+                    "userid-param",
+                    "Realm.AllocateUser"
+                  ],
+                  [
+                    "userid-group",
+                    [
+                      "User.Modify"
+                    ]
+                  ]
+                ]
+              ],
+              "description": "Each user is allowed to change their own password. A user can change the password of another user if they have 'Realm.AllocateUser' (on the realm of user <userid>) and 'User.Modify' permission on /access/groups/<group> on a group where user <userid> is member of. For the PAM realm, a password change does not take  effect cluster-wide, but only applies to the local node."
+            },
+            "response": {
+              "type": "null"
+            },
+            "source": "Retained versioned API schema and S4 protected credential contract."
           },
           "contract": "dist/contracts.json#/contracts/622"
         }
@@ -20093,23 +21238,75 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "input-refs",
+            "sensitiveInputs": [
+              "password"
+            ],
+            "reason": "Explicitly authorized credential and sensitive-input operation; shared preview and confirmation controls apply, including effectful scans.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Never recreate a one-time credential to determine delivery or outcome."
+            },
+            "privileges": {
+              "check": [
+                "or",
+                [
+                  "userid-param",
+                  "self"
+                ],
+                [
+                  "userid-group",
+                  [
+                    "User.Modify"
+                  ]
+                ]
+              ]
+            },
+            "response": {
+              "type": "null"
+            },
+            "source": "Retained versioned API schema and S4 protected credential contract."
           },
           "contract": "dist/contracts.json#/contracts/29"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "input-refs",
+            "sensitiveInputs": [
+              "password"
+            ],
+            "reason": "Explicitly authorized credential and sensitive-input operation; shared preview and confirmation controls apply, including effectful scans.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Never recreate a one-time credential to determine delivery or outcome."
+            },
+            "privileges": {
+              "check": [
+                "or",
+                [
+                  "userid-param",
+                  "self"
+                ],
+                [
+                  "userid-group",
+                  [
+                    "User.Modify"
+                  ]
+                ]
+              ]
+            },
+            "response": {
+              "type": "null"
+            },
+            "source": "Retained versioned API schema and S4 protected credential contract."
           },
           "contract": "dist/contracts.json#/contracts/634"
         }
@@ -20159,23 +21356,121 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "private-result",
+            "sensitiveInputs": [],
+            "reason": "Explicitly authorized credential and sensitive-input operation; shared preview and confirmation controls apply, including effectful scans.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Never recreate a one-time credential to determine delivery or outcome."
+            },
+            "privileges": {
+              "check": [
+                "or",
+                [
+                  "userid-param",
+                  "self"
+                ],
+                [
+                  "userid-group",
+                  [
+                    "User.Modify"
+                  ]
+                ]
+              ]
+            },
+            "response": {
+              "description": "Updated token information.",
+              "properties": {
+                "comment": {
+                  "optional": 1,
+                  "type": "string"
+                },
+                "expire": {
+                  "default": "same as user",
+                  "description": "API token expiration date (seconds since epoch). '0' means no expiration date.",
+                  "minimum": 0,
+                  "optional": 1,
+                  "type": "integer"
+                },
+                "privsep": {
+                  "default": 1,
+                  "description": "Restrict API token privileges with separate ACLs (default), or give full privileges of corresponding user.",
+                  "optional": 1,
+                  "type": "boolean"
+                }
+              },
+              "type": "object"
+            },
+            "source": "Retained versioned API schema and S4 protected credential contract."
           },
           "contract": "dist/contracts.json#/contracts/42"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "private-result",
+            "sensitiveInputs": [],
+            "reason": "Explicitly authorized credential and sensitive-input operation; shared preview and confirmation controls apply, including effectful scans.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Never recreate a one-time credential to determine delivery or outcome."
+            },
+            "privileges": {
+              "check": [
+                "or",
+                [
+                  "userid-param",
+                  "self"
+                ],
+                [
+                  "userid-group",
+                  [
+                    "User.Modify"
+                  ]
+                ]
+              ]
+            },
+            "response": {
+              "properties": {
+                "comment": {
+                  "optional": 1,
+                  "type": "string"
+                },
+                "expire": {
+                  "default": "same as user",
+                  "description": "API token expiration date (seconds since epoch). '0' means no expiration date.",
+                  "minimum": 0,
+                  "optional": 1,
+                  "type": "integer"
+                },
+                "full-tokenid": {
+                  "description": "The full token id. Only set when 'regenerate' was set.",
+                  "format_description": "<userid>!<tokenid>",
+                  "optional": 1,
+                  "type": "string"
+                },
+                "privsep": {
+                  "default": 1,
+                  "description": "Restrict API token privileges with separate ACLs (default), or give full privileges of corresponding user.",
+                  "optional": 1,
+                  "type": "boolean"
+                },
+                "value": {
+                  "description": "API token value used for authentication. Only set when 'regenerate' was set.",
+                  "optional": 1,
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            },
+            "source": "Retained versioned API schema and S4 protected credential contract."
           },
           "contract": "dist/contracts.json#/contracts/647"
         }

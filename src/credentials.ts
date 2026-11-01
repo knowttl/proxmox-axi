@@ -4,14 +4,20 @@ import { Ajv } from 'ajv'
 import schema from './profile-schema.json' with { type: 'json' }
 import { Failure } from './errors.js'
 import { readPrivateFile } from './private-file.js'
+import { PrivateResults } from './private-results.js'
 
-type SecretRef = { env: string } | { file: string }
-interface Profile { auth: 'api-token', origin: string, tokenId: string, token?: SecretRef, caBundle?: string, writes?: { operations: string[] },
+export type SecretRef = { env: string } | { file: string }
+interface Profile { auth: 'api-token' | 'ticket' | 'password', origin: string, tokenId?: string, userId?: string, token?: SecretRef,
+  ticket?: SecretRef, csrfPreventionToken?: SecretRef, password?: SecretRef, otp?: SecretRef, caBundle?: string, writes?: { operations: string[] },
   certificatePin?: { sha256: string, origin: string, replaceHostname?: boolean } }
 export interface Credentials {
+  auth: Profile['auth']
   origin: string
   tokenId: string
   token: string
+  csrf?: string
+  otp?: string
+  results: PrivateResults
   writeOperations: string[]
   ca?: string
   certificatePin?: Profile['certificatePin']
@@ -19,7 +25,16 @@ export interface Credentials {
 }
 
 const validateProfile = new Ajv({ strict: false }).compile<Profile>(schema)
-const invalid = () => new Failure('CONFIG_INVALID', 'Invalid API token profile or configuration.', 'Use a strict API token profile with SecretRefs; see proxmox-axi get --help.')
+const invalid = () => new Failure('CONFIG_INVALID', 'Invalid authentication profile or configuration.', 'Use one explicit authentication branch with SecretRefs; see proxmox-axi get --help.')
+
+export async function resolveSecret(reference: SecretRef, verifyAcl = false): Promise<string> {
+  if (!reference || typeof reference !== 'object' || Array.isArray(reference) || Object.keys(reference).length !== 1 ||
+    !('env' in reference && typeof reference.env === 'string' && /^[A-Za-z_][A-Za-z0-9_]*$/.test(reference.env) ||
+      'file' in reference && typeof reference.file === 'string' && isAbsolute(reference.file))) throw invalid()
+  const value = 'env' in reference ? process.env[reference.env] : (await readPrivateFile(reference.file, true, verifyAcl)).replace(/^\uFEFF/, '').trimEnd()
+  if (!value) throw new Failure('AUTH_REQUIRED', 'The selected secret reference has no value.', 'Supply the selected protected secret source.')
+  return value
+}
 
 export function configurationPath(config?: string): string {
   const env = process.env
@@ -66,10 +81,14 @@ export async function resolveCredentials(selection: { config?: string, profile?:
   let source: string
   const environmentFields = ['ORIGIN', 'AUTH', 'TOKEN_ID', 'TOKEN', 'CA_BUNDLE', 'USER_ID', 'TICKET', 'CSRF_PREVENTION_TOKEN', 'PASSWORD', 'OTP']
   if (!selected && environmentFields.some(field => env[`PROXMOX_AXI_${field}`] !== undefined)) {
-    if (['USER_ID', 'TICKET', 'CSRF_PREVENTION_TOKEN', 'PASSWORD', 'OTP'].some(field => env[`PROXMOX_AXI_${field}`] !== undefined)) throw invalid()
-    if (!env.PROXMOX_AXI_ORIGIN || !env.PROXMOX_AXI_TOKEN_ID || !env.PROXMOX_AXI_TOKEN) throw invalid()
-    profile = { auth: env.PROXMOX_AXI_AUTH ?? 'api-token', origin: env.PROXMOX_AXI_ORIGIN,
-      tokenId: env.PROXMOX_AXI_TOKEN_ID, token: { env: 'PROXMOX_AXI_TOKEN' },
+    const auth = env.PROXMOX_AXI_AUTH ?? 'api-token'
+    const allowed = auth === 'api-token' ? ['TOKEN_ID', 'TOKEN'] : auth === 'ticket' ? ['USER_ID', 'TICKET', 'CSRF_PREVENTION_TOKEN'] : auth === 'password' ? ['USER_ID', 'PASSWORD', 'OTP'] : []
+    const required = allowed.filter(field => field !== 'OTP')
+    if (!allowed.length || !env.PROXMOX_AXI_ORIGIN || required.some(field => !env[`PROXMOX_AXI_${field}`]) ||
+      ['TOKEN_ID', 'TOKEN', 'USER_ID', 'TICKET', 'CSRF_PREVENTION_TOKEN', 'PASSWORD', 'OTP'].some(field => !allowed.includes(field) && env[`PROXMOX_AXI_${field}`] !== undefined)) throw invalid()
+    profile = { auth, origin: env.PROXMOX_AXI_ORIGIN,
+      ...(auth === 'api-token' ? { tokenId: env.PROXMOX_AXI_TOKEN_ID } : { userId: env.PROXMOX_AXI_USER_ID }),
+      ...(auth === 'password' && env.PROXMOX_AXI_OTP ? { otp: { env: 'PROXMOX_AXI_OTP' } } : {}),
       ...(env.PROXMOX_AXI_CA_BUNDLE ? { caBundle: env.PROXMOX_AXI_CA_BUNDLE } : {}) }
     name = 'environment'
     source = 'environment'
@@ -91,13 +110,20 @@ export async function resolveCredentials(selection: { config?: string, profile?:
   if (origin.protocol !== 'https:' || origin.username || origin.password || origin.search || origin.hash ||
     origin.pathname !== '/' || origin.origin !== profile.origin) throw invalid()
   if (profile.certificatePin && (profile.certificatePin.origin !== origin.origin || profile.caBundle)) throw invalid()
-  const reference = profile.token ?? { env: 'PROXMOX_AXI_TOKEN' }
+  const field = profile.auth === 'api-token' ? 'token' : profile.auth === 'ticket' ? 'ticket' : 'password'
+  const reference = profile[field] ?? { env: `PROXMOX_AXI_${field.toUpperCase()}` }
   const tokenSource = 'env' in reference ? `env:${reference.env}` : `file:${reference.file}`
-  const token = 'env' in reference ? env[reference.env] : (await readPrivateFile(reference.file, true, selection.verifyAcl)).replace(/^\uFEFF/, '').trimEnd()
-  if (!token) throw new Failure('AUTH_REQUIRED', 'The selected token reference has no value.', 'Supply the secret through the selected environment or protected-file reference.')
-  if (/[^\x21-\x7e]/.test(token)) throw invalid()
+  const token = await resolveSecret(reference, selection.verifyAcl)
+  if (profile.auth !== 'password' && /[^\x21-\x7e]/.test(token)) throw invalid()
+  const csrf = profile.auth === 'ticket' ? await resolveSecret(profile.csrfPreventionToken ?? { env: 'PROXMOX_AXI_CSRF_PREVENTION_TOKEN' }, selection.verifyAcl) : undefined
+  if (csrf && /[^\x21-\x7e]/.test(csrf)) throw invalid()
+  const otp = profile.otp ? await resolveSecret(profile.otp, selection.verifyAcl) : undefined
+  const results = new PrivateResults()
+  for (const secret of [token, csrf, otp]) results.register(secret)
   const ca = profile.caBundle ? await readPrivateFile(profile.caBundle, false, selection.verifyAcl) : undefined
-  return { origin: origin.origin, tokenId: profile.tokenId, token, writeOperations: profile.writes?.operations ?? [], ...(ca ? { ca } : {}),
+  return { auth: profile.auth, origin: origin.origin, tokenId: (profile.auth === 'api-token' ? profile.tokenId : profile.userId)!, token,
+    ...(csrf ? { csrf } : {}), ...(otp ? { otp } : {}), results,
+    writeOperations: profile.writes?.operations ?? [], ...(ca ? { ca } : {}),
     ...(profile.certificatePin ? { certificatePin: profile.certificatePin } : {}),
     diagnostics: { profile: name, source, tokenSource } }
 }

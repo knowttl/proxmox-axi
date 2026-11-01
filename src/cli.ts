@@ -12,8 +12,9 @@ import { presentRead } from './presentation.js'
 import { writeOperation } from './writes.js'
 import { journalOperation, taskOperation } from './tasks.js'
 import operations from './operations.json' with { type: 'json' }
+import { authOperation, useSession } from './auth.js'
 
-const flags = ['--config', '--profile', '--format', '--catalogue', '--body-file', '--limit', '--fields', '--full', '--help', '--preview', '--confirm', '--wait-ms', '--journal']
+const flags = ['--config', '--profile', '--format', '--catalogue', '--body-file', '--limit', '--fields', '--full', '--help', '--preview', '--confirm', '--wait-ms', '--journal', '--session']
 const help = {
   purpose: operations[0]!.help,
   usage: 'proxmox-axi get /version [--config <absolute-path>] [--profile <name>] [--format toon|json]',
@@ -26,14 +27,38 @@ const help = {
 }
 
 export async function main(args: string[]): Promise<void> {
+  if (args.length === 2 && args[0] === 'auth' && args[1] === 'session') {
+    // The caller explicitly owns this bounded process and its stdin command stream.
+    let pending = Buffer.alloc(0)
+    let count = 0
+    const timer = setTimeout(() => process.stdin.destroy(new Error('Session expired')), 300_000)
+    try {
+      for await (const chunk of process.stdin) {
+        pending = Buffer.concat([pending, Buffer.from(chunk)])
+        if (pending.length > 65536) throw new Error('Command limit')
+        let newline: number
+        while ((newline = pending.indexOf(10)) >= 0) {
+          const line = pending.subarray(0, newline).toString('utf8')
+          pending = pending.subarray(newline + 1)
+          const command: unknown = JSON.parse(line)
+          if (++count > 256 || !Array.isArray(command) || !command.every(item => typeof item === 'string') || command[0] === 'auth' && command[1] === 'session') throw new Error('Invalid command')
+          process.exitCode = 0
+          await main(command)
+        }
+      }
+      if (pending.length) throw new Error('Incomplete command')
+    } catch {
+      console.log(encode({ error: { code: 'AUTH_SESSION_INVALID', message: 'Caller-managed session input failed or expired.' } }))
+      process.exitCode = 1
+    } finally { clearTimeout(timer) }
+    return
+  }
   let format = 'toon'
   let credentials: Credentials | undefined
-  const output = (value: Record<string, unknown>) => {
+  const output = (value: Record<string, unknown>, generated = false) => {
     let text = format === 'json' ? JSON.stringify(value) : encode(value)
     if (credentials) {
-      for (const secret of [credentials.token, encodeURIComponent(credentials.token), JSON.stringify(credentials.token).slice(1, -1)]) {
-        text = text.replaceAll(secret, '[REDACTED]')
-      }
+      if (!generated) text = credentials.results.redact(text)
     }
     if (Buffer.byteLength(text) > 65536) {
       process.exitCode = 1
@@ -91,6 +116,14 @@ export async function main(args: string[]): Promise<void> {
     }
     if (task) positional.splice(0, 2, task === 'cancel' ? 'delete' : 'get', `/nodes/{node}/tasks/{upid}${task === 'cancel' ? '' : task === 'log' ? '/log' : '/status'}`)
     const command = positional.join(' ')
+    const authAction = positional.length === 2 && positional[0] === 'auth' && ['acquire', 'continue', 'cancel'].includes(positional[1]!) ? positional[1] : undefined
+    if (authAction && options.help) {
+      output({ usage: 'proxmox-axi auth acquire|continue|cancel [--session <id>] [--body-file <protected-refs.json>]',
+        flags: ['--config <path>', '--profile <name>', '--format toon|json', '--session <id>', '--body-file <absolute-path|->'],
+        examples: ['proxmox-axi auth acquire --profile user', 'proxmox-axi auth session (bounded newline-separated JSON argv arrays on stdin)'],
+        privateResults: 'PROXMOX_AXI_RESULT_FD must name an inherited pipe; version 1 length-prefixed JSON frames.' })
+      return
+    }
     const limit = Number(options['--limit'] ?? 100)
     if (!Number.isSafeInteger(limit) || limit < 1 || limit > 1000) throw usage('Display limit must be an integer from 1 to 1000.')
     const fields = options['--fields']?.split(',')
@@ -154,11 +187,12 @@ export async function main(args: string[]): Promise<void> {
     }
     const isLocal = ['', 'home', 'auth status', 'doctor'].includes(command)
     if (isLocal && Object.keys(options).some(key => !['--config', '--profile', '--format'].includes(key))) throw usage('Valid local flags: --config, --profile, --format, --help.')
-    const contract = ['', 'home', 'doctor'].includes(command) ? selectContract('GET', '/version', release) :
+    const contract = authAction ? undefined : ['', 'home', 'doctor'].includes(command) ? selectContract('GET', '/version', release) :
       isLocal ? undefined : positional.length === 2 ? selectContract(positional[0]!, positional[1]!, release) : undefined
-    if (!isLocal && !contract) throw usage('Select a command from inventory.')
+    if (!isLocal && !contract && !authAction) throw usage('Select a command from inventory.')
     if (contract && ['write', 'batch'].includes(contract.policy.effect) && Object.keys(options).some(key =>
-      !['--config', '--profile', '--format', '--catalogue', '--body-file', '--preview', '--confirm'].includes(key) && !key.startsWith('--api-'))) throw usage('Writes accept credential selectors, API inputs, --preview and --confirm only.')
+      !['--config', '--profile', '--format', '--catalogue', '--body-file', '--preview', '--confirm', '--session'].includes(key) && !key.startsWith('--api-'))) throw usage('Writes accept credential selectors, API inputs, --preview and --confirm only.')
+    if (authAction && Object.keys(options).some(key => !['--config', '--profile', '--format', '--session', '--body-file'].includes(key))) throw usage('Invalid authentication option.')
     if (task && task !== 'cancel' && Object.keys(options).some(key =>
       !['--config', '--profile', '--format', '--body-file', '--journal', ...(task === 'wait' ? ['--wait-ms'] : [])].includes(key) && !key.startsWith('--api-'))) throw usage('Task reads accept API inputs and --journal; task wait also accepts --wait-ms.')
     if (contract?.policy.effect === 'read' && (options['--preview'] || options['--confirm'])) throw usage('Preview and confirmation apply to reviewed writes only.')
@@ -207,12 +241,22 @@ export async function main(args: string[]): Promise<void> {
     credentials = await resolveCredentials({ ...(options['--config'] ? { config: options['--config'] } : {}),
       verifyAcl: command === 'auth status' || command === 'doctor',
       ...(options['--profile'] ? { profile: options['--profile'] } : {}) })
+    if (authAction) {
+      output(await authOperation(credentials, authAction, values, options['--session']), true)
+      return
+    }
+    if (options['--session']) credentials = useSession(credentials, options['--session'])
+    else if (credentials.auth === 'password' && command !== 'auth status') {
+      const acquired = await authOperation(credentials, 'acquire', {})
+      if (acquired.status !== 'ready' || !('session' in acquired)) throw new Failure('AUTH_CHALLENGE', 'Authentication requires caller continuation.', 'Use auth acquire and auth continue in an explicit caller-managed session.')
+      credentials = useSession(credentials, acquired.session)
+    }
     if (task && task !== 'cancel') {
       const waitMs = Number(options['--wait-ms'] ?? 5000)
       if (!Number.isSafeInteger(waitMs) || waitMs < 1 || waitMs > 30000) throw usage('Task wait must be 1-30000 ms.')
       output(redact(await taskOperation(credentials, task, values, waitMs, options['--journal']), [credentials.token]) as Record<string, unknown>)
     } else if (contract && ['write', 'batch'].includes(contract.policy.effect)) {
-      output(await writeOperation(credentials, contract, values, { preview: !!options['--preview'], ...(options['--confirm'] ? { confirmation: options['--confirm'] } : {}) }))
+      output(await writeOperation(credentials, contract, values, { preview: !!options['--preview'], ...(options['--confirm'] ? { confirmation: options['--confirm'] } : {}) }), true)
     } else if (command === 'auth status') {
       output({ credential: { ...credentials.diagnostics, origin: credentials.origin, tokenId: credentials.tokenId } })
     } else if (command === 'doctor') {
@@ -229,7 +273,7 @@ export async function main(args: string[]): Promise<void> {
     }
   } catch (error) {
     const failure = error instanceof Failure ? error : new Failure('CONFIG_INVALID', 'Unable to read the selected configuration.', 'Check the selected configuration and protected file paths.')
-    output({ error: { code: failure.code, message: failure.message }, help: [failure.next] })
+    output({ error: { code: failure.code, message: failure.message }, help: [failure.next] }, true)
     process.exitCode = failure.exitCode
   }
 }

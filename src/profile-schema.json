@@ -1,18 +1,28 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "title": "Proxmox AXI API token profile",
+  "title": "Proxmox AXI authentication profile",
   "type": "object",
   "additionalProperties": false,
-  "required": ["auth", "origin", "tokenId"],
+  "required": ["auth", "origin"],
+  "oneOf": [
+    { "properties": { "auth": { "const": "api-token" } }, "required": ["tokenId"], "not": { "anyOf": [{ "required": ["userId"] }, { "required": ["ticket"] }, { "required": ["csrfPreventionToken"] }, { "required": ["password"] }, { "required": ["otp"] }] } },
+    { "properties": { "auth": { "const": "ticket" } }, "required": ["userId"], "not": { "anyOf": [{ "required": ["tokenId"] }, { "required": ["token"] }, { "required": ["password"] }, { "required": ["otp"] }] } },
+    { "properties": { "auth": { "const": "password" } }, "required": ["userId"], "not": { "anyOf": [{ "required": ["tokenId"] }, { "required": ["token"] }, { "required": ["ticket"] }, { "required": ["csrfPreventionToken"] }] } }
+  ],
   "properties": {
     "writes": { "type": "object", "additionalProperties": false, "required": ["operations"],
       "properties": { "operations": { "type": "array", "uniqueItems": true, "maxItems": 681,
         "items": { "type": "string", "pattern": "^OP-(GET|POST|PUT|DELETE)-[A-Za-z0-9-]+$" } } } },
-    "auth": { "const": "api-token" },
+    "auth": { "enum": ["api-token", "ticket", "password"] },
     "origin": { "type": "string", "pattern": "^https://[^/?#@]+$" },
     "tokenId": { "type": "string", "maxLength": 256, "pattern": "^[^\\s:/@!=]+@[A-Za-z][A-Za-z0-9._-]*![A-Za-z][A-Za-z0-9._-]*$",
       "allOf": [{ "pattern": "^[\\x21-\\x7e]+$" }] },
     "token": { "$ref": "#/$defs/secretRef", "x-secret": true },
+    "userId": { "type": "string", "maxLength": 64, "pattern": "^[^\\s:/@!=]+@[A-Za-z][A-Za-z0-9._-]*$" },
+    "ticket": { "$ref": "#/$defs/secretRef", "x-secret": true },
+    "csrfPreventionToken": { "$ref": "#/$defs/secretRef", "x-secret": true },
+    "password": { "$ref": "#/$defs/secretRef", "x-secret": true },
+    "otp": { "$ref": "#/$defs/secretRef", "x-secret": true },
     "caBundle": { "type": "string", "minLength": 1 },
     "certificatePin": {
       "type": "object", "additionalProperties": false,
