@@ -68,7 +68,7 @@ export function validateValue(value: unknown, schema: VendorSchema): void {
     if (typeof value !== 'string' || (pem ? /[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]/ : /[\x00-\x1f\x7f]/).test(value)) throw invalid()
     if ((schema.minLength !== undefined && value.length < schema.minLength) || (schema.maxLength !== undefined && value.length > schema.maxLength)) throw invalid()
     if (schema.pattern) {
-      // Perl's scoped modifiers are not ECMAScript. Keep the original and refuse use.
+      // Perl syntax requires a reviewed translation when ECMAScript cannot represent it directly.
       const translated = (constraints.patterns as Record<string, string>)[schema.pattern] ?? schema.pattern
       if (constraints.unsupportedPatternMarkers.some(marker => translated.includes(marker))) throw unsupported()
       let pattern: RegExp

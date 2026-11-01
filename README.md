@@ -44,7 +44,7 @@ An interrupted HTTPS response returns `CONNECTION_FAILED`; the total deadline an
 API token profiles use `auth: "api-token"`, an HTTPS `origin`, a full `tokenId` and an optional token SecretRef.
 The shipped `axi-credential.schema.json` rejects unknown fields and inline secrets.
 The default environment profile reads `PROXMOX_AXI_ORIGIN`, `PROXMOX_AXI_TOKEN_ID` and `PROXMOX_AXI_TOKEN`.
-`PROXMOX_AXI_AUTH` selects `api-token`, `ticket` or `password`; each branch requires its own identity and secret fields without mixing sources.
+`PROXMOX_AXI_AUTH` selects `api-token`, `ticket` or `password`; see the [S4 contract](docs/s4-contract.md) for branch-specific fields and explicit session acquisition.
 `PROXMOX_AXI_CA_BUNDLE` names an absolute trusted PEM file.
 Token values never arrive through command arguments.
 
@@ -141,7 +141,8 @@ proxmox-axi journal reconcile '<intent-id>' --profile lab
 
 Preview may perform bounded version reads but sends no business mutation.
 Confirmations expire after five minutes and bind origin, identity, caller, selected contract, policy, target, complete ordered inputs, trust and secret-source revisions.
-Sensitive configuration inputs require env/file SecretRefs in a body file; literal secret arguments are refused.
+Sensitive operation inputs require env/file SecretRefs in a body file; literal secret arguments are refused.
+The [S4 contract](docs/s4-contract.md) defines protected results and hosted protected-input delivery.
 An execute batch resolves every ordered node-relative child to its reviewed operation and schema before any wrapper transmission.
 Every child requires tool and host permission, including nested batches.
 Limits are 64 total operations, four nesting levels and 32768 bytes per commands string.
