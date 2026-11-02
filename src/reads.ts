@@ -8,7 +8,7 @@ export function capability(version: string) {
   return { version, catalogue: major === 8 ? 'legacy-8.2.7' : 'published-current',
     status: major === 9 && /^9\.2(?:\.|$)/.test(version) ? 'supported' : 'unverified',
     evidence: major === 8 ? 'legacy regression fixtures' : major === 9 ? 'published schema; live commissioning pending' : 'unknown major; known reads only',
-    writes: 'disabled' }
+    writeVerification: 'unverified' }
 }
 
 const inventoryRoutes = new Set(['/nodes', '/cluster/resources', '/nodes/{node}/qemu', '/nodes/{node}/lxc', '/nodes/{node}/storage', '/nodes/{node}/tasks'])
@@ -20,7 +20,13 @@ function inventoryVisibility(path: string, permissions: unknown): string {
   return root && required.every(privilege => root[privilege] === 1 || root[privilege] === true) ? 'complete' : 'permission-filtered'
 }
 
-export async function readOperation(credentials: Credentials, initial: Contract, values: Record<string, unknown>, explicitCatalogue?: string) {
+export function validateFields(contract: Contract, fields?: string[]): void {
+  const known = Object.keys(contract.returns.items?.properties ?? contract.returns.properties ?? {})
+  const unknown = fields?.filter(field => !known.includes(field)) ?? []
+  if (unknown.length) throw new Failure('INVALID_INPUT', `Unknown fields: ${unknown.join(', ')}.`, `Available fields: ${known.join(', ')}.`, 2)
+}
+
+export async function readOperation(credentials: Credentials, initial: Contract, values: Record<string, unknown>, explicitCatalogue?: string, fields?: string[]) {
   if (initial.policy.transport !== 'json') throw new Failure('INVALID_INPUT', 'This operation requires managed transport.', 'Use proxmox-axi transfer --help.', 2)
   if (initial.policy.effect !== 'read') throw new Failure('WRITE_DISABLED', 'Operation requires the write execution policy.', 'Use create, set or delete with a preview and exact confirmation.')
   // Validate before any version or permission request.
@@ -37,6 +43,7 @@ export async function readOperation(credentials: Credentials, initial: Contract,
     selected = found
   }
   if (!selected.callable) throw new Failure('CAPABILITY_UNSUPPORTED', 'Operation is not admitted for this target.', `Inspect proxmox-axi schema ${selected.method.toLowerCase()} ${selected.path}`)
+  validateFields(selected, fields)
   let visibility: string | undefined
   if (inventoryRoutes.has(selected.path)) {
     visibility = 'unknown'
@@ -62,7 +69,8 @@ export async function doctor(credentials: Credentials, node?: string) {
   let release = 'published-current'
   const run = async (path: string, values: Record<string, unknown> = {}) => {
     const result = await readOperation(credentials, selectContract('GET', path, release), values, release)
-    checks.push({ path, ...result, data: credentials.results.sanitize(result.data),
+    const { data, ...metadata } = result
+    checks.push({ path, ...metadata, ...(path === '/access/permissions' ? {} : { data: credentials.results.sanitize(data) }),
       ...(result.compatibility ? { compatibility: { ...result.compatibility, version: credentials.results.redact(result.compatibility.version) } } : {}) })
     return result.data
   }

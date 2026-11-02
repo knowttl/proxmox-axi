@@ -6,5 +6,5 @@
     "outDir": ".test-build",
     "allowImportingTsExtensions": false
   },
-  "include": ["test/*.ts", "scripts/auth-clock.ts"]
+  "include": ["test/*.ts", "scripts/auth-clock.ts", "scripts/journal-lock-crash.ts"]
 }

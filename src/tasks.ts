@@ -4,7 +4,7 @@ import { buildPath, selectContract, validateResponse } from './contract.js'
 import { executeRead } from './transport.js'
 import { Failure } from './errors.js'
 import { journalOwner, openJournal, taskCommand } from './writes.js'
-import { publicChildren, type JournalRecord } from './journal.js'
+import { publicChildren, reconciliationValue, type JournalRecord } from './journal.js'
 
 type TaskStatus = 'running' | 'success' | 'failed'
 
@@ -37,7 +37,7 @@ export async function taskOperation(credentials: Credentials, command: string, v
       throw error
     }
     validateResponse(data, contract.returns)
-    if (command === 'log') return { upid, data: credentials.results.sanitize(data) }
+    if (command === 'log') return { upid, data: credentials.results.sanitize((data as { n: number, t: string }[]).map(({ n, t }) => ({ n, t }))) }
     status = outcome(data, node, upid)
     if (record && journal) {
       await journal.update(record.id, current => {
@@ -52,7 +52,8 @@ export async function taskOperation(credentials: Credentials, command: string, v
     await setTimeout(Math.min(250, Math.max(0, deadline - performance.now())))
   } while (performance.now() < deadline)
   if (status === 'failed') process.exitCode = 1
-  return { upid, status, data: credentials.results.sanitize(data), ...(command === 'wait' && status === 'running' ? { wait: 'deadline-reached' } : {}),
+  const { status: processState, ...details } = data as Record<string, unknown>
+  return { upid, status, data: credentials.results.sanitize({ processState, ...details }), ...(command === 'wait' && status === 'running' ? { wait: 'deadline-reached' } : {}),
     help: status === 'running' ? [taskCommand('status')] : [] }
 }
 
@@ -156,7 +157,7 @@ async function observeCheck(credentials: Credentials, check: NonNullable<Journal
   const matched = !!data && typeof data === 'object' && Object.entries(check.expected).every(([name, digest]) => {
     if (!Object.hasOwn(data, name)) return false
     const value = (data as Record<string, unknown>)[name]
-    const normalized = check.booleans?.includes(name) && (value === 0 || value === 1) ? value === 1 : value
+    const normalized = check.booleans?.includes(name) && (value === 0 || value === 1) ? value === 1 : reconciliationValue(name, value)
     return journal.fingerprint(normalized) === digest
   })
   return { at: Date.now(), desiredStateObserved: matched,

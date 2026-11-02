@@ -106,6 +106,7 @@ proxmox-axi duplex create <setup-template> [--api-<parameter> <value>] --preview
 ```
 
 Common flags are `--config <absolute-path>`, `--profile <name>`, `--session <id>` and `--format toon|json`.
+Offline `inventory` and `schema` accept `--config` without loading credentials.
 
 ```sh
 proxmox-axi inventory --catalogue legacy-8.2.7 --format json
@@ -122,6 +123,7 @@ Notes:
 - `--body-file /absolute/file.json` or `--body-file -` supplies one JSON parameter object, bounded to 64 KiB and five seconds.
 - Duplicate API parameters, unknown flags and unknown routes fail before credential resolution or network access.
 - `doctor` verifies file protection and checks the entry version, permissions and node inventory.
+  The permission map appears once in the top-level `permissions` field; its check entry contains metadata only.
   It then checks the first returned node's version, VMs, containers, stores, tasks and one task status when available, in at most nine bounded reads.
 - `auth status` reports the selected credential sources without secret values and sends no request.
 - `profile list` lists profile names without resolving secrets.
@@ -130,6 +132,8 @@ Notes:
 
 Ordinary JSON reads other than `/version` detect the entry version and, for node-specific routes, the selected node version before choosing a catalogue.
 For ordinary JSON reads, an explicit `--catalogue` selects a replay contract without version detection, and inventory visibility remains unknown.
+Version reads still report compatibility for the returned server version, so their `compatibility.catalogue` can differ from the explicit replay contract.
+`compatibility.writeVerification` describes release verification evidence; operation authorization comes from the profile and host policies.
 Managed read transfers always detect the selected node version and choose its contract, even when `--catalogue` is supplied.
 Writes require a detected major of 8 or 9 and select the corresponding contract, including when an explicit catalogue was supplied.
 Automatic inventory reads check effective root audit permissions and report `complete` or `permission-filtered` visibility.
@@ -177,11 +181,16 @@ Any failed child makes the batch fail, with partial outcomes retained and no ass
   Records hold request fingerprints and safe metadata, never credentials or input values.
 - Journal failure prevents transmission.
 - An accepted UPID means the action is pending, and matching task status distinguishes running, success and failure.
+  `task status` and `task wait` label the vendor's running/stopped state as `data.processState`, separately from the action outcome in `status`.
 - `task log` returns numbered lines without storing them in the journal.
+  Its table columns are always `n` (line number), then `t` (text).
 - `task wait` has a 1-30000 ms elapsed budget, defaulting to 5000 ms.
 - `task cancel` requires its own preview and exact confirmation, using the same operation permission as deleting the task route.
 - Lost responses and crashes remain uncertain, with no automatic mutation retry.
+  HTTP 400, 401 and 403 refusals mark the intent failed and include bounded, sanitized parameter or permission hints when recognized.
+  A refused batch wrapper leaves all its descendants `not-sent`, including nested batches.
 - `journal reconcile` can observe reviewed direct configuration or status fields, or inspect retained UPIDs.
+  Description comparisons ignore trailing whitespace in both the requested and observed values.
   Observation does not attribute an uncertain mutation, and missing or filtered data never proves failure.
   Variants without a safe reconciliation read say so explicitly.
 
@@ -240,6 +249,8 @@ No insecure-TLS flag or automatic trust update exists.
 - TOON is the default, and `--format json` preserves the same structured result.
 - Lists default to 100 compact rows.
   `--limit <1-1000>` changes the display limit, `--fields` chooses fields, and `--full` includes all received rows and, unless `--fields` is supplied, all received fields.
+  Unknown `--fields` names return `INVALID_INPUT` with available names from the selected response contract.
+  Except for `/version`, automatic reads validate field names after target catalogue detection; an explicit `--catalogue` validates them before network access.
 - Provider totals and pagination remain separate from received counts and display truncation.
 - Rendered output has a 65536-byte cap, including `--full`.
 - Exit code 0 is success, 1 is a failed command and 2 is an unknown command.

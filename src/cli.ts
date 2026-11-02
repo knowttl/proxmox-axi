@@ -6,7 +6,7 @@ import { isAbsolute } from 'node:path'
 import { configurationPath, listProfiles, resolveCredentials, type Credentials } from './credentials.js'
 import { buildPath, contracts, parseParameter, selectContract } from './contract.js'
 import { Failure } from './errors.js'
-import { readOperation, doctor } from './reads.js'
+import { readOperation, doctor, validateFields } from './reads.js'
 import { presentRead } from './presentation.js'
 import { writeOperation } from './writes.js'
 import { journalOperation, taskOperation } from './tasks.js'
@@ -164,7 +164,7 @@ export async function main(args: string[]): Promise<void> {
         'auth status': 'auth status [--config <absolute-path>] [--profile <name>] [--session <id>] [--format toon|json]',
       }
       const key = positional[0] === 'schema' ? 'schema' : command
-      const names = ['--format', '--help', ...(['inventory', 'schema'].includes(key) ? ['--catalogue'] :
+      const names = ['--format', '--help', ...(['inventory', 'schema'].includes(key) ? ['--catalogue', '--config'] :
         ['doctor', 'auth status'].includes(key) ? ['--config', '--profile', '--session'] : ['--config'])]
       if (Object.keys(options).some(option => option !== 'help' && !names.includes(option))) throw usage(`Valid flags: ${names.join(', ')}.`)
       output({ purpose: key === 'doctor' ? 'Check private-file protection and perform one bounded version read.' : `Inspect ${key}.`,
@@ -183,7 +183,7 @@ export async function main(args: string[]): Promise<void> {
     }
     const release = options['--catalogue'] ?? (transferring || duplex ? 'published-current' : 'legacy-8.2.7')
     if (command === 'inventory') {
-      if (Object.keys(options).some(key => !['--format', '--catalogue', '--full', '--limit'].includes(key))) throw usage('Invalid inventory option.')
+      if (Object.keys(options).some(key => !['--format', '--catalogue', '--full', '--limit', '--config'].includes(key))) throw usage('Invalid inventory option.')
       const selected = contracts.filter(contract => contract.release === release)
       if (!selected.length) throw usage('Unknown catalogue.')
       output({ release, count: selected.length, operations: selected.slice(0, options['--full'] ? selected.length : limit).map(({ method, path, callable }) => ({ method, path, callable })),
@@ -191,7 +191,7 @@ export async function main(args: string[]): Promise<void> {
       return
     }
     if (positional[0] === 'schema' && positional.length === 3) {
-      if (Object.keys(options).some(key => !['--format', '--catalogue'].includes(key))) throw usage('Invalid schema option.')
+      if (Object.keys(options).some(key => !['--format', '--catalogue', '--config'].includes(key))) throw usage('Invalid schema option.')
       const contract = selectContract(positional[1]!, positional[2]!, release)
       output({ id: contract.id, release, method: contract.method, path: contract.path, callable: contract.callable,
         policy: contract.policy, invocation: contract.invocation, parameters: contract.parameters, returns: contract.returns })
@@ -216,6 +216,7 @@ export async function main(args: string[]): Promise<void> {
     const contract = authAction ? undefined : ['', 'home', 'doctor'].includes(command) ? selectContract('GET', '/version', release) :
       isLocal ? undefined : positional.length === 2 ? selectContract(positional[0]!, positional[1]!, release) : undefined
     if (!isLocal && !contract && !authAction) throw usage('Select a command from inventory.')
+    if (fields && contract && (options['--catalogue'] || contract.path === '/version')) validateFields(contract, fields)
     if (contract?.policy.transport === 'managed' && !transferring) throw usage('This operation requires transfer and a private byte channel.')
     if (contract && ['write', 'batch'].includes(contract.policy.effect) && Object.keys(options).some(key =>
       !['--config', '--profile', '--format', '--catalogue', '--body-file', '--preview', '--confirm', '--session', ...(transferring ? ['--response-format', '--input-file', '--raw', '--expected-bytes', '--expected-sha256'] : [])].includes(key) && !key.startsWith('--api-'))) throw usage('Writes accept credential selectors, API inputs, --preview and --confirm only.')
@@ -314,7 +315,7 @@ export async function main(args: string[]): Promise<void> {
       output(await doctor(credentials))
     } else {
       const selected = contract ?? selectContract('GET', '/version', release)
-      const result = await readOperation(credentials, selected, values, options['--catalogue'])
+      const result = await readOperation(credentials, selected, values, options['--catalogue'], fields)
       const nextOptions = ['--config', '--profile', '--catalogue'].filter(key => options[key]).map(key => `${key} ${JSON.stringify(options[key])}`).join(' ')
       const next = `proxmox-axi schema get ${selected.path} ${nextOptions}`.trim()
       const safeData = presentRead({ ...result, data: credentials.results.sanitize(result.data),

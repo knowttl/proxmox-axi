@@ -31,6 +31,14 @@ test('unknown route has no invocation contract', () => {
   assert.throws(() => selectContract('GET', '/unknown-new-route', 'published-current'), { code: 'INVALID_INPUT' })
 })
 
+for (const args of [['inventory'], ['schema', 'get', '/version']]) {
+  test(`D7 ${args[0]} accepts the common config flag without loading credentials`, () => {
+    const result = spawnSync(process.execPath, ['bin/proxmox-axi.mjs', ...args, '--config', '/synthetic-unused-config.json', '--format', 'json'], { encoding: 'utf8' })
+    assert.equal(result.status, 0, result.stdout + result.stderr)
+    assert.equal(JSON.parse(result.stdout).release, 'legacy-8.2.7')
+  })
+}
+
 for (const release of ['legacy-8.2.7', 'published-current']) {
   test(`provider-side download remains discoverable but refused in ${release}`, () => {
     const path = '/nodes/{node}/storage/{storage}/download-url'

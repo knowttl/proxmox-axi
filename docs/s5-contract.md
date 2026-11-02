@@ -1,7 +1,7 @@
 # Managed transfers and duplex sessions
 
 `transfer get|create <template>` selects an operation-specific byte transport.
-`--response-format` selects the API formatter independently of `--format toon|json`, which controls public metadata.
+`--response-format` selects the operation's transfer representation independently of `--format toon|json`, which controls public metadata.
 Use `transfer --help` and the selected operation's schema to inspect parameters.
 
 | Operation | Response format | Handling |
@@ -10,8 +10,11 @@ Use `transfer --help` and the selected operation's schema to inspect parameters.
 | Guest/node SPICE setup | `spiceconfig` | Exact private configuration bytes |
 | Storage upload | `multipart` | Streamed file with source SHA-256 bound into confirmation |
 | Backup file restore download | `download` | Exact bytes through the private channel |
-| Task log with `download=true` and no `start`/`limit`, and journal | `text` | Text with optional gzip decoding |
+| Task log with `--api-download true` and no `--api-start`/`--api-limit`, and journal | `text` | Text with optional gzip decoding |
 | QEMU guest-agent file read | `guest-file` | Managed content export with explicit representation and truncation |
+
+The `text` representation uses the `/api2/json/` route for task-log downloads and journal reads.
+HTTP 501 includes a hint to check formatter support for the selected operation and server release.
 
 `PROXMOX_AXI_STREAM_FD` must identify an inherited pipe or socket distinct from stdout, stderr and the private result channel.
 Ordinary output contains byte counts, SHA-256, selected limits and completion state.
@@ -46,6 +49,7 @@ Use the same arguments with `--preview`, then execute with the returned `--confi
 When the setup schema supports a `websocket` flag, duplex execution selects `true`.
 Before requesting setup, callers must provide both the byte channel and the existing S4 private result pipe through `PROXMOX_AXI_RESULT_FD`.
 The private result frame provides the ticket, user/password and other setup fields needed by the caller's inner protocol.
+Console, shell and migration setup responses accept decimal-digit string ports and normalize them to integers before validation and private delivery, including ordinary creates and recursive batch children.
 The tool connects only to the selected HTTPS origin and the corresponding reviewed node/guest WebSocket route.
 Returned console ports must be in 5900-5999; the opaque migration socket is taken only from that authenticated setup and returned to its matching node/guest route with the bound ticket.
 There is no arbitrary TCP forwarding or reconnection using a consumed confirmation.
@@ -57,6 +61,7 @@ Frames are limited to 1 MiB and each direction to `PROXMOX_AXI_DUPLEX_BYTES` (de
 Connection establishment has a five-second bound.
 Input EOF requests a normal WebSocket close while retaining the output half until final peer frames arrive.
 Cancellation, quota failures, abnormal close and interrupted setup retain an uncertain write outcome and close the provider connection.
+Setup failures include the sanitized underlying error code, cause and next-step hint.
 No automatic retry occurs.
 
 The Artium extension provides authenticated managed streaming outside the ordinary base64 run input.
