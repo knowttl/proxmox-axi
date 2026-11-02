@@ -71,8 +71,11 @@ export async function exerciseStreamJourney(options: Journey) {
     }
     if (/\/(vncproxy|termproxy|vncshell|mtunnel)$/.test(url.pathname)) {
       for await (const _chunk of request) { /* Consume the independently validated setup body. */ }
-      response.end(JSON.stringify({ data: url.pathname.endsWith('/mtunnel') ? { ticket: privateTicket, socket: '/run/pve/migrate-test.sock', upid } :
-        { ...session, port: mode === 'wrong-target' ? 22 : mode === 'malformed-port' ? '5900junk' : mode === 'legacy' ? session.port : 5900 } })); return
+      const { cert, ...terminal } = session
+      const data = url.pathname.endsWith('/mtunnel') ? { ticket: privateTicket, socket: '/run/pve/migrate-test.sock', upid } :
+        { ...terminal, ...(!url.pathname.endsWith('/termproxy') ? { cert } : {}),
+          port: mode === 'wrong-target' ? 22 : mode === 'malformed-port' ? '5900junk' : mode === 'legacy' ? session.port : 5900 }
+      response.end(JSON.stringify({ data })); return
     }
     if (url.pathname.endsWith('/file-read')) {
       const decoded = url.searchParams.get('decode') !== '0'
@@ -195,6 +198,7 @@ export async function exerciseStreamJourney(options: Journey) {
       assert.equal(frame.readUInt32BE(0), frame.length - 4)
       const payload = JSON.parse(frame.subarray(4).toString()).payload
       assert.ok(payload.ticket === privateTicket, 'Inner-protocol setup is available only through the private result pipe')
+      if (args[2]!.endsWith('/termproxy')) assert.deepEqual(Object.keys(payload).sort(), ['port', 'ticket', 'upid', 'user'], '#26 terminal setup matches the node, QEMU and LXC return schemas')
       if (!args[2]!.endsWith('/mtunnel')) assert.equal(payload.port, 5900, 'Decimal setup ports are delivered as integers')
     }
     options.transcripts.push(`case: ${active}\nexit: ${code}\nstdout:\n${text}`)
@@ -280,8 +284,8 @@ export async function exerciseStreamJourney(options: Journey) {
     const maximum = await run('guest-16777216-bytes', [...guest, '--api-decode', 'true'], 0)
     assert.equal(maximum.bytes.length, 16777216)
     assert.equal(hash(maximum.bytes), hash(Buffer.alloc(16777216, 0x61)))
-    const memory = maximum.output.transfer as { peakRssBytes: number, limits: { peakRssBytes: number } }
-    assert.ok(memory.peakRssBytes <= memory.limits.peakRssBytes, 'Guest transfer remains within its declared constant memory budget')
+    const memory = maximum.output.transfer as { peakRssBytes: number }
+    assert.ok(memory.peakRssBytes <= 384 * 1024 ** 2, 'Guest transfer remains within the documented 384 MiB acceptance budget')
     mode = 'binary-guest'
     const binary = await run('guest-arbitrary-bytes', [...guest, '--api-decode', 'false', '--raw'], 0)
     assert.equal(hash(binary.bytes), hash(image))
