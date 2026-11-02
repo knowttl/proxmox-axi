@@ -2,6 +2,7 @@
   "name": "@knowttl/proxmox-axi",
   "version": "0.1.1",
   "description": "AXI client for Proxmox VE",
+  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/knowttl/proxmox-axi.git"
@@ -24,7 +25,8 @@
     "catalogue-diff.json",
     "artium-invocations.json",
     "help.json",
-    "README.md"
+    "README.md",
+    "LICENSE"
   ],
   "engines": {
     "node": ">=24.11.0"
