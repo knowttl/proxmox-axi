@@ -113,6 +113,16 @@ export async function exerciseStreamJourney(options: Journey) {
     assert.equal(url.searchParams.get(url.pathname.endsWith('/mtunnelwebsocket') ? 'socket' : 'port'), url.pathname.endsWith('/mtunnelwebsocket') ? '/run/pve/migrate-test.sock' : '5900')
     const accept = createHash('sha1').update(String(request.headers['sec-websocket-key']) + '258EAFA5-E914-47DA-95CA-C5AB0DC85B11').digest('base64')
     socket.write(`HTTP/1.1 101 Switching Protocols\r\nUpgrade: websocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: ${accept}\r\nSec-WebSocket-Protocol: binary\r\n\r\n`)
+    if (mode === 'slow-peer' || mode === 'stalled-peer' || mode === 'lifetime-peer') {
+      socket.write(Buffer.from([0x82, 6]))
+      let remaining = 6
+      const progress = setInterval(() => {
+        socket.write(Buffer.from([remaining--]))
+        if (remaining === 0) clearInterval(progress)
+      }, 300)
+      if (mode === 'stalled-peer') clearInterval(progress)
+      socket.once('close', () => clearInterval(progress))
+    }
     let pending = head
     socket.on('data', chunk => {
       if (mode === 'cancel') { cancelCurrent(); return }
@@ -128,6 +138,7 @@ export async function exerciseStreamJourney(options: Journey) {
         for (let index = 0; index < payload.length; index++) payload[index] = payload[index]! ^ mask[index % 4]!
         pending = pending.subarray(offset + 4 + length)
         if (opcode === 8) { socket.end(Buffer.from([0x88, 2, 3, 232])); return }
+        if (mode === 'slow-peer' || mode === 'stalled-peer' || mode === 'lifetime-peer') continue
         assert.equal(opcode, 2)
         // Independent peer fragments one message across a binary and continuation frame.
         socket.write(Buffer.concat([Buffer.from([0x02, 2]), payload.subarray(0, 2), Buffer.from([0x80, payload.length - 2]), payload.subarray(2)]))
@@ -158,9 +169,18 @@ export async function exerciseStreamJourney(options: Journey) {
     const privateFrames: Buffer[] = []
     child.stdio[4]!.on('data', (chunk: Buffer) => privateFrames.push(chunk))
     stream.on('data', chunk => bytes.push(Buffer.from(chunk)))
+    if (mode === 'slow-peer') stream.once('data', () => stream.end())
     stream.on('error', () => {})
     child.stdout!.on('data', chunk => stdout.push(chunk)); child.stderr!.on('data', chunk => stderr.push(chunk))
-    if (input) stream.end(input)
+    if (input && mode === 'slow-caller') {
+      stream.write(input.subarray(0, 4))
+      let offset = 4
+      const progress = setInterval(() => {
+        stream.write(input.subarray(offset, ++offset))
+        if (offset === input.length) { clearInterval(progress); stream.end() }
+      }, 300)
+      child.once('close', () => clearInterval(progress))
+    } else if (input) stream.end(input)
     const code = await new Promise<number | null>((resolve, reject) => { child.once('error', reject); child.once('close', resolve) })
     const text = Buffer.concat(stdout).toString(), errors = Buffer.concat(stderr).toString()
     for (const secret of [privateTicket, spiceSecret]) assert.ok(!text.includes(secret) && !errors.includes(secret), 'Setup secrets stay private')
@@ -285,6 +305,30 @@ export async function exerciseStreamJourney(options: Journey) {
       await run(`${family}-reconnect-denied`, [...args, '--confirm', String(approved.output.confirmation)], 1)
       mode = 'success'
       if (setup !== consolePath && setup !== consolePath.replace('/vncproxy', '/mtunnel')) continue
+      if (!options.hosted && setup === consolePath) {
+        const limits = { PROXMOX_AXI_DUPLEX_IDLE_MS: '1000' }
+        const framed = Buffer.concat([prefix, payload])
+        for (const progressing of ['slow-caller', 'slow-peer']) {
+          const preview = await run(`#25-${progressing}-preview`, [...args, '--preview'], 0, undefined, limits)
+          mode = progressing
+          const result = await run(`#25-${progressing}`, [...args, '--confirm', String(preview.output.confirmation)], 0, progressing === 'slow-caller' ? framed : undefined, limits)
+          assert.equal((result.output.transfer as { status: string }).status, 'complete', '#25 chunk progress keeps a session active')
+          assert.deepEqual(result.bytes, progressing === 'slow-caller' ? framed : Buffer.from([0, 0, 0, 6, 6, 5, 4, 3, 2, 1]), '#25 partial chunks preserve the exact message')
+          mode = 'success'
+        }
+        for (const [bound, extra] of [
+          ['stalled-peer', limits],
+          ['lifetime-peer', { ...limits, PROXMOX_AXI_DUPLEX_MS: '1000' }],
+          ['slow-peer', { ...limits, PROXMOX_AXI_DUPLEX_BYTES: '3' }],
+        ] as const) {
+          const preview = await run(`#25-${bound}-bound-preview`, [...args, '--preview'], 0, undefined, extra)
+          mode = bound
+          const result = await run(`#25-${bound}-bound`, [...args, '--confirm', String(preview.output.confirmation)], 1, undefined, extra)
+          assert.equal((result.output.error as { code: string }).code, 'WRITE_UNCERTAIN', '#25 stalled, lifetime and quota failures remain uncertain')
+          await peerClosed
+          mode = 'success'
+        }
+      }
       const expiring = await run(`${family}-idle-preview`, [...args, '--preview'], 0, undefined, { PROXMOX_AXI_DUPLEX_IDLE_MS: '50' })
       mode = 'idle'
       const expired = await run(`${family}-idle-expired`, [...args, '--confirm', String(expiring.output.confirmation)], 1, undefined, { PROXMOX_AXI_DUPLEX_IDLE_MS: '50' })
