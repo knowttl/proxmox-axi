@@ -1,5 +1,10 @@
 # Protected results and memory authentication
 
+Guest configuration and pending-setting GET operations use this private result contract because their validated payloads can contain credentials.
+They require the inherited pipe before any provider request, return `data: { "privateResult": true }` on stdout, and deliver the complete payload in a private frame.
+Ordinary table display flags do not trim the private payload, and these reads do not create journal records.
+The result binding hashes the selected catalogue and target request path, alongside the existing origin, identity, operation, actor and credential-revision bindings.
+
 Executing a secret-producing operation requires a caller-owned inherited pipe before upstream transmission.
 Write previews may perform bounded version reads without a private sink and never request the protected result.
 `PROXMOX_AXI_RESULT_FD` selects its descriptor, which must be at least 3 and refer to a pipe or socket.

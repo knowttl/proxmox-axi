@@ -1271,12 +1271,16 @@
         "confirm": "value",
         "session": "value",
         "api-cores": "value",
+        "api-cpulimit": "value",
+        "api-cpuunits": "value",
         "api-description": "value",
         "api-digest": "value",
         "api-hostname": "value",
         "api-memory": "value",
         "api-node": "value",
         "api-onboot": "value",
+        "api-startup": "value",
+        "api-swap": "value",
         "api-vmid": "value"
       }
     },
@@ -1297,13 +1301,20 @@
         "preview": "boolean",
         "confirm": "value",
         "session": "value",
+        "api-balloon": "value",
         "api-cores": "value",
+        "api-cpu": "value",
+        "api-cpulimit": "value",
+        "api-cpuunits": "value",
         "api-description": "value",
         "api-digest": "value",
         "api-memory": "value",
         "api-name": "value",
         "api-node": "value",
         "api-onboot": "value",
+        "api-sockets": "value",
+        "api-startup": "value",
+        "api-vcpus": "value",
         "api-vmid": "value"
       }
     },
@@ -1443,6 +1454,21 @@
       }
     },
     {
+      "command": "ls /nodes/{node}/lxc/{vmid}/pending",
+      "effect": "read",
+      "privateResult": true,
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "session": "value",
+        "limit": "value",
+        "fields": "value",
+        "full": "boolean",
+        "api-node": "value",
+        "api-vmid": "value"
+      }
+    },
+    {
       "command": "ls /nodes/{node}/qemu",
       "effect": "read",
       "flags": {
@@ -1454,6 +1480,21 @@
         "full": "boolean",
         "api-full": "value",
         "api-node": "value"
+      }
+    },
+    {
+      "command": "ls /nodes/{node}/qemu/{vmid}/pending",
+      "effect": "read",
+      "privateResult": true,
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "session": "value",
+        "limit": "value",
+        "fields": "value",
+        "full": "boolean",
+        "api-node": "value",
+        "api-vmid": "value"
       }
     },
     {
@@ -7792,6 +7833,76 @@
       ]
     },
     {
+      "command": "get /nodes/{node}/lxc/{vmid}/config",
+      "operationId": "OP-GET-7066e6cdde",
+      "method": "GET",
+      "path": "/nodes/{node}/lxc/{vmid}/config",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value",
+        "limit": "value",
+        "fields": "value",
+        "full": "boolean",
+        "session": "value",
+        "api-current": "value",
+        "api-node": "value",
+        "api-snapshot": "value",
+        "api-vmid": "value"
+      },
+      "privateResult": true,
+      "catalogues": [
+        "legacy-8.2.7",
+        "published-current"
+      ]
+    },
+    {
+      "command": "get /nodes/{node}/lxc/{vmid}/pending",
+      "operationId": "OP-GET-055effe38c",
+      "method": "GET",
+      "path": "/nodes/{node}/lxc/{vmid}/pending",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value",
+        "limit": "value",
+        "fields": "value",
+        "full": "boolean",
+        "session": "value",
+        "api-node": "value",
+        "api-vmid": "value"
+      },
+      "privateResult": true,
+      "catalogues": [
+        "legacy-8.2.7",
+        "published-current"
+      ]
+    },
+    {
+      "command": "get /nodes/{node}/lxc/{vmid}/status/current",
+      "operationId": "OP-GET-3e89cf9759",
+      "method": "GET",
+      "path": "/nodes/{node}/lxc/{vmid}/status/current",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value",
+        "limit": "value",
+        "fields": "value",
+        "full": "boolean",
+        "session": "value",
+        "api-node": "value",
+        "api-vmid": "value"
+      },
+      "catalogues": [
+        "legacy-8.2.7",
+        "published-current"
+      ]
+    },
+    {
       "command": "get /nodes/{node}/qemu",
       "operationId": "OP-GET-ee0e17bebb",
       "method": "GET",
@@ -7807,6 +7918,76 @@
         "session": "value",
         "api-full": "value",
         "api-node": "value"
+      },
+      "catalogues": [
+        "legacy-8.2.7",
+        "published-current"
+      ]
+    },
+    {
+      "command": "get /nodes/{node}/qemu/{vmid}/config",
+      "operationId": "OP-GET-c4dfe973bb",
+      "method": "GET",
+      "path": "/nodes/{node}/qemu/{vmid}/config",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value",
+        "limit": "value",
+        "fields": "value",
+        "full": "boolean",
+        "session": "value",
+        "api-current": "value",
+        "api-node": "value",
+        "api-snapshot": "value",
+        "api-vmid": "value"
+      },
+      "privateResult": true,
+      "catalogues": [
+        "legacy-8.2.7",
+        "published-current"
+      ]
+    },
+    {
+      "command": "get /nodes/{node}/qemu/{vmid}/pending",
+      "operationId": "OP-GET-95bc0cc390",
+      "method": "GET",
+      "path": "/nodes/{node}/qemu/{vmid}/pending",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value",
+        "limit": "value",
+        "fields": "value",
+        "full": "boolean",
+        "session": "value",
+        "api-node": "value",
+        "api-vmid": "value"
+      },
+      "privateResult": true,
+      "catalogues": [
+        "legacy-8.2.7",
+        "published-current"
+      ]
+    },
+    {
+      "command": "get /nodes/{node}/qemu/{vmid}/status/current",
+      "operationId": "OP-GET-51ca5330c0",
+      "method": "GET",
+      "path": "/nodes/{node}/qemu/{vmid}/status/current",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value",
+        "limit": "value",
+        "fields": "value",
+        "full": "boolean",
+        "session": "value",
+        "api-node": "value",
+        "api-vmid": "value"
       },
       "catalogues": [
         "legacy-8.2.7",

@@ -11,6 +11,12 @@
     "reason": "Requires operation-specific effect, transport and secret review before admission."
   },
   "reviewed": {
+    "GET /nodes/{node}/qemu/{vmid}/config": { "effect": "read", "transport": "json", "secrets": "private-result", "reason": "Guest configuration may contain cloud-init credentials; validated payload is delivered only through the inherited private result pipe." },
+    "GET /nodes/{node}/lxc/{vmid}/config": { "effect": "read", "transport": "json", "secrets": "private-result", "reason": "Container configuration may contain protected data; validated payload is delivered only through the inherited private result pipe." },
+    "GET /nodes/{node}/qemu/{vmid}/pending": { "effect": "read", "transport": "json", "secrets": "private-result", "reason": "Current and pending configuration values can include credentials; validated rows use the inherited private result pipe." },
+    "GET /nodes/{node}/lxc/{vmid}/pending": { "effect": "read", "transport": "json", "secrets": "private-result", "reason": "Current and pending container values can include protected data; validated rows use the inherited private result pipe." },
+    "GET /nodes/{node}/qemu/{vmid}/status/current": { "effect": "read", "transport": "json", "secrets": "none", "reason": "Existing guest power state, CPU, memory and I/O metrics; no guest or host lifecycle control." },
+    "GET /nodes/{node}/lxc/{vmid}/status/current": { "effect": "read", "transport": "json", "secrets": "none", "reason": "Existing container power state, CPU, memory and I/O metrics; no guest or host lifecycle control." },
     "GET /cluster/status": { "effect": "read", "transport": "json", "secrets": "none", "reason": "Cluster membership and quorum status only; no membership or quorum changes." },
     "GET /cluster/nextid": { "effect": "read", "transport": "json", "secrets": "none", "reason": "Suggest or check an available VMID at read time; does not reserve an ID." },
     "GET /nodes/{node}/status": { "effect": "read", "transport": "json", "secrets": "none", "reason": "Node CPU, memory, filesystem and boot metrics; no node lifecycle control." },

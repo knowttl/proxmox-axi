@@ -9447,23 +9447,23 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "read",
+            "transport": "json",
+            "secrets": "private-result",
+            "reason": "Container configuration may contain protected data; validated payload is delivered only through the inherited private result pipe."
           },
           "contract": "dist/contracts.json#/contracts/358"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "read",
+            "transport": "json",
+            "secrets": "private-result",
+            "reason": "Container configuration may contain protected data; validated payload is delivered only through the inherited private result pipe."
           },
           "contract": "dist/contracts.json#/contracts/1026"
         }
@@ -9964,23 +9964,23 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "read",
+            "transport": "json",
+            "secrets": "private-result",
+            "reason": "Current and pending container values can include protected data; validated rows use the inherited private result pipe."
           },
           "contract": "dist/contracts.json#/contracts/389"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "read",
+            "transport": "json",
+            "secrets": "private-result",
+            "reason": "Current and pending container values can include protected data; validated rows use the inherited private result pipe."
           },
           "contract": "dist/contracts.json#/contracts/1058"
         }
@@ -10239,23 +10239,23 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "read",
+            "transport": "json",
+            "secrets": "none",
+            "reason": "Existing container power state, CPU, memory and I/O metrics; no guest or host lifecycle control."
           },
           "contract": "dist/contracts.json#/contracts/403"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "read",
+            "transport": "json",
+            "secrets": "none",
+            "reason": "Existing container power state, CPU, memory and I/O metrics; no guest or host lifecycle control."
           },
           "contract": "dist/contracts.json#/contracts/1072"
         }
@@ -11059,23 +11059,23 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "read",
+            "transport": "json",
+            "secrets": "private-result",
+            "reason": "Guest configuration may contain cloud-init credentials; validated payload is delivered only through the inherited private result pipe."
           },
           "contract": "dist/contracts.json#/contracts/458"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "read",
+            "transport": "json",
+            "secrets": "private-result",
+            "reason": "Guest configuration may contain cloud-init credentials; validated payload is delivered only through the inherited private result pipe."
           },
           "contract": "dist/contracts.json#/contracts/1127"
         }
@@ -11554,23 +11554,23 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "read",
+            "transport": "json",
+            "secrets": "private-result",
+            "reason": "Current and pending configuration values can include credentials; validated rows use the inherited private result pipe."
           },
           "contract": "dist/contracts.json#/contracts/491"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "read",
+            "transport": "json",
+            "secrets": "private-result",
+            "reason": "Current and pending configuration values can include credentials; validated rows use the inherited private result pipe."
           },
           "contract": "dist/contracts.json#/contracts/1161"
         }
@@ -11829,23 +11829,23 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "read",
+            "transport": "json",
+            "secrets": "none",
+            "reason": "Existing guest power state, CPU, memory and I/O metrics; no guest or host lifecycle control."
           },
           "contract": "dist/contracts.json#/contracts/506"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "read",
+            "transport": "json",
+            "secrets": "none",
+            "reason": "Existing guest power state, CPU, memory and I/O metrics; no guest or host lifecycle control."
           },
           "contract": "dist/contracts.json#/contracts/1176"
         }
@@ -23743,7 +23743,7 @@
             "effect": "write",
             "transport": "json",
             "secrets": "input-refs",
-            "reason": "Reviewed scalar configuration branches only; credential fields require SecretRefs. Other supplied branches stay refused.",
+            "reason": "Reviewed compute and startup branches only; CPU feature overrides and host passthrough remain refused, and credential fields require SecretRefs.",
             "allowedInputs": [
               "node",
               "vmid",
@@ -23752,7 +23752,15 @@
               "hostname",
               "memory",
               "cores",
+              "sockets",
+              "vcpus",
+              "balloon",
+              "swap",
+              "cpu",
+              "cpulimit",
+              "cpuunits",
               "onboot",
+              "startup",
               "digest",
               "cipassword",
               "password"
@@ -23796,7 +23804,7 @@
             "effect": "write",
             "transport": "json",
             "secrets": "input-refs",
-            "reason": "Reviewed scalar configuration branches only; credential fields require SecretRefs. Other supplied branches stay refused.",
+            "reason": "Reviewed compute and startup branches only; CPU feature overrides and host passthrough remain refused, and credential fields require SecretRefs.",
             "allowedInputs": [
               "node",
               "vmid",
@@ -23805,7 +23813,15 @@
               "hostname",
               "memory",
               "cores",
+              "sockets",
+              "vcpus",
+              "balloon",
+              "swap",
+              "cpu",
+              "cpulimit",
+              "cpuunits",
               "onboot",
+              "startup",
               "digest",
               "cipassword",
               "password"
@@ -24157,7 +24173,7 @@
             "effect": "write",
             "transport": "json",
             "secrets": "input-refs",
-            "reason": "Reviewed scalar configuration branches only; credential fields require SecretRefs. Other supplied branches stay refused.",
+            "reason": "Reviewed compute and startup branches only; CPU feature overrides and host passthrough remain refused, and credential fields require SecretRefs.",
             "allowedInputs": [
               "node",
               "vmid",
@@ -24166,7 +24182,15 @@
               "hostname",
               "memory",
               "cores",
+              "sockets",
+              "vcpus",
+              "balloon",
+              "swap",
+              "cpu",
+              "cpulimit",
+              "cpuunits",
               "onboot",
+              "startup",
               "digest",
               "cipassword",
               "password"
@@ -24212,7 +24236,7 @@
             "effect": "write",
             "transport": "json",
             "secrets": "input-refs",
-            "reason": "Reviewed scalar configuration branches only; credential fields require SecretRefs. Other supplied branches stay refused.",
+            "reason": "Reviewed compute and startup branches only; CPU feature overrides and host passthrough remain refused, and credential fields require SecretRefs.",
             "allowedInputs": [
               "node",
               "vmid",
@@ -24221,7 +24245,15 @@
               "hostname",
               "memory",
               "cores",
+              "sockets",
+              "vcpus",
+              "balloon",
+              "swap",
+              "cpu",
+              "cpulimit",
+              "cpuunits",
               "onboot",
+              "startup",
               "digest",
               "cipassword",
               "password"

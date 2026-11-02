@@ -19,7 +19,8 @@ export function* routeCases(catalogues, policy) {
   for (const catalogue of catalogues) for (const operation of catalogue.operations) {
     const review = policy.reviewed[routeKey(operation)] ?? policy.default
     const reviewedWrite = !!reviewWrite(operation)
-    const callable = policy.captureBindings[catalogue.release] === catalogue.captureSha256 && review.effect === 'read' && review.transport === 'json' && review.secrets === 'none' && operation.allowtoken !== 0
+    const callable = policy.captureBindings[catalogue.release] === catalogue.captureSha256 && review.effect === 'read' && review.transport === 'json' && ['none', 'private-result'].includes(review.secrets) && operation.allowtoken !== 0
+    const privateResult = callable && review.secrets === 'private-result'
     const values = {}
     const properties = operation.parameters?.properties ?? {}
     for (const [name, schema] of Object.entries(properties)) if (!schema.optional) {
@@ -49,7 +50,7 @@ export function* routeCases(catalogues, policy) {
         if (path.includes(placeholder)) path = path.replace(placeholder, encoded)
         else query.push(`${encodeURIComponent(name)}=${encodeURIComponent(typeof value === 'boolean' ? (value ? '1' : '0') : String(value))}`)
       }
-      yield { id: `${catalogue.release}/${routeKey(operation)}/${variant.branch}`, operation, release: catalogue.release, callable: callable && !taskLogDownload, reviewedWrite,
+      yield { id: `${catalogue.release}/${routeKey(operation)}/${variant.branch}`, operation, release: catalogue.release, callable: callable && !taskLogDownload, privateResult, reviewedWrite,
         managed: taskLogDownload || reviewWrite(operation)?.transport === 'managed', args,
         values: variant.values,
         response,

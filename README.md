@@ -196,6 +196,34 @@ For example, a protected config can keep two independent profiles with separate 
 Supply credentials through the referenced secret source and set file ownership and permissions as described under [Configuration](#configuration).
 These reads do not grant storage administration, node power control, or cluster membership changes.
 
+### Guest configuration and compute settings
+
+QEMU and LXC current status reads expose power state and resource metrics:
+
+```sh
+proxmox-axi get '/nodes/{node}/qemu/{vmid}/status/current' --api-node '<node>' --api-vmid 100 --profile lab
+proxmox-axi get '/nodes/{node}/lxc/{vmid}/status/current' --api-node '<node>' --api-vmid 101 --profile lab
+```
+
+`get '/nodes/{node}/qemu/{vmid}/config'`, the LXC equivalent, and both guests' `/pending` reads require a caller-owned private result pipe because their payloads can contain credentials.
+Supply `PROXMOX_AXI_RESULT_FD` using the [private result contract](docs/s4-contract.md); stdout contains `data: { "privateResult": true }` after delivery.
+The complete validated payload travels privately, independently of ordinary table display flags, and is never written to the journal.
+Without a valid pipe these reads fail before contacting the provider.
+
+Confirmed `set .../config` supports the settings present in each guest's selected contract: names/description, cores, CPU limits/weights, memory, onboot and startup order; QEMU also supports sockets, vCPUs, balloon memory and a CPU model, while LXC supports swap.
+QEMU memory accepts `2048` or `current=2048` in MiB, with a minimum of 16; LXC memory and swap use integer MB values.
+CPU configuration accepts a model identifier, optionally prefixed with `cputype=`, and refuses `host` and feature-override subproperties.
+Startup strings use canonical order: optional `order` first, then `up`, then `down`, with no duplicate keys.
+Pass a configuration digest when available to detect concurrent changes.
+
+```sh
+proxmox-axi set '/nodes/{node}/qemu/{vmid}/config' --api-node '<node>' --api-vmid 100 --api-cores 4 --api-sockets 1 --api-memory current=2048 --api-balloon 1024 --api-cpu x86-64-v2-AES --api-startup order=2,up=10,down=15 --profile lab --preview
+proxmox-axi set '/nodes/{node}/lxc/{vmid}/config' --api-node '<node>' --api-vmid 101 --api-memory 2048 --api-swap 512 --api-cpulimit 2 --profile lab --preview
+```
+
+Repeat the exact selected command with `--confirm '<confirmation>'` after inspecting its preview.
+Hardware passthrough, executable hooks and other unreviewed configuration branches remain refused.
+
 ## Safety
 
 - Ordinary JSON reads use trusted HTTPS, a five-second total deadline and a 64 KiB response bound, and reject redirects.
