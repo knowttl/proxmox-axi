@@ -70,7 +70,7 @@ export async function exerciseReadJourney({ runCase, pack, retained, contracts, 
   assert.equal(extra.version.compatibleAddedField, 'retained')
   const explicitVersion = await run('D7/version-explicit-catalogue', ['get', '/version', '--catalogue', 'published-current', '--format', 'json'], { exitCode: 0, requests: 1 }, version)
   assert.equal(explicitVersion.compatibility.catalogue, 'legacy-8.2.7', 'Version compatibility describes the server, independent of the replay contract')
-  await run('D7/unknown-field', [...nodes.args, '--fields', 'node,bogus', '--format', 'json'], { exitCode: 2, requests: 0, error: 'INVALID_INPUT' }, vendor)
+  await run('D7/unknown-field', [...nodes.args, '--catalogue', 'legacy-8.2.7', '--fields', 'node,bogus', '--format', 'json'], { exitCode: 2, requests: 0, error: 'INVALID_INPUT' }, vendor)
   for (const [httpStatus, error] of [[403, 'PERMISSION_DENIED'], [404, 'NOT_FOUND_OR_HIDDEN'], [429, 'HTTP_ERROR']]) {
     await run(`http/${httpStatus}`, ['get', '/version', '--format', 'json'], { exitCode: 1, requests: 1, error }, { httpStatus, body: '' })
   }

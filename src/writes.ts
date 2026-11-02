@@ -1,5 +1,5 @@
 import { lstat } from 'node:fs/promises'
-import { buildPath, contracts, selectContract, validateResponse, type Contract } from './contract.js'
+import { buildPath, contracts, selectContract, validateOperationResponse, type Contract } from './contract.js'
 import type { Credentials } from './credentials.js'
 import { executeRequest, readVersion } from './transport.js'
 import { readPrivateFile } from './private-file.js'
@@ -147,8 +147,7 @@ export async function writeOperation(credentials: Credentials, initial: Contract
       return await journal.update(id, current => {
         current.status = outcome.status
         if (outcome.upid) current.upid = outcome.upid
-        // A refused batch leaves its children untransmitted.
-        if (outcome.status !== 'failed' || outcome.children) mergeOutcomes(current.children, outcome.children)
+        mergeOutcomes(current.children, outcome.children)
       })
     }
     catch { throw new Failure('WRITE_UNCERTAIN', `Terminal journal update failed; intent ${id} remains durable.`, `Run proxmox-axi journal reconcile ${id}; do not repeat the mutation.`) }
@@ -165,13 +164,13 @@ export async function writeOperation(credentials: Credentials, initial: Contract
       transfer = result.transfer
     } else data = await executeRequest(credentials, query ? call.wire : path!, { method: call.contract.method, ...(!query && body ? { body } : {}) })
     if (privateResult(call)) registerResults(call, data, credentials.results)
-    if (!options.transport || data !== null) validateResponse(data, call.contract.returns)
+    if (!options.transport || data !== null) validateOperationResponse(data, call.contract)
     outcome = resultStatus(call, data, credentials.results)
     if (privateResult(call) && !options.transport) await credentials.results.deliver(resultBinding(credentials.origin, credentials.tokenId, call.contract.id, fingerprint), data)
   } catch (error) {
     // Authentication, permission and validation refusals prove this request was not applied.
     if (error instanceof Failure && [400, 401, 403].includes(error.httpStatus ?? 0)) {
-      await saveOutcome({ status: 'failed' })
+      await saveOutcome({ status: 'failed', children: call.children.map(notSent) })
       throw error
     }
     await saveOutcome({ status: 'uncertain' })
@@ -222,9 +221,14 @@ function childRecords(call: Invocation, journal: Journal): NonNullable<JournalRe
   })
 }
 
-interface Outcome { status: JournalRecord['status'], upid?: string, children?: Outcome[] }
+interface Outcome { status: JournalRecord['status'], upid?: string, children?: ChildOutcome[] }
+type ChildOutcome = Omit<Outcome, 'status'> & { status: Outcome['status'] | 'not-sent' }
 
-function mergeOutcomes(records: JournalRecord['children'], outcomes: Outcome[] | undefined): void {
+function notSent(call: Invocation): ChildOutcome {
+  return { status: 'not-sent', children: call.children.map(notSent) }
+}
+
+function mergeOutcomes(records: JournalRecord['children'], outcomes: ChildOutcome[] | undefined): void {
   for (const [index, record] of (records ?? []).entries()) {
     const outcome = outcomes?.[index]
     record.status = outcome?.status ?? 'uncertain'
@@ -245,8 +249,8 @@ function resultStatus(call: Invocation, data: unknown, results: Credentials['res
   const children = call.children.map((child, index): Outcome => {
     const item = data[index] as { status?: unknown, data?: unknown }
     if (!item || typeof item.status !== 'number') return { status: 'uncertain' }
-    if (item.status !== 200) return { status: 'failed' }
-    try { validateResponse(item.data, child.contract.returns); return resultStatus(child, item.data, results) }
+    if (item.status !== 200) return { status: 'failed', ...([400, 401, 403].includes(item.status) ? { children: child.children.map(notSent) } : {}) }
+    try { validateOperationResponse(item.data, child.contract); return resultStatus(child, item.data, results) }
     catch { return { status: 'uncertain' } }
   })
   const statuses = children.map(child => child.status)

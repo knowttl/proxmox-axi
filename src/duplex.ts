@@ -2,7 +2,7 @@ import { Agent, request } from 'node:https'
 import { createHash, randomBytes } from 'node:crypto'
 import type { Socket } from 'node:net'
 import type { Credentials } from './credentials.js'
-import { buildPath, selectContract, validateResponse, type Contract } from './contract.js'
+import { buildPath, selectContract, validateOperationResponse, type Contract } from './contract.js'
 import { authorization, executeRequest, trustedSocket } from './transport.js'
 import { byteChannel, byteDescriptor } from './transfer.js'
 import { Failure } from './errors.js'
@@ -35,9 +35,7 @@ export function prepareDuplex(contract: Contract, preview: boolean) {
         credentials.results.registerMinted(data)
         if (!data || typeof data !== 'object') throw failed('Invalid protected session setup.')
         const setup = data as Record<string, unknown>
-        // Older releases encode the setup port as decimal text.
-        if (typeof setup.port === 'string' && /^\d+$/.test(setup.port)) setup.port = Number(setup.port)
-        validateResponse(data, selected.returns)
+        validateOperationResponse(data, selected)
         if (typeof setup.ticket !== 'string' || !setup.ticket || setup.ticket.length > 4096) throw failed('Invalid private session ticket.')
         const migration = selected.path.endsWith('/mtunnel')
         // The opaque socket is accepted only from this exact authenticated setup,

@@ -10,7 +10,7 @@ import { gzipSync } from 'node:zlib'
 import { decode } from '@toon-format/toon'
 import live from '../test/fixtures/live-8.2.7.json' with { type: 'json' }
 
-const { session } = live
+const { session, refusals } = live
 
 interface Journey {
   task: string, scratch: string, out: string, executable: string, caFile: string, env: Record<string, string>
@@ -65,6 +65,8 @@ export async function exerciseStreamJourney(options: Journey) {
       const boundary = /boundary=(.+)$/.exec(String(request.headers['content-type']))![1]!
       const end = body.lastIndexOf(Buffer.from(`\r\n--${boundary}--\r\n`))
       uploadDigest = hash(body.subarray(start, end))
+      const refusal = refusals.find(item => mode === `refused-${item.status}`)
+      if (refusal) { response.writeHead(refusal.status).end(JSON.stringify({ ...refusal.body, debug: 'private-host.invalid', password: 'CANARY-S5-auth' })); return }
       response.end(JSON.stringify({ data: upid })); return
     }
     if (/\/(vncproxy|termproxy|vncshell|mtunnel)$/.test(url.pathname)) {
@@ -190,6 +192,17 @@ export async function exerciseStreamJourney(options: Journey) {
     assert.equal(uploadDigest, hash(image), 'Multipart body preserves bytes beyond the legacy host upload cap')
     await run('upload-replay-denied', [...upload, '--confirm', String(preview.output.confirmation)], 1)
     assert.equal(uploads, 1)
+    for (const refusal of refusals) {
+      const preview = await run(`D3/upload-${refusal.status}-preview`, [...upload, '--preview'], 0)
+      mode = `refused-${refusal.status}`
+      const result = await run(`D3/upload-${refusal.status}-refused`, [...upload, '--confirm', String(preview.output.confirmation)], 1)
+      const error = result.output.error as { code: string, message: string }
+      assert.equal(error.code, refusal.code)
+      if (refusal.status === 400) assert.ok(error.message.includes('poolid: invalid format'))
+      if (refusal.status === 403) assert.ok(error.message.includes('Permission check failed (/, Pool.Allocate)'))
+      assert.ok(!JSON.stringify(result.output).includes('private-host.invalid'))
+      mode = 'success'
+    }
     await run('batch-cannot-open-byte-channel', ['create', '/nodes/{node}/execute', '--api-node', 'pve-test', '--api-commands', JSON.stringify([
       { method: 'POST', path: 'storage/local/upload', args: { content: 'iso', filename: 'image.iso' } },
     ]), '--preview'], 2)

@@ -57,7 +57,8 @@ export async function exerciseWriteJourney(options: Journey): Promise<void> {
   const apply = (method: string, path: string, args: Record<string, string>): unknown => {
     if (path.endsWith('/execute')) {
       const commands = JSON.parse(args.commands!) as { method: string, path: string, args?: Record<string, string> }[]
-      return commands.map((child, index) => (mode === 'partial-batch' && index === 1) || (mode === 'failed-wrapper' && child.path === 'execute') ? { status: 500, message: 'controlled child failure' } :
+      return commands.map((child, index) => mode === 'refused-wrapper' && child.path === 'execute' ? { status: 403 } :
+        (mode === 'partial-batch' && index === 1) || (mode === 'failed-wrapper' && child.path === 'execute') ? { status: 500, message: 'controlled child failure' } :
         { status: 200, data: apply(child.method, `/api2/json/nodes/pve-test/${child.path}`, child.args ?? {}) })
     }
     if (path === '/api2/json/pools') {
@@ -122,7 +123,7 @@ export async function exerciseWriteJourney(options: Journey): Promise<void> {
       bodyEvidence.push(transmission)
       mutationCount++
       const refusal = refusals.find(item => mode === `refused-${item.status}`)
-      if (refusal) { reply.writeHead(refusal.status).end(JSON.stringify(refusal.body)); return }
+      if (refusal) { reply.writeHead(refusal.status).end(JSON.stringify({ ...refusal.body, debug: 'private-host.invalid', password: options.env.PROXMOX_AXI_TOKEN })); return }
       if (mode === 'disconnect-before-acceptance') { reply.destroy(); return }
       data = apply(method, path, args)
       transmission.after = snapshot()
@@ -187,6 +188,9 @@ export async function exerciseWriteJourney(options: Journey): Promise<void> {
       mode = `refused-${refusal.status}`
       const result = await invoke(`D3/${refusal.status}-refused`, [...args, '--confirm', preview.confirmation], { code: 1, error: refusal.code, mutations: 1 })
       assert.match(result.help[0], refusal.status === 400 ? /parameter/i : /identity|permission/i)
+      if (refusal.status === 400) assert.ok(result.error.message.includes('poolid: invalid format'))
+      if (refusal.status === 403) assert.ok(result.error.message.includes('Permission check failed (/, Pool.Allocate)'))
+      assert.ok(!JSON.stringify(result).includes('private-host.invalid'))
       const shown = await invoke(`D3/${refusal.status}-journal`, ['journal', 'show', preview.id])
       assert.equal(shown.journal.status, 'failed')
       mode = 'success'
@@ -365,7 +369,7 @@ export async function exerciseWriteJourney(options: Journey): Promise<void> {
     await invoke('AC-ASYNC/accepted', [...start, '--confirm', taskPreview.confirmation], { status: 'accepted', mutations: 1 })
     const taskArgs = ['--api-node', 'pve-test', '--api-upid', upid, '--journal', taskPreview.id]
     if (!options.hosted && process.platform !== 'win32') {
-      const crash = spawn(process.execPath, [fileURLToPath(new URL('./journal-lock-crash.ts', import.meta.url)),
+      const crash = spawn(process.execPath, [fileURLToPath(new URL(import.meta.url.endsWith('.ts') ? './journal-lock-crash.ts' : './journal-lock-crash.js', import.meta.url)),
         pathToFileURL(join(dirname(executable), '../dist/journal.js')).href, taskPreview.id], { env, stdio: ['ignore', 'pipe', 'pipe'] })
       const errors: Buffer[] = []
       crash.stderr.on('data', (chunk: Buffer) => errors.push(chunk))
@@ -438,11 +442,28 @@ export async function exerciseWriteJourney(options: Journey): Promise<void> {
     assert.deepEqual(reconciledPartial.journal.children.map((child: { status: string }) => child.status), ['success', 'failed'])
     const nestedCommands = JSON.stringify([{ method: 'POST', path: 'execute', args: { commands } }])
     const nested = [...batch.slice(0, -1), nestedCommands]
+    for (const refusal of refusals) {
+      const preview = await invoke(`D3/batch-${refusal.status}-preview`, [...nested, '--preview'])
+      mode = `refused-${refusal.status}`
+      await invoke(`D3/batch-${refusal.status}-refused`, [...nested, '--confirm', preview.confirmation], { code: 1, error: refusal.code, mutations: 1 })
+      mode = 'success'
+      const shown = await invoke(`D3/batch-${refusal.status}-journal`, ['journal', 'show', preview.id])
+      assert.equal(shown.journal.status, 'failed')
+      assert.equal(shown.journal.children[0].status, 'not-sent')
+      assert.deepEqual(shown.journal.children[0].children.map((child: { status: string }) => child.status), ['not-sent', 'not-sent'])
+    }
     const nestedPreview = await invoke('AC-SPECIAL-BATCH-POLICY/nested-preview', [...nested, '--preview'])
     await invoke('AC-SPECIAL-BATCH-POLICY/nested', [...nested, '--confirm', nestedPreview.confirmation], { status: 'accepted', mutations: 1 })
     const failedWrapperArgs = [...batch.slice(0, -1), JSON.stringify([
       { method: 'POST', path: 'execute', args: { commands } }, { method: 'POST', path: 'lxc/100/status/start' },
     ])]
+    const refusedWrapper = await invoke('D3/refused-child-wrapper-preview', [...failedWrapperArgs, '--preview'])
+    mode = 'refused-wrapper'
+    const refusedChildren = await invoke('D3/refused-child-wrapper', [...failedWrapperArgs, '--confirm', refusedWrapper.confirmation], { code: 1, status: 'failed', mutations: 1 })
+    assert.equal(refusedChildren.children[0].status, 'failed')
+    assert.deepEqual(refusedChildren.children[0].children.map((child: { status: string }) => child.status), ['not-sent', 'not-sent'])
+    assert.equal(refusedChildren.children[1].status, 'accepted')
+    mode = 'success'
     const failedWrapper = await invoke('AC-SPECIAL-BATCH-RESULTS/failed-wrapper-preview', [...failedWrapperArgs, '--preview'])
     mode = 'failed-wrapper'
     await invoke('AC-SPECIAL-BATCH-RESULTS/failed-wrapper', [...failedWrapperArgs, '--confirm', failedWrapper.confirmation], { code: 1, status: 'failed', mutations: 1 })

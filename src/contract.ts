@@ -154,6 +154,14 @@ export function parseParameter(value: string, schema: VendorSchema): unknown {
   return value
 }
 
+export function validateOperationResponse(value: unknown, contract: Contract): void {
+  if (contract.method === 'POST' && /\/(vncproxy|termproxy|vncshell|mtunnel)$/.test(contract.path) && value && typeof value === 'object' && !Array.isArray(value)) {
+    const setup = value as Record<string, unknown>
+    if (typeof setup.port === 'string' && /^\d+$/.test(setup.port)) setup.port = Number(setup.port)
+  }
+  validateResponse(value, contract.returns)
+}
+
 export function validateResponse(value: unknown, schema: VendorSchema): void {
   const fail = () => new Failure('INVALID_RESPONSE', 'Response does not match the selected vendor shape.', 'Check the selected catalogue and server response.')
   if (schema.type === 'array') {

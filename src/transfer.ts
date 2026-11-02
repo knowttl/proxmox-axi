@@ -10,7 +10,7 @@ import { createGunzip } from 'node:zlib'
 import type { Credentials } from './credentials.js'
 import { buildPath, type Contract } from './contract.js'
 import { authorization, trustedSocket } from './transport.js'
-import { Failure, httpFailure } from './errors.js'
+import { Failure, responseFailure } from './errors.js'
 
 export interface TransferOptions {
   formatter: string
@@ -146,8 +146,7 @@ async function runTransfer(credentials: Credentials, contract: Contract, values:
     } else req.end(contract.method === 'GET' ? undefined : query)
     const [response] = await responsePromise as [import('node:http').IncomingMessage]
     if (response.statusCode !== 200) {
-      response.destroy()
-      throw httpFailure(response.statusCode ?? 0, 'Transfer')
+      throw await responseFailure(response, 'Transfer', credentials.results)
     }
     const decoded = response.headers['content-encoding'] === 'gzip' ? response.pipe(createGunzip()) : response
     if (decoded !== response) response.once('error', error => decoded.destroy(error))

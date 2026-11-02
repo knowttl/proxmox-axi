@@ -6,7 +6,7 @@ import { isAbsolute } from 'node:path'
 import { configurationPath, listProfiles, resolveCredentials, type Credentials } from './credentials.js'
 import { buildPath, contracts, parseParameter, selectContract } from './contract.js'
 import { Failure } from './errors.js'
-import { readOperation, doctor } from './reads.js'
+import { readOperation, doctor, validateFields } from './reads.js'
 import { presentRead } from './presentation.js'
 import { writeOperation } from './writes.js'
 import { journalOperation, taskOperation } from './tasks.js'
@@ -216,11 +216,7 @@ export async function main(args: string[]): Promise<void> {
     const contract = authAction ? undefined : ['', 'home', 'doctor'].includes(command) ? selectContract('GET', '/version', release) :
       isLocal ? undefined : positional.length === 2 ? selectContract(positional[0]!, positional[1]!, release) : undefined
     if (!isLocal && !contract && !authAction) throw usage('Select a command from inventory.')
-    if (fields && contract) {
-      const known = Object.keys(contract.returns.items?.properties ?? contract.returns.properties ?? {})
-      const unknown = fields.filter(field => !known.includes(field))
-      if (unknown.length) throw new Failure('INVALID_INPUT', `Unknown fields: ${unknown.join(', ')}.`, `Available fields: ${known.join(', ')}.`, 2)
-    }
+    if (fields && contract && (options['--catalogue'] || contract.path === '/version')) validateFields(contract, fields)
     if (contract?.policy.transport === 'managed' && !transferring) throw usage('This operation requires transfer and a private byte channel.')
     if (contract && ['write', 'batch'].includes(contract.policy.effect) && Object.keys(options).some(key =>
       !['--config', '--profile', '--format', '--catalogue', '--body-file', '--preview', '--confirm', '--session', ...(transferring ? ['--response-format', '--input-file', '--raw', '--expected-bytes', '--expected-sha256'] : [])].includes(key) && !key.startsWith('--api-'))) throw usage('Writes accept credential selectors, API inputs, --preview and --confirm only.')
@@ -319,7 +315,7 @@ export async function main(args: string[]): Promise<void> {
       output(await doctor(credentials))
     } else {
       const selected = contract ?? selectContract('GET', '/version', release)
-      const result = await readOperation(credentials, selected, values, options['--catalogue'])
+      const result = await readOperation(credentials, selected, values, options['--catalogue'], fields)
       const nextOptions = ['--config', '--profile', '--catalogue'].filter(key => options[key]).map(key => `${key} ${JSON.stringify(options[key])}`).join(' ')
       const next = `proxmox-axi schema get ${selected.path} ${nextOptions}`.trim()
       const safeData = presentRead({ ...result, data: credentials.results.sanitize(result.data),

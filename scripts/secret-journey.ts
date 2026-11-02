@@ -112,11 +112,12 @@ export async function exerciseSecretJourney(options: Journey): Promise<void> {
         else if (url.pathname.endsWith('/execute')) {
           const batch = JSON.parse(params.commands!) as { method: string, path: string, args: Record<string, string> }[]
           const apply = (items: typeof batch): unknown[] => items.map(child => ({ status: 200, data: child.path === 'execute' ? apply(JSON.parse(child.args.commands!) as typeof batch) :
-            /\/(vncproxy|termproxy)$/.test(child.path) ? { port: 5900, cert: 'synthetic-cert', ticket: minted, password: recovery, user: 'synthetic@pve', upid: 'synthetic-upid' } :
+            /\/(vncproxy|termproxy)$/.test(child.path) ? { port: '5900', cert: 'synthetic-cert', ticket: minted, password: recovery, user: 'synthetic@pve', upid: 'synthetic-upid' } :
             child.path.endsWith('/start') ? taskUpid :
               (assert.ok(child.args.cipassword === password, 'nested protected password reaches the vendor'), null) }))
           data = apply(batch)
-        } else if (url.pathname.includes('/access/tfa/') && request.method === 'POST') data = { id: 'synthetic-tfa', recovery: [recovery] }
+        } else if (/\/(vncproxy|termproxy)$/.test(url.pathname)) data = { port: '5900', cert: 'synthetic-cert', ticket: minted, user: 'synthetic@pve', upid: 'synthetic-upid' }
+        else if (url.pathname.includes('/access/tfa/') && request.method === 'POST') data = { id: 'synthetic-tfa', recovery: [recovery] }
         else data = null
       }
     }
@@ -285,6 +286,19 @@ export async function exerciseSecretJourney(options: Journey): Promise<void> {
     const batchResult = await invoke('AC-SPECIAL-BATCH-RESULTS/nested-private-results', [...batchArgs, '--confirm', String(batchPreview.value.confirmation)], { status: 'accepted', mutations: 1, private: true }, batch)
     assert.equal(object((object((batchResult.value.children as unknown[])[0]).children as unknown[])[2]).upid, taskUpid)
     if (batchResult.frame) assert.ok(JSON.stringify(batchResult.frame.payload).includes(recovery))
+    if (batchResult.frame) {
+      const children = (batchResult.frame.payload as unknown as { data: { data: unknown }[] }[])[0]!.data
+      for (const index of [1, 3, 4, 5]) assert.equal(object(children[index]!.data).port, 5900)
+    }
+    for (const family of ['qemu', 'lxc']) {
+      for (const action of ['vncproxy', 'termproxy']) {
+        const args = ['create', `/nodes/{node}/${family}/{vmid}/${action}`]
+        const input = { node: 'pve-test', vmid: 100 }
+        const preview = await invoke(`D1/${family}-${action}-preview`, [...args, '--preview'], {}, input)
+        const result = await invoke(`D1/${family}-${action}-decimal-port`, [...args, '--confirm', String(preview.value.confirmation)], { status: 'success', mutations: 1, private: true }, input)
+        if (result.frame) assert.equal(object(result.frame.payload).port, 5900)
+      }
+    }
 
     if (options.task === 'S4.2') {
     await configure('ticket')
