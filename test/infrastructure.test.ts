@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import { execFile } from 'node:child_process'
-import { chmod, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises'
+import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises'
 import { createServer } from 'node:https'
 import type { AddressInfo } from 'node:net'
 import { tmpdir } from 'node:os'
@@ -18,18 +18,20 @@ const nodeStatus = {
   pveversion: 'synthetic', rootfs: { avail: 1024, free: 1024, total: 4096, used: 3072 },
 }
 const storageStatus = { active: 1, enabled: 1, type: 'dir', content: 'iso,vztmpl', avail: 1024, total: 4096, used: 3072 }
+const upid = 'UPID:node-a:00000001:00000002:00000003:vzdump:100:synthetic@pve:'
+const logPath = '/nodes/{node}/tasks/{upid}/log'
+const logWire = `/api2/json/nodes/node-a/tasks/${encodeURIComponent(upid)}/log`
+const logLines = [{ n: 1, t: 'first line' }, { n: 2, t: 'second line' }]
 
 test('infrastructure discovery through named profiles', async t => {
   const scratch = await mkdtemp(join(tmpdir(), 'proxmox-infrastructure-'))
   t.after(() => rm(scratch, { recursive: true, force: true }))
   const caFile = join(scratch, 'server.crt')
-  await execute('openssl', ['req', '-x509', '-newkey', 'rsa:2048', '-nodes', '-days', '1', '-subj', '/CN=localhost',
-    '-addext', 'subjectAltName=IP:127.0.0.1', '-keyout', join(scratch, 'server.key'), '-out', caFile])
-  await chmod(caFile, 0o600)
-  const tls = { key: await readFile(join(scratch, 'server.key')), cert: await readFile(caFile) }
+  await writeFile(caFile, await readFile(new URL('../../test/fixtures/localhost-cert.pem', import.meta.url)), { mode: 0o600 })
+  const tls = { key: await readFile(new URL('../../test/fixtures/localhost-key.pem', import.meta.url)), cert: await readFile(caFile) }
   const requests: { profile: string, authorization: string | undefined, path: string }[] = []
   let permissions: Record<string, unknown> = { '/': { 'Sys.Audit': 1, 'Datastore.Audit': 1 } }
-  let override: { path: string, status: number, data: unknown } | undefined
+  let override: { path: string, status: number, data: unknown, total?: number } | undefined
   const profiles: Record<string, unknown> = {}
   for (const [name, version] of [['lab', '8.2.7'], ['secondary', '9.2.1']]) {
     const server = createServer(tls, (request, response) => {
@@ -46,8 +48,12 @@ test('infrastructure discovery through named profiles', async t => {
         '/api2/json/nodes/node-a/status': nodeStatus,
         '/api2/json/storage': [{ storage: `${name}-store`, password: 'backend-secret-canary', server: 'private-backend' }],
         '/api2/json/nodes/node-a/storage/local/status': storageStatus,
+        [logWire]: logLines,
+        [`${logWire}?download=0`]: logLines,
       }
-      if (override?.path === path) response.writeHead(override.status).end(JSON.stringify({ data: override.data }))
+      if (path === `${logWire}?download=1`) response.end('first line\nsecond line\n')
+      else if (override?.path === path) response.writeHead(override.status).end(JSON.stringify({ data: override.data,
+        ...(override.total === undefined ? {} : { total: override.total }) }))
       else if (Object.hasOwn(data, path)) response.end(JSON.stringify({ data: data[path] }))
       else response.writeHead(404).end(JSON.stringify({ data: null }))
     })
@@ -67,6 +73,27 @@ test('infrastructure discovery through named profiles', async t => {
       return { code: result.code, stdout: result.stdout, stderr: result.stderr }
     }
   }
+  const downloadBody = join(scratch, 'download.json')
+  await writeFile(downloadBody, JSON.stringify({ download: true }), { mode: 0o600 })
+  for (const route of [['get', logPath], ['ls', logPath], ['task', 'log']]) for (const input of [
+    { name: 'flag', args: ['--api-download', 'true'] },
+    { name: 'body-file', args: ['--body-file', downloadBody] },
+  ]) for (const profile of ['lab', 'missing']) {
+    await t.test(`#6 ${route[0]} refuses download ${input.name} before credentials and HTTP with ${profile} profile`, async () => {
+      requests.length = 0
+      const result = await command([...route, '--api-node', 'node-a', '--api-upid', upid, ...input.args, '--profile', profile])
+      assert.equal(result.code, 2, result.stdout + result.stderr)
+      assert.equal(JSON.parse(result.stdout).error.code, 'INVALID_INPUT')
+      assert.deepEqual(requests, [])
+    })
+  }
+  for (const args of [[], ['--api-download', 'false']]) {
+    await t.test(`#6 task log preserves numbered logs with ${args.length ? 'download=false' : 'default input'}`, async () => {
+      const result = await command(['task', 'log', '--api-node', 'node-a', '--api-upid', upid, ...args, '--profile', 'lab'])
+      assert.equal(result.code, 0, result.stdout + result.stderr)
+      assert.deepEqual(JSON.parse(result.stdout).data, logLines)
+    })
+  }
   await t.test('profile listing does not resolve token references or contact either host', async () => {
     requests.length = 0
     const result = await execute(process.execPath, [executable, 'profile', 'list', '--config', config, '--format', 'json'],
@@ -80,6 +107,57 @@ test('infrastructure discovery through named profiles', async t => {
     assert.equal(result.code, 1, result.stdout + result.stderr)
     assert.equal(JSON.parse(result.stdout).error.code, 'PROFILE_NOT_FOUND')
     assert.deepEqual(requests, [])
+  })
+  for (const verb of ['get', 'ls']) for (const catalogue of [
+    { name: 'detected', args: [] },
+    { name: 'legacy-8.2.7', args: ['--catalogue', 'legacy-8.2.7'] },
+    { name: 'published-current', args: ['--catalogue', 'published-current'] },
+  ]) {
+    await t.test(`#6 ${verb} refuses task-log download before HTTP in ${catalogue.name}`, async () => {
+      requests.length = 0
+      const result = await command([verb, logPath, '--api-node', 'node-a', '--api-upid', upid,
+        '--api-download', 'true', ...catalogue.args, '--profile', 'lab'])
+      assert.equal(result.code, 2, result.stdout + result.stderr)
+      assert.equal(JSON.parse(result.stdout).error.code, 'INVALID_INPUT')
+      assert.deepEqual(requests, [])
+    })
+    await t.test(`#6 ${verb} preserves numbered logs with download=false in ${catalogue.name}`, async () => {
+      const result = await command([verb, logPath, '--api-node', 'node-a', '--api-upid', upid,
+        '--api-download', 'false', ...catalogue.args, '--profile', 'lab'])
+      assert.equal(result.code, 0, result.stdout + result.stderr)
+      assert.deepEqual(JSON.parse(result.stdout).data, logLines)
+    })
+  }
+  for (const row of [
+    { profile: 'lab', args: [], release: 'legacy-8.2.7' },
+    { profile: 'secondary', args: [], release: 'published-current' },
+    { profile: 'lab', args: ['--catalogue', 'published-current'], release: 'published-current' },
+  ]) await t.test(`#7 ${row.profile} schema suggestion executes without credentials for ${row.release}`, async () => {
+    const result = await command(['get', '/storage', '--profile', row.profile, ...row.args])
+    assert.equal(result.code, 0, result.stdout + result.stderr)
+    const args = (JSON.parse(result.stdout).help[0] as string).split(' ').slice(1)
+    requests.length = 0
+    const schema = await execute(process.execPath, [executable, ...args, '--format', 'json'], { env: environment })
+    assert.equal(JSON.parse(schema.stdout).release, row.release)
+    assert.deepEqual(requests, [])
+  })
+  for (const row of [
+    { granted: true, total: 20, empty: 'empty-page', visibleTotal: 20, pagination: 'partial' },
+    { granted: false, total: 20, empty: 'empty-page', visibleTotal: null, pagination: 'partial' },
+    { granted: true, total: 0, empty: 'verified-empty', visibleTotal: 0, pagination: 'complete' },
+    { granted: false, total: 0, empty: 'visibility-unverified', visibleTotal: null, pagination: 'complete' },
+  ]) await t.test(`#8 empty task page with total=${row.total} and root audit=${row.granted}`, async () => {
+    permissions = row.granted ? { '/': { 'Sys.Audit': 1, 'Datastore.Audit': 1 } } : {}
+    override = { path: '/api2/json/nodes/node-a/tasks?start=20', status: 200, data: [], total: row.total }
+    const result = await command(['get', '/nodes/{node}/tasks', '--api-node', 'node-a', '--api-start', '20', '--profile', 'lab'])
+    assert.equal(result.code, 0, result.stdout + result.stderr)
+    const value = JSON.parse(result.stdout)
+    assert.equal(value.empty, row.empty)
+    assert.equal(value.providerTotal, row.total)
+    assert.equal(value.total, row.visibleTotal)
+    assert.equal(value.providerPagination, row.pagination)
+    assert.deepEqual(value.data, [])
+    override = undefined
   })
   const routes = [
     { path: '/cluster/status', api: [], wire: '/api2/json/cluster/status', invalid: {},

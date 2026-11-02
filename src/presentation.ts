@@ -15,7 +15,7 @@ export function presentRead(result: { data: unknown, visibility?: string, provid
     return Object.fromEntries(fields.filter(field => Object.hasOwn(row, field)).map(field => [field, row[field]]))
   })
   return { ...result, data, count: data.length, received, total: result.visibility && result.visibility !== 'complete' ? null : result.providerTotal ?? null,
-    empty: received === 0 ? result.visibility === 'complete' ? 'verified-empty' : 'visibility-unverified' : false,
+    empty: received === 0 ? (result.providerTotal ?? 0) > 0 ? 'empty-page' : result.visibility === 'complete' ? 'verified-empty' : 'visibility-unverified' : false,
     displayTruncated: data.length < received, providerPagination: result.providerTotal === undefined ? 'unknown' : result.providerTotal > received ? 'partial' : 'complete',
     help: [options.next, ...(data.length < received ? ['Repeat with --full for all received fields and rows (65536-byte output cap).'] : [])] }
 }

@@ -93,7 +93,7 @@ proxmox-axi profile list
 Offline discovery (no credential values required):
 
 ```sh
-proxmox-axi inventory [--catalogue <release>]
+proxmox-axi inventory [--catalogue <release>] [--limit <1-1000>|--full]
 proxmox-axi schema <method> <template> [--catalogue <release>]
 ```
 
@@ -240,6 +240,9 @@ Any failed child makes the batch fail, with partial outcomes retained and no ass
   `task status` and `task wait` label the vendor's running/stopped state as `data.processState`, separately from the action outcome in `status`.
 - `task log` returns numbered lines without storing them in the journal.
   Its table columns are always `n` (line number), then `t` (text).
+  Ordinary `get`, `ls` and `task log` reject `download=true`, including through `--body-file`, with `INVALID_INPUT` before credential resolution or HTTP.
+  Standalone numbered-log reads accept `--api-download false`; hosted ordinary task-log `get` and `ls` omit the download flag entirely.
+  For private text downloads, use the [S5 transfer contract](docs/s5-contract.md).
 - `task wait` has a 1-30000 ms elapsed budget, defaulting to 5000 ms.
   If the final request exhausts the remaining budget after a valid observation, the wait returns that observation with `wait: deadline-reached`.
   A timeout before the first valid observation remains a failure.
@@ -311,6 +314,10 @@ No insecure-TLS flag or automatic trust update exists.
   Unknown `--fields` names return `INVALID_INPUT` with available names from the selected response contract.
   Except for `/version`, automatic reads validate field names after target catalogue detection; an explicit `--catalogue` validates them before network access.
 - Provider totals and pagination remain separate from received counts and display truncation.
+  An empty received page with a positive `providerTotal` reports `empty: empty-page`, regardless of visibility.
+  Otherwise, an empty result reports `verified-empty` only with complete visibility, or `visibility-unverified` when visibility is filtered or unknown.
+  Filtered or unknown visibility keeps `total` null even when `providerTotal` is present.
+- Ordinary list-read schema hints run offline and carry the explicit replay catalogue or detected catalogue, without credential selectors.
 - Rendered output has a 65536-byte cap, including `--full`.
 - Exit code 0 is success, 1 is a failed command and 2 is an unknown command.
 - Common error codes: `AUTH_REQUIRED` (HTTP 401 or no profile), `INVALID_RESPONSE` (malformed success body), `CONNECTION_FAILED` (interrupted response), `TIMEOUT`, `OUTPUT_LIMIT`, `INVALID_INPUT`, `CONTRACT_UNRESOLVED` and `NOT_FOUND_OR_HIDDEN`.

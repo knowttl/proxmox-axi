@@ -49,3 +49,36 @@ for (const release of ['legacy-8.2.7', 'published-current']) {
     assert.equal(JSON.parse(result.stdout).error.code, 'CONTRACT_UNRESOLVED')
   })
 }
+
+for (const row of [
+  { release: 'legacy-8.2.7', count: 605 },
+  { release: 'published-current', count: 680 },
+]) for (const mode of [
+  { name: 'full', kind: 'boolean', args: ['--full'], rows: row.count },
+  { name: 'limit', kind: 'value', args: ['--limit', '2'], rows: 2 },
+]) test(`#11 hosted inventory admits --${mode.name} in ${row.release}`, async () => {
+  const { commands } = JSON.parse(await readFile(new URL('../artium-invocations.json', import.meta.url)))
+  assert.equal(commands.find(command => command.command === 'inventory').flags[mode.name], mode.kind)
+  const result = spawnSync(process.execPath, ['bin/proxmox-axi.mjs', 'inventory', ...mode.args, '--catalogue', row.release, '--format', 'json'], { encoding: 'utf8' })
+  assert.equal(result.status, 0, result.stdout + result.stderr)
+  const value = JSON.parse(result.stdout)
+  assert.equal(value.count, row.count)
+  assert.equal(value.operations.length, mode.rows)
+})
+
+for (const verb of ['get', 'ls']) test(`#6 ordinary hosted ${verb} does not admit the task-log download flag`, async () => {
+  const { commands } = JSON.parse(await readFile(new URL('../artium-invocations.json', import.meta.url)))
+  assert.equal(Object.hasOwn(commands.find(command => command.command === `${verb} /nodes/{node}/tasks/{upid}/log`).flags, 'api-download'), false)
+})
+
+test('#6 hosted private task-log transfer preserves its download flag', async () => {
+  const { commands } = JSON.parse(await readFile(new URL('../artium-invocations.json', import.meta.url)))
+  assert.equal(commands.find(command => command.command === 'transfer get /nodes/{node}/tasks/{upid}/log').flags['api-download'], 'value')
+})
+
+test('#11 inventory help accepts and discloses full and limit flags without credentials', () => {
+  const result = spawnSync(process.execPath, ['bin/proxmox-axi.mjs', 'inventory', '--full', '--limit', '2', '--help', '--format', 'json'], { encoding: 'utf8' })
+  assert.equal(result.status, 0, result.stdout + result.stderr)
+  assert.deepEqual(JSON.parse(result.stdout).flags.filter(flag => flag.startsWith('--full') || flag.startsWith('--limit'))
+    .map(flag => flag.split(' ')[0]), ['--limit', '--full'])
+})
