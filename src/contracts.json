@@ -50598,28 +50598,6 @@
               "type": "object",
               "additionalProperties": false,
               "properties": {
-                "arch": {
-                  "enum": [
-                    "amd64",
-                    "i386",
-                    "arm64",
-                    "armhf",
-                    "riscv32",
-                    "riscv64"
-                  ],
-                  "type": "string"
-                },
-                "cmode": {
-                  "enum": [
-                    "shell",
-                    "console",
-                    "tty"
-                  ],
-                  "type": "string"
-                },
-                "console": {
-                  "type": "boolean"
-                },
                 "cores": {
                   "type": "integer",
                   "minimum": 1,
@@ -50635,71 +50613,22 @@
                   "minimum": 0,
                   "maximum": 500000
                 },
-                "debug": {
-                  "type": "boolean"
-                },
-                "delete": {
-                  "type": "string",
-                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*(?:[,; ][A-Za-z][A-Za-z0-9._-]*)*$"
-                },
                 "description": {
                   "type": "string",
                   "maxLength": 8192
                 },
-                "dev[n]": {
-                  "not": {},
-                  "x-untranslated": "numbered vendor parameter"
-                },
                 "digest": {
                   "type": "string",
                   "maxLength": 40
-                },
-                "features": {
-                  "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
-                },
-                "hookscript": {
-                  "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
                 },
                 "hostname": {
                   "type": "string",
                   "maxLength": 255,
                   "pattern": "^(?=.{1,255}$)[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?(?:\\.[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?)*$"
                 },
-                "lock": {
-                  "enum": [
-                    "backup",
-                    "create",
-                    "destroyed",
-                    "disk",
-                    "fstrim",
-                    "migrate",
-                    "mounted",
-                    "rollback",
-                    "snapshot",
-                    "snapshot-delete"
-                  ],
-                  "type": "string"
-                },
                 "memory": {
                   "type": "integer",
                   "minimum": 16
-                },
-                "mp[n]": {
-                  "not": {},
-                  "x-untranslated": "numbered vendor parameter"
-                },
-                "nameserver": {
-                  "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
-                },
-                "net[n]": {
-                  "not": {},
-                  "x-untranslated": "numbered vendor parameter"
                 },
                 "node": {
                   "type": "string",
@@ -50708,39 +50637,6 @@
                 "onboot": {
                   "type": "boolean"
                 },
-                "ostype": {
-                  "enum": [
-                    "debian",
-                    "devuan",
-                    "ubuntu",
-                    "centos",
-                    "fedora",
-                    "opensuse",
-                    "archlinux",
-                    "alpine",
-                    "gentoo",
-                    "nixos",
-                    "unmanaged"
-                  ],
-                  "type": "string"
-                },
-                "protection": {
-                  "type": "boolean"
-                },
-                "revert": {
-                  "type": "string",
-                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*(?:[,; ][A-Za-z][A-Za-z0-9._-]*)*$"
-                },
-                "rootfs": {
-                  "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
-                },
-                "searchdomain": {
-                  "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
-                },
                 "startup": {
                   "type": "string",
                   "pattern": "^(?:(?:order=)?[0-9]+(?:,up=[0-9]+)?(?:,down=[0-9]+)?|up=[0-9]+(?:,down=[0-9]+)?|down=[0-9]+)$"
@@ -50748,31 +50644,6 @@
                 "swap": {
                   "type": "integer",
                   "minimum": 0
-                },
-                "tags": {
-                  "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
-                },
-                "template": {
-                  "type": "boolean"
-                },
-                "timezone": {
-                  "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
-                },
-                "tty": {
-                  "type": "integer",
-                  "minimum": 0,
-                  "maximum": 6
-                },
-                "unprivileged": {
-                  "type": "boolean"
-                },
-                "unused[n]": {
-                  "not": {},
-                  "x-untranslated": "numbered vendor parameter"
                 },
                 "vmid": {
                   "type": "integer",
@@ -60549,9 +60420,6 @@
               "type": "object",
               "additionalProperties": false,
               "properties": {
-                "debug": {
-                  "type": "boolean"
-                },
                 "node": {
                   "type": "string",
                   "pattern": "^[A-Za-z0-9][A-Za-z0-9.-]*$"
@@ -60696,9 +60564,6 @@
                 "node": {
                   "type": "string",
                   "pattern": "^[A-Za-z0-9][A-Za-z0-9.-]*$"
-                },
-                "overrule-shutdown": {
-                  "type": "boolean"
                 },
                 "skiplock": {
                   "type": "boolean"
@@ -66759,9 +66624,6 @@
                   "pattern": "^[A-Za-z0-9][A-Za-z0-9.-]*$"
                 },
                 "purge": {
-                  "type": "boolean"
-                },
-                "skiplock": {
                   "type": "boolean"
                 },
                 "vmid": {
@@ -78421,73 +78283,9 @@
               "type": "object",
               "additionalProperties": false,
               "properties": {
-                "acpi": {
-                  "type": "boolean"
-                },
-                "affinity": {
-                  "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
-                },
-                "agent": {
-                  "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
-                },
-                "amd-sev": {
-                  "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
-                },
-                "arch": {
-                  "enum": [
-                    "x86_64",
-                    "aarch64"
-                  ],
-                  "type": "string"
-                },
-                "args": {
-                  "type": "string"
-                },
-                "audio0": {
-                  "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
-                },
-                "autostart": {
-                  "type": "boolean"
-                },
                 "balloon": {
                   "type": "integer",
                   "minimum": 0
-                },
-                "bios": {
-                  "enum": [
-                    "seabios",
-                    "ovmf"
-                  ],
-                  "type": "string"
-                },
-                "boot": {
-                  "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
-                },
-                "bootdisk": {
-                  "type": "string",
-                  "pattern": "^(?:(ide|sata|scsi|virtio)\\d+)$",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
-                },
-                "cdrom": {
-                  "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
-                },
-                "cicustom": {
-                  "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
                 },
                 "cipassword": {
                   "oneOf": [
@@ -78520,20 +78318,6 @@
                   ],
                   "x-secret": true
                 },
-                "citype": {
-                  "enum": [
-                    "configdrive2",
-                    "nocloud",
-                    "opennebula"
-                  ],
-                  "type": "string"
-                },
-                "ciupgrade": {
-                  "type": "boolean"
-                },
-                "ciuser": {
-                  "type": "string"
-                },
                 "cores": {
                   "type": "integer",
                   "minimum": 1
@@ -78552,10 +78336,6 @@
                   "minimum": 1,
                   "maximum": 262144
                 },
-                "delete": {
-                  "type": "string",
-                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*(?:[,; ][A-Za-z][A-Za-z0-9._-]*)*$"
-                },
                 "description": {
                   "type": "string",
                   "maxLength": 8192
@@ -78564,326 +78344,45 @@
                   "type": "string",
                   "maxLength": 40
                 },
-                "efidisk0": {
-                  "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
-                },
-                "force": {
-                  "type": "boolean"
-                },
-                "freeze": {
-                  "type": "boolean"
-                },
-                "hookscript": {
-                  "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
-                },
-                "hostpci[n]": {
-                  "not": {},
-                  "x-untranslated": "numbered vendor parameter"
-                },
-                "hotplug": {
-                  "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
-                },
-                "hugepages": {
-                  "enum": [
-                    "any",
-                    "2",
-                    "1024"
-                  ],
-                  "type": "string"
-                },
-                "ide[n]": {
-                  "not": {},
-                  "x-untranslated": "numbered vendor parameter"
-                },
-                "ipconfig[n]": {
-                  "not": {},
-                  "x-untranslated": "numbered vendor parameter"
-                },
-                "ivshmem": {
-                  "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
-                },
-                "keephugepages": {
-                  "type": "boolean"
-                },
-                "keyboard": {
-                  "enum": [
-                    "de",
-                    "de-ch",
-                    "da",
-                    "en-gb",
-                    "en-us",
-                    "es",
-                    "fi",
-                    "fr",
-                    "fr-be",
-                    "fr-ca",
-                    "fr-ch",
-                    "hu",
-                    "is",
-                    "it",
-                    "ja",
-                    "lt",
-                    "mk",
-                    "nl",
-                    "no",
-                    "pl",
-                    "pt",
-                    "pt-br",
-                    "sv",
-                    "sl",
-                    "tr"
-                  ],
-                  "type": "string"
-                },
-                "kvm": {
-                  "type": "boolean"
-                },
-                "localtime": {
-                  "type": "boolean"
-                },
-                "lock": {
-                  "enum": [
-                    "backup",
-                    "clone",
-                    "create",
-                    "migrate",
-                    "rollback",
-                    "snapshot",
-                    "snapshot-delete",
-                    "suspending",
-                    "suspended"
-                  ],
-                  "type": "string"
-                },
-                "machine": {
-                  "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
-                },
                 "memory": {
                   "type": "string",
                   "pattern": "^(?:current=)?(?:1[6-9]|[2-9][0-9]|[1-9][0-9]{2,})$"
-                },
-                "migrate_downtime": {
-                  "type": "number",
-                  "minimum": 0
-                },
-                "migrate_speed": {
-                  "type": "integer",
-                  "minimum": 0
                 },
                 "name": {
                   "type": "string",
                   "pattern": "^(?=.{1,255}$)[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?(?:\\.[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?)*$"
                 },
-                "nameserver": {
-                  "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
-                },
-                "net[n]": {
-                  "not": {},
-                  "x-untranslated": "numbered vendor parameter"
-                },
                 "node": {
                   "type": "string",
                   "pattern": "^[A-Za-z0-9][A-Za-z0-9.-]*$"
                 },
-                "numa": {
-                  "type": "boolean"
-                },
-                "numa[n]": {
-                  "not": {},
-                  "x-untranslated": "numbered vendor parameter"
-                },
                 "onboot": {
                   "type": "boolean"
-                },
-                "ostype": {
-                  "enum": [
-                    "other",
-                    "wxp",
-                    "w2k",
-                    "w2k3",
-                    "w2k8",
-                    "wvista",
-                    "win7",
-                    "win8",
-                    "win10",
-                    "win11",
-                    "l24",
-                    "l26",
-                    "solaris"
-                  ],
-                  "type": "string"
-                },
-                "parallel[n]": {
-                  "not": {},
-                  "x-untranslated": "numbered vendor parameter"
-                },
-                "protection": {
-                  "type": "boolean"
-                },
-                "reboot": {
-                  "type": "boolean"
-                },
-                "revert": {
-                  "type": "string",
-                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*(?:[,; ][A-Za-z][A-Za-z0-9._-]*)*$"
-                },
-                "rng0": {
-                  "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
-                },
-                "sata[n]": {
-                  "not": {},
-                  "x-untranslated": "numbered vendor parameter"
-                },
-                "scsi[n]": {
-                  "not": {},
-                  "x-untranslated": "numbered vendor parameter"
-                },
-                "scsihw": {
-                  "enum": [
-                    "lsi",
-                    "lsi53c810",
-                    "virtio-scsi-pci",
-                    "virtio-scsi-single",
-                    "megasas",
-                    "pvscsi"
-                  ],
-                  "type": "string"
-                },
-                "searchdomain": {
-                  "type": "string"
-                },
-                "serial[n]": {
-                  "not": {},
-                  "x-untranslated": "numbered vendor parameter"
-                },
-                "shares": {
-                  "type": "integer",
-                  "minimum": 0,
-                  "maximum": 50000
-                },
-                "skiplock": {
-                  "type": "boolean"
-                },
-                "smbios1": {
-                  "type": "string",
-                  "maxLength": 512,
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
-                },
-                "smp": {
-                  "type": "integer",
-                  "minimum": 1
                 },
                 "sockets": {
                   "type": "integer",
                   "minimum": 1
                 },
-                "spice_enhancements": {
-                  "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
-                },
-                "sshkeys": {
-                  "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
-                },
-                "startdate": {
-                  "type": "string",
-                  "pattern": "^(?:(now|\\d{4}-\\d{1,2}-\\d{1,2}(T\\d{1,2}:\\d{1,2}:\\d{1,2})?))$"
-                },
                 "startup": {
                   "type": "string",
                   "pattern": "^(?:(?:order=)?[0-9]+(?:,up=[0-9]+)?(?:,down=[0-9]+)?|up=[0-9]+(?:,down=[0-9]+)?|down=[0-9]+)$"
                 },
-                "tablet": {
-                  "type": "boolean"
-                },
-                "tags": {
-                  "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
-                },
-                "tdf": {
-                  "type": "boolean"
-                },
-                "template": {
-                  "type": "boolean"
-                },
-                "tpmstate0": {
-                  "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
-                },
-                "unused[n]": {
-                  "not": {},
-                  "x-untranslated": "numbered vendor parameter"
-                },
-                "usb[n]": {
-                  "not": {},
-                  "x-untranslated": "numbered vendor parameter"
-                },
                 "vcpus": {
                   "type": "integer",
                   "minimum": 1
-                },
-                "vga": {
-                  "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
-                },
-                "virtio[n]": {
-                  "not": {},
-                  "x-untranslated": "numbered vendor parameter"
-                },
-                "virtiofs[n]": {
-                  "not": {},
-                  "x-untranslated": "numbered vendor parameter"
-                },
-                "vmgenid": {
-                  "type": "string",
-                  "not": {},
-                  "x-untranslated": "Perl pattern"
                 },
                 "vmid": {
                   "type": "integer",
                   "minimum": 100,
                   "maximum": 999999999,
                   "pattern": "^[1-9][0-9]*$"
-                },
-                "vmstatestorage": {
-                  "type": "string",
-                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*$"
-                },
-                "watchdog": {
-                  "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
                 }
               },
               "required": [
                 "node",
                 "vmid"
               ],
-              "dependencies": {
-                "force": [
-                  "delete"
-                ]
-              }
+              "dependencies": {}
             }
           },
           "required": [
@@ -85471,9 +84970,6 @@
                     }
                   ]
                 },
-                "skiplock": {
-                  "type": "boolean"
-                },
                 "vmid": {
                   "type": "integer",
                   "minimum": 100,
@@ -87661,9 +87157,6 @@
               "type": "object",
               "additionalProperties": false,
               "properties": {
-                "nocheck": {
-                  "type": "boolean"
-                },
                 "node": {
                   "type": "string",
                   "pattern": "^[A-Za-z0-9][A-Za-z0-9.-]*$"
@@ -88050,45 +87543,12 @@
               "type": "object",
               "additionalProperties": false,
               "properties": {
-                "force-cpu": {
-                  "type": "string"
-                },
-                "machine": {
-                  "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
-                },
-                "migratedfrom": {
-                  "type": "string",
-                  "pattern": "^[A-Za-z0-9][A-Za-z0-9.-]*$"
-                },
-                "migration_network": {
-                  "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
-                },
-                "migration_type": {
-                  "enum": [
-                    "secure",
-                    "insecure"
-                  ],
-                  "type": "string"
-                },
                 "node": {
                   "type": "string",
                   "pattern": "^[A-Za-z0-9][A-Za-z0-9.-]*$"
                 },
                 "skiplock": {
                   "type": "boolean"
-                },
-                "stateuri": {
-                  "type": "string",
-                  "maxLength": 128
-                },
-                "targetstorage": {
-                  "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
                 },
                 "timeout": {
                   "type": "integer",
@@ -88252,16 +87712,9 @@
                 "keepActive": {
                   "type": "boolean"
                 },
-                "migratedfrom": {
-                  "type": "string",
-                  "pattern": "^[A-Za-z0-9][A-Za-z0-9.-]*$"
-                },
                 "node": {
                   "type": "string",
                   "pattern": "^[A-Za-z0-9][A-Za-z0-9.-]*$"
-                },
-                "overrule-shutdown": {
-                  "type": "boolean"
                 },
                 "skiplock": {
                   "type": "boolean"
@@ -88422,10 +87875,6 @@
                 "skiplock": {
                   "type": "boolean"
                 },
-                "statestorage": {
-                  "type": "string",
-                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*$"
-                },
                 "todisk": {
                   "type": "boolean"
                 },
@@ -88440,11 +87889,7 @@
                 "node",
                 "vmid"
               ],
-              "dependencies": {
-                "statestorage": [
-                  "todisk"
-                ]
-              }
+              "dependencies": {}
             }
           },
           "required": [
@@ -92821,35 +92266,15 @@
               "type": "object",
               "additionalProperties": false,
               "properties": {
-                "cmd": {
-                  "enum": [
-                    "ceph_install",
-                    "upgrade",
-                    "login"
-                  ],
-                  "type": "string"
-                },
-                "cmd-opts": {
-                  "type": "string"
-                },
                 "node": {
                   "type": "string",
                   "pattern": "^[A-Za-z0-9][A-Za-z0-9.-]*$"
-                },
-                "proxy": {
-                  "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
                 }
               },
               "required": [
                 "node"
               ],
-              "dependencies": {
-                "cmd-opts": [
-                  "cmd"
-                ]
-              }
+              "dependencies": {}
             }
           },
           "required": [
@@ -96045,10 +95470,6 @@
                 "storage": {
                   "type": "string",
                   "pattern": "^[A-Za-z][A-Za-z0-9._-]*$"
-                },
-                "tmpfilename": {
-                  "type": "string",
-                  "pattern": "^(?:/var/tmp/pveupload-[0-9a-f]+)$"
                 }
               },
               "required": [
@@ -97546,17 +96967,6 @@
               "type": "object",
               "additionalProperties": false,
               "properties": {
-                "cmd": {
-                  "enum": [
-                    "ceph_install",
-                    "upgrade",
-                    "login"
-                  ],
-                  "type": "string"
-                },
-                "cmd-opts": {
-                  "type": "string"
-                },
                 "node": {
                   "type": "string",
                   "pattern": "^[A-Za-z0-9][A-Za-z0-9.-]*$"
@@ -97565,11 +96975,7 @@
               "required": [
                 "node"
               ],
-              "dependencies": {
-                "cmd-opts": [
-                  "cmd"
-                ]
-              }
+              "dependencies": {}
             }
           },
           "required": [
@@ -98021,43 +97427,18 @@
               "type": "object",
               "additionalProperties": false,
               "properties": {
-                "cmd": {
-                  "enum": [
-                    "ceph_install",
-                    "upgrade",
-                    "login"
-                  ],
-                  "type": "string"
-                },
-                "cmd-opts": {
-                  "type": "string"
-                },
-                "height": {
-                  "type": "integer",
-                  "minimum": 16,
-                  "maximum": 2160
-                },
                 "node": {
                   "type": "string",
                   "pattern": "^[A-Za-z0-9][A-Za-z0-9.-]*$"
                 },
                 "websocket": {
                   "type": "boolean"
-                },
-                "width": {
-                  "type": "integer",
-                  "minimum": 16,
-                  "maximum": 4096
                 }
               },
               "required": [
                 "node"
               ],
-              "dependencies": {
-                "cmd-opts": [
-                  "cmd"
-                ]
-              }
+              "dependencies": {}
             }
           },
           "required": [
@@ -122938,7 +122319,13 @@
           "type": "object",
           "additionalProperties": false,
           "properties": {
-            "api": {}
+            "api": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {},
+              "required": [],
+              "dependencies": {}
+            }
           },
           "required": [
             "api"
@@ -123308,7 +122695,13 @@
           "type": "object",
           "additionalProperties": false,
           "properties": {
-            "api": {}
+            "api": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {},
+              "required": [],
+              "dependencies": {}
+            }
           },
           "required": [
             "api"
@@ -138500,7 +137893,13 @@
           "type": "object",
           "additionalProperties": false,
           "properties": {
-            "api": {}
+            "api": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {},
+              "required": [],
+              "dependencies": {}
+            }
           },
           "required": [
             "api"
@@ -168516,28 +167915,6 @@
               "type": "object",
               "additionalProperties": false,
               "properties": {
-                "arch": {
-                  "enum": [
-                    "amd64",
-                    "i386",
-                    "arm64",
-                    "armhf",
-                    "riscv32",
-                    "riscv64"
-                  ],
-                  "type": "string"
-                },
-                "cmode": {
-                  "enum": [
-                    "shell",
-                    "console",
-                    "tty"
-                  ],
-                  "type": "string"
-                },
-                "console": {
-                  "type": "boolean"
-                },
                 "cores": {
                   "type": "integer",
                   "minimum": 1,
@@ -168553,81 +167930,22 @@
                   "minimum": 0,
                   "maximum": 500000
                 },
-                "debug": {
-                  "type": "boolean"
-                },
-                "delete": {
-                  "type": "string",
-                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*(?:[,; ][A-Za-z][A-Za-z0-9._-]*)*$"
-                },
                 "description": {
                   "type": "string",
                   "maxLength": 8192
                 },
-                "dev[n]": {
-                  "not": {},
-                  "x-untranslated": "numbered vendor parameter"
-                },
                 "digest": {
                   "type": "string",
                   "maxLength": 40
-                },
-                "entrypoint": {
-                  "type": "string",
-                  "not": {},
-                  "x-untranslated": "Perl pattern"
-                },
-                "env": {
-                  "type": "string",
-                  "not": {},
-                  "x-untranslated": "Perl pattern"
-                },
-                "features": {
-                  "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
-                },
-                "hookscript": {
-                  "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
                 },
                 "hostname": {
                   "type": "string",
                   "maxLength": 255,
                   "pattern": "^(?=.{1,255}$)[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?(?:\\.[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?)*$"
                 },
-                "lock": {
-                  "enum": [
-                    "backup",
-                    "create",
-                    "destroyed",
-                    "disk",
-                    "fstrim",
-                    "migrate",
-                    "mounted",
-                    "rollback",
-                    "snapshot",
-                    "snapshot-delete"
-                  ],
-                  "type": "string"
-                },
                 "memory": {
                   "type": "integer",
                   "minimum": 16
-                },
-                "mp[n]": {
-                  "not": {},
-                  "x-untranslated": "numbered vendor parameter"
-                },
-                "nameserver": {
-                  "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
-                },
-                "net[n]": {
-                  "not": {},
-                  "x-untranslated": "numbered vendor parameter"
                 },
                 "node": {
                   "type": "string",
@@ -168636,39 +167954,6 @@
                 "onboot": {
                   "type": "boolean"
                 },
-                "ostype": {
-                  "enum": [
-                    "debian",
-                    "devuan",
-                    "ubuntu",
-                    "centos",
-                    "fedora",
-                    "opensuse",
-                    "archlinux",
-                    "alpine",
-                    "gentoo",
-                    "nixos",
-                    "unmanaged"
-                  ],
-                  "type": "string"
-                },
-                "protection": {
-                  "type": "boolean"
-                },
-                "revert": {
-                  "type": "string",
-                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*(?:[,; ][A-Za-z][A-Za-z0-9._-]*)*$"
-                },
-                "rootfs": {
-                  "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
-                },
-                "searchdomain": {
-                  "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
-                },
                 "startup": {
                   "type": "string",
                   "pattern": "^(?:(?:order=)?[0-9]+(?:,up=[0-9]+)?(?:,down=[0-9]+)?|up=[0-9]+(?:,down=[0-9]+)?|down=[0-9]+)$"
@@ -168676,31 +167961,6 @@
                 "swap": {
                   "type": "integer",
                   "minimum": 0
-                },
-                "tags": {
-                  "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
-                },
-                "template": {
-                  "type": "boolean"
-                },
-                "timezone": {
-                  "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
-                },
-                "tty": {
-                  "type": "integer",
-                  "minimum": 0,
-                  "maximum": 6
-                },
-                "unprivileged": {
-                  "type": "boolean"
-                },
-                "unused[n]": {
-                  "not": {},
-                  "x-untranslated": "numbered vendor parameter"
                 },
                 "vmid": {
                   "type": "integer",
@@ -178779,9 +178039,6 @@
               "type": "object",
               "additionalProperties": false,
               "properties": {
-                "debug": {
-                  "type": "boolean"
-                },
                 "node": {
                   "type": "string",
                   "pattern": "^[A-Za-z0-9][A-Za-z0-9.-]*$"
@@ -178926,9 +178183,6 @@
                 "node": {
                   "type": "string",
                   "pattern": "^[A-Za-z0-9][A-Za-z0-9.-]*$"
-                },
-                "overrule-shutdown": {
-                  "type": "boolean"
                 },
                 "skiplock": {
                   "type": "boolean"
@@ -185045,9 +184299,6 @@
                   "pattern": "^[A-Za-z0-9][A-Za-z0-9.-]*$"
                 },
                 "purge": {
-                  "type": "boolean"
-                },
-                "skiplock": {
                   "type": "boolean"
                 },
                 "vmid": {
@@ -196789,76 +196040,9 @@
               "type": "object",
               "additionalProperties": false,
               "properties": {
-                "acpi": {
-                  "type": "boolean"
-                },
-                "affinity": {
-                  "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
-                },
-                "agent": {
-                  "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
-                },
-                "allow-ksm": {
-                  "type": "boolean"
-                },
-                "amd-sev": {
-                  "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
-                },
-                "arch": {
-                  "enum": [
-                    "x86_64",
-                    "aarch64"
-                  ],
-                  "type": "string"
-                },
-                "args": {
-                  "type": "string"
-                },
-                "audio0": {
-                  "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
-                },
-                "autostart": {
-                  "type": "boolean"
-                },
                 "balloon": {
                   "type": "integer",
                   "minimum": 0
-                },
-                "bios": {
-                  "enum": [
-                    "seabios",
-                    "ovmf"
-                  ],
-                  "type": "string"
-                },
-                "boot": {
-                  "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
-                },
-                "bootdisk": {
-                  "type": "string",
-                  "pattern": "^(?:(ide|sata|scsi|virtio)\\d+)$",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
-                },
-                "cdrom": {
-                  "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
-                },
-                "cicustom": {
-                  "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
                 },
                 "cipassword": {
                   "oneOf": [
@@ -196891,20 +196075,6 @@
                   ],
                   "x-secret": true
                 },
-                "citype": {
-                  "enum": [
-                    "configdrive2",
-                    "nocloud",
-                    "opennebula"
-                  ],
-                  "type": "string"
-                },
-                "ciupgrade": {
-                  "type": "boolean"
-                },
-                "ciuser": {
-                  "type": "string"
-                },
                 "cores": {
                   "type": "integer",
                   "minimum": 1
@@ -196923,10 +196093,6 @@
                   "minimum": 1,
                   "maximum": 262144
                 },
-                "delete": {
-                  "type": "string",
-                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*(?:[,; ][A-Za-z][A-Za-z0-9._-]*)*$"
-                },
                 "description": {
                   "type": "string",
                   "maxLength": 8192
@@ -196935,331 +196101,45 @@
                   "type": "string",
                   "maxLength": 40
                 },
-                "efidisk0": {
-                  "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
-                },
-                "force": {
-                  "type": "boolean"
-                },
-                "freeze": {
-                  "type": "boolean"
-                },
-                "hookscript": {
-                  "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
-                },
-                "hostpci[n]": {
-                  "not": {},
-                  "x-untranslated": "numbered vendor parameter"
-                },
-                "hotplug": {
-                  "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
-                },
-                "hugepages": {
-                  "enum": [
-                    "any",
-                    "2",
-                    "1024"
-                  ],
-                  "type": "string"
-                },
-                "ide[n]": {
-                  "not": {},
-                  "x-untranslated": "numbered vendor parameter"
-                },
-                "intel-tdx": {
-                  "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
-                },
-                "ipconfig[n]": {
-                  "not": {},
-                  "x-untranslated": "numbered vendor parameter"
-                },
-                "ivshmem": {
-                  "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
-                },
-                "keephugepages": {
-                  "type": "boolean"
-                },
-                "keyboard": {
-                  "enum": [
-                    "de",
-                    "de-ch",
-                    "da",
-                    "en-gb",
-                    "en-us",
-                    "es",
-                    "fi",
-                    "fr",
-                    "fr-be",
-                    "fr-ca",
-                    "fr-ch",
-                    "hu",
-                    "is",
-                    "it",
-                    "ja",
-                    "lt",
-                    "mk",
-                    "nl",
-                    "no",
-                    "pl",
-                    "pt",
-                    "pt-br",
-                    "sv",
-                    "sl",
-                    "tr"
-                  ],
-                  "type": "string"
-                },
-                "kvm": {
-                  "type": "boolean"
-                },
-                "localtime": {
-                  "type": "boolean"
-                },
-                "lock": {
-                  "enum": [
-                    "backup",
-                    "clone",
-                    "create",
-                    "migrate",
-                    "rollback",
-                    "snapshot",
-                    "snapshot-delete",
-                    "suspending",
-                    "suspended"
-                  ],
-                  "type": "string"
-                },
-                "machine": {
-                  "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
-                },
                 "memory": {
                   "type": "string",
                   "pattern": "^(?:current=)?(?:1[6-9]|[2-9][0-9]|[1-9][0-9]{2,})$"
-                },
-                "migrate_downtime": {
-                  "type": "number",
-                  "minimum": 0
-                },
-                "migrate_speed": {
-                  "type": "integer",
-                  "minimum": 0
                 },
                 "name": {
                   "type": "string",
                   "pattern": "^(?=.{1,255}$)[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?(?:\\.[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?)*$"
                 },
-                "nameserver": {
-                  "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
-                },
-                "net[n]": {
-                  "not": {},
-                  "x-untranslated": "numbered vendor parameter"
-                },
                 "node": {
                   "type": "string",
                   "pattern": "^[A-Za-z0-9][A-Za-z0-9.-]*$"
                 },
-                "numa": {
-                  "type": "boolean"
-                },
-                "numa[n]": {
-                  "not": {},
-                  "x-untranslated": "numbered vendor parameter"
-                },
                 "onboot": {
                   "type": "boolean"
-                },
-                "ostype": {
-                  "enum": [
-                    "other",
-                    "wxp",
-                    "w2k",
-                    "w2k3",
-                    "w2k8",
-                    "wvista",
-                    "win7",
-                    "win8",
-                    "win10",
-                    "win11",
-                    "l24",
-                    "l26",
-                    "solaris"
-                  ],
-                  "type": "string"
-                },
-                "parallel[n]": {
-                  "not": {},
-                  "x-untranslated": "numbered vendor parameter"
-                },
-                "protection": {
-                  "type": "boolean"
-                },
-                "reboot": {
-                  "type": "boolean"
-                },
-                "revert": {
-                  "type": "string",
-                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*(?:[,; ][A-Za-z][A-Za-z0-9._-]*)*$"
-                },
-                "rng0": {
-                  "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
-                },
-                "sata[n]": {
-                  "not": {},
-                  "x-untranslated": "numbered vendor parameter"
-                },
-                "scsi[n]": {
-                  "not": {},
-                  "x-untranslated": "numbered vendor parameter"
-                },
-                "scsihw": {
-                  "enum": [
-                    "lsi",
-                    "lsi53c810",
-                    "virtio-scsi-pci",
-                    "virtio-scsi-single",
-                    "megasas",
-                    "pvscsi"
-                  ],
-                  "type": "string"
-                },
-                "searchdomain": {
-                  "type": "string"
-                },
-                "serial[n]": {
-                  "not": {},
-                  "x-untranslated": "numbered vendor parameter"
-                },
-                "shares": {
-                  "type": "integer",
-                  "minimum": 0,
-                  "maximum": 50000
-                },
-                "skiplock": {
-                  "type": "boolean"
-                },
-                "smbios1": {
-                  "type": "string",
-                  "maxLength": 512,
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
-                },
-                "smp": {
-                  "type": "integer",
-                  "minimum": 1
                 },
                 "sockets": {
                   "type": "integer",
                   "minimum": 1
                 },
-                "spice_enhancements": {
-                  "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
-                },
-                "sshkeys": {
-                  "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
-                },
-                "startdate": {
-                  "type": "string",
-                  "pattern": "^(?:(now|\\d{4}-\\d{1,2}-\\d{1,2}(T\\d{1,2}:\\d{1,2}:\\d{1,2})?))$"
-                },
                 "startup": {
                   "type": "string",
                   "pattern": "^(?:(?:order=)?[0-9]+(?:,up=[0-9]+)?(?:,down=[0-9]+)?|up=[0-9]+(?:,down=[0-9]+)?|down=[0-9]+)$"
                 },
-                "tablet": {
-                  "type": "boolean"
-                },
-                "tags": {
-                  "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
-                },
-                "tdf": {
-                  "type": "boolean"
-                },
-                "template": {
-                  "type": "boolean"
-                },
-                "tpmstate0": {
-                  "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
-                },
-                "unused[n]": {
-                  "not": {},
-                  "x-untranslated": "numbered vendor parameter"
-                },
-                "usb[n]": {
-                  "not": {},
-                  "x-untranslated": "numbered vendor parameter"
-                },
                 "vcpus": {
                   "type": "integer",
                   "minimum": 1
-                },
-                "vga": {
-                  "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
-                },
-                "virtio[n]": {
-                  "not": {},
-                  "x-untranslated": "numbered vendor parameter"
-                },
-                "virtiofs[n]": {
-                  "not": {},
-                  "x-untranslated": "numbered vendor parameter"
-                },
-                "vmgenid": {
-                  "type": "string",
-                  "not": {},
-                  "x-untranslated": "Perl pattern"
                 },
                 "vmid": {
                   "type": "integer",
                   "minimum": 100,
                   "maximum": 999999999,
                   "pattern": "^[1-9][0-9]*$"
-                },
-                "vmstatestorage": {
-                  "type": "string",
-                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*$"
-                },
-                "watchdog": {
-                  "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
                 }
               },
               "required": [
                 "node",
                 "vmid"
               ],
-              "dependencies": {
-                "force": [
-                  "delete"
-                ]
-              }
+              "dependencies": {}
             }
           },
           "required": [
@@ -204125,9 +203005,6 @@
                     }
                   ]
                 },
-                "skiplock": {
-                  "type": "boolean"
-                },
                 "vmid": {
                   "type": "integer",
                   "minimum": 100,
@@ -206352,9 +205229,6 @@
               "type": "object",
               "additionalProperties": false,
               "properties": {
-                "nocheck": {
-                  "type": "boolean"
-                },
                 "node": {
                   "type": "string",
                   "pattern": "^[A-Za-z0-9][A-Za-z0-9.-]*$"
@@ -206762,49 +205636,12 @@
               "type": "object",
               "additionalProperties": false,
               "properties": {
-                "force-cpu": {
-                  "type": "string"
-                },
-                "machine": {
-                  "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
-                },
-                "migratedfrom": {
-                  "type": "string",
-                  "pattern": "^[A-Za-z0-9][A-Za-z0-9.-]*$"
-                },
-                "migration_network": {
-                  "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
-                },
-                "migration_type": {
-                  "enum": [
-                    "secure",
-                    "insecure"
-                  ],
-                  "type": "string"
-                },
-                "nets-host-mtu": {
-                  "type": "string",
-                  "pattern": "^(?:net\\d+=\\d+(,net\\d+=\\d+)*)$"
-                },
                 "node": {
                   "type": "string",
                   "pattern": "^[A-Za-z0-9][A-Za-z0-9.-]*$"
                 },
                 "skiplock": {
                   "type": "boolean"
-                },
-                "stateuri": {
-                  "type": "string",
-                  "maxLength": 128
-                },
-                "targetstorage": {
-                  "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
                 },
                 "timeout": {
                   "type": "integer",
@@ -206815,9 +205652,6 @@
                   "minimum": 100,
                   "maximum": 999999999,
                   "pattern": "^[1-9][0-9]*$"
-                },
-                "with-conntrack-state": {
-                  "type": "boolean"
                 }
               },
               "required": [
@@ -206971,16 +205805,9 @@
                 "keepActive": {
                   "type": "boolean"
                 },
-                "migratedfrom": {
-                  "type": "string",
-                  "pattern": "^[A-Za-z0-9][A-Za-z0-9.-]*$"
-                },
                 "node": {
                   "type": "string",
                   "pattern": "^[A-Za-z0-9][A-Za-z0-9.-]*$"
-                },
-                "overrule-shutdown": {
-                  "type": "boolean"
                 },
                 "skiplock": {
                   "type": "boolean"
@@ -207141,10 +205968,6 @@
                 "skiplock": {
                   "type": "boolean"
                 },
-                "statestorage": {
-                  "type": "string",
-                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*$"
-                },
                 "todisk": {
                   "type": "boolean"
                 },
@@ -207159,11 +205982,7 @@
                 "node",
                 "vmid"
               ],
-              "dependencies": {
-                "statestorage": [
-                  "todisk"
-                ]
-              }
+              "dependencies": {}
             }
           },
           "required": [
@@ -212686,35 +211505,15 @@
               "type": "object",
               "additionalProperties": false,
               "properties": {
-                "cmd": {
-                  "enum": [
-                    "ceph_install",
-                    "login",
-                    "upgrade"
-                  ],
-                  "type": "string"
-                },
-                "cmd-opts": {
-                  "type": "string"
-                },
                 "node": {
                   "type": "string",
                   "pattern": "^[A-Za-z0-9][A-Za-z0-9.-]*$"
-                },
-                "proxy": {
-                  "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
                 }
               },
               "required": [
                 "node"
               ],
-              "dependencies": {
-                "cmd-opts": [
-                  "cmd"
-                ]
-              }
+              "dependencies": {}
             }
           },
           "required": [
@@ -216277,10 +215076,6 @@
                 "storage": {
                   "type": "string",
                   "pattern": "^[A-Za-z][A-Za-z0-9._-]*$"
-                },
-                "tmpfilename": {
-                  "type": "string",
-                  "pattern": "^(?:/var/tmp/pveupload-[0-9a-f]+)$"
                 }
               },
               "required": [
@@ -217801,17 +216596,6 @@
               "type": "object",
               "additionalProperties": false,
               "properties": {
-                "cmd": {
-                  "enum": [
-                    "ceph_install",
-                    "login",
-                    "upgrade"
-                  ],
-                  "type": "string"
-                },
-                "cmd-opts": {
-                  "type": "string"
-                },
                 "node": {
                   "type": "string",
                   "pattern": "^[A-Za-z0-9][A-Za-z0-9.-]*$"
@@ -217820,11 +216604,7 @@
               "required": [
                 "node"
               ],
-              "dependencies": {
-                "cmd-opts": [
-                  "cmd"
-                ]
-              }
+              "dependencies": {}
             }
           },
           "required": [
@@ -218286,43 +217066,18 @@
               "type": "object",
               "additionalProperties": false,
               "properties": {
-                "cmd": {
-                  "enum": [
-                    "ceph_install",
-                    "login",
-                    "upgrade"
-                  ],
-                  "type": "string"
-                },
-                "cmd-opts": {
-                  "type": "string"
-                },
-                "height": {
-                  "type": "integer",
-                  "minimum": 16,
-                  "maximum": 2160
-                },
                 "node": {
                   "type": "string",
                   "pattern": "^[A-Za-z0-9][A-Za-z0-9.-]*$"
                 },
                 "websocket": {
                   "type": "boolean"
-                },
-                "width": {
-                  "type": "integer",
-                  "minimum": 16,
-                  "maximum": 4096
                 }
               },
               "required": [
                 "node"
               ],
-              "dependencies": {
-                "cmd-opts": [
-                  "cmd"
-                ]
-              }
+              "dependencies": {}
             }
           },
           "required": [

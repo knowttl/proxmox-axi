@@ -58,12 +58,14 @@ test('disk growth uses confirmed relative increments and retained task outcomes'
   const target = ['--api-node', 'node-a', '--api-vmid', '100']
   for (const release of [{ name: 'legacy-8.2.7', version: '8.2.7' }, { name: 'published-current', version: '9.2.1' }]) {
     for (const [family, disk] of [['qemu', 'scsi0'], ['lxc', 'rootfs']]) {
-      await t.test(`${release.name} ${family} discovery admits growth and refuses absolute sizes`, async () => {
+      await t.test(`${release.name} ${family} discovery admits growth and refuses absolute sizes and lock bypass`, async () => {
         const schema = await command(['schema', 'set', resize(family!), '--catalogue', release.name])
         assert.equal(schema.code, 0, schema.stderr)
         const validate = new Ajv({ strict: false }).compile(schema.data.invocation.schema)
         assert.equal(validate({ api: { node: 'node-a', vmid: 100, disk, size: '+8G' } }), true)
         assert.equal(validate({ api: { node: 'node-a', vmid: 100, disk, size: '24G' } }), false)
+        assert.equal(validate({ api: { node: 'node-a', vmid: 100, disk, size: '+8G', skiplock: true } }), false)
+        if (family === 'qemu') assert.equal(schema.data.parameters.properties.skiplock.type, 'boolean')
       })
       await t.test(`${release.name} ${family} grows only after exact confirmation and tracks completion`, async () => {
         version = release.version
