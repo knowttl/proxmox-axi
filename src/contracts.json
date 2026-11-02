@@ -48693,8 +48693,7 @@
                 },
                 "rootfs": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^(?:volume=)?[A-Za-z][A-Za-z0-9._-]*:(?:(?:[1-9][0-9]*(?:\\.[0-9]+)?|0\\.[0-9]*[1-9][0-9]*)|(?:vm|subvol)-[1-9][0-9]*-disk-[0-9]+(?:\\.raw)?)(?:,acl=[01])?(?:,quota=[01])?(?:,ro=[01])?$"
                 },
                 "searchdomain": {
                   "type": "string",
@@ -50529,7 +50528,7 @@
         "effect": "write",
         "transport": "json",
         "secrets": "input-refs",
-        "reason": "Reviewed compute and startup branches only; CPU feature overrides and host passthrough remain refused, and credential fields require SecretRefs.",
+        "reason": "Reviewed compute, startup and managed disk branches; numbered slots and removal selectors are explicit, host passthrough remains refused, and credentials require SecretRefs.",
         "allowedInputs": [
           "node",
           "vmid",
@@ -50549,8 +50548,269 @@
           "startup",
           "digest",
           "cipassword",
-          "password"
+          "password",
+          "mp0",
+          "mp1",
+          "mp2",
+          "mp3",
+          "mp4",
+          "mp5",
+          "mp6",
+          "mp7",
+          "mp8",
+          "mp9",
+          "mp10",
+          "mp11",
+          "mp12",
+          "mp13",
+          "mp14",
+          "mp15",
+          "mp16",
+          "mp17",
+          "mp18",
+          "mp19",
+          "mp20",
+          "mp21",
+          "mp22",
+          "mp23",
+          "mp24",
+          "mp25",
+          "mp26",
+          "mp27",
+          "mp28",
+          "mp29",
+          "mp30",
+          "mp31",
+          "mp32",
+          "mp33",
+          "mp34",
+          "mp35",
+          "mp36",
+          "mp37",
+          "mp38",
+          "mp39",
+          "mp40",
+          "mp41",
+          "mp42",
+          "mp43",
+          "mp44",
+          "mp45",
+          "mp46",
+          "mp47",
+          "mp48",
+          "mp49",
+          "mp50",
+          "mp51",
+          "mp52",
+          "mp53",
+          "mp54",
+          "mp55",
+          "mp56",
+          "mp57",
+          "mp58",
+          "mp59",
+          "mp60",
+          "mp61",
+          "mp62",
+          "mp63",
+          "mp64",
+          "mp65",
+          "mp66",
+          "mp67",
+          "mp68",
+          "mp69",
+          "mp70",
+          "mp71",
+          "mp72",
+          "mp73",
+          "mp74",
+          "mp75",
+          "mp76",
+          "mp77",
+          "mp78",
+          "mp79",
+          "mp80",
+          "mp81",
+          "mp82",
+          "mp83",
+          "mp84",
+          "mp85",
+          "mp86",
+          "mp87",
+          "mp88",
+          "mp89",
+          "mp90",
+          "mp91",
+          "mp92",
+          "mp93",
+          "mp94",
+          "mp95",
+          "mp96",
+          "mp97",
+          "mp98",
+          "mp99",
+          "mp100",
+          "mp101",
+          "mp102",
+          "mp103",
+          "mp104",
+          "mp105",
+          "mp106",
+          "mp107",
+          "mp108",
+          "mp109",
+          "mp110",
+          "mp111",
+          "mp112",
+          "mp113",
+          "mp114",
+          "mp115",
+          "mp116",
+          "mp117",
+          "mp118",
+          "mp119",
+          "mp120",
+          "mp121",
+          "mp122",
+          "mp123",
+          "mp124",
+          "mp125",
+          "mp126",
+          "mp127",
+          "mp128",
+          "mp129",
+          "mp130",
+          "mp131",
+          "mp132",
+          "mp133",
+          "mp134",
+          "mp135",
+          "mp136",
+          "mp137",
+          "mp138",
+          "mp139",
+          "mp140",
+          "mp141",
+          "mp142",
+          "mp143",
+          "mp144",
+          "mp145",
+          "mp146",
+          "mp147",
+          "mp148",
+          "mp149",
+          "mp150",
+          "mp151",
+          "mp152",
+          "mp153",
+          "mp154",
+          "mp155",
+          "mp156",
+          "mp157",
+          "mp158",
+          "mp159",
+          "mp160",
+          "mp161",
+          "mp162",
+          "mp163",
+          "mp164",
+          "mp165",
+          "mp166",
+          "mp167",
+          "mp168",
+          "mp169",
+          "mp170",
+          "mp171",
+          "mp172",
+          "mp173",
+          "mp174",
+          "mp175",
+          "mp176",
+          "mp177",
+          "mp178",
+          "mp179",
+          "mp180",
+          "mp181",
+          "mp182",
+          "mp183",
+          "mp184",
+          "mp185",
+          "mp186",
+          "mp187",
+          "mp188",
+          "mp189",
+          "mp190",
+          "mp191",
+          "mp192",
+          "mp193",
+          "mp194",
+          "mp195",
+          "mp196",
+          "mp197",
+          "mp198",
+          "mp199",
+          "mp200",
+          "mp201",
+          "mp202",
+          "mp203",
+          "mp204",
+          "mp205",
+          "mp206",
+          "mp207",
+          "mp208",
+          "mp209",
+          "mp210",
+          "mp211",
+          "mp212",
+          "mp213",
+          "mp214",
+          "mp215",
+          "mp216",
+          "mp217",
+          "mp218",
+          "mp219",
+          "mp220",
+          "mp221",
+          "mp222",
+          "mp223",
+          "mp224",
+          "mp225",
+          "mp226",
+          "mp227",
+          "mp228",
+          "mp229",
+          "mp230",
+          "mp231",
+          "mp232",
+          "mp233",
+          "mp234",
+          "mp235",
+          "mp236",
+          "mp237",
+          "mp238",
+          "mp239",
+          "mp240",
+          "mp241",
+          "mp242",
+          "mp243",
+          "mp244",
+          "mp245",
+          "mp246",
+          "mp247",
+          "mp248",
+          "mp249",
+          "mp250",
+          "mp251",
+          "mp252",
+          "mp253",
+          "mp254",
+          "mp255",
+          "rootfs",
+          "delete"
         ],
+        "inputPatterns": {
+          "delete": "^(?:mp0|mp1|mp2|mp3|mp4|mp5|mp6|mp7|mp8|mp9|mp10|mp11|mp12|mp13|mp14|mp15|mp16|mp17|mp18|mp19|mp20|mp21|mp22|mp23|mp24|mp25|mp26|mp27|mp28|mp29|mp30|mp31|mp32|mp33|mp34|mp35|mp36|mp37|mp38|mp39|mp40|mp41|mp42|mp43|mp44|mp45|mp46|mp47|mp48|mp49|mp50|mp51|mp52|mp53|mp54|mp55|mp56|mp57|mp58|mp59|mp60|mp61|mp62|mp63|mp64|mp65|mp66|mp67|mp68|mp69|mp70|mp71|mp72|mp73|mp74|mp75|mp76|mp77|mp78|mp79|mp80|mp81|mp82|mp83|mp84|mp85|mp86|mp87|mp88|mp89|mp90|mp91|mp92|mp93|mp94|mp95|mp96|mp97|mp98|mp99|mp100|mp101|mp102|mp103|mp104|mp105|mp106|mp107|mp108|mp109|mp110|mp111|mp112|mp113|mp114|mp115|mp116|mp117|mp118|mp119|mp120|mp121|mp122|mp123|mp124|mp125|mp126|mp127|mp128|mp129|mp130|mp131|mp132|mp133|mp134|mp135|mp136|mp137|mp138|mp139|mp140|mp141|mp142|mp143|mp144|mp145|mp146|mp147|mp148|mp149|mp150|mp151|mp152|mp153|mp154|mp155|mp156|mp157|mp158|mp159|mp160|mp161|mp162|mp163|mp164|mp165|mp166|mp167|mp168|mp169|mp170|mp171|mp172|mp173|mp174|mp175|mp176|mp177|mp178|mp179|mp180|mp181|mp182|mp183|mp184|mp185|mp186|mp187|mp188|mp189|mp190|mp191|mp192|mp193|mp194|mp195|mp196|mp197|mp198|mp199|mp200|mp201|mp202|mp203|mp204|mp205|mp206|mp207|mp208|mp209|mp210|mp211|mp212|mp213|mp214|mp215|mp216|mp217|mp218|mp219|mp220|mp221|mp222|mp223|mp224|mp225|mp226|mp227|mp228|mp229|mp230|mp231|mp232|mp233|mp234|mp235|mp236|mp237|mp238|mp239|mp240|mp241|mp242|mp243|mp244|mp245|mp246|mp247|mp248|mp249|mp250|mp251|mp252|mp253|mp254|mp255)(?:,(?:mp0|mp1|mp2|mp3|mp4|mp5|mp6|mp7|mp8|mp9|mp10|mp11|mp12|mp13|mp14|mp15|mp16|mp17|mp18|mp19|mp20|mp21|mp22|mp23|mp24|mp25|mp26|mp27|mp28|mp29|mp30|mp31|mp32|mp33|mp34|mp35|mp36|mp37|mp38|mp39|mp40|mp41|mp42|mp43|mp44|mp45|mp46|mp47|mp48|mp49|mp50|mp51|mp52|mp53|mp54|mp55|mp56|mp57|mp58|mp59|mp60|mp61|mp62|mp63|mp64|mp65|mp66|mp67|mp68|mp69|mp70|mp71|mp72|mp73|mp74|mp75|mp76|mp77|mp78|mp79|mp80|mp81|mp82|mp83|mp84|mp85|mp86|mp87|mp88|mp89|mp90|mp91|mp92|mp93|mp94|mp95|mp96|mp97|mp98|mp99|mp100|mp101|mp102|mp103|mp104|mp105|mp106|mp107|mp108|mp109|mp110|mp111|mp112|mp113|mp114|mp115|mp116|mp117|mp118|mp119|mp120|mp121|mp122|mp123|mp124|mp125|mp126|mp127|mp128|mp129|mp130|mp131|mp132|mp133|mp134|mp135|mp136|mp137|mp138|mp139|mp140|mp141|mp142|mp143|mp144|mp145|mp146|mp147|mp148|mp149|mp150|mp151|mp152|mp153|mp154|mp155|mp156|mp157|mp158|mp159|mp160|mp161|mp162|mp163|mp164|mp165|mp166|mp167|mp168|mp169|mp170|mp171|mp172|mp173|mp174|mp175|mp176|mp177|mp178|mp179|mp180|mp181|mp182|mp183|mp184|mp185|mp186|mp187|mp188|mp189|mp190|mp191|mp192|mp193|mp194|mp195|mp196|mp197|mp198|mp199|mp200|mp201|mp202|mp203|mp204|mp205|mp206|mp207|mp208|mp209|mp210|mp211|mp212|mp213|mp214|mp215|mp216|mp217|mp218|mp219|mp220|mp221|mp222|mp223|mp224|mp225|mp226|mp227|mp228|mp229|mp230|mp231|mp232|mp233|mp234|mp235|mp236|mp237|mp238|mp239|mp240|mp241|mp242|mp243|mp244|mp245|mp246|mp247|mp248|mp249|mp250|mp251|mp252|mp253|mp254|mp255))*$"
+        },
         "sensitiveInputs": [
           "cipassword",
           "password"
@@ -50613,6 +50873,15 @@
                   "minimum": 0,
                   "maximum": 500000
                 },
+                "delete": {
+                  "type": "string",
+                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*(?:[,; ][A-Za-z][A-Za-z0-9._-]*)*$",
+                  "allOf": [
+                    {
+                      "pattern": "^(?:mp0|mp1|mp2|mp3|mp4|mp5|mp6|mp7|mp8|mp9|mp10|mp11|mp12|mp13|mp14|mp15|mp16|mp17|mp18|mp19|mp20|mp21|mp22|mp23|mp24|mp25|mp26|mp27|mp28|mp29|mp30|mp31|mp32|mp33|mp34|mp35|mp36|mp37|mp38|mp39|mp40|mp41|mp42|mp43|mp44|mp45|mp46|mp47|mp48|mp49|mp50|mp51|mp52|mp53|mp54|mp55|mp56|mp57|mp58|mp59|mp60|mp61|mp62|mp63|mp64|mp65|mp66|mp67|mp68|mp69|mp70|mp71|mp72|mp73|mp74|mp75|mp76|mp77|mp78|mp79|mp80|mp81|mp82|mp83|mp84|mp85|mp86|mp87|mp88|mp89|mp90|mp91|mp92|mp93|mp94|mp95|mp96|mp97|mp98|mp99|mp100|mp101|mp102|mp103|mp104|mp105|mp106|mp107|mp108|mp109|mp110|mp111|mp112|mp113|mp114|mp115|mp116|mp117|mp118|mp119|mp120|mp121|mp122|mp123|mp124|mp125|mp126|mp127|mp128|mp129|mp130|mp131|mp132|mp133|mp134|mp135|mp136|mp137|mp138|mp139|mp140|mp141|mp142|mp143|mp144|mp145|mp146|mp147|mp148|mp149|mp150|mp151|mp152|mp153|mp154|mp155|mp156|mp157|mp158|mp159|mp160|mp161|mp162|mp163|mp164|mp165|mp166|mp167|mp168|mp169|mp170|mp171|mp172|mp173|mp174|mp175|mp176|mp177|mp178|mp179|mp180|mp181|mp182|mp183|mp184|mp185|mp186|mp187|mp188|mp189|mp190|mp191|mp192|mp193|mp194|mp195|mp196|mp197|mp198|mp199|mp200|mp201|mp202|mp203|mp204|mp205|mp206|mp207|mp208|mp209|mp210|mp211|mp212|mp213|mp214|mp215|mp216|mp217|mp218|mp219|mp220|mp221|mp222|mp223|mp224|mp225|mp226|mp227|mp228|mp229|mp230|mp231|mp232|mp233|mp234|mp235|mp236|mp237|mp238|mp239|mp240|mp241|mp242|mp243|mp244|mp245|mp246|mp247|mp248|mp249|mp250|mp251|mp252|mp253|mp254|mp255)(?:,(?:mp0|mp1|mp2|mp3|mp4|mp5|mp6|mp7|mp8|mp9|mp10|mp11|mp12|mp13|mp14|mp15|mp16|mp17|mp18|mp19|mp20|mp21|mp22|mp23|mp24|mp25|mp26|mp27|mp28|mp29|mp30|mp31|mp32|mp33|mp34|mp35|mp36|mp37|mp38|mp39|mp40|mp41|mp42|mp43|mp44|mp45|mp46|mp47|mp48|mp49|mp50|mp51|mp52|mp53|mp54|mp55|mp56|mp57|mp58|mp59|mp60|mp61|mp62|mp63|mp64|mp65|mp66|mp67|mp68|mp69|mp70|mp71|mp72|mp73|mp74|mp75|mp76|mp77|mp78|mp79|mp80|mp81|mp82|mp83|mp84|mp85|mp86|mp87|mp88|mp89|mp90|mp91|mp92|mp93|mp94|mp95|mp96|mp97|mp98|mp99|mp100|mp101|mp102|mp103|mp104|mp105|mp106|mp107|mp108|mp109|mp110|mp111|mp112|mp113|mp114|mp115|mp116|mp117|mp118|mp119|mp120|mp121|mp122|mp123|mp124|mp125|mp126|mp127|mp128|mp129|mp130|mp131|mp132|mp133|mp134|mp135|mp136|mp137|mp138|mp139|mp140|mp141|mp142|mp143|mp144|mp145|mp146|mp147|mp148|mp149|mp150|mp151|mp152|mp153|mp154|mp155|mp156|mp157|mp158|mp159|mp160|mp161|mp162|mp163|mp164|mp165|mp166|mp167|mp168|mp169|mp170|mp171|mp172|mp173|mp174|mp175|mp176|mp177|mp178|mp179|mp180|mp181|mp182|mp183|mp184|mp185|mp186|mp187|mp188|mp189|mp190|mp191|mp192|mp193|mp194|mp195|mp196|mp197|mp198|mp199|mp200|mp201|mp202|mp203|mp204|mp205|mp206|mp207|mp208|mp209|mp210|mp211|mp212|mp213|mp214|mp215|mp216|mp217|mp218|mp219|mp220|mp221|mp222|mp223|mp224|mp225|mp226|mp227|mp228|mp229|mp230|mp231|mp232|mp233|mp234|mp235|mp236|mp237|mp238|mp239|mp240|mp241|mp242|mp243|mp244|mp245|mp246|mp247|mp248|mp249|mp250|mp251|mp252|mp253|mp254|mp255))*$"
+                    }
+                  ]
+                },
                 "description": {
                   "type": "string",
                   "maxLength": 8192
@@ -50637,6 +50906,10 @@
                 "onboot": {
                   "type": "boolean"
                 },
+                "rootfs": {
+                  "type": "string",
+                  "pattern": "^(?:volume=)?[A-Za-z][A-Za-z0-9._-]*:(?:(?:[1-9][0-9]*(?:\\.[0-9]+)?|0\\.[0-9]*[1-9][0-9]*)|(?:vm|subvol)-[1-9][0-9]*-disk-[0-9]+(?:\\.raw)?)(?:,acl=[01])?(?:,quota=[01])?(?:,ro=[01])?$"
+                },
                 "startup": {
                   "type": "string",
                   "pattern": "^(?:(?:order=)?[0-9]+(?:,up=[0-9]+)?(?:,down=[0-9]+)?|up=[0-9]+(?:,down=[0-9]+)?|down=[0-9]+)$"
@@ -50650,13 +50923,787 @@
                   "minimum": 100,
                   "maximum": 999999999,
                   "pattern": "^[1-9][0-9]*$"
+                },
+                "mp0": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp1": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp2": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp3": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp4": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp5": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp6": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp7": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp8": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp9": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp10": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp11": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp12": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp13": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp14": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp15": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp16": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp17": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp18": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp19": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp20": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp21": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp22": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp23": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp24": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp25": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp26": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp27": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp28": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp29": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp30": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp31": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp32": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp33": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp34": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp35": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp36": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp37": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp38": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp39": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp40": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp41": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp42": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp43": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp44": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp45": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp46": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp47": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp48": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp49": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp50": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp51": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp52": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp53": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp54": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp55": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp56": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp57": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp58": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp59": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp60": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp61": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp62": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp63": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp64": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp65": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp66": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp67": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp68": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp69": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp70": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp71": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp72": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp73": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp74": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp75": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp76": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp77": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp78": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp79": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp80": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp81": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp82": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp83": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp84": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp85": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp86": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp87": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp88": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp89": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp90": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp91": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp92": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp93": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp94": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp95": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp96": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp97": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp98": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp99": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp100": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp101": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp102": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp103": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp104": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp105": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp106": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp107": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp108": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp109": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp110": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp111": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp112": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp113": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp114": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp115": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp116": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp117": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp118": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp119": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp120": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp121": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp122": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp123": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp124": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp125": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp126": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp127": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp128": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp129": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp130": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp131": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp132": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp133": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp134": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp135": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp136": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp137": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp138": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp139": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp140": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp141": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp142": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp143": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp144": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp145": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp146": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp147": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp148": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp149": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp150": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp151": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp152": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp153": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp154": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp155": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp156": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp157": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp158": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp159": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp160": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp161": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp162": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp163": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp164": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp165": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp166": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp167": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp168": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp169": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp170": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp171": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp172": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp173": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp174": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp175": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp176": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp177": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp178": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp179": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp180": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp181": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp182": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp183": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp184": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp185": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp186": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp187": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp188": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp189": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp190": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp191": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp192": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp193": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp194": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp195": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp196": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp197": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp198": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp199": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp200": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp201": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp202": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp203": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp204": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp205": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp206": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp207": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp208": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp209": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp210": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp211": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp212": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp213": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp214": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp215": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp216": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp217": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp218": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp219": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp220": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp221": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp222": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp223": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp224": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp225": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp226": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp227": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp228": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp229": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp230": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp231": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp232": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp233": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp234": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp235": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp236": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp237": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp238": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp239": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp240": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp241": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp242": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp243": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp244": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp245": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp246": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp247": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp248": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp249": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp250": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp251": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp252": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp253": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp254": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp255": {
+                  "$ref": "#/properties/api/$defs/mp"
                 }
               },
               "required": [
                 "node",
                 "vmid"
               ],
-              "dependencies": {}
+              "dependencies": {},
+              "$defs": {
+                "mp": {
+                  "type": "string",
+                  "pattern": "^(?:volume=)?[A-Za-z][A-Za-z0-9._-]*:(?:(?:[1-9][0-9]*(?:\\.[0-9]+)?|0\\.[0-9]*[1-9][0-9]*)|(?:vm|subvol)-[1-9][0-9]*-disk-[0-9]+(?:\\.raw)?),mp=(?:/(?!\\.{1,2}(?:/|,|$))[A-Za-z0-9._-]+)+(?:,acl=[01])?(?:,backup=[01])?(?:,quota=[01])?(?:,ro=[01])?$"
+                }
+              }
             }
           },
           "required": [
@@ -66156,8 +67203,7 @@
                 },
                 "efidisk0": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^(?:file=)?[A-Za-z][A-Za-z0-9._-]*:(?:(?:[1-9][0-9]*(?:\\.[0-9]+)?|0\\.[0-9]*[1-9][0-9]*)|(?:[1-9][0-9]*/)?vm-[1-9][0-9]*-disk-[0-9]+(?:\\.(?:raw|qcow2|vmdk))?)(?:,format=(?:raw|qcow2|vmdk))?$"
                 },
                 "force": {
                   "type": "boolean"
@@ -66427,8 +67473,7 @@
                 },
                 "tpmstate0": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^(?:file=)?[A-Za-z][A-Za-z0-9._-]*:(?:(?:[1-9][0-9]*(?:\\.[0-9]+)?|0\\.[0-9]*[1-9][0-9]*)|(?:[1-9][0-9]*/)?vm-[1-9][0-9]*-disk-[0-9]+(?:\\.(?:raw|qcow2|vmdk))?)$"
                 },
                 "unique": {
                   "type": "boolean"
@@ -75354,8 +76399,7 @@
                 },
                 "efidisk0": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^(?:file=)?[A-Za-z][A-Za-z0-9._-]*:(?:(?:[1-9][0-9]*(?:\\.[0-9]+)?|0\\.[0-9]*[1-9][0-9]*)|(?:[1-9][0-9]*/)?vm-[1-9][0-9]*-disk-[0-9]+(?:\\.(?:raw|qcow2|vmdk))?)(?:,format=(?:raw|qcow2|vmdk))?$"
                 },
                 "force": {
                   "type": "boolean"
@@ -75618,8 +76662,7 @@
                 },
                 "tpmstate0": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^(?:file=)?[A-Za-z][A-Za-z0-9._-]*:(?:(?:[1-9][0-9]*(?:\\.[0-9]+)?|0\\.[0-9]*[1-9][0-9]*)|(?:[1-9][0-9]*/)?vm-[1-9][0-9]*-disk-[0-9]+(?:\\.(?:raw|qcow2|vmdk))?)$"
                 },
                 "unused[n]": {
                   "not": {},
@@ -78212,7 +79255,7 @@
         "effect": "write",
         "transport": "json",
         "secrets": "input-refs",
-        "reason": "Reviewed compute and startup branches only; CPU feature overrides and host passthrough remain refused, and credential fields require SecretRefs.",
+        "reason": "Reviewed compute, startup and managed disk branches; numbered slots and removal selectors are explicit, host passthrough remains refused, and credentials require SecretRefs.",
         "allowedInputs": [
           "node",
           "vmid",
@@ -78232,8 +79275,69 @@
           "startup",
           "digest",
           "cipassword",
-          "password"
+          "password",
+          "ide0",
+          "ide1",
+          "ide2",
+          "ide3",
+          "sata0",
+          "sata1",
+          "sata2",
+          "sata3",
+          "sata4",
+          "sata5",
+          "scsi0",
+          "scsi1",
+          "scsi2",
+          "scsi3",
+          "scsi4",
+          "scsi5",
+          "scsi6",
+          "scsi7",
+          "scsi8",
+          "scsi9",
+          "scsi10",
+          "scsi11",
+          "scsi12",
+          "scsi13",
+          "scsi14",
+          "scsi15",
+          "scsi16",
+          "scsi17",
+          "scsi18",
+          "scsi19",
+          "scsi20",
+          "scsi21",
+          "scsi22",
+          "scsi23",
+          "scsi24",
+          "scsi25",
+          "scsi26",
+          "scsi27",
+          "scsi28",
+          "scsi29",
+          "scsi30",
+          "virtio0",
+          "virtio1",
+          "virtio2",
+          "virtio3",
+          "virtio4",
+          "virtio5",
+          "virtio6",
+          "virtio7",
+          "virtio8",
+          "virtio9",
+          "virtio10",
+          "virtio11",
+          "virtio12",
+          "virtio13",
+          "virtio14",
+          "virtio15",
+          "delete"
         ],
+        "inputPatterns": {
+          "delete": "^(?:ide0|ide1|ide2|ide3|sata0|sata1|sata2|sata3|sata4|sata5|scsi0|scsi1|scsi2|scsi3|scsi4|scsi5|scsi6|scsi7|scsi8|scsi9|scsi10|scsi11|scsi12|scsi13|scsi14|scsi15|scsi16|scsi17|scsi18|scsi19|scsi20|scsi21|scsi22|scsi23|scsi24|scsi25|scsi26|scsi27|scsi28|scsi29|scsi30|virtio0|virtio1|virtio2|virtio3|virtio4|virtio5|virtio6|virtio7|virtio8|virtio9|virtio10|virtio11|virtio12|virtio13|virtio14|virtio15)(?:,(?:ide0|ide1|ide2|ide3|sata0|sata1|sata2|sata3|sata4|sata5|scsi0|scsi1|scsi2|scsi3|scsi4|scsi5|scsi6|scsi7|scsi8|scsi9|scsi10|scsi11|scsi12|scsi13|scsi14|scsi15|scsi16|scsi17|scsi18|scsi19|scsi20|scsi21|scsi22|scsi23|scsi24|scsi25|scsi26|scsi27|scsi28|scsi29|scsi30|virtio0|virtio1|virtio2|virtio3|virtio4|virtio5|virtio6|virtio7|virtio8|virtio9|virtio10|virtio11|virtio12|virtio13|virtio14|virtio15))*$"
+        },
         "sensitiveInputs": [
           "cipassword",
           "password"
@@ -78336,6 +79440,15 @@
                   "minimum": 1,
                   "maximum": 262144
                 },
+                "delete": {
+                  "type": "string",
+                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*(?:[,; ][A-Za-z][A-Za-z0-9._-]*)*$",
+                  "allOf": [
+                    {
+                      "pattern": "^(?:ide0|ide1|ide2|ide3|sata0|sata1|sata2|sata3|sata4|sata5|scsi0|scsi1|scsi2|scsi3|scsi4|scsi5|scsi6|scsi7|scsi8|scsi9|scsi10|scsi11|scsi12|scsi13|scsi14|scsi15|scsi16|scsi17|scsi18|scsi19|scsi20|scsi21|scsi22|scsi23|scsi24|scsi25|scsi26|scsi27|scsi28|scsi29|scsi30|virtio0|virtio1|virtio2|virtio3|virtio4|virtio5|virtio6|virtio7|virtio8|virtio9|virtio10|virtio11|virtio12|virtio13|virtio14|virtio15)(?:,(?:ide0|ide1|ide2|ide3|sata0|sata1|sata2|sata3|sata4|sata5|scsi0|scsi1|scsi2|scsi3|scsi4|scsi5|scsi6|scsi7|scsi8|scsi9|scsi10|scsi11|scsi12|scsi13|scsi14|scsi15|scsi16|scsi17|scsi18|scsi19|scsi20|scsi21|scsi22|scsi23|scsi24|scsi25|scsi26|scsi27|scsi28|scsi29|scsi30|virtio0|virtio1|virtio2|virtio3|virtio4|virtio5|virtio6|virtio7|virtio8|virtio9|virtio10|virtio11|virtio12|virtio13|virtio14|virtio15))*$"
+                    }
+                  ]
+                },
                 "description": {
                   "type": "string",
                   "maxLength": 8192
@@ -78376,13 +79489,202 @@
                   "minimum": 100,
                   "maximum": 999999999,
                   "pattern": "^[1-9][0-9]*$"
+                },
+                "ide0": {
+                  "$ref": "#/properties/api/$defs/ide"
+                },
+                "ide1": {
+                  "$ref": "#/properties/api/$defs/ide"
+                },
+                "ide2": {
+                  "$ref": "#/properties/api/$defs/ide"
+                },
+                "ide3": {
+                  "$ref": "#/properties/api/$defs/ide"
+                },
+                "sata0": {
+                  "$ref": "#/properties/api/$defs/sata"
+                },
+                "sata1": {
+                  "$ref": "#/properties/api/$defs/sata"
+                },
+                "sata2": {
+                  "$ref": "#/properties/api/$defs/sata"
+                },
+                "sata3": {
+                  "$ref": "#/properties/api/$defs/sata"
+                },
+                "sata4": {
+                  "$ref": "#/properties/api/$defs/sata"
+                },
+                "sata5": {
+                  "$ref": "#/properties/api/$defs/sata"
+                },
+                "scsi0": {
+                  "$ref": "#/properties/api/$defs/scsi"
+                },
+                "scsi1": {
+                  "$ref": "#/properties/api/$defs/scsi"
+                },
+                "scsi2": {
+                  "$ref": "#/properties/api/$defs/scsi"
+                },
+                "scsi3": {
+                  "$ref": "#/properties/api/$defs/scsi"
+                },
+                "scsi4": {
+                  "$ref": "#/properties/api/$defs/scsi"
+                },
+                "scsi5": {
+                  "$ref": "#/properties/api/$defs/scsi"
+                },
+                "scsi6": {
+                  "$ref": "#/properties/api/$defs/scsi"
+                },
+                "scsi7": {
+                  "$ref": "#/properties/api/$defs/scsi"
+                },
+                "scsi8": {
+                  "$ref": "#/properties/api/$defs/scsi"
+                },
+                "scsi9": {
+                  "$ref": "#/properties/api/$defs/scsi"
+                },
+                "scsi10": {
+                  "$ref": "#/properties/api/$defs/scsi"
+                },
+                "scsi11": {
+                  "$ref": "#/properties/api/$defs/scsi"
+                },
+                "scsi12": {
+                  "$ref": "#/properties/api/$defs/scsi"
+                },
+                "scsi13": {
+                  "$ref": "#/properties/api/$defs/scsi"
+                },
+                "scsi14": {
+                  "$ref": "#/properties/api/$defs/scsi"
+                },
+                "scsi15": {
+                  "$ref": "#/properties/api/$defs/scsi"
+                },
+                "scsi16": {
+                  "$ref": "#/properties/api/$defs/scsi"
+                },
+                "scsi17": {
+                  "$ref": "#/properties/api/$defs/scsi"
+                },
+                "scsi18": {
+                  "$ref": "#/properties/api/$defs/scsi"
+                },
+                "scsi19": {
+                  "$ref": "#/properties/api/$defs/scsi"
+                },
+                "scsi20": {
+                  "$ref": "#/properties/api/$defs/scsi"
+                },
+                "scsi21": {
+                  "$ref": "#/properties/api/$defs/scsi"
+                },
+                "scsi22": {
+                  "$ref": "#/properties/api/$defs/scsi"
+                },
+                "scsi23": {
+                  "$ref": "#/properties/api/$defs/scsi"
+                },
+                "scsi24": {
+                  "$ref": "#/properties/api/$defs/scsi"
+                },
+                "scsi25": {
+                  "$ref": "#/properties/api/$defs/scsi"
+                },
+                "scsi26": {
+                  "$ref": "#/properties/api/$defs/scsi"
+                },
+                "scsi27": {
+                  "$ref": "#/properties/api/$defs/scsi"
+                },
+                "scsi28": {
+                  "$ref": "#/properties/api/$defs/scsi"
+                },
+                "scsi29": {
+                  "$ref": "#/properties/api/$defs/scsi"
+                },
+                "scsi30": {
+                  "$ref": "#/properties/api/$defs/scsi"
+                },
+                "virtio0": {
+                  "$ref": "#/properties/api/$defs/virtio"
+                },
+                "virtio1": {
+                  "$ref": "#/properties/api/$defs/virtio"
+                },
+                "virtio2": {
+                  "$ref": "#/properties/api/$defs/virtio"
+                },
+                "virtio3": {
+                  "$ref": "#/properties/api/$defs/virtio"
+                },
+                "virtio4": {
+                  "$ref": "#/properties/api/$defs/virtio"
+                },
+                "virtio5": {
+                  "$ref": "#/properties/api/$defs/virtio"
+                },
+                "virtio6": {
+                  "$ref": "#/properties/api/$defs/virtio"
+                },
+                "virtio7": {
+                  "$ref": "#/properties/api/$defs/virtio"
+                },
+                "virtio8": {
+                  "$ref": "#/properties/api/$defs/virtio"
+                },
+                "virtio9": {
+                  "$ref": "#/properties/api/$defs/virtio"
+                },
+                "virtio10": {
+                  "$ref": "#/properties/api/$defs/virtio"
+                },
+                "virtio11": {
+                  "$ref": "#/properties/api/$defs/virtio"
+                },
+                "virtio12": {
+                  "$ref": "#/properties/api/$defs/virtio"
+                },
+                "virtio13": {
+                  "$ref": "#/properties/api/$defs/virtio"
+                },
+                "virtio14": {
+                  "$ref": "#/properties/api/$defs/virtio"
+                },
+                "virtio15": {
+                  "$ref": "#/properties/api/$defs/virtio"
                 }
               },
               "required": [
                 "node",
                 "vmid"
               ],
-              "dependencies": {}
+              "dependencies": {},
+              "$defs": {
+                "ide": {
+                  "type": "string",
+                  "pattern": "^(?:file=)?[A-Za-z][A-Za-z0-9._-]*:(?:(?:[1-9][0-9]*(?:\\.[0-9]+)?|0\\.[0-9]*[1-9][0-9]*)|(?:[1-9][0-9]*/)?vm-[1-9][0-9]*-disk-[0-9]+(?:\\.(?:raw|qcow2|vmdk))?)(?:,backup=[01])?(?:,cache=(?:none|writethrough|writeback|directsync))?(?:,discard=(?:ignore|on))?(?:,format=(?:raw|qcow2|vmdk))?(?:,ssd=[01])?$"
+                },
+                "sata": {
+                  "type": "string",
+                  "pattern": "^(?:file=)?[A-Za-z][A-Za-z0-9._-]*:(?:(?:[1-9][0-9]*(?:\\.[0-9]+)?|0\\.[0-9]*[1-9][0-9]*)|(?:[1-9][0-9]*/)?vm-[1-9][0-9]*-disk-[0-9]+(?:\\.(?:raw|qcow2|vmdk))?)(?:,backup=[01])?(?:,cache=(?:none|writethrough|writeback|directsync))?(?:,discard=(?:ignore|on))?(?:,format=(?:raw|qcow2|vmdk))?(?:,ssd=[01])?$"
+                },
+                "scsi": {
+                  "type": "string",
+                  "pattern": "^(?:file=)?[A-Za-z][A-Za-z0-9._-]*:(?:(?:[1-9][0-9]*(?:\\.[0-9]+)?|0\\.[0-9]*[1-9][0-9]*)|(?:[1-9][0-9]*/)?vm-[1-9][0-9]*-disk-[0-9]+(?:\\.(?:raw|qcow2|vmdk))?)(?:,backup=[01])?(?:,cache=(?:none|writethrough|writeback|directsync))?(?:,discard=(?:ignore|on))?(?:,format=(?:raw|qcow2|vmdk))?(?:,iothread=[01])?(?:,ssd=[01])?(?:,ro=[01])?$"
+                },
+                "virtio": {
+                  "type": "string",
+                  "pattern": "^(?:file=)?[A-Za-z][A-Za-z0-9._-]*:(?:(?:[1-9][0-9]*(?:\\.[0-9]+)?|0\\.[0-9]*[1-9][0-9]*)|(?:[1-9][0-9]*/)?vm-[1-9][0-9]*-disk-[0-9]+(?:\\.(?:raw|qcow2|vmdk))?)(?:,backup=[01])?(?:,cache=(?:none|writethrough|writeback|directsync))?(?:,discard=(?:ignore|on))?(?:,format=(?:raw|qcow2|vmdk))?(?:,iothread=[01])?(?:,ro=[01])?$"
+                }
+              }
             }
           },
           "required": [
@@ -165928,8 +167230,7 @@
                 },
                 "rootfs": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^(?:volume=)?[A-Za-z][A-Za-z0-9._-]*:(?:(?:[1-9][0-9]*(?:\\.[0-9]+)?|0\\.[0-9]*[1-9][0-9]*)|(?:vm|subvol)-[1-9][0-9]*-disk-[0-9]+(?:\\.raw)?)(?:,acl=[01])?(?:,quota=[01])?(?:,ro=[01])?$"
                 },
                 "searchdomain": {
                   "type": "string",
@@ -167846,7 +169147,7 @@
         "effect": "write",
         "transport": "json",
         "secrets": "input-refs",
-        "reason": "Reviewed compute and startup branches only; CPU feature overrides and host passthrough remain refused, and credential fields require SecretRefs.",
+        "reason": "Reviewed compute, startup and managed disk branches; numbered slots and removal selectors are explicit, host passthrough remains refused, and credentials require SecretRefs.",
         "allowedInputs": [
           "node",
           "vmid",
@@ -167866,8 +169167,269 @@
           "startup",
           "digest",
           "cipassword",
-          "password"
+          "password",
+          "mp0",
+          "mp1",
+          "mp2",
+          "mp3",
+          "mp4",
+          "mp5",
+          "mp6",
+          "mp7",
+          "mp8",
+          "mp9",
+          "mp10",
+          "mp11",
+          "mp12",
+          "mp13",
+          "mp14",
+          "mp15",
+          "mp16",
+          "mp17",
+          "mp18",
+          "mp19",
+          "mp20",
+          "mp21",
+          "mp22",
+          "mp23",
+          "mp24",
+          "mp25",
+          "mp26",
+          "mp27",
+          "mp28",
+          "mp29",
+          "mp30",
+          "mp31",
+          "mp32",
+          "mp33",
+          "mp34",
+          "mp35",
+          "mp36",
+          "mp37",
+          "mp38",
+          "mp39",
+          "mp40",
+          "mp41",
+          "mp42",
+          "mp43",
+          "mp44",
+          "mp45",
+          "mp46",
+          "mp47",
+          "mp48",
+          "mp49",
+          "mp50",
+          "mp51",
+          "mp52",
+          "mp53",
+          "mp54",
+          "mp55",
+          "mp56",
+          "mp57",
+          "mp58",
+          "mp59",
+          "mp60",
+          "mp61",
+          "mp62",
+          "mp63",
+          "mp64",
+          "mp65",
+          "mp66",
+          "mp67",
+          "mp68",
+          "mp69",
+          "mp70",
+          "mp71",
+          "mp72",
+          "mp73",
+          "mp74",
+          "mp75",
+          "mp76",
+          "mp77",
+          "mp78",
+          "mp79",
+          "mp80",
+          "mp81",
+          "mp82",
+          "mp83",
+          "mp84",
+          "mp85",
+          "mp86",
+          "mp87",
+          "mp88",
+          "mp89",
+          "mp90",
+          "mp91",
+          "mp92",
+          "mp93",
+          "mp94",
+          "mp95",
+          "mp96",
+          "mp97",
+          "mp98",
+          "mp99",
+          "mp100",
+          "mp101",
+          "mp102",
+          "mp103",
+          "mp104",
+          "mp105",
+          "mp106",
+          "mp107",
+          "mp108",
+          "mp109",
+          "mp110",
+          "mp111",
+          "mp112",
+          "mp113",
+          "mp114",
+          "mp115",
+          "mp116",
+          "mp117",
+          "mp118",
+          "mp119",
+          "mp120",
+          "mp121",
+          "mp122",
+          "mp123",
+          "mp124",
+          "mp125",
+          "mp126",
+          "mp127",
+          "mp128",
+          "mp129",
+          "mp130",
+          "mp131",
+          "mp132",
+          "mp133",
+          "mp134",
+          "mp135",
+          "mp136",
+          "mp137",
+          "mp138",
+          "mp139",
+          "mp140",
+          "mp141",
+          "mp142",
+          "mp143",
+          "mp144",
+          "mp145",
+          "mp146",
+          "mp147",
+          "mp148",
+          "mp149",
+          "mp150",
+          "mp151",
+          "mp152",
+          "mp153",
+          "mp154",
+          "mp155",
+          "mp156",
+          "mp157",
+          "mp158",
+          "mp159",
+          "mp160",
+          "mp161",
+          "mp162",
+          "mp163",
+          "mp164",
+          "mp165",
+          "mp166",
+          "mp167",
+          "mp168",
+          "mp169",
+          "mp170",
+          "mp171",
+          "mp172",
+          "mp173",
+          "mp174",
+          "mp175",
+          "mp176",
+          "mp177",
+          "mp178",
+          "mp179",
+          "mp180",
+          "mp181",
+          "mp182",
+          "mp183",
+          "mp184",
+          "mp185",
+          "mp186",
+          "mp187",
+          "mp188",
+          "mp189",
+          "mp190",
+          "mp191",
+          "mp192",
+          "mp193",
+          "mp194",
+          "mp195",
+          "mp196",
+          "mp197",
+          "mp198",
+          "mp199",
+          "mp200",
+          "mp201",
+          "mp202",
+          "mp203",
+          "mp204",
+          "mp205",
+          "mp206",
+          "mp207",
+          "mp208",
+          "mp209",
+          "mp210",
+          "mp211",
+          "mp212",
+          "mp213",
+          "mp214",
+          "mp215",
+          "mp216",
+          "mp217",
+          "mp218",
+          "mp219",
+          "mp220",
+          "mp221",
+          "mp222",
+          "mp223",
+          "mp224",
+          "mp225",
+          "mp226",
+          "mp227",
+          "mp228",
+          "mp229",
+          "mp230",
+          "mp231",
+          "mp232",
+          "mp233",
+          "mp234",
+          "mp235",
+          "mp236",
+          "mp237",
+          "mp238",
+          "mp239",
+          "mp240",
+          "mp241",
+          "mp242",
+          "mp243",
+          "mp244",
+          "mp245",
+          "mp246",
+          "mp247",
+          "mp248",
+          "mp249",
+          "mp250",
+          "mp251",
+          "mp252",
+          "mp253",
+          "mp254",
+          "mp255",
+          "rootfs",
+          "delete"
         ],
+        "inputPatterns": {
+          "delete": "^(?:mp0|mp1|mp2|mp3|mp4|mp5|mp6|mp7|mp8|mp9|mp10|mp11|mp12|mp13|mp14|mp15|mp16|mp17|mp18|mp19|mp20|mp21|mp22|mp23|mp24|mp25|mp26|mp27|mp28|mp29|mp30|mp31|mp32|mp33|mp34|mp35|mp36|mp37|mp38|mp39|mp40|mp41|mp42|mp43|mp44|mp45|mp46|mp47|mp48|mp49|mp50|mp51|mp52|mp53|mp54|mp55|mp56|mp57|mp58|mp59|mp60|mp61|mp62|mp63|mp64|mp65|mp66|mp67|mp68|mp69|mp70|mp71|mp72|mp73|mp74|mp75|mp76|mp77|mp78|mp79|mp80|mp81|mp82|mp83|mp84|mp85|mp86|mp87|mp88|mp89|mp90|mp91|mp92|mp93|mp94|mp95|mp96|mp97|mp98|mp99|mp100|mp101|mp102|mp103|mp104|mp105|mp106|mp107|mp108|mp109|mp110|mp111|mp112|mp113|mp114|mp115|mp116|mp117|mp118|mp119|mp120|mp121|mp122|mp123|mp124|mp125|mp126|mp127|mp128|mp129|mp130|mp131|mp132|mp133|mp134|mp135|mp136|mp137|mp138|mp139|mp140|mp141|mp142|mp143|mp144|mp145|mp146|mp147|mp148|mp149|mp150|mp151|mp152|mp153|mp154|mp155|mp156|mp157|mp158|mp159|mp160|mp161|mp162|mp163|mp164|mp165|mp166|mp167|mp168|mp169|mp170|mp171|mp172|mp173|mp174|mp175|mp176|mp177|mp178|mp179|mp180|mp181|mp182|mp183|mp184|mp185|mp186|mp187|mp188|mp189|mp190|mp191|mp192|mp193|mp194|mp195|mp196|mp197|mp198|mp199|mp200|mp201|mp202|mp203|mp204|mp205|mp206|mp207|mp208|mp209|mp210|mp211|mp212|mp213|mp214|mp215|mp216|mp217|mp218|mp219|mp220|mp221|mp222|mp223|mp224|mp225|mp226|mp227|mp228|mp229|mp230|mp231|mp232|mp233|mp234|mp235|mp236|mp237|mp238|mp239|mp240|mp241|mp242|mp243|mp244|mp245|mp246|mp247|mp248|mp249|mp250|mp251|mp252|mp253|mp254|mp255)(?:,(?:mp0|mp1|mp2|mp3|mp4|mp5|mp6|mp7|mp8|mp9|mp10|mp11|mp12|mp13|mp14|mp15|mp16|mp17|mp18|mp19|mp20|mp21|mp22|mp23|mp24|mp25|mp26|mp27|mp28|mp29|mp30|mp31|mp32|mp33|mp34|mp35|mp36|mp37|mp38|mp39|mp40|mp41|mp42|mp43|mp44|mp45|mp46|mp47|mp48|mp49|mp50|mp51|mp52|mp53|mp54|mp55|mp56|mp57|mp58|mp59|mp60|mp61|mp62|mp63|mp64|mp65|mp66|mp67|mp68|mp69|mp70|mp71|mp72|mp73|mp74|mp75|mp76|mp77|mp78|mp79|mp80|mp81|mp82|mp83|mp84|mp85|mp86|mp87|mp88|mp89|mp90|mp91|mp92|mp93|mp94|mp95|mp96|mp97|mp98|mp99|mp100|mp101|mp102|mp103|mp104|mp105|mp106|mp107|mp108|mp109|mp110|mp111|mp112|mp113|mp114|mp115|mp116|mp117|mp118|mp119|mp120|mp121|mp122|mp123|mp124|mp125|mp126|mp127|mp128|mp129|mp130|mp131|mp132|mp133|mp134|mp135|mp136|mp137|mp138|mp139|mp140|mp141|mp142|mp143|mp144|mp145|mp146|mp147|mp148|mp149|mp150|mp151|mp152|mp153|mp154|mp155|mp156|mp157|mp158|mp159|mp160|mp161|mp162|mp163|mp164|mp165|mp166|mp167|mp168|mp169|mp170|mp171|mp172|mp173|mp174|mp175|mp176|mp177|mp178|mp179|mp180|mp181|mp182|mp183|mp184|mp185|mp186|mp187|mp188|mp189|mp190|mp191|mp192|mp193|mp194|mp195|mp196|mp197|mp198|mp199|mp200|mp201|mp202|mp203|mp204|mp205|mp206|mp207|mp208|mp209|mp210|mp211|mp212|mp213|mp214|mp215|mp216|mp217|mp218|mp219|mp220|mp221|mp222|mp223|mp224|mp225|mp226|mp227|mp228|mp229|mp230|mp231|mp232|mp233|mp234|mp235|mp236|mp237|mp238|mp239|mp240|mp241|mp242|mp243|mp244|mp245|mp246|mp247|mp248|mp249|mp250|mp251|mp252|mp253|mp254|mp255))*$"
+        },
         "sensitiveInputs": [
           "cipassword",
           "password"
@@ -167930,6 +169492,15 @@
                   "minimum": 0,
                   "maximum": 500000
                 },
+                "delete": {
+                  "type": "string",
+                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*(?:[,; ][A-Za-z][A-Za-z0-9._-]*)*$",
+                  "allOf": [
+                    {
+                      "pattern": "^(?:mp0|mp1|mp2|mp3|mp4|mp5|mp6|mp7|mp8|mp9|mp10|mp11|mp12|mp13|mp14|mp15|mp16|mp17|mp18|mp19|mp20|mp21|mp22|mp23|mp24|mp25|mp26|mp27|mp28|mp29|mp30|mp31|mp32|mp33|mp34|mp35|mp36|mp37|mp38|mp39|mp40|mp41|mp42|mp43|mp44|mp45|mp46|mp47|mp48|mp49|mp50|mp51|mp52|mp53|mp54|mp55|mp56|mp57|mp58|mp59|mp60|mp61|mp62|mp63|mp64|mp65|mp66|mp67|mp68|mp69|mp70|mp71|mp72|mp73|mp74|mp75|mp76|mp77|mp78|mp79|mp80|mp81|mp82|mp83|mp84|mp85|mp86|mp87|mp88|mp89|mp90|mp91|mp92|mp93|mp94|mp95|mp96|mp97|mp98|mp99|mp100|mp101|mp102|mp103|mp104|mp105|mp106|mp107|mp108|mp109|mp110|mp111|mp112|mp113|mp114|mp115|mp116|mp117|mp118|mp119|mp120|mp121|mp122|mp123|mp124|mp125|mp126|mp127|mp128|mp129|mp130|mp131|mp132|mp133|mp134|mp135|mp136|mp137|mp138|mp139|mp140|mp141|mp142|mp143|mp144|mp145|mp146|mp147|mp148|mp149|mp150|mp151|mp152|mp153|mp154|mp155|mp156|mp157|mp158|mp159|mp160|mp161|mp162|mp163|mp164|mp165|mp166|mp167|mp168|mp169|mp170|mp171|mp172|mp173|mp174|mp175|mp176|mp177|mp178|mp179|mp180|mp181|mp182|mp183|mp184|mp185|mp186|mp187|mp188|mp189|mp190|mp191|mp192|mp193|mp194|mp195|mp196|mp197|mp198|mp199|mp200|mp201|mp202|mp203|mp204|mp205|mp206|mp207|mp208|mp209|mp210|mp211|mp212|mp213|mp214|mp215|mp216|mp217|mp218|mp219|mp220|mp221|mp222|mp223|mp224|mp225|mp226|mp227|mp228|mp229|mp230|mp231|mp232|mp233|mp234|mp235|mp236|mp237|mp238|mp239|mp240|mp241|mp242|mp243|mp244|mp245|mp246|mp247|mp248|mp249|mp250|mp251|mp252|mp253|mp254|mp255)(?:,(?:mp0|mp1|mp2|mp3|mp4|mp5|mp6|mp7|mp8|mp9|mp10|mp11|mp12|mp13|mp14|mp15|mp16|mp17|mp18|mp19|mp20|mp21|mp22|mp23|mp24|mp25|mp26|mp27|mp28|mp29|mp30|mp31|mp32|mp33|mp34|mp35|mp36|mp37|mp38|mp39|mp40|mp41|mp42|mp43|mp44|mp45|mp46|mp47|mp48|mp49|mp50|mp51|mp52|mp53|mp54|mp55|mp56|mp57|mp58|mp59|mp60|mp61|mp62|mp63|mp64|mp65|mp66|mp67|mp68|mp69|mp70|mp71|mp72|mp73|mp74|mp75|mp76|mp77|mp78|mp79|mp80|mp81|mp82|mp83|mp84|mp85|mp86|mp87|mp88|mp89|mp90|mp91|mp92|mp93|mp94|mp95|mp96|mp97|mp98|mp99|mp100|mp101|mp102|mp103|mp104|mp105|mp106|mp107|mp108|mp109|mp110|mp111|mp112|mp113|mp114|mp115|mp116|mp117|mp118|mp119|mp120|mp121|mp122|mp123|mp124|mp125|mp126|mp127|mp128|mp129|mp130|mp131|mp132|mp133|mp134|mp135|mp136|mp137|mp138|mp139|mp140|mp141|mp142|mp143|mp144|mp145|mp146|mp147|mp148|mp149|mp150|mp151|mp152|mp153|mp154|mp155|mp156|mp157|mp158|mp159|mp160|mp161|mp162|mp163|mp164|mp165|mp166|mp167|mp168|mp169|mp170|mp171|mp172|mp173|mp174|mp175|mp176|mp177|mp178|mp179|mp180|mp181|mp182|mp183|mp184|mp185|mp186|mp187|mp188|mp189|mp190|mp191|mp192|mp193|mp194|mp195|mp196|mp197|mp198|mp199|mp200|mp201|mp202|mp203|mp204|mp205|mp206|mp207|mp208|mp209|mp210|mp211|mp212|mp213|mp214|mp215|mp216|mp217|mp218|mp219|mp220|mp221|mp222|mp223|mp224|mp225|mp226|mp227|mp228|mp229|mp230|mp231|mp232|mp233|mp234|mp235|mp236|mp237|mp238|mp239|mp240|mp241|mp242|mp243|mp244|mp245|mp246|mp247|mp248|mp249|mp250|mp251|mp252|mp253|mp254|mp255))*$"
+                    }
+                  ]
+                },
                 "description": {
                   "type": "string",
                   "maxLength": 8192
@@ -167954,6 +169525,10 @@
                 "onboot": {
                   "type": "boolean"
                 },
+                "rootfs": {
+                  "type": "string",
+                  "pattern": "^(?:volume=)?[A-Za-z][A-Za-z0-9._-]*:(?:(?:[1-9][0-9]*(?:\\.[0-9]+)?|0\\.[0-9]*[1-9][0-9]*)|(?:vm|subvol)-[1-9][0-9]*-disk-[0-9]+(?:\\.raw)?)(?:,acl=[01])?(?:,quota=[01])?(?:,ro=[01])?$"
+                },
                 "startup": {
                   "type": "string",
                   "pattern": "^(?:(?:order=)?[0-9]+(?:,up=[0-9]+)?(?:,down=[0-9]+)?|up=[0-9]+(?:,down=[0-9]+)?|down=[0-9]+)$"
@@ -167967,13 +169542,787 @@
                   "minimum": 100,
                   "maximum": 999999999,
                   "pattern": "^[1-9][0-9]*$"
+                },
+                "mp0": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp1": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp2": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp3": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp4": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp5": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp6": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp7": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp8": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp9": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp10": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp11": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp12": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp13": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp14": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp15": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp16": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp17": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp18": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp19": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp20": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp21": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp22": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp23": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp24": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp25": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp26": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp27": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp28": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp29": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp30": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp31": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp32": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp33": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp34": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp35": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp36": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp37": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp38": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp39": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp40": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp41": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp42": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp43": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp44": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp45": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp46": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp47": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp48": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp49": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp50": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp51": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp52": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp53": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp54": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp55": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp56": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp57": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp58": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp59": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp60": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp61": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp62": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp63": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp64": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp65": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp66": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp67": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp68": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp69": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp70": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp71": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp72": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp73": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp74": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp75": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp76": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp77": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp78": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp79": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp80": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp81": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp82": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp83": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp84": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp85": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp86": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp87": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp88": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp89": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp90": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp91": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp92": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp93": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp94": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp95": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp96": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp97": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp98": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp99": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp100": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp101": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp102": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp103": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp104": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp105": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp106": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp107": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp108": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp109": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp110": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp111": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp112": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp113": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp114": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp115": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp116": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp117": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp118": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp119": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp120": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp121": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp122": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp123": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp124": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp125": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp126": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp127": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp128": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp129": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp130": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp131": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp132": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp133": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp134": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp135": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp136": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp137": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp138": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp139": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp140": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp141": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp142": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp143": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp144": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp145": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp146": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp147": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp148": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp149": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp150": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp151": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp152": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp153": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp154": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp155": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp156": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp157": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp158": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp159": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp160": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp161": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp162": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp163": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp164": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp165": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp166": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp167": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp168": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp169": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp170": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp171": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp172": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp173": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp174": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp175": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp176": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp177": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp178": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp179": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp180": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp181": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp182": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp183": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp184": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp185": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp186": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp187": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp188": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp189": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp190": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp191": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp192": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp193": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp194": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp195": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp196": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp197": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp198": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp199": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp200": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp201": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp202": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp203": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp204": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp205": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp206": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp207": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp208": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp209": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp210": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp211": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp212": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp213": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp214": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp215": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp216": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp217": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp218": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp219": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp220": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp221": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp222": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp223": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp224": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp225": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp226": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp227": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp228": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp229": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp230": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp231": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp232": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp233": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp234": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp235": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp236": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp237": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp238": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp239": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp240": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp241": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp242": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp243": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp244": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp245": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp246": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp247": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp248": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp249": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp250": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp251": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp252": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp253": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp254": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp255": {
+                  "$ref": "#/properties/api/$defs/mp"
                 }
               },
               "required": [
                 "node",
                 "vmid"
               ],
-              "dependencies": {}
+              "dependencies": {},
+              "$defs": {
+                "mp": {
+                  "type": "string",
+                  "pattern": "^(?:volume=)?[A-Za-z][A-Za-z0-9._-]*:(?:(?:[1-9][0-9]*(?:\\.[0-9]+)?|0\\.[0-9]*[1-9][0-9]*)|(?:vm|subvol)-[1-9][0-9]*-disk-[0-9]+(?:\\.raw)?),mp=(?:/(?!\\.{1,2}(?:/|,|$))[A-Za-z0-9._-]+)+(?:,acl=[01])?(?:,backup=[01])?(?:,quota=[01])?(?:,ro=[01])?$"
+                }
+              }
             }
           },
           "required": [
@@ -183823,8 +186172,7 @@
                 },
                 "efidisk0": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^(?:file=)?[A-Za-z][A-Za-z0-9._-]*:(?:(?:[1-9][0-9]*(?:\\.[0-9]+)?|0\\.[0-9]*[1-9][0-9]*)|(?:[1-9][0-9]*/)?vm-[1-9][0-9]*-disk-[0-9]+(?:\\.(?:raw|qcow2|vmdk))?)(?:,format=(?:raw|qcow2|vmdk))?$"
                 },
                 "force": {
                   "type": "boolean"
@@ -184102,8 +186450,7 @@
                 },
                 "tpmstate0": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^(?:file=)?[A-Za-z][A-Za-z0-9._-]*:(?:(?:[1-9][0-9]*(?:\\.[0-9]+)?|0\\.[0-9]*[1-9][0-9]*)|(?:[1-9][0-9]*/)?vm-[1-9][0-9]*-disk-[0-9]+(?:\\.(?:raw|qcow2|vmdk))?)(?:,format=(?:raw|qcow2|vmdk))?$"
                 },
                 "unique": {
                   "type": "boolean"
@@ -193148,8 +195495,7 @@
                 },
                 "efidisk0": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^(?:file=)?[A-Za-z][A-Za-z0-9._-]*:(?:(?:[1-9][0-9]*(?:\\.[0-9]+)?|0\\.[0-9]*[1-9][0-9]*)|(?:[1-9][0-9]*/)?vm-[1-9][0-9]*-disk-[0-9]+(?:\\.(?:raw|qcow2|vmdk))?)(?:,format=(?:raw|qcow2|vmdk))?$"
                 },
                 "force": {
                   "type": "boolean"
@@ -193417,8 +195763,7 @@
                 },
                 "tpmstate0": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^(?:file=)?[A-Za-z][A-Za-z0-9._-]*:(?:(?:[1-9][0-9]*(?:\\.[0-9]+)?|0\\.[0-9]*[1-9][0-9]*)|(?:[1-9][0-9]*/)?vm-[1-9][0-9]*-disk-[0-9]+(?:\\.(?:raw|qcow2|vmdk))?)(?:,format=(?:raw|qcow2|vmdk))?$"
                 },
                 "unused[n]": {
                   "not": {},
@@ -195969,7 +198314,7 @@
         "effect": "write",
         "transport": "json",
         "secrets": "input-refs",
-        "reason": "Reviewed compute and startup branches only; CPU feature overrides and host passthrough remain refused, and credential fields require SecretRefs.",
+        "reason": "Reviewed compute, startup and managed disk branches; numbered slots and removal selectors are explicit, host passthrough remains refused, and credentials require SecretRefs.",
         "allowedInputs": [
           "node",
           "vmid",
@@ -195989,8 +198334,69 @@
           "startup",
           "digest",
           "cipassword",
-          "password"
+          "password",
+          "ide0",
+          "ide1",
+          "ide2",
+          "ide3",
+          "sata0",
+          "sata1",
+          "sata2",
+          "sata3",
+          "sata4",
+          "sata5",
+          "scsi0",
+          "scsi1",
+          "scsi2",
+          "scsi3",
+          "scsi4",
+          "scsi5",
+          "scsi6",
+          "scsi7",
+          "scsi8",
+          "scsi9",
+          "scsi10",
+          "scsi11",
+          "scsi12",
+          "scsi13",
+          "scsi14",
+          "scsi15",
+          "scsi16",
+          "scsi17",
+          "scsi18",
+          "scsi19",
+          "scsi20",
+          "scsi21",
+          "scsi22",
+          "scsi23",
+          "scsi24",
+          "scsi25",
+          "scsi26",
+          "scsi27",
+          "scsi28",
+          "scsi29",
+          "scsi30",
+          "virtio0",
+          "virtio1",
+          "virtio2",
+          "virtio3",
+          "virtio4",
+          "virtio5",
+          "virtio6",
+          "virtio7",
+          "virtio8",
+          "virtio9",
+          "virtio10",
+          "virtio11",
+          "virtio12",
+          "virtio13",
+          "virtio14",
+          "virtio15",
+          "delete"
         ],
+        "inputPatterns": {
+          "delete": "^(?:ide0|ide1|ide2|ide3|sata0|sata1|sata2|sata3|sata4|sata5|scsi0|scsi1|scsi2|scsi3|scsi4|scsi5|scsi6|scsi7|scsi8|scsi9|scsi10|scsi11|scsi12|scsi13|scsi14|scsi15|scsi16|scsi17|scsi18|scsi19|scsi20|scsi21|scsi22|scsi23|scsi24|scsi25|scsi26|scsi27|scsi28|scsi29|scsi30|virtio0|virtio1|virtio2|virtio3|virtio4|virtio5|virtio6|virtio7|virtio8|virtio9|virtio10|virtio11|virtio12|virtio13|virtio14|virtio15)(?:,(?:ide0|ide1|ide2|ide3|sata0|sata1|sata2|sata3|sata4|sata5|scsi0|scsi1|scsi2|scsi3|scsi4|scsi5|scsi6|scsi7|scsi8|scsi9|scsi10|scsi11|scsi12|scsi13|scsi14|scsi15|scsi16|scsi17|scsi18|scsi19|scsi20|scsi21|scsi22|scsi23|scsi24|scsi25|scsi26|scsi27|scsi28|scsi29|scsi30|virtio0|virtio1|virtio2|virtio3|virtio4|virtio5|virtio6|virtio7|virtio8|virtio9|virtio10|virtio11|virtio12|virtio13|virtio14|virtio15))*$"
+        },
         "sensitiveInputs": [
           "cipassword",
           "password"
@@ -196093,6 +198499,15 @@
                   "minimum": 1,
                   "maximum": 262144
                 },
+                "delete": {
+                  "type": "string",
+                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*(?:[,; ][A-Za-z][A-Za-z0-9._-]*)*$",
+                  "allOf": [
+                    {
+                      "pattern": "^(?:ide0|ide1|ide2|ide3|sata0|sata1|sata2|sata3|sata4|sata5|scsi0|scsi1|scsi2|scsi3|scsi4|scsi5|scsi6|scsi7|scsi8|scsi9|scsi10|scsi11|scsi12|scsi13|scsi14|scsi15|scsi16|scsi17|scsi18|scsi19|scsi20|scsi21|scsi22|scsi23|scsi24|scsi25|scsi26|scsi27|scsi28|scsi29|scsi30|virtio0|virtio1|virtio2|virtio3|virtio4|virtio5|virtio6|virtio7|virtio8|virtio9|virtio10|virtio11|virtio12|virtio13|virtio14|virtio15)(?:,(?:ide0|ide1|ide2|ide3|sata0|sata1|sata2|sata3|sata4|sata5|scsi0|scsi1|scsi2|scsi3|scsi4|scsi5|scsi6|scsi7|scsi8|scsi9|scsi10|scsi11|scsi12|scsi13|scsi14|scsi15|scsi16|scsi17|scsi18|scsi19|scsi20|scsi21|scsi22|scsi23|scsi24|scsi25|scsi26|scsi27|scsi28|scsi29|scsi30|virtio0|virtio1|virtio2|virtio3|virtio4|virtio5|virtio6|virtio7|virtio8|virtio9|virtio10|virtio11|virtio12|virtio13|virtio14|virtio15))*$"
+                    }
+                  ]
+                },
                 "description": {
                   "type": "string",
                   "maxLength": 8192
@@ -196133,13 +198548,202 @@
                   "minimum": 100,
                   "maximum": 999999999,
                   "pattern": "^[1-9][0-9]*$"
+                },
+                "ide0": {
+                  "$ref": "#/properties/api/$defs/ide"
+                },
+                "ide1": {
+                  "$ref": "#/properties/api/$defs/ide"
+                },
+                "ide2": {
+                  "$ref": "#/properties/api/$defs/ide"
+                },
+                "ide3": {
+                  "$ref": "#/properties/api/$defs/ide"
+                },
+                "sata0": {
+                  "$ref": "#/properties/api/$defs/sata"
+                },
+                "sata1": {
+                  "$ref": "#/properties/api/$defs/sata"
+                },
+                "sata2": {
+                  "$ref": "#/properties/api/$defs/sata"
+                },
+                "sata3": {
+                  "$ref": "#/properties/api/$defs/sata"
+                },
+                "sata4": {
+                  "$ref": "#/properties/api/$defs/sata"
+                },
+                "sata5": {
+                  "$ref": "#/properties/api/$defs/sata"
+                },
+                "scsi0": {
+                  "$ref": "#/properties/api/$defs/scsi"
+                },
+                "scsi1": {
+                  "$ref": "#/properties/api/$defs/scsi"
+                },
+                "scsi2": {
+                  "$ref": "#/properties/api/$defs/scsi"
+                },
+                "scsi3": {
+                  "$ref": "#/properties/api/$defs/scsi"
+                },
+                "scsi4": {
+                  "$ref": "#/properties/api/$defs/scsi"
+                },
+                "scsi5": {
+                  "$ref": "#/properties/api/$defs/scsi"
+                },
+                "scsi6": {
+                  "$ref": "#/properties/api/$defs/scsi"
+                },
+                "scsi7": {
+                  "$ref": "#/properties/api/$defs/scsi"
+                },
+                "scsi8": {
+                  "$ref": "#/properties/api/$defs/scsi"
+                },
+                "scsi9": {
+                  "$ref": "#/properties/api/$defs/scsi"
+                },
+                "scsi10": {
+                  "$ref": "#/properties/api/$defs/scsi"
+                },
+                "scsi11": {
+                  "$ref": "#/properties/api/$defs/scsi"
+                },
+                "scsi12": {
+                  "$ref": "#/properties/api/$defs/scsi"
+                },
+                "scsi13": {
+                  "$ref": "#/properties/api/$defs/scsi"
+                },
+                "scsi14": {
+                  "$ref": "#/properties/api/$defs/scsi"
+                },
+                "scsi15": {
+                  "$ref": "#/properties/api/$defs/scsi"
+                },
+                "scsi16": {
+                  "$ref": "#/properties/api/$defs/scsi"
+                },
+                "scsi17": {
+                  "$ref": "#/properties/api/$defs/scsi"
+                },
+                "scsi18": {
+                  "$ref": "#/properties/api/$defs/scsi"
+                },
+                "scsi19": {
+                  "$ref": "#/properties/api/$defs/scsi"
+                },
+                "scsi20": {
+                  "$ref": "#/properties/api/$defs/scsi"
+                },
+                "scsi21": {
+                  "$ref": "#/properties/api/$defs/scsi"
+                },
+                "scsi22": {
+                  "$ref": "#/properties/api/$defs/scsi"
+                },
+                "scsi23": {
+                  "$ref": "#/properties/api/$defs/scsi"
+                },
+                "scsi24": {
+                  "$ref": "#/properties/api/$defs/scsi"
+                },
+                "scsi25": {
+                  "$ref": "#/properties/api/$defs/scsi"
+                },
+                "scsi26": {
+                  "$ref": "#/properties/api/$defs/scsi"
+                },
+                "scsi27": {
+                  "$ref": "#/properties/api/$defs/scsi"
+                },
+                "scsi28": {
+                  "$ref": "#/properties/api/$defs/scsi"
+                },
+                "scsi29": {
+                  "$ref": "#/properties/api/$defs/scsi"
+                },
+                "scsi30": {
+                  "$ref": "#/properties/api/$defs/scsi"
+                },
+                "virtio0": {
+                  "$ref": "#/properties/api/$defs/virtio"
+                },
+                "virtio1": {
+                  "$ref": "#/properties/api/$defs/virtio"
+                },
+                "virtio2": {
+                  "$ref": "#/properties/api/$defs/virtio"
+                },
+                "virtio3": {
+                  "$ref": "#/properties/api/$defs/virtio"
+                },
+                "virtio4": {
+                  "$ref": "#/properties/api/$defs/virtio"
+                },
+                "virtio5": {
+                  "$ref": "#/properties/api/$defs/virtio"
+                },
+                "virtio6": {
+                  "$ref": "#/properties/api/$defs/virtio"
+                },
+                "virtio7": {
+                  "$ref": "#/properties/api/$defs/virtio"
+                },
+                "virtio8": {
+                  "$ref": "#/properties/api/$defs/virtio"
+                },
+                "virtio9": {
+                  "$ref": "#/properties/api/$defs/virtio"
+                },
+                "virtio10": {
+                  "$ref": "#/properties/api/$defs/virtio"
+                },
+                "virtio11": {
+                  "$ref": "#/properties/api/$defs/virtio"
+                },
+                "virtio12": {
+                  "$ref": "#/properties/api/$defs/virtio"
+                },
+                "virtio13": {
+                  "$ref": "#/properties/api/$defs/virtio"
+                },
+                "virtio14": {
+                  "$ref": "#/properties/api/$defs/virtio"
+                },
+                "virtio15": {
+                  "$ref": "#/properties/api/$defs/virtio"
                 }
               },
               "required": [
                 "node",
                 "vmid"
               ],
-              "dependencies": {}
+              "dependencies": {},
+              "$defs": {
+                "ide": {
+                  "type": "string",
+                  "pattern": "^(?:file=)?[A-Za-z][A-Za-z0-9._-]*:(?:(?:[1-9][0-9]*(?:\\.[0-9]+)?|0\\.[0-9]*[1-9][0-9]*)|(?:[1-9][0-9]*/)?vm-[1-9][0-9]*-disk-[0-9]+(?:\\.(?:raw|qcow2|vmdk))?)(?:,backup=[01])?(?:,cache=(?:none|writethrough|writeback|directsync))?(?:,discard=(?:ignore|on))?(?:,format=(?:raw|qcow2|vmdk))?(?:,ssd=[01])?$"
+                },
+                "sata": {
+                  "type": "string",
+                  "pattern": "^(?:file=)?[A-Za-z][A-Za-z0-9._-]*:(?:(?:[1-9][0-9]*(?:\\.[0-9]+)?|0\\.[0-9]*[1-9][0-9]*)|(?:[1-9][0-9]*/)?vm-[1-9][0-9]*-disk-[0-9]+(?:\\.(?:raw|qcow2|vmdk))?)(?:,backup=[01])?(?:,cache=(?:none|writethrough|writeback|directsync))?(?:,discard=(?:ignore|on))?(?:,format=(?:raw|qcow2|vmdk))?(?:,ssd=[01])?$"
+                },
+                "scsi": {
+                  "type": "string",
+                  "pattern": "^(?:file=)?[A-Za-z][A-Za-z0-9._-]*:(?:(?:[1-9][0-9]*(?:\\.[0-9]+)?|0\\.[0-9]*[1-9][0-9]*)|(?:[1-9][0-9]*/)?vm-[1-9][0-9]*-disk-[0-9]+(?:\\.(?:raw|qcow2|vmdk))?)(?:,backup=[01])?(?:,cache=(?:none|writethrough|writeback|directsync))?(?:,discard=(?:ignore|on))?(?:,format=(?:raw|qcow2|vmdk))?(?:,iothread=[01])?(?:,ssd=[01])?(?:,ro=[01])?$"
+                },
+                "virtio": {
+                  "type": "string",
+                  "pattern": "^(?:file=)?[A-Za-z][A-Za-z0-9._-]*:(?:(?:[1-9][0-9]*(?:\\.[0-9]+)?|0\\.[0-9]*[1-9][0-9]*)|(?:[1-9][0-9]*/)?vm-[1-9][0-9]*-disk-[0-9]+(?:\\.(?:raw|qcow2|vmdk))?)(?:,backup=[01])?(?:,cache=(?:none|writethrough|writeback|directsync))?(?:,discard=(?:ignore|on))?(?:,format=(?:raw|qcow2|vmdk))?(?:,iothread=[01])?(?:,ro=[01])?$"
+                }
+              }
             }
           },
           "required": [

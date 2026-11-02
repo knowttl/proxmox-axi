@@ -114,8 +114,13 @@ proxmox-axi duplex create <setup-template> [--api-<parameter> <value>] --preview
 
 Common flags are `--config <absolute-path>`, `--profile <name>`, `--session <id>` and `--format toon|json`.
 Offline `inventory` and `schema` accept `--config` without loading credentials.
-For callable operations, `schema` exposes reviewed inputs and constraints in `invocation.schema`; `parameters` retains the complete vendor schema, including refused inputs.
+For callable operations, `schema` defaults to the complete executable `invocation.schema`, policy and return shape, without the raw vendor parameter payload.
 Use `invocation.schema` to validate invocation objects shaped as `{ "api": { ... } }`, and check `callable` and `policy` before invoking.
+Use `schema <method> '<template>' --view vendor` for complete raw vendor parameters, including refused inputs, in bounded pages.
+Repeat the same method, template, catalogue and format with `--offset <page.nextOffset>` until `nextOffset` is null.
+Each page preserves complete parameter entries and root schema metadata; no parameter is silently truncated.
+The full original vendor schemas also remain in the shipped `dist/contracts.json`.
+This bounded default fixes the pre-existing QEMU configuration schema overflow without raising the universal 65536-byte output cap.
 
 ```sh
 proxmox-axi inventory --catalogue legacy-8.2.7 --format json
@@ -238,7 +243,26 @@ proxmox-axi set '/nodes/{node}/qemu/{vmid}/resize' --api-node '<node>' --api-vmi
 Repeat the exact command with `--confirm '<confirmation>'`, then use `task wait` with the returned node, UPID and journal ID.
 An accepted task does not prove completion or that the guest partition/filesystem expanded.
 If delivery is uncertain, inspect the journal/task instead of repeating relative growth, which could add capacity twice.
-Disk attachment changes remain refused pending their separate admission review.
+### Manage disk attachments
+
+Confirmed `set .../config` admits the ordinary QEMU disk slots listed above and LXC `rootfs` plus `mp0` through `mp255`.
+Use concrete flags such as `--api-scsi0` or `--api-mp0`, or the same concrete keys in a protected body file.
+Invocation schemas and agent flags expose those concrete names; `--view vendor` retains the original vendor numbered templates.
+Allocate managed storage with `storage:8` (positive GiB), or attach a conventional managed ID such as `storage:vm-100-disk-0`, `storage:100/vm-100-disk-0.qcow2` for QEMU, or `storage:subvol-100-disk-0` for LXC.
+QEMU property strings accept an optional `file=` prefix, then optional modifiers in this order: `backup`, `cache`, `discard`, `format`, `iothread`, `ssd`, `ro`, when present in that disk's vendor schema.
+Cache values are `none`, `writethrough`, `writeback` or `directsync`; formats are `raw`, `qcow2` or `vmdk`; discard is `ignore` or `on`; other admitted modifiers use `0` or `1`.
+LXC strings accept optional `volume=`, a managed allocation/volume, required `mp=/container/path` for mount points, then optional `acl`, `backup`, `quota`, `ro` in that order when supported by the selected branch.
+Host paths/devices, bind mounts, imports, unsafe cache, unreviewed modifiers and informational `size=` copies remain refused.
+
+```sh
+proxmox-axi set '/nodes/{node}/qemu/{vmid}/config' --api-node '<node>' --api-vmid 100 --api-scsi0 'local-lvm:8,backup=1' --profile lab --preview
+proxmox-axi set '/nodes/{node}/lxc/{vmid}/config' --api-node '<node>' --api-vmid 101 --api-mp0 'local-lvm:8,mp=/mnt/data,backup=1' --profile lab --preview
+```
+
+Setting an existing slot replaces its configuration and requires the same exact preview/confirmation flow as adding it.
+Use `--api-delete scsi0` or a comma-separated list of ordinary QEMU slots to remove their settings; LXC removal admits only `mp0` through `mp255`, never `rootfs`.
+This admission covers disk configuration removal, not arbitrary storage-volume deletion; unused-volume selectors and force remain refused.
+Include `--api-digest` from a private configuration read to guard concurrent changes, and inspect the exact target before confirming replacement or removal.
 
 ## Safety
 

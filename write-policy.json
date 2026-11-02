@@ -3505,7 +3505,7 @@
         "effect": "write",
         "transport": "json",
         "secrets": "input-refs",
-        "reason": "Reviewed compute and startup branches only; CPU feature overrides and host passthrough remain refused, and credential fields require SecretRefs.",
+        "reason": "Reviewed compute, startup and managed disk branches; numbered slots and removal selectors are explicit, host passthrough remains refused, and credentials require SecretRefs.",
         "allowedInputs": [
           "node",
           "vmid",
@@ -3525,8 +3525,269 @@
           "startup",
           "digest",
           "cipassword",
-          "password"
+          "password",
+          "mp0",
+          "mp1",
+          "mp2",
+          "mp3",
+          "mp4",
+          "mp5",
+          "mp6",
+          "mp7",
+          "mp8",
+          "mp9",
+          "mp10",
+          "mp11",
+          "mp12",
+          "mp13",
+          "mp14",
+          "mp15",
+          "mp16",
+          "mp17",
+          "mp18",
+          "mp19",
+          "mp20",
+          "mp21",
+          "mp22",
+          "mp23",
+          "mp24",
+          "mp25",
+          "mp26",
+          "mp27",
+          "mp28",
+          "mp29",
+          "mp30",
+          "mp31",
+          "mp32",
+          "mp33",
+          "mp34",
+          "mp35",
+          "mp36",
+          "mp37",
+          "mp38",
+          "mp39",
+          "mp40",
+          "mp41",
+          "mp42",
+          "mp43",
+          "mp44",
+          "mp45",
+          "mp46",
+          "mp47",
+          "mp48",
+          "mp49",
+          "mp50",
+          "mp51",
+          "mp52",
+          "mp53",
+          "mp54",
+          "mp55",
+          "mp56",
+          "mp57",
+          "mp58",
+          "mp59",
+          "mp60",
+          "mp61",
+          "mp62",
+          "mp63",
+          "mp64",
+          "mp65",
+          "mp66",
+          "mp67",
+          "mp68",
+          "mp69",
+          "mp70",
+          "mp71",
+          "mp72",
+          "mp73",
+          "mp74",
+          "mp75",
+          "mp76",
+          "mp77",
+          "mp78",
+          "mp79",
+          "mp80",
+          "mp81",
+          "mp82",
+          "mp83",
+          "mp84",
+          "mp85",
+          "mp86",
+          "mp87",
+          "mp88",
+          "mp89",
+          "mp90",
+          "mp91",
+          "mp92",
+          "mp93",
+          "mp94",
+          "mp95",
+          "mp96",
+          "mp97",
+          "mp98",
+          "mp99",
+          "mp100",
+          "mp101",
+          "mp102",
+          "mp103",
+          "mp104",
+          "mp105",
+          "mp106",
+          "mp107",
+          "mp108",
+          "mp109",
+          "mp110",
+          "mp111",
+          "mp112",
+          "mp113",
+          "mp114",
+          "mp115",
+          "mp116",
+          "mp117",
+          "mp118",
+          "mp119",
+          "mp120",
+          "mp121",
+          "mp122",
+          "mp123",
+          "mp124",
+          "mp125",
+          "mp126",
+          "mp127",
+          "mp128",
+          "mp129",
+          "mp130",
+          "mp131",
+          "mp132",
+          "mp133",
+          "mp134",
+          "mp135",
+          "mp136",
+          "mp137",
+          "mp138",
+          "mp139",
+          "mp140",
+          "mp141",
+          "mp142",
+          "mp143",
+          "mp144",
+          "mp145",
+          "mp146",
+          "mp147",
+          "mp148",
+          "mp149",
+          "mp150",
+          "mp151",
+          "mp152",
+          "mp153",
+          "mp154",
+          "mp155",
+          "mp156",
+          "mp157",
+          "mp158",
+          "mp159",
+          "mp160",
+          "mp161",
+          "mp162",
+          "mp163",
+          "mp164",
+          "mp165",
+          "mp166",
+          "mp167",
+          "mp168",
+          "mp169",
+          "mp170",
+          "mp171",
+          "mp172",
+          "mp173",
+          "mp174",
+          "mp175",
+          "mp176",
+          "mp177",
+          "mp178",
+          "mp179",
+          "mp180",
+          "mp181",
+          "mp182",
+          "mp183",
+          "mp184",
+          "mp185",
+          "mp186",
+          "mp187",
+          "mp188",
+          "mp189",
+          "mp190",
+          "mp191",
+          "mp192",
+          "mp193",
+          "mp194",
+          "mp195",
+          "mp196",
+          "mp197",
+          "mp198",
+          "mp199",
+          "mp200",
+          "mp201",
+          "mp202",
+          "mp203",
+          "mp204",
+          "mp205",
+          "mp206",
+          "mp207",
+          "mp208",
+          "mp209",
+          "mp210",
+          "mp211",
+          "mp212",
+          "mp213",
+          "mp214",
+          "mp215",
+          "mp216",
+          "mp217",
+          "mp218",
+          "mp219",
+          "mp220",
+          "mp221",
+          "mp222",
+          "mp223",
+          "mp224",
+          "mp225",
+          "mp226",
+          "mp227",
+          "mp228",
+          "mp229",
+          "mp230",
+          "mp231",
+          "mp232",
+          "mp233",
+          "mp234",
+          "mp235",
+          "mp236",
+          "mp237",
+          "mp238",
+          "mp239",
+          "mp240",
+          "mp241",
+          "mp242",
+          "mp243",
+          "mp244",
+          "mp245",
+          "mp246",
+          "mp247",
+          "mp248",
+          "mp249",
+          "mp250",
+          "mp251",
+          "mp252",
+          "mp253",
+          "mp254",
+          "mp255",
+          "rootfs",
+          "delete"
         ],
+        "inputPatterns": {
+          "delete": "^(?:mp0|mp1|mp2|mp3|mp4|mp5|mp6|mp7|mp8|mp9|mp10|mp11|mp12|mp13|mp14|mp15|mp16|mp17|mp18|mp19|mp20|mp21|mp22|mp23|mp24|mp25|mp26|mp27|mp28|mp29|mp30|mp31|mp32|mp33|mp34|mp35|mp36|mp37|mp38|mp39|mp40|mp41|mp42|mp43|mp44|mp45|mp46|mp47|mp48|mp49|mp50|mp51|mp52|mp53|mp54|mp55|mp56|mp57|mp58|mp59|mp60|mp61|mp62|mp63|mp64|mp65|mp66|mp67|mp68|mp69|mp70|mp71|mp72|mp73|mp74|mp75|mp76|mp77|mp78|mp79|mp80|mp81|mp82|mp83|mp84|mp85|mp86|mp87|mp88|mp89|mp90|mp91|mp92|mp93|mp94|mp95|mp96|mp97|mp98|mp99|mp100|mp101|mp102|mp103|mp104|mp105|mp106|mp107|mp108|mp109|mp110|mp111|mp112|mp113|mp114|mp115|mp116|mp117|mp118|mp119|mp120|mp121|mp122|mp123|mp124|mp125|mp126|mp127|mp128|mp129|mp130|mp131|mp132|mp133|mp134|mp135|mp136|mp137|mp138|mp139|mp140|mp141|mp142|mp143|mp144|mp145|mp146|mp147|mp148|mp149|mp150|mp151|mp152|mp153|mp154|mp155|mp156|mp157|mp158|mp159|mp160|mp161|mp162|mp163|mp164|mp165|mp166|mp167|mp168|mp169|mp170|mp171|mp172|mp173|mp174|mp175|mp176|mp177|mp178|mp179|mp180|mp181|mp182|mp183|mp184|mp185|mp186|mp187|mp188|mp189|mp190|mp191|mp192|mp193|mp194|mp195|mp196|mp197|mp198|mp199|mp200|mp201|mp202|mp203|mp204|mp205|mp206|mp207|mp208|mp209|mp210|mp211|mp212|mp213|mp214|mp215|mp216|mp217|mp218|mp219|mp220|mp221|mp222|mp223|mp224|mp225|mp226|mp227|mp228|mp229|mp230|mp231|mp232|mp233|mp234|mp235|mp236|mp237|mp238|mp239|mp240|mp241|mp242|mp243|mp244|mp245|mp246|mp247|mp248|mp249|mp250|mp251|mp252|mp253|mp254|mp255)(?:,(?:mp0|mp1|mp2|mp3|mp4|mp5|mp6|mp7|mp8|mp9|mp10|mp11|mp12|mp13|mp14|mp15|mp16|mp17|mp18|mp19|mp20|mp21|mp22|mp23|mp24|mp25|mp26|mp27|mp28|mp29|mp30|mp31|mp32|mp33|mp34|mp35|mp36|mp37|mp38|mp39|mp40|mp41|mp42|mp43|mp44|mp45|mp46|mp47|mp48|mp49|mp50|mp51|mp52|mp53|mp54|mp55|mp56|mp57|mp58|mp59|mp60|mp61|mp62|mp63|mp64|mp65|mp66|mp67|mp68|mp69|mp70|mp71|mp72|mp73|mp74|mp75|mp76|mp77|mp78|mp79|mp80|mp81|mp82|mp83|mp84|mp85|mp86|mp87|mp88|mp89|mp90|mp91|mp92|mp93|mp94|mp95|mp96|mp97|mp98|mp99|mp100|mp101|mp102|mp103|mp104|mp105|mp106|mp107|mp108|mp109|mp110|mp111|mp112|mp113|mp114|mp115|mp116|mp117|mp118|mp119|mp120|mp121|mp122|mp123|mp124|mp125|mp126|mp127|mp128|mp129|mp130|mp131|mp132|mp133|mp134|mp135|mp136|mp137|mp138|mp139|mp140|mp141|mp142|mp143|mp144|mp145|mp146|mp147|mp148|mp149|mp150|mp151|mp152|mp153|mp154|mp155|mp156|mp157|mp158|mp159|mp160|mp161|mp162|mp163|mp164|mp165|mp166|mp167|mp168|mp169|mp170|mp171|mp172|mp173|mp174|mp175|mp176|mp177|mp178|mp179|mp180|mp181|mp182|mp183|mp184|mp185|mp186|mp187|mp188|mp189|mp190|mp191|mp192|mp193|mp194|mp195|mp196|mp197|mp198|mp199|mp200|mp201|mp202|mp203|mp204|mp205|mp206|mp207|mp208|mp209|mp210|mp211|mp212|mp213|mp214|mp215|mp216|mp217|mp218|mp219|mp220|mp221|mp222|mp223|mp224|mp225|mp226|mp227|mp228|mp229|mp230|mp231|mp232|mp233|mp234|mp235|mp236|mp237|mp238|mp239|mp240|mp241|mp242|mp243|mp244|mp245|mp246|mp247|mp248|mp249|mp250|mp251|mp252|mp253|mp254|mp255))*$"
+        },
         "sensitiveInputs": [
           "cipassword",
           "password"
@@ -3595,7 +3856,7 @@
         },
         {
           "name": "delete",
-          "admitted": false,
+          "admitted": true,
           "sensitive": false
         },
         {
@@ -3680,7 +3941,7 @@
         },
         {
           "name": "rootfs",
-          "admitted": false,
+          "admitted": true,
           "sensitive": false
         },
         {
@@ -3730,6 +3991,1286 @@
         },
         {
           "name": "vmid",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp0",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp1",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp2",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp3",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp4",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp5",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp6",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp7",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp8",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp9",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp10",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp11",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp12",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp13",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp14",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp15",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp16",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp17",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp18",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp19",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp20",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp21",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp22",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp23",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp24",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp25",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp26",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp27",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp28",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp29",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp30",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp31",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp32",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp33",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp34",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp35",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp36",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp37",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp38",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp39",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp40",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp41",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp42",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp43",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp44",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp45",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp46",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp47",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp48",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp49",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp50",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp51",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp52",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp53",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp54",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp55",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp56",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp57",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp58",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp59",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp60",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp61",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp62",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp63",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp64",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp65",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp66",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp67",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp68",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp69",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp70",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp71",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp72",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp73",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp74",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp75",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp76",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp77",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp78",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp79",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp80",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp81",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp82",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp83",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp84",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp85",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp86",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp87",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp88",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp89",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp90",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp91",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp92",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp93",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp94",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp95",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp96",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp97",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp98",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp99",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp100",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp101",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp102",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp103",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp104",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp105",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp106",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp107",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp108",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp109",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp110",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp111",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp112",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp113",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp114",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp115",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp116",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp117",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp118",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp119",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp120",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp121",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp122",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp123",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp124",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp125",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp126",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp127",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp128",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp129",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp130",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp131",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp132",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp133",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp134",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp135",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp136",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp137",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp138",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp139",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp140",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp141",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp142",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp143",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp144",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp145",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp146",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp147",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp148",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp149",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp150",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp151",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp152",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp153",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp154",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp155",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp156",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp157",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp158",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp159",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp160",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp161",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp162",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp163",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp164",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp165",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp166",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp167",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp168",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp169",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp170",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp171",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp172",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp173",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp174",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp175",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp176",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp177",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp178",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp179",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp180",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp181",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp182",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp183",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp184",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp185",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp186",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp187",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp188",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp189",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp190",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp191",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp192",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp193",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp194",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp195",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp196",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp197",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp198",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp199",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp200",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp201",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp202",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp203",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp204",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp205",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp206",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp207",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp208",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp209",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp210",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp211",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp212",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp213",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp214",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp215",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp216",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp217",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp218",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp219",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp220",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp221",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp222",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp223",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp224",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp225",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp226",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp227",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp228",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp229",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp230",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp231",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp232",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp233",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp234",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp235",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp236",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp237",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp238",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp239",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp240",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp241",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp242",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp243",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp244",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp245",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp246",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp247",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp248",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp249",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp250",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp251",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp252",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp253",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp254",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp255",
           "admitted": true,
           "sensitive": false
         }
@@ -5226,7 +6767,7 @@
         "effect": "write",
         "transport": "json",
         "secrets": "input-refs",
-        "reason": "Reviewed compute and startup branches only; CPU feature overrides and host passthrough remain refused, and credential fields require SecretRefs.",
+        "reason": "Reviewed compute, startup and managed disk branches; numbered slots and removal selectors are explicit, host passthrough remains refused, and credentials require SecretRefs.",
         "allowedInputs": [
           "node",
           "vmid",
@@ -5246,8 +6787,69 @@
           "startup",
           "digest",
           "cipassword",
-          "password"
+          "password",
+          "ide0",
+          "ide1",
+          "ide2",
+          "ide3",
+          "sata0",
+          "sata1",
+          "sata2",
+          "sata3",
+          "sata4",
+          "sata5",
+          "scsi0",
+          "scsi1",
+          "scsi2",
+          "scsi3",
+          "scsi4",
+          "scsi5",
+          "scsi6",
+          "scsi7",
+          "scsi8",
+          "scsi9",
+          "scsi10",
+          "scsi11",
+          "scsi12",
+          "scsi13",
+          "scsi14",
+          "scsi15",
+          "scsi16",
+          "scsi17",
+          "scsi18",
+          "scsi19",
+          "scsi20",
+          "scsi21",
+          "scsi22",
+          "scsi23",
+          "scsi24",
+          "scsi25",
+          "scsi26",
+          "scsi27",
+          "scsi28",
+          "scsi29",
+          "scsi30",
+          "virtio0",
+          "virtio1",
+          "virtio2",
+          "virtio3",
+          "virtio4",
+          "virtio5",
+          "virtio6",
+          "virtio7",
+          "virtio8",
+          "virtio9",
+          "virtio10",
+          "virtio11",
+          "virtio12",
+          "virtio13",
+          "virtio14",
+          "virtio15",
+          "delete"
         ],
+        "inputPatterns": {
+          "delete": "^(?:ide0|ide1|ide2|ide3|sata0|sata1|sata2|sata3|sata4|sata5|scsi0|scsi1|scsi2|scsi3|scsi4|scsi5|scsi6|scsi7|scsi8|scsi9|scsi10|scsi11|scsi12|scsi13|scsi14|scsi15|scsi16|scsi17|scsi18|scsi19|scsi20|scsi21|scsi22|scsi23|scsi24|scsi25|scsi26|scsi27|scsi28|scsi29|scsi30|virtio0|virtio1|virtio2|virtio3|virtio4|virtio5|virtio6|virtio7|virtio8|virtio9|virtio10|virtio11|virtio12|virtio13|virtio14|virtio15)(?:,(?:ide0|ide1|ide2|ide3|sata0|sata1|sata2|sata3|sata4|sata5|scsi0|scsi1|scsi2|scsi3|scsi4|scsi5|scsi6|scsi7|scsi8|scsi9|scsi10|scsi11|scsi12|scsi13|scsi14|scsi15|scsi16|scsi17|scsi18|scsi19|scsi20|scsi21|scsi22|scsi23|scsi24|scsi25|scsi26|scsi27|scsi28|scsi29|scsi30|virtio0|virtio1|virtio2|virtio3|virtio4|virtio5|virtio6|virtio7|virtio8|virtio9|virtio10|virtio11|virtio12|virtio13|virtio14|virtio15))*$"
+        },
         "sensitiveInputs": [
           "cipassword",
           "password"
@@ -5393,7 +6995,7 @@
         },
         {
           "name": "delete",
-          "admitted": false,
+          "admitted": true,
           "sensitive": false
         },
         {
@@ -5709,6 +7311,291 @@
         {
           "name": "watchdog",
           "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "ide0",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "ide1",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "ide2",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "ide3",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "sata0",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "sata1",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "sata2",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "sata3",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "sata4",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "sata5",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "scsi0",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "scsi1",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "scsi2",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "scsi3",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "scsi4",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "scsi5",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "scsi6",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "scsi7",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "scsi8",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "scsi9",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "scsi10",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "scsi11",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "scsi12",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "scsi13",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "scsi14",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "scsi15",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "scsi16",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "scsi17",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "scsi18",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "scsi19",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "scsi20",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "scsi21",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "scsi22",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "scsi23",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "scsi24",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "scsi25",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "scsi26",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "scsi27",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "scsi28",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "scsi29",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "scsi30",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "virtio0",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "virtio1",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "virtio2",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "virtio3",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "virtio4",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "virtio5",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "virtio6",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "virtio7",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "virtio8",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "virtio9",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "virtio10",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "virtio11",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "virtio12",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "virtio13",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "virtio14",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "virtio15",
+          "admitted": true,
           "sensitive": false
         }
       ],
@@ -12171,7 +14058,7 @@
         "effect": "write",
         "transport": "json",
         "secrets": "input-refs",
-        "reason": "Reviewed compute and startup branches only; CPU feature overrides and host passthrough remain refused, and credential fields require SecretRefs.",
+        "reason": "Reviewed compute, startup and managed disk branches; numbered slots and removal selectors are explicit, host passthrough remains refused, and credentials require SecretRefs.",
         "allowedInputs": [
           "node",
           "vmid",
@@ -12191,8 +14078,269 @@
           "startup",
           "digest",
           "cipassword",
-          "password"
+          "password",
+          "mp0",
+          "mp1",
+          "mp2",
+          "mp3",
+          "mp4",
+          "mp5",
+          "mp6",
+          "mp7",
+          "mp8",
+          "mp9",
+          "mp10",
+          "mp11",
+          "mp12",
+          "mp13",
+          "mp14",
+          "mp15",
+          "mp16",
+          "mp17",
+          "mp18",
+          "mp19",
+          "mp20",
+          "mp21",
+          "mp22",
+          "mp23",
+          "mp24",
+          "mp25",
+          "mp26",
+          "mp27",
+          "mp28",
+          "mp29",
+          "mp30",
+          "mp31",
+          "mp32",
+          "mp33",
+          "mp34",
+          "mp35",
+          "mp36",
+          "mp37",
+          "mp38",
+          "mp39",
+          "mp40",
+          "mp41",
+          "mp42",
+          "mp43",
+          "mp44",
+          "mp45",
+          "mp46",
+          "mp47",
+          "mp48",
+          "mp49",
+          "mp50",
+          "mp51",
+          "mp52",
+          "mp53",
+          "mp54",
+          "mp55",
+          "mp56",
+          "mp57",
+          "mp58",
+          "mp59",
+          "mp60",
+          "mp61",
+          "mp62",
+          "mp63",
+          "mp64",
+          "mp65",
+          "mp66",
+          "mp67",
+          "mp68",
+          "mp69",
+          "mp70",
+          "mp71",
+          "mp72",
+          "mp73",
+          "mp74",
+          "mp75",
+          "mp76",
+          "mp77",
+          "mp78",
+          "mp79",
+          "mp80",
+          "mp81",
+          "mp82",
+          "mp83",
+          "mp84",
+          "mp85",
+          "mp86",
+          "mp87",
+          "mp88",
+          "mp89",
+          "mp90",
+          "mp91",
+          "mp92",
+          "mp93",
+          "mp94",
+          "mp95",
+          "mp96",
+          "mp97",
+          "mp98",
+          "mp99",
+          "mp100",
+          "mp101",
+          "mp102",
+          "mp103",
+          "mp104",
+          "mp105",
+          "mp106",
+          "mp107",
+          "mp108",
+          "mp109",
+          "mp110",
+          "mp111",
+          "mp112",
+          "mp113",
+          "mp114",
+          "mp115",
+          "mp116",
+          "mp117",
+          "mp118",
+          "mp119",
+          "mp120",
+          "mp121",
+          "mp122",
+          "mp123",
+          "mp124",
+          "mp125",
+          "mp126",
+          "mp127",
+          "mp128",
+          "mp129",
+          "mp130",
+          "mp131",
+          "mp132",
+          "mp133",
+          "mp134",
+          "mp135",
+          "mp136",
+          "mp137",
+          "mp138",
+          "mp139",
+          "mp140",
+          "mp141",
+          "mp142",
+          "mp143",
+          "mp144",
+          "mp145",
+          "mp146",
+          "mp147",
+          "mp148",
+          "mp149",
+          "mp150",
+          "mp151",
+          "mp152",
+          "mp153",
+          "mp154",
+          "mp155",
+          "mp156",
+          "mp157",
+          "mp158",
+          "mp159",
+          "mp160",
+          "mp161",
+          "mp162",
+          "mp163",
+          "mp164",
+          "mp165",
+          "mp166",
+          "mp167",
+          "mp168",
+          "mp169",
+          "mp170",
+          "mp171",
+          "mp172",
+          "mp173",
+          "mp174",
+          "mp175",
+          "mp176",
+          "mp177",
+          "mp178",
+          "mp179",
+          "mp180",
+          "mp181",
+          "mp182",
+          "mp183",
+          "mp184",
+          "mp185",
+          "mp186",
+          "mp187",
+          "mp188",
+          "mp189",
+          "mp190",
+          "mp191",
+          "mp192",
+          "mp193",
+          "mp194",
+          "mp195",
+          "mp196",
+          "mp197",
+          "mp198",
+          "mp199",
+          "mp200",
+          "mp201",
+          "mp202",
+          "mp203",
+          "mp204",
+          "mp205",
+          "mp206",
+          "mp207",
+          "mp208",
+          "mp209",
+          "mp210",
+          "mp211",
+          "mp212",
+          "mp213",
+          "mp214",
+          "mp215",
+          "mp216",
+          "mp217",
+          "mp218",
+          "mp219",
+          "mp220",
+          "mp221",
+          "mp222",
+          "mp223",
+          "mp224",
+          "mp225",
+          "mp226",
+          "mp227",
+          "mp228",
+          "mp229",
+          "mp230",
+          "mp231",
+          "mp232",
+          "mp233",
+          "mp234",
+          "mp235",
+          "mp236",
+          "mp237",
+          "mp238",
+          "mp239",
+          "mp240",
+          "mp241",
+          "mp242",
+          "mp243",
+          "mp244",
+          "mp245",
+          "mp246",
+          "mp247",
+          "mp248",
+          "mp249",
+          "mp250",
+          "mp251",
+          "mp252",
+          "mp253",
+          "mp254",
+          "mp255",
+          "rootfs",
+          "delete"
         ],
+        "inputPatterns": {
+          "delete": "^(?:mp0|mp1|mp2|mp3|mp4|mp5|mp6|mp7|mp8|mp9|mp10|mp11|mp12|mp13|mp14|mp15|mp16|mp17|mp18|mp19|mp20|mp21|mp22|mp23|mp24|mp25|mp26|mp27|mp28|mp29|mp30|mp31|mp32|mp33|mp34|mp35|mp36|mp37|mp38|mp39|mp40|mp41|mp42|mp43|mp44|mp45|mp46|mp47|mp48|mp49|mp50|mp51|mp52|mp53|mp54|mp55|mp56|mp57|mp58|mp59|mp60|mp61|mp62|mp63|mp64|mp65|mp66|mp67|mp68|mp69|mp70|mp71|mp72|mp73|mp74|mp75|mp76|mp77|mp78|mp79|mp80|mp81|mp82|mp83|mp84|mp85|mp86|mp87|mp88|mp89|mp90|mp91|mp92|mp93|mp94|mp95|mp96|mp97|mp98|mp99|mp100|mp101|mp102|mp103|mp104|mp105|mp106|mp107|mp108|mp109|mp110|mp111|mp112|mp113|mp114|mp115|mp116|mp117|mp118|mp119|mp120|mp121|mp122|mp123|mp124|mp125|mp126|mp127|mp128|mp129|mp130|mp131|mp132|mp133|mp134|mp135|mp136|mp137|mp138|mp139|mp140|mp141|mp142|mp143|mp144|mp145|mp146|mp147|mp148|mp149|mp150|mp151|mp152|mp153|mp154|mp155|mp156|mp157|mp158|mp159|mp160|mp161|mp162|mp163|mp164|mp165|mp166|mp167|mp168|mp169|mp170|mp171|mp172|mp173|mp174|mp175|mp176|mp177|mp178|mp179|mp180|mp181|mp182|mp183|mp184|mp185|mp186|mp187|mp188|mp189|mp190|mp191|mp192|mp193|mp194|mp195|mp196|mp197|mp198|mp199|mp200|mp201|mp202|mp203|mp204|mp205|mp206|mp207|mp208|mp209|mp210|mp211|mp212|mp213|mp214|mp215|mp216|mp217|mp218|mp219|mp220|mp221|mp222|mp223|mp224|mp225|mp226|mp227|mp228|mp229|mp230|mp231|mp232|mp233|mp234|mp235|mp236|mp237|mp238|mp239|mp240|mp241|mp242|mp243|mp244|mp245|mp246|mp247|mp248|mp249|mp250|mp251|mp252|mp253|mp254|mp255)(?:,(?:mp0|mp1|mp2|mp3|mp4|mp5|mp6|mp7|mp8|mp9|mp10|mp11|mp12|mp13|mp14|mp15|mp16|mp17|mp18|mp19|mp20|mp21|mp22|mp23|mp24|mp25|mp26|mp27|mp28|mp29|mp30|mp31|mp32|mp33|mp34|mp35|mp36|mp37|mp38|mp39|mp40|mp41|mp42|mp43|mp44|mp45|mp46|mp47|mp48|mp49|mp50|mp51|mp52|mp53|mp54|mp55|mp56|mp57|mp58|mp59|mp60|mp61|mp62|mp63|mp64|mp65|mp66|mp67|mp68|mp69|mp70|mp71|mp72|mp73|mp74|mp75|mp76|mp77|mp78|mp79|mp80|mp81|mp82|mp83|mp84|mp85|mp86|mp87|mp88|mp89|mp90|mp91|mp92|mp93|mp94|mp95|mp96|mp97|mp98|mp99|mp100|mp101|mp102|mp103|mp104|mp105|mp106|mp107|mp108|mp109|mp110|mp111|mp112|mp113|mp114|mp115|mp116|mp117|mp118|mp119|mp120|mp121|mp122|mp123|mp124|mp125|mp126|mp127|mp128|mp129|mp130|mp131|mp132|mp133|mp134|mp135|mp136|mp137|mp138|mp139|mp140|mp141|mp142|mp143|mp144|mp145|mp146|mp147|mp148|mp149|mp150|mp151|mp152|mp153|mp154|mp155|mp156|mp157|mp158|mp159|mp160|mp161|mp162|mp163|mp164|mp165|mp166|mp167|mp168|mp169|mp170|mp171|mp172|mp173|mp174|mp175|mp176|mp177|mp178|mp179|mp180|mp181|mp182|mp183|mp184|mp185|mp186|mp187|mp188|mp189|mp190|mp191|mp192|mp193|mp194|mp195|mp196|mp197|mp198|mp199|mp200|mp201|mp202|mp203|mp204|mp205|mp206|mp207|mp208|mp209|mp210|mp211|mp212|mp213|mp214|mp215|mp216|mp217|mp218|mp219|mp220|mp221|mp222|mp223|mp224|mp225|mp226|mp227|mp228|mp229|mp230|mp231|mp232|mp233|mp234|mp235|mp236|mp237|mp238|mp239|mp240|mp241|mp242|mp243|mp244|mp245|mp246|mp247|mp248|mp249|mp250|mp251|mp252|mp253|mp254|mp255))*$"
+        },
         "sensitiveInputs": [
           "cipassword",
           "password"
@@ -12261,7 +14409,7 @@
         },
         {
           "name": "delete",
-          "admitted": false,
+          "admitted": true,
           "sensitive": false
         },
         {
@@ -12356,7 +14504,7 @@
         },
         {
           "name": "rootfs",
-          "admitted": false,
+          "admitted": true,
           "sensitive": false
         },
         {
@@ -12406,6 +14554,1286 @@
         },
         {
           "name": "vmid",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp0",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp1",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp2",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp3",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp4",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp5",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp6",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp7",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp8",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp9",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp10",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp11",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp12",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp13",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp14",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp15",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp16",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp17",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp18",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp19",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp20",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp21",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp22",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp23",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp24",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp25",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp26",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp27",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp28",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp29",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp30",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp31",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp32",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp33",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp34",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp35",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp36",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp37",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp38",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp39",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp40",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp41",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp42",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp43",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp44",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp45",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp46",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp47",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp48",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp49",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp50",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp51",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp52",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp53",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp54",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp55",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp56",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp57",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp58",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp59",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp60",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp61",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp62",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp63",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp64",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp65",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp66",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp67",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp68",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp69",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp70",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp71",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp72",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp73",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp74",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp75",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp76",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp77",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp78",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp79",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp80",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp81",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp82",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp83",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp84",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp85",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp86",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp87",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp88",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp89",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp90",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp91",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp92",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp93",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp94",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp95",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp96",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp97",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp98",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp99",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp100",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp101",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp102",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp103",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp104",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp105",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp106",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp107",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp108",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp109",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp110",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp111",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp112",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp113",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp114",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp115",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp116",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp117",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp118",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp119",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp120",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp121",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp122",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp123",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp124",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp125",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp126",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp127",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp128",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp129",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp130",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp131",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp132",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp133",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp134",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp135",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp136",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp137",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp138",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp139",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp140",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp141",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp142",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp143",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp144",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp145",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp146",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp147",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp148",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp149",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp150",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp151",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp152",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp153",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp154",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp155",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp156",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp157",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp158",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp159",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp160",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp161",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp162",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp163",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp164",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp165",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp166",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp167",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp168",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp169",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp170",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp171",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp172",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp173",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp174",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp175",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp176",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp177",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp178",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp179",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp180",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp181",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp182",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp183",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp184",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp185",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp186",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp187",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp188",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp189",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp190",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp191",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp192",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp193",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp194",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp195",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp196",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp197",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp198",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp199",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp200",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp201",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp202",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp203",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp204",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp205",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp206",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp207",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp208",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp209",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp210",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp211",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp212",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp213",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp214",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp215",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp216",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp217",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp218",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp219",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp220",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp221",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp222",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp223",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp224",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp225",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp226",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp227",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp228",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp229",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp230",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp231",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp232",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp233",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp234",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp235",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp236",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp237",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp238",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp239",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp240",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp241",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp242",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp243",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp244",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp245",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp246",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp247",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp248",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp249",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp250",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp251",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp252",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp253",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp254",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "mp255",
           "admitted": true,
           "sensitive": false
         }
@@ -13915,7 +17343,7 @@
         "effect": "write",
         "transport": "json",
         "secrets": "input-refs",
-        "reason": "Reviewed compute and startup branches only; CPU feature overrides and host passthrough remain refused, and credential fields require SecretRefs.",
+        "reason": "Reviewed compute, startup and managed disk branches; numbered slots and removal selectors are explicit, host passthrough remains refused, and credentials require SecretRefs.",
         "allowedInputs": [
           "node",
           "vmid",
@@ -13935,8 +17363,69 @@
           "startup",
           "digest",
           "cipassword",
-          "password"
+          "password",
+          "ide0",
+          "ide1",
+          "ide2",
+          "ide3",
+          "sata0",
+          "sata1",
+          "sata2",
+          "sata3",
+          "sata4",
+          "sata5",
+          "scsi0",
+          "scsi1",
+          "scsi2",
+          "scsi3",
+          "scsi4",
+          "scsi5",
+          "scsi6",
+          "scsi7",
+          "scsi8",
+          "scsi9",
+          "scsi10",
+          "scsi11",
+          "scsi12",
+          "scsi13",
+          "scsi14",
+          "scsi15",
+          "scsi16",
+          "scsi17",
+          "scsi18",
+          "scsi19",
+          "scsi20",
+          "scsi21",
+          "scsi22",
+          "scsi23",
+          "scsi24",
+          "scsi25",
+          "scsi26",
+          "scsi27",
+          "scsi28",
+          "scsi29",
+          "scsi30",
+          "virtio0",
+          "virtio1",
+          "virtio2",
+          "virtio3",
+          "virtio4",
+          "virtio5",
+          "virtio6",
+          "virtio7",
+          "virtio8",
+          "virtio9",
+          "virtio10",
+          "virtio11",
+          "virtio12",
+          "virtio13",
+          "virtio14",
+          "virtio15",
+          "delete"
         ],
+        "inputPatterns": {
+          "delete": "^(?:ide0|ide1|ide2|ide3|sata0|sata1|sata2|sata3|sata4|sata5|scsi0|scsi1|scsi2|scsi3|scsi4|scsi5|scsi6|scsi7|scsi8|scsi9|scsi10|scsi11|scsi12|scsi13|scsi14|scsi15|scsi16|scsi17|scsi18|scsi19|scsi20|scsi21|scsi22|scsi23|scsi24|scsi25|scsi26|scsi27|scsi28|scsi29|scsi30|virtio0|virtio1|virtio2|virtio3|virtio4|virtio5|virtio6|virtio7|virtio8|virtio9|virtio10|virtio11|virtio12|virtio13|virtio14|virtio15)(?:,(?:ide0|ide1|ide2|ide3|sata0|sata1|sata2|sata3|sata4|sata5|scsi0|scsi1|scsi2|scsi3|scsi4|scsi5|scsi6|scsi7|scsi8|scsi9|scsi10|scsi11|scsi12|scsi13|scsi14|scsi15|scsi16|scsi17|scsi18|scsi19|scsi20|scsi21|scsi22|scsi23|scsi24|scsi25|scsi26|scsi27|scsi28|scsi29|scsi30|virtio0|virtio1|virtio2|virtio3|virtio4|virtio5|virtio6|virtio7|virtio8|virtio9|virtio10|virtio11|virtio12|virtio13|virtio14|virtio15))*$"
+        },
         "sensitiveInputs": [
           "cipassword",
           "password"
@@ -14087,7 +17576,7 @@
         },
         {
           "name": "delete",
-          "admitted": false,
+          "admitted": true,
           "sensitive": false
         },
         {
@@ -14408,6 +17897,291 @@
         {
           "name": "watchdog",
           "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "ide0",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "ide1",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "ide2",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "ide3",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "sata0",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "sata1",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "sata2",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "sata3",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "sata4",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "sata5",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "scsi0",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "scsi1",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "scsi2",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "scsi3",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "scsi4",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "scsi5",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "scsi6",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "scsi7",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "scsi8",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "scsi9",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "scsi10",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "scsi11",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "scsi12",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "scsi13",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "scsi14",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "scsi15",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "scsi16",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "scsi17",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "scsi18",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "scsi19",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "scsi20",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "scsi21",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "scsi22",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "scsi23",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "scsi24",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "scsi25",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "scsi26",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "scsi27",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "scsi28",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "scsi29",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "scsi30",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "virtio0",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "virtio1",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "virtio2",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "virtio3",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "virtio4",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "virtio5",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "virtio6",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "virtio7",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "virtio8",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "virtio9",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "virtio10",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "virtio11",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "virtio12",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "virtio13",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "virtio14",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "virtio15",
+          "admitted": true,
           "sensitive": false
         }
       ],

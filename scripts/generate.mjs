@@ -2,7 +2,7 @@ import { readFileSync, writeFileSync } from 'node:fs'
 import { createHash } from 'node:crypto'
 import { captures, replay, routeKey, compareCatalogues } from './catalogue.mjs'
 import { reviewWrite } from './write-policy.ts'
-import { propertyFormatPattern } from '../src/property-format.ts'
+import { parameterProperties, propertyFormatPattern } from '../src/property-format.ts'
 
 const root = new URL('../', import.meta.url)
 const read = path => readFileSync(new URL(path, root), 'utf8')
@@ -55,9 +55,17 @@ const contracts = catalogues.flatMap(catalogue => catalogue.operations.map(opera
   const callable = policy.captureBindings[catalogue.release] === catalogue.captureSha256 && ['read', 'write', 'batch'].includes(review.effect) && ['json', 'managed'].includes(review.transport) && ['none', 'input-refs', 'private-result'].includes(review.secrets)
   const id = operations.find(item => routeKey(item) === routeKey(operation))?.id ?? `OP-${operation.method}-${createHash('sha256').update(routeKey(operation)).digest('hex').slice(0, 10)}`
   const api = parameterSchema({ ...operation.parameters,
-    properties: Object.fromEntries(Object.entries(operation.parameters.properties ?? {}).filter(([name]) =>
+    properties: Object.fromEntries(Object.entries(parameterProperties(operation.parameters, review.allowedInputs)).filter(([name]) =>
       !review.allowedInputs || review.allowedInputs.includes(name))),
   })
+  for (const name of review.allowedInputs ?? []) {
+    const template = name.replace(/[0-9]+$/, '[n]')
+    if (template === name || !Object.hasOwn(operation.parameters.properties ?? {}, template) || Object.hasOwn(operation.parameters.properties, name)) continue
+    const key = template.replace('[n]', '')
+    api.$defs ??= {}
+    api.$defs[key] ??= api.properties[name]
+    api.properties[name] = { $ref: `#/properties/api/$defs/${key}` }
+  }
   for (const [name, pattern] of Object.entries(review.inputPatterns ?? {})) {
     if (!api.properties?.[name]) throw new Error('Reviewed constraint names an unknown input')
     api.properties[name].allOf = [...(api.properties[name].allOf ?? []), { pattern }]
@@ -92,7 +100,7 @@ const outputs = {
       contract: `dist/contracts.json#/contracts/${contracts.indexOf(operation)}` }
     if (!operation.callable) return route
     return { ...route, policy: operation.policy,
-    inputs: Object.keys(operation.parameters.properties ?? {}).map(name => ({ name,
+    inputs: Object.keys(parameterProperties(operation.parameters, operation.policy.allowedInputs)).map(name => ({ name,
       admitted: operation.callable && (!operation.policy.allowedInputs || operation.policy.allowedInputs.includes(name)),
       sensitive: operation.callable ? operation.policy.sensitiveInputs?.includes(name) ?? false : 'unresolved' })),
     results: { type: operation.returns.type ?? 'unresolved', handling: operation.policy.secrets === 'private-result' ? 'versioned inherited private pipe; public metadata only' : 'public metadata; protected inputs excluded' },
@@ -129,7 +137,7 @@ const outputs = {
       if (!variants.length) return []
       const operation = variants[0]
       const verb = { POST: 'create', PUT: 'set', DELETE: 'delete' }[operation.method]
-      const flags = Object.fromEntries([...new Set(variants.flatMap(item => Object.keys(item.parameters.properties ?? {})))].filter(name =>
+      const flags = Object.fromEntries([...new Set(variants.flatMap(item => Object.keys(parameterProperties(item.parameters, item.policy.allowedInputs))))].filter(name =>
         !operation.policy.sensitiveInputs?.includes(name) && (!operation.policy.allowedInputs || operation.policy.allowedInputs.includes(name))).map(name => [`api-${name}`, 'value']))
       return [{ command: `${verb ?? 'get'} ${operation.path}`, operationId: operation.id, method: operation.method, path: operation.path,
         sensitiveInputs: operation.policy.sensitiveInputs ?? [], privateResult: operation.policy.secrets === 'private-result',
@@ -145,7 +153,7 @@ const outputs = {
     { command: 'inventory', effect: 'read', flags: { help: 'boolean', format: 'value', catalogue: 'value', full: 'boolean', limit: 'value' } },
     ...[...keys].sort().map(key => {
       const operation = contracts.find(operation => routeKey(operation) === key)
-      return { command: `schema ${operation.method.toLowerCase()} ${operation.path}`, effect: 'read', flags: { help: 'boolean', format: 'value', catalogue: 'value' } }
+      return { command: `schema ${operation.method.toLowerCase()} ${operation.path}`, effect: 'read', flags: { help: 'boolean', format: 'value', catalogue: 'value', view: 'value', offset: 'value' } }
     }),
     ...[...keys].sort().flatMap(key => {
     const variants = contracts.filter(operation => routeKey(operation) === key && operation.callable && operation.policy.transport === 'json' && operation.policy.effect === 'read')

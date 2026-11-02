@@ -60,16 +60,20 @@ export function reviewWrite(operation: Operation) {
   if (!admitted) return undefined
   // Configuration has credentials, hardware passthrough and executable hooks.
   // Compute settings admit scalar values and narrowly reviewed property strings only.
+  const disks = path.includes('/qemu/') ? [['ide', 4], ['sata', 6], ['scsi', 31], ['virtio', 16]] as const : [['mp', 256]] as const
+  const slots = disks.flatMap(([prefix, count]) => Array.from({ length: count }, (_, index) => `${prefix}${index}`))
   const allowedInputs = config ? ['node', 'vmid', 'description', 'name', 'hostname', 'memory', 'cores', 'sockets', 'vcpus', 'balloon', 'swap', 'cpu', 'cpulimit', 'cpuunits', 'onboot', 'startup', 'digest', 'cipassword', 'password'] :
     lifecyclePath ? ['node', 'vmid', 'timeout', 'forceStop', 'keepActive', 'skiplock', 'todisk'] :
     guest ? ['node', 'vmid', 'purge', 'destroy-unreferenced-disks', 'force'] : undefined
   return { effect: batch ? 'batch' : 'write', transport: 'json', secrets: config ? 'input-refs' : 'none',
     reason: batch ? 'Vendor execute resolves each ordered node-relative child and reports per-child status; no atomicity.' :
       cancel ? 'Stop an existing UPID; cancellation is a separately confirmed mutation.' :
-      config ? 'Reviewed compute and startup branches only; CPU feature overrides and host passthrough remain refused, and credential fields require SecretRefs.' :
+      config ? 'Reviewed compute, startup and managed disk branches; numbered slots and removal selectors are explicit, host passthrough remains refused, and credentials require SecretRefs.' :
       lifecyclePath ? 'Guest power-state operation, asynchronous UPID acceptance does not prove completion.' :
       guest ? 'Destroy guest; absence or filtered inventory cannot prove the outcome.' : 'Pool configuration and membership mutation; no automatic retry.',
-    allowedInputs, sensitiveInputs: config ? ['cipassword', 'password'] : [],
+    allowedInputs: config ? [...allowedInputs!, ...slots, ...(path.includes('/lxc/') ? ['rootfs'] : []), 'delete'] : allowedInputs,
+    ...(config ? { inputPatterns: { delete: `^(?:${slots.join('|')})(?:,(?:${slots.join('|')}))*$` } } : {}),
+    sensitiveInputs: config ? ['cipassword', 'password'] : [],
     reconciliation: config ? { kind: 'read', path, reason: 'Direct configuration observation may confirm supplied fields; missing fields never prove failure.' } :
       lifecyclePath ? { kind: 'read', path: path.replace(/\/status\/[^/]+$/, '/status/current'), reason: 'Direct guest status observation; only requested stable start/stop states can be confirmed.' } :
         { kind: 'none', reason: 'No safe automated business-outcome proof is admitted for this variant. Use the retained UPID when available; otherwise retain uncertainty and inspect independently.' },

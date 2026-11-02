@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs'
 import { createPrivateKey, X509Certificate } from 'node:crypto'
 import { Failure } from './errors.js'
 import constraints from './vendor-constraints.json' with { type: 'json' }
-import { propertyFormatPattern } from './property-format.js'
+import { parameterProperties, propertyFormatPattern } from './property-format.js'
 
 export interface VendorSchema {
   type?: string
@@ -131,7 +131,7 @@ export function validateParameters(values: Record<string, unknown>, schema: Vend
 }
 
 export function buildPath(contract: Contract, values: Record<string, unknown>): string {
-  validateParameters(values, contract.parameters)
+  validateParameters(values, { ...contract.parameters, properties: parameterProperties(contract.parameters, contract.policy.allowedInputs) })
   const used = new Set<string>()
   const path = contract.path.replace(/\{([^}]+)\}/g, (_, name: string) => {
     used.add(name)
