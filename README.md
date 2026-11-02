@@ -265,11 +265,8 @@ proxmox-axi set '/nodes/{node}/qemu/{vmid}/config' --api-node '<node>' --api-vmi
 proxmox-axi set '/nodes/{node}/lxc/{vmid}/config' --api-node '<node>' --api-vmid 101 --api-net0 'name=eth0,bridge=vmbr0,firewall=1,ip=dhcp,ip6=auto,type=veth' --profile lab --preview
 ```
 
-Read private configuration first and supply the complete intended NIC property string with a digest when available.
-Changing a NIC replaces its property string; omitted modifiers follow provider defaults.
-Use `--api-delete net0` for confirmed NIC removal.
-These commands change guest configuration and select existing bridges; they do not create or modify host network interfaces.
-Agent enablement configures the VM communication channel; install and start the guest-agent service inside the guest separately.
+Repeat the exact command with its confirmation after inspecting the preview.
+Follow the [guest networking and boot reference](skills/proxmox-axi/references/guest-management.md#guest-networking-and-boot) for NIC replacement/removal safeguards, host-network boundaries and guest-agent prerequisites.
 
 ## Safety
 

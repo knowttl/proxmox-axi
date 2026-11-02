@@ -49,7 +49,7 @@ LXC starts with required `name=<interface>` followed by optional `bridge`, `fire
 LXC `ip` accepts IPv4/CIDR, `dhcp` or `manual`; `gw` accepts IPv4; `ip6` accepts only `auto`, `dhcp` or `manual`; `type` is `veth`.
 MAC addresses must be unicast, VLAN tags are 1-4094, rates are nonnegative numbers, and firewall/link flags are `0` or `1`.
 Trunks, static IPv6/gw6, host-managed/offload options, MTU/queue tuning and other modifiers remain refused pending their own review.
-Use `--api-delete` with explicit NIC selectors for confirmed NIC removal; it can also combine reviewed disk selectors.
+For confirmed NIC removal with `--api-delete net0`, follow the [configuration removal guidance](#managed-disk-configuration).
 
 QEMU boot order uses `order=<device>;<device>` with admitted ordinary disk/NIC selectors, for example `order=ide2;scsi0;net0`.
 Use a supported CD-ROM slot such as `ide2` with `storage:iso/installer.iso,media=cdrom`, or `none,media=cdrom` to eject media.
@@ -77,6 +77,7 @@ Cache values are `none`, `writethrough`, `writeback`, `directsync`; disk formats
 LXC accepts optional `volume=`, the managed volume/allocation, then required `mp=/container/path` for numbered mount points, and optional `acl`, `backup`, `quota`, `ro` in that order where supported.
 Host sources, bind mounts, imports, unsafe cache and other modifiers remain refused; do not copy informational `size=` fields into updates.
 Replacing a configured slot changes its disk attachment and requires preview and exact confirmation.
-For configuration removal, use `--api-delete scsi0` or a comma-separated list of ordinary QEMU slots or LXC mount points; LXC rootfs, unused volumes and arbitrary settings cannot be selected.
+For configuration removal, use `--api-delete scsi0` or a comma-separated list of ordinary QEMU disk slots or LXC mount points, optionally combined with `net0`-`net31` selectors for that guest.
+NIC selectors can also be removed alone; LXC rootfs, unused volumes and arbitrary settings cannot be selected.
 This does not admit arbitrary storage-volume deletion or force options.
 Use a private configuration digest for concurrent-change protection and inspect the exact guest and disk before confirming replacement/removal.
