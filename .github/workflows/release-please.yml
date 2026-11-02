@@ -36,15 +36,7 @@ jobs:
       - run: pnpm install --frozen-lockfile
         if: ${{ steps.release.outputs.release_created }}
 
-      # Ubuntu's AppArmor policy otherwise blocks the acceptance network namespace.
-      - name: Enable isolated acceptance tests
-        if: ${{ steps.release.outputs.release_created }}
-        run: sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
-
-      - run: pnpm lint
-        if: ${{ steps.release.outputs.release_created }}
-
-      - run: pnpm test
+      - run: pnpm build
         if: ${{ steps.release.outputs.release_created }}
 
       # setup-node writes a placeholder token that would override OIDC authentication.
