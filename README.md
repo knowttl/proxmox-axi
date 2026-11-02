@@ -94,7 +94,7 @@ Offline discovery (no credential values required):
 
 ```sh
 proxmox-axi inventory [--catalogue <release>] [--limit <1-1000>|--full]
-proxmox-axi schema <method> <template> [--catalogue <release>]
+proxmox-axi schema <method> <template> [--catalogue <release>] [--view invocation|vendor] [--offset <n>]
 ```
 
 Writes (see [Safety](#safety)):
@@ -114,8 +114,10 @@ proxmox-axi duplex create <setup-template> [--api-<parameter> <value>] --preview
 
 Common flags are `--config <absolute-path>`, `--profile <name>`, `--session <id>` and `--format toon|json`.
 Offline `inventory` and `schema` accept `--config` without loading credentials.
-For callable operations, `schema` exposes reviewed inputs and constraints in `invocation.schema`; `parameters` retains the complete vendor schema, including refused inputs.
+For callable operations, `schema` defaults to the complete executable `invocation.schema`, policy and return shape, without the raw vendor parameter payload.
 Use `invocation.schema` to validate invocation objects shaped as `{ "api": { ... } }`, and check `callable` and `policy` before invoking.
+Use `schema <method> '<template>' --view vendor` for complete raw vendor parameters, including refused inputs, in bounded pages.
+See [schema views](skills/proxmox-axi/references/guest-management.md#schema-views) for paging, flag scope and full vendor schema access.
 
 ```sh
 proxmox-axi inventory --catalogue legacy-8.2.7 --format json
@@ -238,7 +240,18 @@ proxmox-axi set '/nodes/{node}/qemu/{vmid}/resize' --api-node '<node>' --api-vmi
 Repeat the exact command with `--confirm '<confirmation>'`, then use `task wait` with the returned node, UPID and journal ID.
 An accepted task does not prove completion or that the guest partition/filesystem expanded.
 If delivery is uncertain, inspect the journal/task instead of repeating relative growth, which could add capacity twice.
-Disk attachment changes remain refused pending their separate admission review.
+
+### Manage disk attachments
+
+Use concrete flags such as `--api-scsi0` or `--api-mp0`, or the same concrete keys in a protected body file.
+Follow the [managed disk configuration reference](skills/proxmox-axi/references/guest-management.md#managed-disk-configuration) for admitted slots, managed volume syntax, modifier order, replacement/removal safeguards and refused inputs.
+
+```sh
+proxmox-axi set '/nodes/{node}/qemu/{vmid}/config' --api-node '<node>' --api-vmid 100 --api-scsi0 'local-lvm:8,backup=1' --profile lab --preview
+proxmox-axi set '/nodes/{node}/lxc/{vmid}/config' --api-node '<node>' --api-vmid 101 --api-mp0 'local-lvm:8,mp=/mnt/data,backup=1' --profile lab --preview
+```
+
+Repeat the exact command with its confirmation after inspecting the preview.
 
 ## Safety
 
@@ -246,7 +259,7 @@ Disk attachment changes remain refused pending their separate admission review.
   Managed transfers have separate administrator-controlled byte and elapsed limits.
 - Operations whose effects, transport or secret handling are not reviewed remain discoverable but uncallable.
   Unresolved policy fields deny invocation, and changing a capture never admits new operations automatically.
-- Writes cover guest power operations, guest destruction, [selected guest configuration settings](#guest-configuration-and-compute-settings), growth-only guest disk resize, pool management, task cancellation, node execute batches, storage uploads and the reviewed credential/session setup operations.
+- Writes cover guest power operations, guest destruction, [selected guest configuration settings](#guest-configuration-and-compute-settings), [managed disk attachments](#manage-disk-attachments), growth-only guest disk resize, pool management, task cancellation, node execute batches, storage uploads and the reviewed credential/session setup operations.
   Effectful CIFS/PBS scans use the same preview and confirmation policy even though their vendor method is GET.
 - Inspect `schema create|set|delete <template>` and the generated `write-policy.json` before enabling an operation.
 - Enable an operation by adding its ID to the selected file profile: `writes: { "operations": ["<operation-id>"] }`.

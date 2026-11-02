@@ -65,7 +65,11 @@ test('disk growth uses confirmed relative increments and retained task outcomes'
         assert.equal(validate({ api: { node: 'node-a', vmid: 100, disk, size: '+8G' } }), true)
         assert.equal(validate({ api: { node: 'node-a', vmid: 100, disk, size: '24G' } }), false)
         assert.equal(validate({ api: { node: 'node-a', vmid: 100, disk, size: '+8G', skiplock: true } }), false)
-        if (family === 'qemu') assert.equal(schema.data.parameters.properties.skiplock.type, 'boolean')
+        if (family === 'qemu') {
+          const vendor = await command(['schema', 'set', resize(family), '--catalogue', release.name, '--view', 'vendor'])
+          assert.equal(vendor.code, 0, vendor.stderr)
+          assert.equal(vendor.data.parameters.properties.skiplock.type, 'boolean')
+        }
       })
       await t.test(`${release.name} ${family} grows only after exact confirmation and tracks completion`, async () => {
         version = release.version

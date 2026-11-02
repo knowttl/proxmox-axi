@@ -5,6 +5,7 @@ import { lstat, open } from 'node:fs/promises'
 import { isAbsolute } from 'node:path'
 import { configurationPath, listProfiles, resolveCredentials, type Credentials } from './credentials.js'
 import { buildPath, contracts, parseParameter, selectContract } from './contract.js'
+import { parameterProperties } from './property-format.js'
 import { Failure } from './errors.js'
 import { readOperation, doctor, validateFields } from './reads.js'
 import { presentRead } from './presentation.js'
@@ -16,7 +17,7 @@ import { byteDescriptor, prepareTransfer } from './transfer.js'
 import { readVersion } from './transport.js'
 import { prepareDuplex } from './duplex.js'
 
-const flags = ['--config', '--profile', '--format', '--catalogue', '--body-file', '--limit', '--fields', '--full', '--help', '--preview', '--confirm', '--wait-ms', '--journal', '--session', '--response-format', '--input-file', '--raw', '--expected-bytes', '--expected-sha256']
+const flags = ['--config', '--profile', '--format', '--catalogue', '--body-file', '--limit', '--fields', '--full', '--help', '--preview', '--confirm', '--wait-ms', '--journal', '--session', '--response-format', '--input-file', '--raw', '--expected-bytes', '--expected-sha256', '--view', '--offset']
 const help = {
   purpose: operations[0]!.help,
   usage: 'proxmox-axi get /version [--config <absolute-path>] [--profile <name>] [--format toon|json]',
@@ -62,8 +63,9 @@ export async function main(args: string[]): Promise<void> {
   }
   let format = 'toon'
   let credentials: Credentials | undefined
+  const render = (value: Record<string, unknown>) => format === 'json' ? JSON.stringify(value) : encode(value)
   const output = (value: Record<string, unknown>) => {
-    let text = format === 'json' ? JSON.stringify(value) : encode(value)
+    let text = render(value)
     if (Buffer.byteLength(text) > 65536) {
       process.exitCode = 1
       const error = { error: { code: 'OUTPUT_LIMIT', message: 'Rendered output exceeds 65536 bytes.' }, help: ['Request fewer rows or fields.'] }
@@ -88,6 +90,7 @@ export async function main(args: string[]): Promise<void> {
     format = options['--format'] ?? 'toon'
     if (!['toon', 'json'].includes(format)) { format = 'toon'; throw usage('Format must be toon or json.') }
     if (positional[0] === 'help') { positional.shift(); options.help = 'true' }
+    if (positional[0] !== 'schema' && (options['--view'] !== undefined || options['--offset'] !== undefined)) throw usage('--view and --offset apply to schema only.')
     const transferring = positional[0] === 'transfer'
     const duplex = positional[0] === 'duplex'
     if (duplex && options.help) {
@@ -157,7 +160,7 @@ export async function main(args: string[]): Promise<void> {
     if (options.help && (['inventory', 'schema', 'config path', 'profile list', 'doctor', 'auth status'].includes(command) || positional[0] === 'schema')) {
       const usages: Record<string, string> = {
         inventory: 'inventory [--catalogue <release>] [--limit <1-1000>|--full] [--format toon|json]',
-        schema: 'schema <method> <template> [--catalogue <release>] [--format toon|json]',
+        schema: 'schema <method> <template> [--catalogue <release>] [--view invocation|vendor] [--offset <n>] [--format toon|json]',
         'config path': 'config path [--config <absolute-path>] [--format toon|json]',
         'profile list': 'profile list [--config <absolute-path>] [--format toon|json]',
         doctor: 'doctor [--config <absolute-path>] [--profile <name>] [--session <id>] [--format toon|json]',
@@ -166,11 +169,13 @@ export async function main(args: string[]): Promise<void> {
       const key = positional[0] === 'schema' ? 'schema' : command
       const names = ['--format', '--help', ...(['inventory', 'schema'].includes(key) ? ['--catalogue', '--config'] :
         ['doctor', 'auth status'].includes(key) ? ['--config', '--profile', '--session'] : ['--config']),
-        ...(key === 'inventory' ? ['--limit', '--full'] : [])]
+        ...(key === 'inventory' ? ['--limit', '--full'] : key === 'schema' ? ['--view', '--offset'] : [])]
       if (Object.keys(options).some(option => option !== 'help' && !names.includes(option))) throw usage(`Valid flags: ${names.join(', ')}.`)
       output({ purpose: key === 'doctor' ? 'Check private-file protection and perform one bounded version read.' : `Inspect ${key}.`,
         usage: `proxmox-axi ${usages[key]}`, examples: key === 'schema' ? ['proxmox-axi schema get /version', 'proxmox-axi schema get /nodes --catalogue published-current'] :
-          [`proxmox-axi ${key}`, `proxmox-axi ${key} --format json`], flags: help.flags.filter(flag => names.some(name => flag.startsWith(name))) })
+          [`proxmox-axi ${key}`, `proxmox-axi ${key} --format json`], flags: [...help.flags,
+          ...(key === 'schema' ? ['--view invocation|vendor (default invocation)', '--offset <nonnegative integer> (vendor schema page)'] : [])]
+          .filter(flag => names.some(name => flag.startsWith(name))) })
       return
     }
     if (command === 'config path' || command === 'profile list') {
@@ -192,10 +197,24 @@ export async function main(args: string[]): Promise<void> {
       return
     }
     if (positional[0] === 'schema' && positional.length === 3) {
-      if (Object.keys(options).some(key => !['--format', '--catalogue', '--config'].includes(key))) throw usage('Invalid schema option.')
+      if (Object.keys(options).some(key => !['--format', '--catalogue', '--config', '--view', '--offset'].includes(key))) throw usage('Invalid schema option.')
       const contract = selectContract(positional[1]!, positional[2]!, release)
-      output({ id: contract.id, release, method: contract.method, path: contract.path, callable: contract.callable,
-        policy: contract.policy, invocation: contract.invocation, parameters: contract.parameters, returns: contract.returns })
+      const view = options['--view'] ?? 'invocation'
+      if (!['invocation', 'vendor'].includes(view) || (options['--offset'] !== undefined && view !== 'vendor')) throw usage('Use --view invocation or vendor; --offset selects a vendor page only.')
+      const identity = { id: contract.id, release, method: contract.method, path: contract.path, callable: contract.callable }
+      if (view === 'invocation') output({ ...identity, view, policy: contract.policy, invocation: contract.invocation, returns: contract.returns })
+      else {
+        const { properties, ...metadata } = contract.parameters
+        const entries = Object.entries(properties ?? {})
+        const rawOffset = options['--offset'] ?? '0', offset = Number(rawOffset)
+        if (!/^(?:0|[1-9][0-9]*)$/.test(rawOffset) || !Number.isSafeInteger(offset) || offset > entries.length) throw usage('Vendor offset must be an integer within the parameter list.')
+        const page = (end: number) => ({ ...identity, view, parameters: { ...metadata, properties: Object.fromEntries(entries.slice(offset, end)) },
+          page: { offset, nextOffset: end < entries.length ? end : null, total: entries.length } })
+        let end = offset
+        while (end < entries.length && Buffer.byteLength(render(page(end + 1))) <= 65536) end++
+        if (end === offset && end < entries.length) throw new Failure('OUTPUT_LIMIT', 'A vendor parameter exceeds the bounded page size.', 'Inspect the complete vendor schema in the shipped contracts.')
+        output(page(end))
+      }
       return
     }
     if (options.help) {
@@ -254,7 +273,7 @@ export async function main(args: string[]): Promise<void> {
     }
     for (const [flag, value] of Object.entries(options)) if (flag.startsWith('--api-')) {
       const name = flag.slice(6)
-      const properties = contract?.parameters.properties ?? {}
+      const properties = contract ? parameterProperties(contract.parameters, contract.policy.allowedInputs) : {}
       const schema = Object.hasOwn(properties, name) ? properties[name] : undefined
       if (!schema || Object.hasOwn(values, name)) throw usage('Unknown or duplicate API parameter.')
       values[name] = parseParameter(value, schema)

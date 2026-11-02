@@ -2,10 +2,73 @@ import assert from 'node:assert/strict'
 import { spawnSync } from 'node:child_process'
 import { readFile } from 'node:fs/promises'
 import test from 'node:test'
+import { decode } from '@toon-format/toon'
 import { buildPath, selectContract } from '../dist/contract.js'
 import { captures, replay } from '../scripts/catalogue.mjs'
 import { verifyDiscovery } from '../scripts/route-cases.mjs'
 import policy from '../src/operation-policy.json' with { type: 'json' }
+
+for (const args of [
+  [], ['get'], ['get', '/version'], ['ls'], ['ls', '/nodes'],
+  ['create'], ['set'], ['delete'], ['post'], ['put'],
+  ['set', '/nodes/{node}/qemu/{vmid}/resize'], ['task'], ['task', 'status'], ['task', 'cancel'],
+  ['journal', 'show', 'synthetic'], ['auth'], ['auth', 'status'], ['auth', 'acquire'],
+  ['home'], ['doctor'], ['inventory'], ['config', 'path'], ['profile', 'list'], ['transfer'], ['duplex'],
+]) {
+  test(`${args.join(' ') || 'root'} help excludes schema-only flags`, () => {
+    const result = spawnSync(process.execPath, ['bin/proxmox-axi.mjs', ...args, '--help', '--format', 'json'], { encoding: 'utf8' })
+    assert.equal(result.status, 0, result.stdout + result.stderr)
+    const flags = JSON.parse(result.stdout).flags.map(flag => flag.split(' ')[0])
+    assert.equal(flags.includes('--view'), false)
+    assert.equal(flags.includes('--offset'), false)
+  })
+  for (const flag of [['--view', 'vendor'], ['--offset', '10']]) {
+    test(`${args.join(' ') || 'root'} refuses schema-only ${flag[0]}`, () => {
+      const result = spawnSync(process.execPath, ['bin/proxmox-axi.mjs', ...args, ...flag, '--format', 'json'], { encoding: 'utf8' })
+      assert.equal(result.status, 2, result.stdout + result.stderr)
+      assert.deepEqual(JSON.parse(result.stdout).error, { code: 'INVALID_INPUT', message: '--view and --offset apply to schema only.' })
+    })
+  }
+}
+
+for (const args of [['schema'], ['schema', 'get', '/nodes'], ['help', 'schema']]) {
+  test(`${args.join(' ')} help includes schema-only flags`, () => {
+    const result = spawnSync(process.execPath, ['bin/proxmox-axi.mjs', ...args, '--help', '--format', 'json'], { encoding: 'utf8' })
+    assert.equal(result.status, 0, result.stdout + result.stderr)
+    const flags = JSON.parse(result.stdout).flags.map(flag => flag.split(' ')[0])
+    assert.equal(flags.includes('--view'), true)
+    assert.equal(flags.includes('--offset'), true)
+  })
+}
+
+test('vendor schema refuses a cursor outside its parameter list', () => {
+  const result = spawnSync(process.execPath, ['bin/proxmox-axi.mjs', 'schema', 'set', '/nodes/{node}/qemu/{vmid}/config',
+    '--view', 'vendor', '--offset', String(Number.MAX_SAFE_INTEGER), '--format', 'json'], { cwd: new URL('..', import.meta.url), encoding: 'utf8' })
+  assert.equal(result.status, 2)
+  assert.equal(JSON.parse(result.stdout).error.code, 'INVALID_INPUT')
+})
+
+for (const capture of captures) for (const format of ['json', 'toon']) {
+  test(`${capture.release} ${format} vendor schema pages reconstruct the complete pinned parameters within the output cap`, async () => {
+    const catalogue = replay(await readFile(new URL(`../vendor/${capture.file}`, import.meta.url)), capture)
+    const expected = catalogue.operations.find(operation => operation.method === 'PUT' && operation.path === '/nodes/{node}/qemu/{vmid}/config').parameters
+    let offset = 0, actual
+    do {
+      const result = spawnSync(process.execPath, ['bin/proxmox-axi.mjs', 'schema', 'set', '/nodes/{node}/qemu/{vmid}/config',
+        '--catalogue', capture.release, '--view', 'vendor', '--offset', String(offset), '--format', format], { cwd: new URL('..', import.meta.url), encoding: 'utf8' })
+      assert.equal(result.status, 0, result.stdout + result.stderr)
+      assert.ok(Buffer.byteLength(result.stdout.trimEnd()) <= 65536)
+      const value = format === 'json' ? JSON.parse(result.stdout) : decode(result.stdout)
+      actual ??= { ...value.parameters, properties: {} }
+      Object.assign(actual.properties, value.parameters.properties)
+      assert.equal(value.page.offset, offset)
+      assert.equal(value.page.total, Object.keys(expected.properties).length)
+      assert.ok(value.page.nextOffset === null || value.page.nextOffset > offset)
+      offset = value.page.nextOffset
+    } while (offset !== null)
+    assert.deepEqual(actual, expected)
+  })
+}
 
 test('discovery retains every release route and its exact vendor parameters', async () => {
   const catalogues = await Promise.all(captures.map(async capture => replay(await readFile(new URL(`../vendor/${capture.file}`, import.meta.url)), capture)))

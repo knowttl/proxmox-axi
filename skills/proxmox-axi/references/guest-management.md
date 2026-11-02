@@ -1,4 +1,4 @@
-# Guest settings and disk growth
+# Guest settings and disk management
 
 Carry the selected profile, node and VMID through each request.
 Read `/nodes/{node}/qemu/{vmid}/status/current` or its LXC equivalent for ordinary resource metrics.
@@ -34,3 +34,26 @@ Preview first, then repeat the identical target and amount with its confirmation
 Treat the returned UPID as pending and use `task wait` with its node, UPID, journal ID and profile to observe completion.
 Growth does not promise that a guest partition or filesystem has expanded.
 After an uncertain response, inspect the journal and task rather than repeating relative growth, which could add space twice.
+
+## Schema views
+
+`--view` and `--offset` apply only to `schema`; `--offset` requires `--view vendor`.
+The default `--view invocation` returns the complete executable invocation schema, policy and return shape without raw vendor parameters.
+Use `schema <method> '<template>' --view vendor` for original vendor templates and constraints, following `page.nextOffset` with `--offset` until null.
+Keep the method, template, catalogue and format unchanged between pages.
+Both JSON and TOON pages retain complete parameter entries and root metadata within the 65536-byte output bound; a parameter that cannot fit is refused with `OUTPUT_LIMIT`, never truncated.
+The full original vendor schemas also ship in `dist/contracts.json`.
+
+## Managed disk configuration
+
+Use confirmed `set .../config` with concrete QEMU slots `ide0`-`ide3`, `sata0`-`sata5`, `scsi0`-`scsi30`, `virtio0`-`virtio15`, or LXC `rootfs`/`mp0`-`mp255`.
+Invocation schemas and agent flags expose concrete slot names; the [vendor schema view](#schema-views) retains original numbered templates.
+Use `storage:8` for a positive GiB allocation, or conventional managed volume IDs such as `storage:vm-100-disk-0`, QEMU `storage:100/vm-100-disk-0.qcow2`, or LXC `storage:subvol-100-disk-0`.
+QEMU accepts optional `file=`, then optional modifiers in canonical order: `backup`, `cache`, `discard`, `format`, `iothread`, `ssd`, `ro`, only when present in the selected vendor branch.
+Cache values are `none`, `writethrough`, `writeback`, `directsync`; disk formats are `raw`, `qcow2`, `vmdk`; discard is `ignore` or `on`; other admitted modifiers use `0` or `1`.
+LXC accepts optional `volume=`, the managed volume/allocation, then required `mp=/container/path` for numbered mount points, and optional `acl`, `backup`, `quota`, `ro` in that order where supported.
+Host sources, bind mounts, imports, unsafe cache and other modifiers remain refused; do not copy informational `size=` fields into updates.
+Replacing a configured slot changes its disk attachment and requires preview and exact confirmation.
+For configuration removal, use `--api-delete scsi0` or a comma-separated list of ordinary QEMU slots or LXC mount points; LXC rootfs, unused volumes and arbitrary settings cannot be selected.
+This does not admit arbitrary storage-volume deletion or force options.
+Use a private configuration digest for concurrent-change protection and inspect the exact guest and disk before confirming replacement/removal.

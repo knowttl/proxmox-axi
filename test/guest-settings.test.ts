@@ -9,6 +9,7 @@ import { join } from 'node:path'
 import type { Readable } from 'node:stream'
 import { promisify } from 'node:util'
 import test from 'node:test'
+import { Ajv } from 'ajv'
 
 const execute = promisify(execFile)
 const executable = new URL('../../bin/proxmox-axi.mjs', import.meta.url).pathname
@@ -45,8 +46,10 @@ test('guest settings use private reads and confirmed compute writes', async t =>
     if (request.method === 'PUT') {
       const chunks: Buffer[] = []
       for await (const chunk of request) chunks.push(Buffer.from(chunk))
-      for (const [name, value] of new URLSearchParams(Buffer.concat(chunks).toString())) state[family]![name] =
-        ['cores', 'sockets', 'vcpus', 'balloon', 'swap', 'cpulimit', 'cpuunits', 'onboot'].includes(name) || (name === 'memory' && family === 'lxc') ? Number(value) : value
+      for (const [name, value] of new URLSearchParams(Buffer.concat(chunks).toString())) {
+        if (name === 'delete') { for (const slot of value.split(',')) delete state[family]![slot]; continue }
+        state[family]![name] = ['cores', 'sockets', 'vcpus', 'balloon', 'swap', 'cpulimit', 'cpuunits', 'onboot'].includes(name) || (name === 'memory' && family === 'lxc') ? Number(value) : value
+      }
       response.end(JSON.stringify({ data: null }))
       return
     }
@@ -156,6 +159,51 @@ test('guest settings use private reads and confirmed compute writes', async t =>
     ['qemu', 'name', 'bad/name', 'INVALID_INPUT', 2], ['qemu', 'hookscript', 'local:snippets/script', 'CONTRACT_UNRESOLVED', 1],
     ['qemu', 'hostpci0', '0000:00:00.0', 'INVALID_INPUT', 2],
   ]
+  for (const contract of releases) for (const { family } of guests) {
+    const added = family === 'qemu' ? { scsi30: 'local-lvm:8,backup=1,cache=none,discard=on,format=raw,iothread=1' } :
+      { rootfs: 'local-lvm:subvol-100-disk-0,acl=1', mp255: 'local-lvm:8,mp=/mnt/data,backup=1' }
+    const replacement = family === 'qemu' ? { scsi30: 'local:100/vm-100-disk-1.qcow2,backup=1,cache=writeback' } :
+      { mp255: 'local-lvm:subvol-100-disk-1,mp=/mnt/data,backup=1,ro=1' }
+    const slot = family === 'qemu' ? 'scsi30' : 'mp255'
+    await t.test(`${contract.release} ${family} discovers and confirms managed disk add, replace and removal`, async () => {
+      version = contract.version
+      state[family] = { ...guests.find(guest => guest.family === family)!.initial }
+      const schema = await command(['schema', 'set', configPath(family), '--catalogue', contract.release])
+      assert.equal(schema.code, 0, schema.stderr)
+      const validate = new Ajv({ strict: false }).compile(JSON.parse(schema.stdout).invocation.schema)
+      assert.equal(validate({ api: { node: 'node-a', vmid: 100, ...added } }), true)
+      assert.equal(validate({ api: { node: 'node-a', vmid: 100, [slot]: '/dev/sda' } }), false)
+      const update = async (settings: Record<string, string>) => {
+        const before = { ...state[family] }
+        const args = ['set', configPath(family), ...target, '--api-digest', digest,
+          ...Object.entries(settings).flatMap(([name, value]) => [`--api-${name}`, value])]
+        const preview = await command([...args, '--preview'])
+        assert.equal(preview.code, 0, preview.stdout + preview.stderr)
+        assert.deepEqual(state[family], before)
+        const written = await command([...args, '--confirm', JSON.parse(preview.stdout).confirmation])
+        assert.equal(written.code, 0, written.stdout + written.stderr)
+        assert.equal(JSON.parse(written.stdout).status, 'success')
+      }
+      await update(added)
+      const first = await command(['get', configPath(family), ...target], true)
+      assert.deepEqual(first.frame?.payload, { ...guests.find(guest => guest.family === family)!.initial, ...added })
+      await update(replacement)
+      const second = await command(['get', configPath(family), ...target], true)
+      assert.deepEqual(second.frame?.payload, { ...guests.find(guest => guest.family === family)!.initial, ...added, ...replacement })
+      await update({ delete: slot })
+      const removed = await command(['get', configPath(family), ...target], true)
+      assert.equal(Object.hasOwn(removed.frame!.payload as object, slot), false)
+    })
+  }
+  refusals.push(
+    ['qemu', 'scsi31', 'local-lvm:8', 'INVALID_INPUT', 2], ['lxc', 'mp256', 'local-lvm:8,mp=/mnt/data', 'INVALID_INPUT', 2],
+    ['qemu', 'scsi0', '/dev/disk/by-id/device', 'INVALID_INPUT', 2], ['lxc', 'rootfs', '/host/path', 'INVALID_INPUT', 2],
+    ['qemu', 'scsi0', 'local-lvm:8,import-from=/source', 'INVALID_INPUT', 2],
+    ['qemu', 'scsi0', 'local-lvm:8,cache=unsafe', 'INVALID_INPUT', 2],
+    ['lxc', 'mp0', 'local-lvm:8,mp=/mnt/../data', 'INVALID_INPUT', 2],
+    ['qemu', 'delete', 'scsi0,hookscript', 'INVALID_INPUT', 2], ['qemu', 'delete', 'unused0', 'INVALID_INPUT', 2],
+    ['lxc', 'delete', 'rootfs', 'INVALID_INPUT', 2],
+  )
   for (const [family, field, value, error, exit] of refusals) {
     await t.test(`${family} rejects unreviewed ${field} value ${value} before network access`, async () => {
       requests.length = 0
