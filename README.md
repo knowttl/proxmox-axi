@@ -114,6 +114,8 @@ proxmox-axi duplex create <setup-template> [--api-<parameter> <value>] --preview
 
 Common flags are `--config <absolute-path>`, `--profile <name>`, `--session <id>` and `--format toon|json`.
 Offline `inventory` and `schema` accept `--config` without loading credentials.
+For callable operations, `schema` exposes reviewed inputs and constraints in `invocation.schema`; `parameters` retains the complete vendor schema, including refused inputs.
+Use `invocation.schema` to validate invocation objects shaped as `{ "api": { ... } }`, and check `callable` and `policy` before invoking.
 
 ```sh
 proxmox-axi inventory --catalogue legacy-8.2.7 --format json
