@@ -38,10 +38,22 @@ Use `--fields`, `--limit` and `--full` when more detail is needed within the out
 
 ## Discover operations and complete confirmed tasks
 
-Use the [guest configuration and compute settings guide](../../README.md#guest-configuration-and-compute-settings) for status reads, supported settings and input syntax.
-For configuration and pending-setting reads, follow the [private result contract](../../docs/s4-contract.md).
+For QEMU/LXC resource metrics, read `/nodes/{node}/qemu/{vmid}/status/current` or its LXC equivalent with the selected node, VMID and profile.
+Configuration and `/pending` GETs require a caller-owned inherited pipe or socket selected by `PROXMOX_AXI_RESULT_FD` (descriptor 3 or higher).
+Launch the CLI executable directly from the caller that owns that pipe.
+Terminals, regular files, stdout and stderr are refused, and a missing private pipe fails before provider access.
+Stdout contains `data: { "privateResult": true }`; the complete validated payload travels privately, is not trimmed by table display flags, and creates no journal.
+Each private frame is a four-byte unsigned big-endian byte length followed by at most 65536 bytes of UTF-8 JSON containing `version: 1`, `binding` and `payload`.
+Validate the frame version and expected origin, identity, operation, request, actor and credential-revision bindings before consuming it.
+Standalone guest-read request bindings hash `<selected catalogue> <encoded request path including query>` with SHA-256; hosted callers use the authenticated request ID supplied by the host.
 Never redirect that payload into public logs or terminal output.
 Use private configuration digests to guard concurrent modifications when changing settings.
+
+Confirmed `set .../config` supports the settings present in each guest's contract: names/description, cores, CPU limits/weights, memory, onboot and startup behavior.
+QEMU also supports sockets, vCPUs, balloon memory and an emulated CPU model; LXC also supports swap.
+Use QEMU memory as `2048` or `current=2048` in MiB, and integer MB values for LXC memory and swap.
+CPU models accept only the model identifier or `cputype=<model>`; `host` and feature overrides remain refused.
+Startup keys must appear in canonical order (`order`, `up`, `down`) without duplicates; a bare integer also sets `order`.
 
 Run `proxmox-axi inventory` or `proxmox-axi schema <method> '<template>'` offline before choosing an operation and its supported inputs.
 Discoverable routes may remain refused; never bypass admission or broaden permissions to work around a refusal.
