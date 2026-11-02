@@ -4,6 +4,6 @@
   "refusals": [
     { "status": 400, "code": "HTTP_ERROR", "body": { "data": null, "errors": { "poolid": "invalid format" } } },
     { "status": 401, "code": "AUTH_REQUIRED", "body": { "data": null } },
-    { "status": 403, "code": "PERMISSION_DENIED", "body": { "data": null, "message": "Permission check failed (/, Pool.Allocate)" } }
+    { "status": 403, "statusMessage": "Permission check failed (/, Pool.Allocate)", "code": "PERMISSION_DENIED", "body": { "data": null } }
   ]
 }

@@ -66,7 +66,7 @@ export async function exerciseStreamJourney(options: Journey) {
       const end = body.lastIndexOf(Buffer.from(`\r\n--${boundary}--\r\n`))
       uploadDigest = hash(body.subarray(start, end))
       const refusal = refusals.find(item => mode === `refused-${item.status}`)
-      if (refusal) { response.writeHead(refusal.status).end(JSON.stringify({ ...refusal.body, debug: 'private-host.invalid', password: 'CANARY-S5-auth' })); return }
+      if (refusal) { response.writeHead(refusal.status, refusal.statusMessage).end(JSON.stringify({ ...refusal.body, debug: 'private-host.invalid', password: 'CANARY-S5-auth' })); return }
       response.end(JSON.stringify({ data: upid })); return
     }
     if (/\/(vncproxy|termproxy|vncshell|mtunnel)$/.test(url.pathname)) {

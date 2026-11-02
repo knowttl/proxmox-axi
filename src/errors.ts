@@ -27,7 +27,8 @@ export async function responseFailure(response: IncomingMessage, operation: 'Req
     const body: unknown = JSON.parse(Buffer.concat(chunks).toString('utf8'))
     if (!body || typeof body !== 'object' || Array.isArray(body)) return failure
     results.registerMinted(body)
-    const { message, errors } = body as { message?: unknown, errors?: unknown }
+    const { message: bodyMessage, errors } = body as { message?: unknown, errors?: unknown }
+    const message = typeof bodyMessage === 'string' ? bodyMessage : response.statusMessage?.slice(0, 1024)
     const hints: string[] = []
     if (typeof message === 'string') {
       const permission = /^Permission check failed \(([^,\r\n]+), ((?:VM|Sys|Pool|Datastore|Permissions|SDN|User|Realm|Group|Mapping)\.[A-Za-z]{1,48})\)$/.exec(message)

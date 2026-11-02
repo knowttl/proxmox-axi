@@ -123,7 +123,7 @@ export async function exerciseWriteJourney(options: Journey): Promise<void> {
       bodyEvidence.push(transmission)
       mutationCount++
       const refusal = refusals.find(item => mode === `refused-${item.status}`)
-      if (refusal) { reply.writeHead(refusal.status).end(JSON.stringify({ ...refusal.body, debug: 'private-host.invalid', password: options.env.PROXMOX_AXI_TOKEN })); return }
+      if (refusal) { reply.writeHead(refusal.status, refusal.statusMessage).end(JSON.stringify({ ...refusal.body, debug: 'private-host.invalid', password: options.env.PROXMOX_AXI_TOKEN })); return }
       if (mode === 'disconnect-before-acceptance') { reply.destroy(); return }
       data = apply(method, path, args)
       transmission.after = snapshot()
