@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import { execFile } from 'node:child_process'
-import { chmod, mkdtemp, readFile, readdir, rm, unlink, writeFile } from 'node:fs/promises'
+import { mkdtemp, readFile, readdir, rm, unlink, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -87,10 +87,9 @@ test('packed package installs offline and exposes the CLI and admission contract
     assert.equal(admission.completeness.variants, 1285)
     if (process.platform === 'linux') {
       const caFile = join(scratch, 'server.crt')
-      await run('openssl', ['req', '-x509', '-newkey', 'rsa:2048', '-nodes', '-days', '1',
-        '-keyout', join(scratch, 'server.key'), '-out', caFile, '-subj', '/CN=localhost',
-        '-addext', 'subjectAltName=IP:127.0.0.1', '-addext', 'basicConstraints=critical,CA:TRUE'])
-      await chmod(caFile, 0o600)
+      // Public test-only material has fixed 2020-2099 validity to tolerate host clock steps.
+      await writeFile(caFile, await readFile(join(root, 'test/fixtures/localhost-cert.pem')), { mode: 0o600 })
+      await writeFile(join(scratch, 'server.key'), await readFile(join(root, 'test/fixtures/localhost-key.pem')), { mode: 0o600 })
       const cases: Record<string, unknown>[] = []
       await exerciseNativeJourney({ scratch, installed, executable: join(installed, 'bin/proxmox-axi.mjs'), caFile,
         env: { ...env, PROXMOX_AXI_TOKEN: 'CANARY-native-journal' }, cases,
