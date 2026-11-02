@@ -312,7 +312,9 @@ async function verify(values, prepared, scratch) {
         transportDiagnostics: (await readFile(diagnostics, 'utf8')).split('\n').filter(Boolean).map(line => JSON.parse(line)) }
       result.cases.push(record)
       for (const value of secrets) {
-        assert.ok(!`${actual.stdout}${actual.stderr}`.includes(value), `${id}: secret leaked to public output`)
+        for (const form of [value, JSON.stringify(value).slice(1, -1), encodeURIComponent(value)]) {
+          assert.ok(!actual.stdout.includes(form) && !actual.stderr.includes(form), `${id}: secret leaked to public output`)
+        }
       }
       transcripts.push(`case: ${id}\nexit: ${actual.code}\nstdout:\n${actual.stdout}stderr:\n${actual.stderr}`)
       const value = expected.bareVersion ? undefined : expected.hostBoundary ? decode(actual.stdout) : args.includes('json') ? JSON.parse(actual.stdout) : decode(actual.stdout)
