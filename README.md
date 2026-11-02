@@ -307,7 +307,8 @@ Policy and data sources:
 
 `pnpm test` runs native and offline tests only, including rejection of an explicitly requested hosted journey with missing fixture inputs.
 The package-contract test packs and installs the tarball offline, checks its file list and CLI bin entry, runs `--help` and `--version`, and imports the modules and JSON artifacts consumed by Artium.
-It requires npm, pnpm and tar, with production dependencies already available in the local pnpm store.
+It also runs the package admission and coexistence checks described above and, on Linux, the native configuration and journal journeys.
+It requires npm, pnpm and tar, plus OpenSSL on Linux, with both the owned package's and sealed baseline's production dependencies already available in the local pnpm store.
 Hosted tests are opt-in and skip with `Artium fixture not supplied` unless an externally prepared, pinned local fixture is selected:
 
 ```sh
@@ -325,7 +326,7 @@ The public acceptance entry installs a packed tarball into an isolated consumer 
 It uses real loopback HTTPS and synthetic credentials inside a Linux user/network namespace containing only loopback.
 An external connection must fail with `ENETUNREACH` before any product journey runs.
 Linux user/network namespaces, iproute2 and OpenSSL are required, and missing isolation fails the check.
-Package installation can fetch dependencies before the isolated journeys start.
+Package installation runs offline; see [Tests](#tests) for the required cached dependencies.
 
 ```sh
 pnpm verify:acceptance -- --task S1.1 --pack /absolute/path/to/pack --out /absolute/new/run/S1.1 --network fake-only --through standalone
