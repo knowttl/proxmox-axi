@@ -5601,23 +5601,23 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "read",
+            "transport": "json",
+            "secrets": "none",
+            "reason": "Suggest or check an available VMID at read time; does not reserve an ID."
           },
           "contract": "dist/contracts.json#/contracts/163"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "read",
+            "transport": "json",
+            "secrets": "none",
+            "reason": "Suggest or check an available VMID at read time; does not reserve an ID."
           },
           "contract": "dist/contracts.json#/contracts/785"
         }
@@ -7295,23 +7295,23 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "read",
+            "transport": "json",
+            "secrets": "none",
+            "reason": "Cluster membership and quorum status only; no membership or quorum changes."
           },
           "contract": "dist/contracts.json#/contracts/247"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "read",
+            "transport": "json",
+            "secrets": "none",
+            "reason": "Cluster membership and quorum status only; no membership or quorum changes."
           },
           "contract": "dist/contracts.json#/contracts/910"
         }
@@ -13052,23 +13052,23 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "read",
+            "transport": "json",
+            "secrets": "none",
+            "reason": "Node CPU, memory, filesystem and boot metrics; no node lifecycle control."
           },
           "contract": "dist/contracts.json#/contracts/550"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "read",
+            "transport": "json",
+            "secrets": "none",
+            "reason": "Node CPU, memory, filesystem and boot metrics; no node lifecycle control."
           },
           "contract": "dist/contracts.json#/contracts/1228"
         }
@@ -13511,23 +13511,23 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "read",
+            "transport": "json",
+            "secrets": "none",
+            "reason": "Storage accessibility, content types and capacity metrics; no backend configuration or credentials."
           },
           "contract": "dist/contracts.json#/contracts/569"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "read",
+            "transport": "json",
+            "secrets": "none",
+            "reason": "Storage accessibility, content types and capacity metrics; no backend configuration or credentials."
           },
           "contract": "dist/contracts.json#/contracts/1249"
         }
@@ -13973,23 +13973,23 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "read",
+            "transport": "json",
+            "secrets": "none",
+            "reason": "Permission-filtered storage index; runtime returns storage identifiers only, excluding backend configuration even with full output."
           },
           "contract": "dist/contracts.json#/contracts/599"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "read",
+            "transport": "json",
+            "secrets": "none",
+            "reason": "Permission-filtered storage index; runtime returns storage identifiers only, excluding backend configuration even with full output."
           },
           "contract": "dist/contracts.json#/contracts/1279"
         }

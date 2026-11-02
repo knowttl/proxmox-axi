@@ -1406,6 +1406,18 @@
       }
     },
     {
+      "command": "ls /cluster/status",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "session": "value",
+        "limit": "value",
+        "fields": "value",
+        "full": "boolean"
+      }
+    },
+    {
       "command": "ls /nodes",
       "effect": "read",
       "flags": {
@@ -1500,6 +1512,19 @@
         "api-node": "value",
         "api-start": "value",
         "api-upid": "value"
+      }
+    },
+    {
+      "command": "ls /storage",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "session": "value",
+        "limit": "value",
+        "fields": "value",
+        "full": "boolean",
+        "api-type": "value"
       }
     },
     {
@@ -7663,6 +7688,27 @@
       ]
     },
     {
+      "command": "get /cluster/nextid",
+      "operationId": "OP-GET-46dcf2bd2a",
+      "method": "GET",
+      "path": "/cluster/nextid",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value",
+        "limit": "value",
+        "fields": "value",
+        "full": "boolean",
+        "session": "value",
+        "api-vmid": "value"
+      },
+      "catalogues": [
+        "legacy-8.2.7",
+        "published-current"
+      ]
+    },
+    {
       "command": "get /cluster/resources",
       "operationId": "OP-GET-f7c0185058",
       "method": "GET",
@@ -7677,6 +7723,26 @@
         "full": "boolean",
         "session": "value",
         "api-type": "value"
+      },
+      "catalogues": [
+        "legacy-8.2.7",
+        "published-current"
+      ]
+    },
+    {
+      "command": "get /cluster/status",
+      "operationId": "OP-GET-907218e704",
+      "method": "GET",
+      "path": "/cluster/status",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value",
+        "limit": "value",
+        "fields": "value",
+        "full": "boolean",
+        "session": "value"
       },
       "catalogues": [
         "legacy-8.2.7",
@@ -7747,6 +7813,27 @@
       ]
     },
     {
+      "command": "get /nodes/{node}/status",
+      "operationId": "OP-GET-565126bd4f",
+      "method": "GET",
+      "path": "/nodes/{node}/status",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value",
+        "limit": "value",
+        "fields": "value",
+        "full": "boolean",
+        "session": "value",
+        "api-node": "value"
+      },
+      "catalogues": [
+        "legacy-8.2.7",
+        "published-current"
+      ]
+    },
+    {
       "command": "get /nodes/{node}/storage",
       "operationId": "OP-GET-26fbb96ac4",
       "method": "GET",
@@ -7766,6 +7853,28 @@
         "api-node": "value",
         "api-storage": "value",
         "api-target": "value"
+      },
+      "catalogues": [
+        "legacy-8.2.7",
+        "published-current"
+      ]
+    },
+    {
+      "command": "get /nodes/{node}/storage/{storage}/status",
+      "operationId": "OP-GET-a514de012d",
+      "method": "GET",
+      "path": "/nodes/{node}/storage/{storage}/status",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value",
+        "limit": "value",
+        "fields": "value",
+        "full": "boolean",
+        "session": "value",
+        "api-node": "value",
+        "api-storage": "value"
       },
       "catalogues": [
         "legacy-8.2.7",
@@ -7865,6 +7974,27 @@
         "full": "boolean",
         "session": "value",
         "api-node": "value"
+      },
+      "catalogues": [
+        "legacy-8.2.7",
+        "published-current"
+      ]
+    },
+    {
+      "command": "get /storage",
+      "operationId": "OP-GET-f7213ba3fc",
+      "method": "GET",
+      "path": "/storage",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value",
+        "limit": "value",
+        "fields": "value",
+        "full": "boolean",
+        "session": "value",
+        "api-type": "value"
       },
       "catalogues": [
         "legacy-8.2.7",

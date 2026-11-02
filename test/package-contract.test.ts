@@ -40,13 +40,13 @@ test('packed package installs offline and exposes the CLI and admission contract
       return path.slice('package/'.length)
     })
     const licenses = (await readdir(root)).filter(path => /^(?:LICENSE|LICENCE|NOTICE|THIRD_PARTY_NOTICES)(?:\.|$)|-LICENSE\.txt$/i.test(path))
-    for (const required of ['package.json', 'README.md', ...licenses, ...Object.values(manifest.bin),
+    for (const required of ['package.json', 'README.md', 'skills/proxmox-axi/SKILL.md', ...licenses, ...Object.values(manifest.bin),
       ...modules.map(name => `dist/${name}.js`), ...data]) assert.ok(files.includes(required), `missing ${required}`)
     const allowedRoot = new Set(['package.json', 'README.md', ...licenses, ...data.filter(path => !path.includes('/')),
       'inventory.json', 'catalogue-diff.json', 'help.json'])
     for (const path of files) {
       assert.ok(allowedRoot.has(path) || path === 'bin/proxmox-axi.mjs' || path === 'docs/s4-contract.md' ||
-        path === 'docs/s5-contract.md' || /^dist\/[a-z][a-z-]*(?:\.js|\.d\.ts|\.json)$/.test(path), `unexpected published file: ${path}`)
+        path === 'docs/s5-contract.md' || path === 'skills/proxmox-axi/SKILL.md' || /^dist\/[a-z][a-z-]*(?:\.js|\.d\.ts|\.json)$/.test(path), `unexpected published file: ${path}`)
       assert.doesNotMatch(path, /(?:^|\/)(?:test|tests|node_modules|src)(?:\/|$)|\.map$|\.test\./)
     }
     await writeFile(join(scratch, 'package.json'), JSON.stringify({ private: true, type: 'module',

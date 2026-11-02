@@ -1769,14 +1769,6 @@
       "contract": "dist/contracts.json#/contracts/162"
     },
     {
-      "id": "OP-GET-46dcf2bd2a",
-      "method": "GET",
-      "path": "/cluster/nextid",
-      "release": "legacy-8.2.7",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/163"
-    },
-    {
       "id": "OP-GET-10054396fd",
       "method": "GET",
       "path": "/cluster/notifications",
@@ -2431,14 +2423,6 @@
       "release": "legacy-8.2.7",
       "admitted": false,
       "contract": "dist/contracts.json#/contracts/246"
-    },
-    {
-      "id": "OP-GET-907218e704",
-      "method": "GET",
-      "path": "/cluster/status",
-      "release": "legacy-8.2.7",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/247"
     },
     {
       "id": "OP-GET-4515fa543e",
@@ -7336,14 +7320,6 @@
       "contract": "dist/contracts.json#/contracts/549"
     },
     {
-      "id": "OP-GET-565126bd4f",
-      "method": "GET",
-      "path": "/nodes/{node}/status",
-      "release": "legacy-8.2.7",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/550"
-    },
-    {
       "id": "OP-POST-8cf44200b8",
       "method": "POST",
       "path": "/nodes/{node}/status",
@@ -7462,14 +7438,6 @@
       "release": "legacy-8.2.7",
       "admitted": false,
       "contract": "dist/contracts.json#/contracts/568"
-    },
-    {
-      "id": "OP-GET-a514de012d",
-      "method": "GET",
-      "path": "/nodes/{node}/storage/{storage}/status",
-      "release": "legacy-8.2.7",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/569"
     },
     {
       "id": "OP-POST-c70b1f8290",
@@ -8057,14 +8025,6 @@
       "release": "legacy-8.2.7",
       "admitted": false,
       "contract": "dist/contracts.json#/contracts/598"
-    },
-    {
-      "id": "OP-GET-f7213ba3fc",
-      "method": "GET",
-      "path": "/storage",
-      "release": "legacy-8.2.7",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/599"
     },
     {
       "id": "OP-POST-56793fd7a3",
@@ -10001,14 +9961,6 @@
       "contract": "dist/contracts.json#/contracts/784"
     },
     {
-      "id": "OP-GET-46dcf2bd2a",
-      "method": "GET",
-      "path": "/cluster/nextid",
-      "release": "published-current",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/785"
-    },
-    {
       "id": "OP-GET-10054396fd",
       "method": "GET",
       "path": "/cluster/notifications",
@@ -10991,14 +10943,6 @@
       "release": "published-current",
       "admitted": false,
       "contract": "dist/contracts.json#/contracts/909"
-    },
-    {
-      "id": "OP-GET-907218e704",
-      "method": "GET",
-      "path": "/cluster/status",
-      "release": "published-current",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/910"
     },
     {
       "id": "OP-GET-4515fa543e",
@@ -16051,14 +15995,6 @@
       "contract": "dist/contracts.json#/contracts/1227"
     },
     {
-      "id": "OP-GET-565126bd4f",
-      "method": "GET",
-      "path": "/nodes/{node}/status",
-      "release": "published-current",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/1228"
-    },
-    {
       "id": "OP-POST-8cf44200b8",
       "method": "POST",
       "path": "/nodes/{node}/status",
@@ -16193,14 +16129,6 @@
       "release": "published-current",
       "admitted": false,
       "contract": "dist/contracts.json#/contracts/1248"
-    },
-    {
-      "id": "OP-GET-a514de012d",
-      "method": "GET",
-      "path": "/nodes/{node}/storage/{storage}/status",
-      "release": "published-current",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/1249"
     },
     {
       "id": "OP-POST-c70b1f8290",
@@ -16797,14 +16725,6 @@
       "release": "published-current",
       "admitted": false,
       "contract": "dist/contracts.json#/contracts/1278"
-    },
-    {
-      "id": "OP-GET-f7213ba3fc",
-      "method": "GET",
-      "path": "/storage",
-      "release": "published-current",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/1279"
     },
     {
       "id": "OP-POST-56793fd7a3",
