@@ -35,6 +35,29 @@ Treat the returned UPID as pending and use `task wait` with its node, UPID, jour
 Growth does not promise that a guest partition or filesystem has expanded.
 After an uncertain response, inspect the journal and task rather than repeating relative growth, which could add space twice.
 
+## Guest networking and boot
+
+Use confirmed `set .../config` with concrete `net0` through `net31` on QEMU or LXC.
+Read the existing configuration privately first, construct the complete intended property string, and include its digest when available.
+NIC updates replace property strings; omitted modifiers follow provider defaults.
+These operations select existing host bridges but do not create or reconfigure host interfaces.
+
+QEMU accepts `virtio`, `e1000`, `e1000e` or `vmxnet3`, optionally prefixed with `model=`, or `<model>=<unicast-MAC>`.
+Optional modifiers follow this canonical order: `bridge`, `firewall`, `link_down`, `rate`, `tag`.
+For example, `virtio,bridge=vmbr0,firewall=1,tag=42` selects an existing bridge and VLAN tag.
+LXC starts with required `name=<interface>` followed by optional `bridge`, `firewall`, `gw`, `hwaddr`, `ip`, `ip6`, `link_down`, `rate`, `tag`, `type` in that order.
+LXC `ip` accepts IPv4/CIDR, `dhcp` or `manual`; `gw` accepts IPv4; `ip6` accepts only `auto`, `dhcp` or `manual`; `type` is `veth`.
+MAC addresses must be unicast, VLAN tags are 1-4094, rates are nonnegative numbers, and firewall/link flags are `0` or `1`.
+Trunks, static IPv6/gw6, host-managed/offload options, MTU/queue tuning and other modifiers remain refused pending their own review.
+Use `--api-delete` with explicit NIC selectors for confirmed NIC removal; it can also combine reviewed disk selectors.
+
+QEMU boot order uses `order=<device>;<device>` with admitted ordinary disk/NIC selectors, for example `order=ide2;scsi0;net0`.
+Use a supported CD-ROM slot such as `ide2` with `storage:iso/installer.iso,media=cdrom`, or `none,media=cdrom` to eject media.
+Only managed ISO filenames are admitted; host paths, remote sources and traversal remain refused.
+Enable or disable QEMU agent communication with `--api-agent 1`, `--api-agent 0`, `--api-agent enabled=1` or `--api-agent enabled=0`.
+Install and start the guest-agent service inside the VM separately; configuration does not prove guest-agent readiness.
+Agent freeze/trim/type modifiers and host passthrough remain refused.
+
 ## Schema views
 
 `--view` and `--offset` apply only to `schema`; `--offset` requires `--view vendor`.
