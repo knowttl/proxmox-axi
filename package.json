@@ -1,13 +1,34 @@
 {
   "name": "@knowttl/proxmox-axi",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "AXI client for Proxmox VE",
-  "repository": { "type": "git", "url": "https://github.com/knowttl/proxmox-axi.git" },
-  "publishConfig": { "access": "public" },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/knowttl/proxmox-axi.git"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
   "type": "module",
-  "bin": { "proxmox-axi": "bin/proxmox-axi.mjs" },
-  "files": ["bin", "dist", "docs/s4-contract.md", "docs/s5-contract.md", "axi-credential.schema.json", "inventory.json", "write-policy.json", "catalogue-diff.json", "artium-invocations.json", "help.json", "README.md"],
-  "engines": { "node": ">=24.11.0" },
+  "bin": {
+    "proxmox-axi": "bin/proxmox-axi.mjs"
+  },
+  "files": [
+    "bin",
+    "dist",
+    "docs/s4-contract.md",
+    "docs/s5-contract.md",
+    "axi-credential.schema.json",
+    "inventory.json",
+    "write-policy.json",
+    "catalogue-diff.json",
+    "artium-invocations.json",
+    "help.json",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=24.11.0"
+  },
   "packageManager": "pnpm@10.22.0",
   "scripts": {
     "build": "node scripts/generate.mjs && tsc",
@@ -26,6 +47,8 @@
     "typescript": "5.9.3"
   },
   "pnpm": {
-    "overrides": { "fast-uri": "3.1.8" }
+    "overrides": {
+      "fast-uri": "3.1.8"
+    }
   }
 }
