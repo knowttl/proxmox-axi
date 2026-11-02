@@ -10,7 +10,7 @@ import { createGunzip } from 'node:zlib'
 import type { Credentials } from './credentials.js'
 import { buildPath, type Contract } from './contract.js'
 import { authorization, trustedSocket } from './transport.js'
-import { Failure } from './errors.js'
+import { Failure, httpFailure } from './errors.js'
 
 export interface TransferOptions {
   formatter: string
@@ -102,7 +102,7 @@ async function runTransfer(credentials: Credentials, contract: Contract, values:
   output: Writable, limits: ReturnType<typeof transferLimits>, file?: FileHandle, source?: { bytes: number, sha256: string }) {
   const headers = authorization(credentials, contract.method)
   const wire = buildPath(contract, values)
-  const formatter = options.formatter === 'multipart' || options.formatter === 'guest-file' || options.formatter === 'download' ? 'json' : options.formatter
+  const formatter = ['multipart', 'guest-file', 'download', 'text'].includes(options.formatter) ? 'json' : options.formatter
   const [path, query] = wire.replace('/api2/json/', `/api2/${formatter}/`).split('?')
   const boundary = `proxmox-${randomBytes(24).toString('hex')}`
   let prefix = Buffer.alloc(0), suffix = Buffer.alloc(0)
@@ -145,7 +145,10 @@ async function runTransfer(credentials: Credentials, contract: Contract, values:
       await pipeline(body, req, { signal: controller.signal })
     } else req.end(contract.method === 'GET' ? undefined : query)
     const [response] = await responsePromise as [import('node:http').IncomingMessage]
-    if (response.statusCode !== 200) { response.destroy(); throw new Failure('HTTP_ERROR', `Transfer returned HTTP ${response.statusCode ?? 0}.`, 'Inspect the selected operation and identity.') }
+    if (response.statusCode !== 200) {
+      response.destroy()
+      throw httpFailure(response.statusCode ?? 0, 'Transfer')
+    }
     const decoded = response.headers['content-encoding'] === 'gzip' ? response.pipe(createGunzip()) : response
     if (decoded !== response) response.once('error', error => decoded.destroy(error))
     if (response.headers['content-encoding'] && response.headers['content-encoding'] !== 'gzip' && response.headers['content-encoding'] !== 'identity') throw invalid('Unsupported response encoding.')

@@ -68,6 +68,9 @@ export async function exerciseReadJourney({ runCase, pack, retained, contracts, 
   const added = { ...version, body: { data: { ...version.body.data, compatibleAddedField: 'retained' } } }
   const extra = await run('compatible-added-fields', ['get', '/version', '--format', 'json'], { exitCode: 0, requests: 1 }, added)
   assert.equal(extra.version.compatibleAddedField, 'retained')
+  const explicitVersion = await run('D7/version-explicit-catalogue', ['get', '/version', '--catalogue', 'published-current', '--format', 'json'], { exitCode: 0, requests: 1 }, version)
+  assert.equal(explicitVersion.compatibility.catalogue, 'legacy-8.2.7', 'Version compatibility describes the server, independent of the replay contract')
+  await run('D7/unknown-field', [...nodes.args, '--fields', 'node,bogus', '--format', 'json'], { exitCode: 2, requests: 0, error: 'INVALID_INPUT' }, vendor)
   for (const [httpStatus, error] of [[403, 'PERMISSION_DENIED'], [404, 'NOT_FOUND_OR_HIDDEN'], [429, 'HTTP_ERROR']]) {
     await run(`http/${httpStatus}`, ['get', '/version', '--format', 'json'], { exitCode: 1, requests: 1, error }, { httpStatus, body: '' })
   }
@@ -80,12 +83,15 @@ export async function exerciseReadJourney({ runCase, pack, retained, contracts, 
     const checked = await run('VP-05/doctor', ['doctor', '--format', 'json'], { exitCode: 0, requests: 9, paths: doctorPaths }, vendor)
     assert.equal(checked.checks.length, 9)
     assert.equal(checked.compatibility.evidence, 'legacy regression fixtures')
+    assert.deepEqual(checked.permissions, permissions.body.data)
+    assert.equal(Object.hasOwn(checked.checks.find(check => check.path === '/access/permissions'), 'data'), false)
     for (const target of ['8.2.7', '9.2.1', '10.0.1']) {
       const value = await run(`VP-01/mixed-node/${target}`, [...vms.args, '--format', 'json'], { exitCode: 0, requests: 4, paths: vmPaths },
         path => path.endsWith('/node-a/version') ? { httpStatus: 200, body: { data: { ...version.body.data, version: target } } } : vendor(path))
       assert.equal(value.compatibility.catalogue, target.startsWith('8') ? 'legacy-8.2.7' : 'published-current')
       assert.equal(value.compatibility.status, target.startsWith('9.2') ? 'supported' : 'unverified')
-      assert.equal(value.compatibility.writes, 'disabled')
+      assert.equal(value.compatibility.writeVerification, 'unverified')
+      assert.equal(Object.hasOwn(value.compatibility, 'writes'), false)
     }
     await run('VP-06/removed-route', ['get', '/nodes/{node}/scan/glusterfs', '--api-node', 'node-a', '--format', 'json'],
       { exitCode: hosted ? 2 : 1, requests: 0, error: hosted ? 'INVALID_INPUT' : 'CAPABILITY_UNSUPPORTED', hostBoundary: hosted }, vendor)

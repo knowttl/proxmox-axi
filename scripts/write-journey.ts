@@ -7,6 +7,9 @@ import { fileURLToPath, pathToFileURL } from 'node:url'
 import { spawn, type ChildProcess } from 'node:child_process'
 import type { IncomingMessage, ServerResponse } from 'node:http'
 import { decode } from '@toon-format/toon'
+import live from '../test/fixtures/live-8.2.7.json' with { type: 'json' }
+
+const { description, refusals } = live
 
 interface CommandResult { code: number, stdout: string, stderr: string }
 interface Journey {
@@ -97,7 +100,7 @@ export async function exerciseWriteJourney(options: Journey): Promise<void> {
         data = { upid: mode === 'wrong-upid' ? upid.replace('qmstart', 'qmstop') : requestedUpid, node: 'pve-test',
           status: state === 'running' ? 'running' : 'stopped', exitstatus: state === 'success' ? 'OK' : 'controlled task failure',
           starttime: 1, type: 'qmstart', pstart: 2, id: '100', user: 'synthetic@pve', pid: 1 }
-      } else if (path.endsWith('/log')) data = [{ n: 1, t: 'started' }, { n: 2, t: 'TASK OK' }]
+      } else if (path.endsWith('/log')) data = mode === 'log-reversed' ? [{ t: 'started', n: 1 }, { t: 'TASK OK', n: 2 }] : [{ n: 1, t: 'started' }, { n: 2, t: 'TASK OK' }]
       else if (path.endsWith('/config')) {
         if (mode === 'reconcile-unavailable' && path.includes('/qemu/')) { reply.writeHead(404).end(); return }
         data = mode === 'filtered' ? {} : guestState.get(path.includes('/lxc/') ? 'lxc' : 'qemu') ?? {}
@@ -118,6 +121,8 @@ export async function exerciseWriteJourney(options: Journey): Promise<void> {
       const transmission: Record<string, unknown> = { method, path, args, before: snapshot() }
       bodyEvidence.push(transmission)
       mutationCount++
+      const refusal = refusals.find(item => mode === `refused-${item.status}`)
+      if (refusal) { reply.writeHead(refusal.status).end(JSON.stringify(refusal.body)); return }
       if (mode === 'disconnect-before-acceptance') { reply.destroy(); return }
       data = apply(method, path, args)
       transmission.after = snapshot()
@@ -176,6 +181,16 @@ export async function exerciseWriteJourney(options: Journey): Promise<void> {
   const argsFor = (command: string, family: string, suffix = '') => [command, `/nodes/{node}/${family}/{vmid}${suffix}`, '--api-node', 'pve-test', '--api-vmid', '100']
   const start = argsFor('create', 'qemu', '/status/start')
   try {
+    for (const refusal of refusals) {
+      const args = ['create', '/pools', '--api-poolid', 'synthetic-pool']
+      const preview = await invoke(`D3/${refusal.status}-preview`, [...args, '--preview'])
+      mode = `refused-${refusal.status}`
+      const result = await invoke(`D3/${refusal.status}-refused`, [...args, '--confirm', preview.confirmation], { code: 1, error: refusal.code, mutations: 1 })
+      assert.match(result.help[0], refusal.status === 400 ? /parameter/i : /identity|permission/i)
+      const shown = await invoke(`D3/${refusal.status}-journal`, ['journal', 'show', preview.id])
+      assert.equal(shown.journal.status, 'failed')
+      mode = 'success'
+    }
     await profile([])
     await invoke('AC-WRITE/tool-default-off', [...start, '--preview'], { code: 1, error: 'WRITE_DISABLED' })
     await profile()
@@ -243,6 +258,12 @@ export async function exerciseWriteJourney(options: Journey): Promise<void> {
       assert.equal(guestState.get(family)!.cores, 2)
       const observation = await invoke(`AC-WRITES/${family}-config-reconcile`, ['journal', 'reconcile', preview.id])
       assert.equal(observation.journal.observation.desiredStateObserved, true)
+      const textArgs = [...argsFor('set', family, '/config'), '--api-description', description.trimEnd()]
+      const textPreview = await invoke(`D5/${family}-preview`, [...textArgs, '--preview'])
+      await invoke(`D5/${family}-set`, [...textArgs, '--confirm', textPreview.confirmation], { status: 'success', mutations: 1 })
+      guestState.get(family)!.description = description
+      const textObserved = await invoke(`D5/${family}-reconcile`, ['journal', 'reconcile', textPreview.id])
+      assert.equal(textObserved.journal.observation.desiredStateObserved, true)
     }
     for (const catalogue of ['8.2.7', '9.2.0']) {
       releaseVersion = { ...version, version: catalogue }
@@ -359,11 +380,19 @@ export async function exerciseWriteJourney(options: Journey): Promise<void> {
     const waiting = await invoke('AC-ASYNC/wait-bounded', ['task', 'wait', ...taskArgs, '--wait-ms', '1000'], { status: 'running' })
     assert.equal(waiting.wait, 'deadline-reached')
     mode = 'task-completes'
-    await invoke('AC-ASYNC/success', ['task', 'wait', ...taskArgs], { status: 'success' })
+    const completed = await invoke('AC-ASYNC/success', ['task', 'wait', ...taskArgs], { status: 'success' })
+    assert.equal(completed.data.processState, 'stopped')
+    assert.equal(Object.hasOwn(completed.data, 'status'), false)
+    const completedStatus = await invoke('D4/status', ['task', 'status', ...taskArgs], { status: 'success' })
+    assert.equal(completedStatus.data.processState, 'stopped')
     mode = 'success'; taskState = 'failed'
     await invoke('AC-ASYNC/failed', ['task', 'status', ...taskArgs], { code: 1, status: 'failed' })
     const logs = await invoke('AC-ASYNC/numbered-log', ['task', 'log', '--api-node', 'pve-test', '--api-upid', upid])
     assert.deepEqual(logs.data, [{ n: 1, t: 'started' }, { n: 2, t: 'TASK OK' }])
+    assert.deepEqual(Object.keys(logs.data[0]!), ['n', 't'])
+    mode = 'log-reversed'
+    const reversed = await invoke('D7/log-column-order', ['task', 'log', '--api-node', 'pve-test', '--api-upid', upid])
+    assert.deepEqual(Object.keys(reversed.data[0]), ['n', 't'])
     mode = 'wrong-upid'
     await invoke('AC-ASYNC/matching-upid-required', ['task', 'status', ...taskArgs], { code: 1, error: 'INVALID_RESPONSE' })
     mode = 'success'

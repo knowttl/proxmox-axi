@@ -33,9 +33,11 @@ export function prepareDuplex(contract: Contract, preview: boolean) {
         const [path, body] = wire.split('?')
         const data = await executeRequest(credentials, path!, { method: 'POST', ...(body ? { body } : {}) })
         credentials.results.registerMinted(data)
-        validateResponse(data, selected.returns)
         if (!data || typeof data !== 'object') throw failed('Invalid protected session setup.')
         const setup = data as Record<string, unknown>
+        // Older releases encode the setup port as decimal text.
+        if (typeof setup.port === 'string' && /^\d+$/.test(setup.port)) setup.port = Number(setup.port)
+        validateResponse(data, selected.returns)
         if (typeof setup.ticket !== 'string' || !setup.ticket || setup.ticket.length > 4096) throw failed('Invalid private session ticket.')
         const migration = selected.path.endsWith('/mtunnel')
         // The opaque socket is accepted only from this exact authenticated setup,

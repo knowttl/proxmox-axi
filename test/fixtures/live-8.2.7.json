@@ -1,0 +1,9 @@
+{
+  "session": { "port": "5900", "ticket": "CANARY-S5-private-session-ticket", "cert": "synthetic", "user": "synthetic@pve", "upid": "UPID:pve-test:00000001:00000002:12345678:imgcopy:100:synthetic@pve:" },
+  "description": "A guest description\n",
+  "refusals": [
+    { "status": 400, "code": "HTTP_ERROR", "body": { "data": null, "errors": { "poolid": "invalid format" } } },
+    { "status": 401, "code": "AUTH_REQUIRED", "body": { "data": null } },
+    { "status": 403, "code": "PERMISSION_DENIED", "body": { "data": null, "message": "Permission check failed (/, Pool.Allocate)" } }
+  ]
+}

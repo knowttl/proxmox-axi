@@ -8,6 +8,9 @@ import type { Socket } from 'node:net'
 import type { Duplex } from 'node:stream'
 import { gzipSync } from 'node:zlib'
 import { decode } from '@toon-format/toon'
+import live from '../test/fixtures/live-8.2.7.json' with { type: 'json' }
+
+const { session } = live
 
 interface Journey {
   task: string, scratch: string, out: string, executable: string, caFile: string, env: Record<string, string>
@@ -67,7 +70,7 @@ export async function exerciseStreamJourney(options: Journey) {
     if (/\/(vncproxy|termproxy|vncshell|mtunnel)$/.test(url.pathname)) {
       for await (const _chunk of request) { /* Consume the independently validated setup body. */ }
       response.end(JSON.stringify({ data: url.pathname.endsWith('/mtunnel') ? { ticket: privateTicket, socket: '/run/pve/migrate-test.sock', upid } :
-        { ticket: privateTicket, port: mode === 'wrong-target' ? 22 : 5900, cert: 'synthetic', user: 'synthetic@pve', upid } })); return
+        { ...session, port: mode === 'wrong-target' ? 22 : mode === 'malformed-port' ? '5900junk' : mode === 'legacy' ? session.port : 5900 } })); return
     }
     if (url.pathname.endsWith('/file-read')) {
       const decoded = url.searchParams.get('decode') !== '0'
@@ -85,7 +88,10 @@ export async function exerciseStreamJourney(options: Journey) {
       response.end(spiceFile); return
     }
     if (url.pathname.endsWith('/file-restore/download')) { response.end(image); return }
-    if (url.pathname.startsWith('/api2/text/')) {
+    if (url.pathname.startsWith('/api2/text/')) { response.writeHead(501).end('no formatter for uri'); return }
+    if (url.pathname.endsWith('/journal') || url.pathname.endsWith('/log')) {
+      if (mode === 'formatter-unavailable') { response.writeHead(501).end('no formatter for uri'); return }
+      if (url.pathname.endsWith('/log') && url.searchParams.get('download') !== '1') { response.writeHead(400).end(); return }
       response.writeHead(200, mode === 'gzip' ? { 'content-encoding': 'gzip' } : {})
       response.end(mode === 'gzip' ? gzipSync(textFile) : textFile); return
     }
@@ -165,7 +171,9 @@ export async function exerciseStreamJourney(options: Journey) {
     if (args[0] === 'duplex' && expected === 0 && !args.includes('--preview')) {
       const frame = Buffer.concat(privateFrames)
       assert.equal(frame.readUInt32BE(0), frame.length - 4)
-      assert.ok(JSON.parse(frame.subarray(4).toString()).payload.ticket === privateTicket, 'Inner-protocol setup is available only through the private result pipe')
+      const payload = JSON.parse(frame.subarray(4).toString()).payload
+      assert.ok(payload.ticket === privateTicket, 'Inner-protocol setup is available only through the private result pipe')
+      if (!args[2]!.endsWith('/mtunnel')) assert.equal(payload.port, 5900, 'Decimal setup ports are delivered as integers')
     }
     options.transcripts.push(`case: ${active}\nexit: ${code}\nstdout:\n${text}`)
     options.cases.push({ id: active, hosted: !!options.hosted, status: 'pass', expected: { exitCode: expected,
@@ -210,14 +218,17 @@ export async function exerciseStreamJourney(options: Journey) {
     const restored = await run('restore-download', ['transfer', 'get', '/nodes/{node}/storage/{storage}/file-restore/download', '--api-node', 'pve-test', '--api-storage', 'local',
       '--api-volume', 'backup/vm/100/fixture', '--api-filepath', Buffer.from('/fixture').toString('base64'), '--response-format', 'download', '--expected-sha256', hash(image)], 0)
     assert.equal(hash(restored.bytes), hash(image))
-    for (const compressed of [false, true]) {
-      mode = compressed ? 'gzip' : 'success'
+    for (const representation of ['success', 'gzip', 'legacy']) {
+      mode = representation
       for (const path of ['/nodes/{node}/journal', '/nodes/{node}/tasks/{upid}/log']) {
         const args = ['transfer', 'get', path, '--api-node', 'pve-test', ...(path.endsWith('/log') ? ['--api-upid', upid, '--api-download', 'true'] : []), '--response-format', 'text']
-        const result = await run(`${compressed ? 'gzip' : 'text'}-${path}`, args, 0)
+        const result = await run(`${representation}-${path}`, args, 0)
         assert.deepEqual(result.bytes, textFile)
       }
     }
+    mode = 'formatter-unavailable'
+    const unavailable = await run('D2/unsupported-formatter-hint', ['transfer', 'get', '/nodes/{node}/journal', '--api-node', 'pve-test', '--response-format', 'text'], 1)
+    assert.match((unavailable.output.help as string[])[0]!, /server does not support this transfer formatter/)
     mode = 'success'
     const guest = ['transfer', 'get', '/nodes/{node}/qemu/{vmid}/agent/file-read', '--catalogue', 'published-current', '--api-node', 'pve-test', '--api-vmid', '100', '--api-file', '/fixture', '--api-count', '16777216', '--response-format', 'guest-file']
     for (const decoded of [false, true]) {
@@ -247,6 +258,7 @@ export async function exerciseStreamJourney(options: Journey) {
     await run('guest-legacy-raw-denied', [...legacy, '--raw'], 2)
     mode = 'success'
     if (options.task === 'S5.2') for (const setup of setupPaths) {
+      mode = 'legacy'
       const family = setup.replace('/nodes/{node}/', '')
       const args = ['duplex', 'create', setup, '--api-node', 'pve-test', ...(setup.includes('{vmid}') ? ['--api-vmid', '100'] : [])]
       const approved = await run(`${family}-preview`, [...args, '--preview'], 0)
@@ -258,6 +270,7 @@ export async function exerciseStreamJourney(options: Journey) {
       assert.equal(peers.size, 0, 'Clean protocol completion releases the vendor peer')
       assert.deepEqual(result.bytes, Buffer.concat([prefix, payload]), 'Duplex peer fragmentation preserves the exact message')
       await run(`${family}-reconnect-denied`, [...args, '--confirm', String(approved.output.confirmation)], 1)
+      mode = 'success'
       if (setup !== consolePath && setup !== consolePath.replace('/vncproxy', '/mtunnel')) continue
       const expiring = await run(`${family}-idle-preview`, [...args, '--preview'], 0, undefined, { PROXMOX_AXI_DUPLEX_IDLE_MS: '50' })
       mode = 'idle'
@@ -276,8 +289,15 @@ export async function exerciseStreamJourney(options: Journey) {
         const wrong = await run('console-target-preview', [...args, '--preview'], 0)
         mode = 'wrong-target'
         const before = options.ledger.filter(row => row.upgrade === 'websocket').length
-        await run('console-wrong-target-denied', [...args, '--confirm', String(wrong.output.confirmation)], 1)
+        const denied = await run('console-wrong-target-denied', [...args, '--confirm', String(wrong.output.confirmation)], 1)
+        assert.match((denied.output.error as { message: string }).message, /DUPLEX_FAILED: Invalid provider session target/)
         assert.equal(options.ledger.filter(row => row.upgrade === 'websocket').length, before, 'An unapproved port never opens a WebSocket')
+        mode = 'success'
+        const malformed = await run('D1/malformed-port-preview', [...args, '--preview'], 0)
+        mode = 'malformed-port'
+        const invalid = await run('D1/malformed-port-cause', [...args, '--confirm', String(malformed.output.confirmation)], 1)
+        assert.match((invalid.output.error as { message: string }).message, /INVALID_RESPONSE: Response does not match/)
+        assert.equal(options.ledger.filter(row => row.upgrade === 'websocket').length, before)
         mode = 'success'
       }
     }

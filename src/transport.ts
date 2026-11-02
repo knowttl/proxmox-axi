@@ -3,7 +3,7 @@ import { connect, checkServerIdentity } from 'node:tls'
 import { createHash, X509Certificate } from 'node:crypto'
 import { isIP } from 'node:net'
 import type { Credentials } from './credentials.js'
-import { Failure } from './errors.js'
+import { Failure, httpFailure } from './errors.js'
 import operations from './operations.json' with { type: 'json' }
 
 // Complete TLS validation before a caller can transmit application bytes.
@@ -78,8 +78,7 @@ export async function executeRequest(credentials: Credentials, wirePath: string,
       const status = response.statusCode ?? 0
       if (status !== 200) {
         response.destroy()
-        reject(new Failure(status === 401 ? 'AUTH_REQUIRED' : status === 403 ? 'PERMISSION_DENIED' : status === 404 ? 'NOT_FOUND_OR_HIDDEN' : 'HTTP_ERROR',
-          `Request returned HTTP ${status}.`, 'Check the configured identity and its permission to read the selected operation.'))
+        reject(httpFailure(status, 'Request'))
         return
       }
       let bytes = 0

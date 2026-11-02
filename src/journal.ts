@@ -31,6 +31,11 @@ export interface JournalRecord {
   check?: { path: string, expected: Record<string, string>, booleans?: string[] }
 }
 
+export function reconciliationValue(name: string, value: unknown): unknown {
+  // Guest descriptions are stored as configuration comments with trailing newlines.
+  return name === 'description' && typeof value === 'string' ? value.trimEnd() : value
+}
+
 export function journalPath(): string {
   const env = process.env
   const state = process.platform === 'win32' ? env.LOCALAPPDATA ?? join(homedir(), 'AppData', 'Local') :

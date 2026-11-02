@@ -4,7 +4,7 @@ import type { Credentials } from './credentials.js'
 import { executeRequest, readVersion } from './transport.js'
 import { readPrivateFile } from './private-file.js'
 import { Failure } from './errors.js'
-import { Journal, publicChildren, type JournalRecord } from './journal.js'
+import { Journal, publicChildren, reconciliationValue, type JournalRecord } from './journal.js'
 import { resultBinding } from './private-results.js'
 
 interface Invocation {
@@ -147,7 +147,8 @@ export async function writeOperation(credentials: Credentials, initial: Contract
       return await journal.update(id, current => {
         current.status = outcome.status
         if (outcome.upid) current.upid = outcome.upid
-        mergeOutcomes(current.children, outcome.children)
+        // A refused batch leaves its children untransmitted.
+        if (outcome.status !== 'failed' || outcome.children) mergeOutcomes(current.children, outcome.children)
       })
     }
     catch { throw new Failure('WRITE_UNCERTAIN', `Terminal journal update failed; intent ${id} remains durable.`, `Run proxmox-axi journal reconcile ${id}; do not repeat the mutation.`) }
@@ -168,10 +169,15 @@ export async function writeOperation(credentials: Credentials, initial: Contract
     outcome = resultStatus(call, data, credentials.results)
     if (privateResult(call) && !options.transport) await credentials.results.deliver(resultBinding(credentials.origin, credentials.tokenId, call.contract.id, fingerprint), data)
   } catch (error) {
-    // Even HTTP failures may follow a partial server-side action. No retry is safe.
+    // Authentication, permission and validation refusals prove this request was not applied.
+    if (error instanceof Failure && [400, 401, 403].includes(error.httpStatus ?? 0)) {
+      await saveOutcome({ status: 'failed' })
+      throw error
+    }
     await saveOutcome({ status: 'uncertain' })
     throw new Failure(error instanceof Failure && error.code === 'DELIVERY_UNCERTAIN' ? 'DELIVERY_UNCERTAIN' : 'WRITE_UNCERTAIN',
-      `Write or private delivery outcome is uncertain; journal ${id}.${error instanceof Failure && error.code === 'DUPLEX_FAILED' ? ` ${error.message}` : ''}`, `Run proxmox-axi journal reconcile ${id}; do not repeat the mutation.`)
+      `Write or private delivery outcome is uncertain; journal ${id}.${error instanceof Failure ? ` ${error.code}: ${credentials.results.redact(error.message)}` : ''}`,
+      `Run proxmox-axi journal reconcile ${id}; do not repeat the mutation.${error instanceof Failure ? ` ${credentials.results.redact(error.next)}` : ''}`)
   }
   const saved = await saveOutcome(outcome)
   if (saved.status === 'failed' || saved.status === 'uncertain') process.exitCode = 1
@@ -203,7 +209,8 @@ function reconciliationCheck(call: Invocation, journal: Journal): JournalRecord[
   const expected = target.endsWith('/status/current') ?
     call.contract.path.endsWith('/start') ? { status: 'running' } : /\/(stop|shutdown)$/.test(call.contract.path) ? { status: 'stopped' } : {} :
     Object.fromEntries(Object.entries(call.values).filter(([name]) => !['node', 'vmid', 'digest'].includes(name)))
-  return { path: buildPath(read, paths), expected: Object.fromEntries(Object.entries(expected).map(([name, value]) => [name, journal.fingerprint(value)])),
+  return { path: buildPath(read, paths), expected: Object.fromEntries(Object.entries(expected).map(([name, value]) =>
+    [name, journal.fingerprint(reconciliationValue(name, value))])),
     booleans: Object.keys(expected).filter(name => read.returns.properties?.[name]?.type === 'boolean') }
 }
 

@@ -8,7 +8,7 @@ export function capability(version: string) {
   return { version, catalogue: major === 8 ? 'legacy-8.2.7' : 'published-current',
     status: major === 9 && /^9\.2(?:\.|$)/.test(version) ? 'supported' : 'unverified',
     evidence: major === 8 ? 'legacy regression fixtures' : major === 9 ? 'published schema; live commissioning pending' : 'unknown major; known reads only',
-    writes: 'disabled' }
+    writeVerification: 'unverified' }
 }
 
 const inventoryRoutes = new Set(['/nodes', '/cluster/resources', '/nodes/{node}/qemu', '/nodes/{node}/lxc', '/nodes/{node}/storage', '/nodes/{node}/tasks'])
@@ -62,7 +62,8 @@ export async function doctor(credentials: Credentials, node?: string) {
   let release = 'published-current'
   const run = async (path: string, values: Record<string, unknown> = {}) => {
     const result = await readOperation(credentials, selectContract('GET', path, release), values, release)
-    checks.push({ path, ...result, data: credentials.results.sanitize(result.data),
+    const { data, ...metadata } = result
+    checks.push({ path, ...metadata, ...(path === '/access/permissions' ? {} : { data: credentials.results.sanitize(data) }),
       ...(result.compatibility ? { compatibility: { ...result.compatibility, version: credentials.results.redact(result.compatibility.version) } } : {}) })
     return result.data
   }

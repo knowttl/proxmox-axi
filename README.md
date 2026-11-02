@@ -130,6 +130,8 @@ Notes:
 
 Ordinary JSON reads other than `/version` detect the entry version and, for node-specific routes, the selected node version before choosing a catalogue.
 For ordinary JSON reads, an explicit `--catalogue` selects a replay contract without version detection, and inventory visibility remains unknown.
+Version reads still report compatibility for the returned server version, so their `compatibility.catalogue` can differ from the explicit replay contract.
+`compatibility.writeVerification` describes release verification evidence; operation authorization comes from the profile and host policies.
 Managed read transfers always detect the selected node version and choose its contract, even when `--catalogue` is supplied.
 Writes require a detected major of 8 or 9 and select the corresponding contract, including when an explicit catalogue was supplied.
 Automatic inventory reads check effective root audit permissions and report `complete` or `permission-filtered` visibility.
@@ -177,10 +179,12 @@ Any failed child makes the batch fail, with partial outcomes retained and no ass
   Records hold request fingerprints and safe metadata, never credentials or input values.
 - Journal failure prevents transmission.
 - An accepted UPID means the action is pending, and matching task status distinguishes running, success and failure.
+  `task status` and `task wait` label the vendor's running/stopped state as `data.processState`, separately from the action outcome in `status`.
 - `task log` returns numbered lines without storing them in the journal.
 - `task wait` has a 1-30000 ms elapsed budget, defaulting to 5000 ms.
 - `task cancel` requires its own preview and exact confirmation, using the same operation permission as deleting the task route.
 - Lost responses and crashes remain uncertain, with no automatic mutation retry.
+  HTTP 400, 401 and 403 refusals mark the intent failed and retain the underlying parameter or permission hint.
 - `journal reconcile` can observe reviewed direct configuration or status fields, or inspect retained UPIDs.
   Observation does not attribute an uncertain mutation, and missing or filtered data never proves failure.
   Variants without a safe reconciliation read say so explicitly.
