@@ -11,6 +11,11 @@
     "reason": "Requires operation-specific effect, transport and secret review before admission."
   },
   "reviewed": {
+    "GET /cluster/status": { "effect": "read", "transport": "json", "secrets": "none", "reason": "Cluster membership and quorum status only; no membership or quorum changes." },
+    "GET /cluster/nextid": { "effect": "read", "transport": "json", "secrets": "none", "reason": "Suggest or check an available VMID at read time; does not reserve an ID." },
+    "GET /nodes/{node}/status": { "effect": "read", "transport": "json", "secrets": "none", "reason": "Node CPU, memory, filesystem and boot metrics; no node lifecycle control." },
+    "GET /storage": { "effect": "read", "transport": "json", "secrets": "none", "reason": "Permission-filtered storage index; runtime returns storage identifiers only, excluding backend configuration even with full output." },
+    "GET /nodes/{node}/storage/{storage}/status": { "effect": "read", "transport": "json", "secrets": "none", "reason": "Storage accessibility, content types and capacity metrics; no backend configuration or credentials." },
     "GET /nodes/{node}/version": { "effect": "read", "transport": "json", "secrets": "none", "reason": "Selected node version metadata for mixed-cluster contract selection." },
     "GET /nodes/{node}/tasks/{upid}/log": { "effect": "read", "transport": "json", "secrets": "none", "reason": "Retained numbered task log; bounded JSON response and redacted output." },
     "GET /version": { "effect": "read", "transport": "json", "secrets": "none", "reason": "Version metadata only; fixed JSON formatter." },

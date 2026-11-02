@@ -11,7 +11,7 @@ export function capability(version: string) {
     writeVerification: 'unverified' }
 }
 
-const inventoryRoutes = new Set(['/nodes', '/cluster/resources', '/nodes/{node}/qemu', '/nodes/{node}/lxc', '/nodes/{node}/storage', '/nodes/{node}/tasks'])
+const inventoryRoutes = new Set(['/nodes', '/cluster/resources', '/cluster/status', '/storage', '/nodes/{node}/qemu', '/nodes/{node}/lxc', '/nodes/{node}/storage', '/nodes/{node}/tasks'])
 
 function inventoryVisibility(path: string, permissions: unknown): string {
   const root = (permissions as Record<string, Record<string, unknown>>)['/']
@@ -55,6 +55,8 @@ export async function readOperation(credentials: Credentials, initial: Contract,
   }
   const envelope = await executeRead(credentials, buildPath(selected, values), true) as { data: unknown, total?: number }
   validateResponse(envelope.data, selected.returns)
+  // The storage index can include backend configuration beyond its declared identifier.
+  if (selected.path === '/storage') envelope.data = (envelope.data as { storage: string }[]).map(({ storage }) => ({ storage }))
   if (selected.path === '/version' || selected.path === '/nodes/{node}/version') {
     const data = envelope.data as Record<string, unknown>
     if (['version', 'release', 'repoid'].some(key => typeof data[key] !== 'string' || !data[key])) throw new Failure('INVALID_RESPONSE', 'Missing version metadata.', 'Check the target version response.')

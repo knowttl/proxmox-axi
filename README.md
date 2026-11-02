@@ -61,7 +61,14 @@ proxmox-axi doctor
 
 ## Use with your agent
 
-No session hooks or agent skill ship with this package yet; this is pending.
+The package includes the [proxmox-axi agent skill](skills/proxmox-axi/SKILL.md) for profile selection, discovery and safe task completion.
+Install it into your agent's skill directory or install from this repository:
+
+```sh
+npx skills add knowttl/proxmox-axi --skill proxmox-axi
+```
+
+No session hooks are installed automatically.
 Agents call the CLI directly.
 `proxmox-axi get --help`, `proxmox-axi inventory` and `proxmox-axi schema <method> <template>` are offline and describe what is callable.
 The generated `artium-invocations.json` holds the callable command and flag contracts for a host inventory generator.
@@ -140,6 +147,55 @@ Automatic inventory reads check effective root audit permissions and report `com
 Scoped privileges may provide useful rows but do not establish complete inventory.
 An empty filtered or unverified result never establishes that no resources exist.
 
+### Infrastructure discovery across profiles
+
+Select a named profile explicitly for each host or cluster.
+`profile list` lists configured names without loading their secrets; `auth status --profile <name>` reports which credential sources that selection uses.
+The selected file profile ignores competing environment-profile fields.
+Each profile can have its own origin, credential SecretRef, TLS trust and write permissions.
+
+```sh
+proxmox-axi profile list
+proxmox-axi get /cluster/status --profile lab
+proxmox-axi get /cluster/nextid --profile lab
+proxmox-axi get '/nodes/{node}/status' --api-node '<node>' --profile lab
+proxmox-axi get /storage --profile lab
+proxmox-axi get '/nodes/{node}/storage/{storage}/status' --api-node '<node>' --api-storage '<storage>' --profile lab
+```
+
+Cluster status returns cluster/node identities and online/quorum flags; `--full` includes the other received status fields.
+`/cluster/nextid` returns a free VMID, or checks `--api-vmid <id>` at read time; it does not reserve that ID.
+Node status reports CPU, memory, filesystem and boot metrics.
+The `/storage` index returns storage identifiers only, including with `--full`, to avoid exposing backend configuration.
+Use `/nodes/{node}/storage` for inventory and capacity, or `/nodes/{node}/storage/{storage}/status` for one store's availability, content types and space metrics.
+Automatic cluster status and storage index reads include permission visibility; explicit `--catalogue` reads report unknown visibility.
+
+For example, a protected config can keep two independent profiles with separate token references:
+
+```json
+{
+  "version": 1,
+  "defaultProfile": "lab",
+  "profiles": {
+    "lab": {
+      "auth": "api-token",
+      "origin": "https://lab.example.test:8006",
+      "tokenId": "automation@pve!audit",
+      "token": { "env": "PVE_LAB_TOKEN" }
+    },
+    "production": {
+      "auth": "api-token",
+      "origin": "https://production.example.test:8006",
+      "tokenId": "automation@pve!audit",
+      "token": { "env": "PVE_PRODUCTION_TOKEN" }
+    }
+  }
+}
+```
+
+Supply credentials through the referenced secret source and set file ownership and permissions as described under [Configuration](#configuration).
+These reads do not grant storage administration, node power control, or cluster membership changes.
+
 ## Safety
 
 - Ordinary JSON reads use trusted HTTPS, a five-second total deadline and a 64 KiB response bound, and reject redirects.
@@ -185,6 +241,8 @@ Any failed child makes the batch fail, with partial outcomes retained and no ass
 - `task log` returns numbered lines without storing them in the journal.
   Its table columns are always `n` (line number), then `t` (text).
 - `task wait` has a 1-30000 ms elapsed budget, defaulting to 5000 ms.
+  If the final request exhausts the remaining budget after a valid observation, the wait returns that observation with `wait: deadline-reached`.
+  A timeout before the first valid observation remains a failure.
 - `task cancel` requires its own preview and exact confirmation, using the same operation permission as deleting the task route.
 - Lost responses and crashes remain uncertain, with no automatic mutation retry.
   HTTP 400, 401 and 403 refusals mark the intent failed and include bounded, sanitized parameter or permission hints when recognized.
@@ -248,7 +306,8 @@ No insecure-TLS flag or automatic trust update exists.
 
 - TOON is the default, and `--format json` preserves the same structured result.
 - Lists default to 100 compact rows.
-  `--limit <1-1000>` changes the display limit, `--fields` chooses fields, and `--full` includes all received rows and, unless `--fields` is supplied, all received fields.
+  `--limit <1-1000>` changes the display limit, `--fields` chooses fields, and `--full` includes all received rows and, unless `--fields` is supplied, all fields retained after safety filtering.
+  See [Infrastructure discovery across profiles](#infrastructure-discovery-across-profiles) for storage index filtering.
   Unknown `--fields` names return `INVALID_INPUT` with available names from the selected response contract.
   Except for `/version`, automatic reads validate field names after target catalogue detection; an explicit `--catalogue` validates them before network access.
 - Provider totals and pagination remain separate from received counts and display truncation.

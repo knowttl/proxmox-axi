@@ -30,10 +30,13 @@ export async function taskOperation(credentials: Credentials, command: string, v
   let status: TaskStatus = 'running'
   let data: unknown
   do {
+    const remaining = deadline - performance.now()
     try {
-      data = await executeRead(credentials, path, false, command === 'wait' ? Math.max(1, Math.min(5000, deadline - performance.now())) : 5000)
+      data = await executeRead(credentials, path, false, command === 'wait' ? Math.max(1, Math.min(5000, remaining)) : 5000)
     } catch (error) {
-      if (command === 'wait' && data !== undefined && error instanceof Failure && error.code === 'TIMEOUT' && performance.now() >= deadline) break
+      // The final request can time out before the clock crosses a fractional deadline.
+      if (command === 'wait' && data !== undefined && error instanceof Failure && error.code === 'TIMEOUT' &&
+        (remaining <= 5000 || performance.now() >= deadline)) break
       throw error
     }
     validateResponse(data, contract.returns)

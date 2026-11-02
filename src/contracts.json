@@ -22122,12 +22122,12 @@
       "id": "OP-GET-46dcf2bd2a",
       "release": "legacy-8.2.7",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "read",
+        "transport": "json",
+        "secrets": "none",
+        "reason": "Suggest or check an available VMID at read time; does not reserve an ID."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "get",
         "/cluster/nextid"
@@ -34242,12 +34242,12 @@
       "id": "OP-GET-907218e704",
       "release": "legacy-8.2.7",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "read",
+        "transport": "json",
+        "secrets": "none",
+        "reason": "Cluster membership and quorum status only; no membership or quorum changes."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "get",
         "/cluster/status"
@@ -93051,12 +93051,12 @@
       "id": "OP-GET-565126bd4f",
       "release": "legacy-8.2.7",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "read",
+        "transport": "json",
+        "secrets": "none",
+        "reason": "Node CPU, memory, filesystem and boot metrics; no node lifecycle control."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "get",
         "/nodes/{node}/status"
@@ -95760,12 +95760,12 @@
       "id": "OP-GET-a514de012d",
       "release": "legacy-8.2.7",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "read",
+        "transport": "json",
+        "secrets": "none",
+        "reason": "Storage accessibility, content types and capacity metrics; no backend configuration or credentials."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "get",
         "/nodes/{node}/storage/{storage}/status"
@@ -100051,12 +100051,12 @@
       "id": "OP-GET-f7213ba3fc",
       "release": "legacy-8.2.7",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "read",
+        "transport": "json",
+        "secrets": "none",
+        "reason": "Permission-filtered storage index; runtime returns storage identifiers only, excluding backend configuration even with full output."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "get",
         "/storage"
@@ -127762,12 +127762,12 @@
       "id": "OP-GET-46dcf2bd2a",
       "release": "published-current",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "read",
+        "transport": "json",
+        "secrets": "none",
+        "reason": "Suggest or check an available VMID at read time; does not reserve an ID."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "get",
         "/cluster/nextid"
@@ -150811,12 +150811,12 @@
       "id": "OP-GET-907218e704",
       "release": "published-current",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "read",
+        "transport": "json",
+        "secrets": "none",
+        "reason": "Cluster membership and quorum status only; no membership or quorum changes."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "get",
         "/cluster/status"
@@ -212865,12 +212865,12 @@
       "id": "OP-GET-565126bd4f",
       "release": "published-current",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "read",
+        "transport": "json",
+        "secrets": "none",
+        "reason": "Node CPU, memory, filesystem and boot metrics; no node lifecycle control."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "get",
         "/nodes/{node}/status"
@@ -215924,12 +215924,12 @@
       "id": "OP-GET-a514de012d",
       "release": "published-current",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "read",
+        "transport": "json",
+        "secrets": "none",
+        "reason": "Storage accessibility, content types and capacity metrics; no backend configuration or credentials."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "get",
         "/nodes/{node}/storage/{storage}/status"
@@ -220183,12 +220183,12 @@
       "id": "OP-GET-f7213ba3fc",
       "release": "published-current",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "read",
+        "transport": "json",
+        "secrets": "none",
+        "reason": "Permission-filtered storage index; runtime returns storage identifiers only, excluding backend configuration even with full output."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "get",
         "/storage"

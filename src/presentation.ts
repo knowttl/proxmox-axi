@@ -5,7 +5,8 @@ export function presentRead(result: { data: unknown, visibility?: string, provid
   if (!Array.isArray(result.data)) return result
   const received = result.data.length
   const rows = result.data.slice(0, options.full ? received : options.limit)
-  const defaults = path.endsWith('/log') ? ['n', 't'] : path.endsWith('/tasks') ? ['upid', 'type', 'status'] :
+  const defaults = path === '/cluster/status' ? ['id', 'name', 'type', 'online', 'quorate'] :
+    path.endsWith('/log') ? ['n', 't'] : path.endsWith('/tasks') ? ['upid', 'type', 'status'] :
     path.endsWith('/storage') ? ['storage', 'type', 'active', 'avail'] : path.endsWith('/nodes') ? ['node', 'status', 'maxcpu'] :
       path === '/cluster/resources' ? ['id', 'type', 'status', 'name'] : ['vmid', 'name', 'status']
   const fields = options.fields ?? defaults
