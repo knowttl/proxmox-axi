@@ -266,7 +266,12 @@ export async function main(args: string[]): Promise<void> {
       }
       throw new Failure('CONTRACT_UNRESOLVED', 'Operation is not admitted by the reviewed policy.', 'Inspect the operation schema and policy before requesting admission.')
     }
-    if (contract && contract.policy.effect === 'read') buildPath(contract, values)
+    if (contract && contract.policy.effect === 'read') {
+      buildPath(contract, values)
+      if (!transferring && contract.path === '/nodes/{node}/tasks/{upid}/log' && values.download === true) {
+        throw new Failure('INVALID_INPUT', 'Task-log download mode requires a private text transfer.', 'Use proxmox-axi transfer --help for private task-log downloads.', 2)
+      }
+    }
     credentials = await resolveCredentials({ ...(options['--config'] ? { config: options['--config'] } : {}),
       verifyAcl: command === 'auth status' || command === 'doctor',
       ...(options['--profile'] ? { profile: options['--profile'] } : {}) })
