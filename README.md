@@ -383,4 +383,4 @@ No `SECURITY.md` ships yet; this is pending.
 
 ## License
 
-No `LICENSE` file ships yet; this is pending.
+Released under the [MIT License](LICENSE).
