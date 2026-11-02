@@ -1507,7 +1507,6 @@
         "limit": "value",
         "fields": "value",
         "full": "boolean",
-        "api-download": "value",
         "api-limit": "value",
         "api-node": "value",
         "api-start": "value",
@@ -1533,7 +1532,9 @@
       "flags": {
         "help": "boolean",
         "format": "value",
-        "catalogue": "value"
+        "catalogue": "value",
+        "full": "boolean",
+        "limit": "value"
       }
     },
     {
@@ -7926,7 +7927,6 @@
         "fields": "value",
         "full": "boolean",
         "session": "value",
-        "api-download": "value",
         "api-limit": "value",
         "api-node": "value",
         "api-start": "value",

@@ -156,7 +156,7 @@ export async function main(args: string[]): Promise<void> {
     if (fields?.some(field => !/^[a-zA-Z0-9_-]+$/.test(field))) throw usage('Fields must be comma-separated field names.')
     if (options.help && (['inventory', 'schema', 'config path', 'profile list', 'doctor', 'auth status'].includes(command) || positional[0] === 'schema')) {
       const usages: Record<string, string> = {
-        inventory: 'inventory [--catalogue <release>] [--format toon|json]',
+        inventory: 'inventory [--catalogue <release>] [--limit <1-1000>|--full] [--format toon|json]',
         schema: 'schema <method> <template> [--catalogue <release>] [--format toon|json]',
         'config path': 'config path [--config <absolute-path>] [--format toon|json]',
         'profile list': 'profile list [--config <absolute-path>] [--format toon|json]',
@@ -165,7 +165,8 @@ export async function main(args: string[]): Promise<void> {
       }
       const key = positional[0] === 'schema' ? 'schema' : command
       const names = ['--format', '--help', ...(['inventory', 'schema'].includes(key) ? ['--catalogue', '--config'] :
-        ['doctor', 'auth status'].includes(key) ? ['--config', '--profile', '--session'] : ['--config'])]
+        ['doctor', 'auth status'].includes(key) ? ['--config', '--profile', '--session'] : ['--config']),
+        ...(key === 'inventory' ? ['--limit', '--full'] : [])]
       if (Object.keys(options).some(option => option !== 'help' && !names.includes(option))) throw usage(`Valid flags: ${names.join(', ')}.`)
       output({ purpose: key === 'doctor' ? 'Check private-file protection and perform one bounded version read.' : `Inspect ${key}.`,
         usage: `proxmox-axi ${usages[key]}`, examples: key === 'schema' ? ['proxmox-axi schema get /version', 'proxmox-axi schema get /nodes --catalogue published-current'] :
@@ -316,8 +317,7 @@ export async function main(args: string[]): Promise<void> {
     } else {
       const selected = contract ?? selectContract('GET', '/version', release)
       const result = await readOperation(credentials, selected, values, options['--catalogue'], fields)
-      const nextOptions = ['--config', '--profile', '--catalogue'].filter(key => options[key]).map(key => `${key} ${JSON.stringify(options[key])}`).join(' ')
-      const next = `proxmox-axi schema get ${selected.path} ${nextOptions}`.trim()
+      const next = `proxmox-axi schema get ${selected.path} --catalogue ${options['--catalogue'] ?? result.compatibility?.catalogue ?? selected.release}`
       const safeData = presentRead({ ...result, data: credentials.results.sanitize(result.data),
         ...(result.compatibility ? { compatibility: { ...result.compatibility, version: credentials.results.redact(result.compatibility.version) } } : {}) },
         selected.path, { limit, full: !!options['--full'], ...(fields ? { fields } : {}), next }) as Record<string, unknown>

@@ -31,6 +31,9 @@ export async function readOperation(credentials: Credentials, initial: Contract,
   if (initial.policy.effect !== 'read') throw new Failure('WRITE_DISABLED', 'Operation requires the write execution policy.', 'Use create, set or delete with a preview and exact confirmation.')
   // Validate before any version or permission request.
   buildPath(initial, values)
+  if (initial.path === '/nodes/{node}/tasks/{upid}/log' && values.download === true) {
+    throw new Failure('INVALID_INPUT', 'Task-log download mode requires a private text transfer.', 'Use proxmox-axi transfer --help for private task-log downloads.', 2)
+  }
   let selected = initial
   let compatibility: ReturnType<typeof capability> | undefined
   if (!explicitCatalogue && initial.path !== '/version') {

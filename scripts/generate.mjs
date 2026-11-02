@@ -132,8 +132,9 @@ const outputs = {
     { command: 'ls', effect: 'read', flags: { help: 'boolean', format: 'value', session: 'value', limit: 'value', fields: 'value', full: 'boolean' } },
     ...contracts.filter(operation => operation.release === 'published-current' && operation.callable && operation.policy.transport === 'json' && operation.policy.effect === 'read' && operation.returns.type === 'array').map(operation => ({
       command: `ls ${operation.path}`, effect: 'read', flags: { help: 'boolean', format: 'value', session: 'value', limit: 'value', fields: 'value', full: 'boolean',
-        ...Object.fromEntries(Object.keys(operation.parameters.properties ?? {}).map(name => [`api-${name}`, 'value'])) } })),
-    { command: 'inventory', effect: 'read', flags: { help: 'boolean', format: 'value', catalogue: 'value' } },
+        ...Object.fromEntries(Object.keys(operation.parameters.properties ?? {}).filter(name =>
+          operation.path !== '/nodes/{node}/tasks/{upid}/log' || name !== 'download').map(name => [`api-${name}`, 'value'])) } })),
+    { command: 'inventory', effect: 'read', flags: { help: 'boolean', format: 'value', catalogue: 'value', full: 'boolean', limit: 'value' } },
     ...[...keys].sort().map(key => {
       const operation = contracts.find(operation => routeKey(operation) === key)
       return { command: `schema ${operation.method.toLowerCase()} ${operation.path}`, effect: 'read', flags: { help: 'boolean', format: 'value', catalogue: 'value' } }
@@ -141,7 +142,8 @@ const outputs = {
     ...[...keys].sort().flatMap(key => {
     const variants = contracts.filter(operation => routeKey(operation) === key && operation.callable && operation.policy.transport === 'json' && operation.policy.effect === 'read')
     if (!variants.length) return []
-    const flags = Object.fromEntries([...new Set(variants.flatMap(operation => Object.keys(operation.parameters.properties ?? {})))].map(name => [`api-${name}`, 'value']))
+    const flags = Object.fromEntries([...new Set(variants.flatMap(operation => Object.keys(operation.parameters.properties ?? {})))].filter(name =>
+      variants[0].path !== '/nodes/{node}/tasks/{upid}/log' || name !== 'download').map(name => [`api-${name}`, 'value']))
     return [{ command: variants[0].command.join(' '), operationId: variants[0].id, method: variants[0].method, path: variants[0].path, effect: 'read', flags: { help: 'boolean', format: 'value', catalogue: 'value', limit: 'value', fields: 'value', full: 'boolean', session: 'value', ...flags },
       catalogues: variants.map(operation => operation.release) }]
   })] },

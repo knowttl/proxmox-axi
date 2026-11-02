@@ -457,7 +457,8 @@ async function verify(values, prepared, scratch) {
       for (const route of routeCases(catalogues, operationPolicy)) {
         const args = hosted ? ['proxmox-axi', ...route.args] : route.args
         const identity = hosted ? 'hosted-canary' : 'environment-canary'
-        const expected = route.callable ? route.operation.path === '/version' ?
+        const callable = route.callable && !(hosted && route.operation.path === '/nodes/{node}/tasks/{upid}/log' && Object.hasOwn(route.values, 'download'))
+        const expected = callable ? route.operation.path === '/version' ?
           { exitCode: 0, requests: 1, version: true, identity } :
           { exitCode: 0, requests: 1, path: route.expectedPath, data: route.response, identity } :
           { exitCode: hosted || route.managed ? 2 : 1, requests: 0, error: hosted || route.managed ? 'INVALID_INPUT' : route.reviewedWrite ? 'WRITE_DISABLED' : 'CONTRACT_UNRESOLVED', hostBoundary: hosted }
@@ -465,7 +466,7 @@ async function verify(values, prepared, scratch) {
           route.operation.path === '/version' ? success : { httpStatus: 200, body: { data: route.response } }, entry)
         await runCase(`${hosted ? 'artium' : 'standalone'}/contract/${route.id}/invalid`, [...args, '--api-constructor', 'invalid'], environment,
           { exitCode: 2, requests: 0, error: 'INVALID_INPUT', hostBoundary: hosted }, success, entry)
-        coverage[route.callable ? 'admitted' : 'denied']++
+        coverage[callable ? 'admitted' : 'denied']++
       }
       return coverage
     }

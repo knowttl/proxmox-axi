@@ -37,6 +37,7 @@ export function* routeCases(catalogues, policy) {
       else if (schema.type === 'integer') variants.push({ branch: `${name}=minimum`, values: { ...values, [name]: schema.minimum ?? 1 } })
     }
     for (const variant of variants) {
+      const taskLogDownload = operation.method === 'GET' && operation.path === '/nodes/{node}/tasks/{upid}/log' && variant.values.download === true
       const args = [operation.method.toLowerCase(), operation.path, '--catalogue', catalogue.release, '--format', 'json', ...(reviewedWrite ? [] : ['--full'])]
       const response = operation.path.endsWith('/version') ? { version: '8.2.7', release: '8.2', repoid: '3e0176e6bb2ade3b' } : responseFixture(operation.returns ?? {})
       if (callable) for (const [name, value] of Object.entries(variant.values)) args.push(`--api-${name}`, String(value))
@@ -48,8 +49,8 @@ export function* routeCases(catalogues, policy) {
         if (path.includes(placeholder)) path = path.replace(placeholder, encoded)
         else query.push(`${encodeURIComponent(name)}=${encodeURIComponent(typeof value === 'boolean' ? (value ? '1' : '0') : String(value))}`)
       }
-      yield { id: `${catalogue.release}/${routeKey(operation)}/${variant.branch}`, operation, release: catalogue.release, callable, reviewedWrite,
-        managed: reviewWrite(operation)?.transport === 'managed', args,
+      yield { id: `${catalogue.release}/${routeKey(operation)}/${variant.branch}`, operation, release: catalogue.release, callable: callable && !taskLogDownload, reviewedWrite,
+        managed: taskLogDownload || reviewWrite(operation)?.transport === 'managed', args,
         values: variant.values,
         response,
         expectedPath: `/api2/json${path}${query.length ? `?${query.join('&')}` : ''}` }
