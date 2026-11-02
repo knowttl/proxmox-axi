@@ -1,8 +1,8 @@
 import assert from 'node:assert/strict'
 import { execFile } from 'node:child_process'
-import { mkdtemp, readFile, readdir, rm, unlink, writeFile } from 'node:fs/promises'
+import { cp, mkdtemp, readFile, readdir, realpath, rm, unlink, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
-import { join } from 'node:path'
+import { dirname, isAbsolute, join, resolve, sep } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { promisify } from 'node:util'
 import test from 'node:test'
@@ -40,19 +40,32 @@ test('packed package installs offline and exposes the CLI and admission contract
       return path.slice('package/'.length)
     })
     const licenses = (await readdir(root)).filter(path => /^(?:LICENSE|LICENCE|NOTICE|THIRD_PARTY_NOTICES)(?:\.|$)|-LICENSE\.txt$/i.test(path))
-    for (const required of ['package.json', 'README.md', 'skills/proxmox-axi/SKILL.md', ...licenses, ...Object.values(manifest.bin),
+    for (const required of ['package.json', 'README.md', 'skills/proxmox-axi/SKILL.md', 'skills/proxmox-axi/references/guest-management.md', ...licenses, ...Object.values(manifest.bin),
       ...modules.map(name => `dist/${name}.js`), ...data]) assert.ok(files.includes(required), `missing ${required}`)
     const allowedRoot = new Set(['package.json', 'README.md', ...licenses, ...data.filter(path => !path.includes('/')),
       'inventory.json', 'catalogue-diff.json', 'help.json'])
     for (const path of files) {
       assert.ok(allowedRoot.has(path) || path === 'bin/proxmox-axi.mjs' || path === 'docs/s4-contract.md' ||
-        path === 'docs/s5-contract.md' || path === 'skills/proxmox-axi/SKILL.md' || /^dist\/[a-z][a-z-]*(?:\.js|\.d\.ts|\.json)$/.test(path), `unexpected published file: ${path}`)
+        path === 'docs/s5-contract.md' || path === 'skills/proxmox-axi/SKILL.md' || /^skills\/proxmox-axi\/references\/[a-z-]+\.md$/.test(path) || /^dist\/[a-z][a-z-]*(?:\.js|\.d\.ts|\.json)$/.test(path), `unexpected published file: ${path}`)
       assert.doesNotMatch(path, /(?:^|\/)(?:test|tests|node_modules|src)(?:\/|$)|\.map$|\.test\./)
     }
     await writeFile(join(scratch, 'package.json'), JSON.stringify({ private: true, type: 'module',
       dependencies: { [manifest.name]: `file:${tarball}` }, pnpm: manifest.pnpm }))
     await run('pnpm', ['install', '--offline', '--prod', '--ignore-scripts', '--lockfile=false'])
     const installed = join(scratch, 'node_modules', manifest.name)
+    // Folder-only skill installation must not depend on package-root docs.
+    const skill = join(scratch, 'copied-skill')
+    await cp(join(installed, 'skills/proxmox-axi'), skill, { recursive: true })
+    const skillRoot = await realpath(skill)
+    for (const file of (await readdir(skill, { recursive: true })).filter(file => file.endsWith('.md'))) {
+      const source = join(skill, file)
+      const markdown = await readFile(source, 'utf8')
+      for (const [, link] of markdown.matchAll(/\[[^\]]*\]\(([^)]+)\)/g)) {
+        assert.ok(link && !isAbsolute(link) && !/^[a-z][a-z\d+.-]*:/i.test(link), `nonlocal skill link: ${link}`)
+        const target = await realpath(resolve(dirname(source), decodeURIComponent(link.split('#')[0] || '.')))
+        assert.ok(target === skillRoot || target.startsWith(skillRoot + sep), `skill link escapes folder: ${link}`)
+      }
+    }
     const published = JSON.parse(await readFile(join(installed, 'package.json'), 'utf8')) as typeof manifest
     assert.equal(published.name, '@knowttl/proxmox-axi')
     assert.equal(published.version, manifest.version)

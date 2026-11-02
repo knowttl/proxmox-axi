@@ -38,6 +38,8 @@ async function invocation(credentials: Credentials, contract: Contract, input: R
   const revisions: unknown[] = []
   for (const [name, value] of Object.entries(values)) {
     if (contract.policy.allowedInputs && !contract.policy.allowedInputs.includes(name)) throw new Failure('CONTRACT_UNRESOLVED', 'Supplied parameter branch has not been admitted.', 'Inspect the operation policy and use reviewed branches only.')
+    const pattern = contract.policy.inputPatterns?.[name]
+    if (pattern && (typeof value !== 'string' || !new RegExp(pattern).test(value))) throw new Failure('INVALID_INPUT', 'Input is outside the reviewed operation constraints.', 'Inspect the invocation schema for admitted values.', 2)
     if (!contract.policy.sensitiveInputs?.includes(name)) continue
     if (!value || typeof value !== 'object' || Array.isArray(value) || Object.keys(value).length !== 1) throw new Failure('INVALID_INPUT', 'Sensitive inputs require one env or file SecretRef.', 'Use --body-file with protected references.', 2)
     const ref = value as Record<string, unknown>

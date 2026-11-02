@@ -4056,8 +4056,75 @@
       "method": "PUT",
       "path": "/nodes/{node}/lxc/{vmid}/resize",
       "release": "legacy-8.2.7",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/391"
+      "admitted": true,
+      "contract": "dist/contracts.json#/contracts/391",
+      "policy": {
+        "effect": "write",
+        "transport": "json",
+        "secrets": "none",
+        "allowedInputs": [
+          "node",
+          "vmid",
+          "disk",
+          "size",
+          "digest"
+        ],
+        "inputPatterns": {
+          "size": "^\\+(?:[1-9][0-9]*(?:\\.[0-9]+)?|0\\.[0-9]*[1-9][0-9]*)[KMGT]$"
+        },
+        "reason": "Confirmed positive relative disk growth only; absolute sizes, shrink and lock bypass remain refused.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Track the returned UPID; never repeat relative growth after uncertain delivery."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/vms/{vmid}",
+            [
+              "VM.Config.Disk"
+            ],
+            "any",
+            1
+          ]
+        },
+        "response": {
+          "description": "the task ID.",
+          "type": "string"
+        },
+        "source": "Pinned vendor resize schemas; supported growth only."
+      },
+      "inputs": [
+        {
+          "name": "digest",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "disk",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "node",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "size",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "vmid",
+          "admitted": true,
+          "sensitive": false
+        }
+      ],
+      "results": {
+        "type": "string",
+        "handling": "public metadata; protected inputs excluded"
+      }
     },
     {
       "id": "OP-GET-7ebdcfff82",
@@ -5975,8 +6042,79 @@
       "method": "PUT",
       "path": "/nodes/{node}/qemu/{vmid}/resize",
       "release": "legacy-8.2.7",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/493"
+      "admitted": true,
+      "contract": "dist/contracts.json#/contracts/493",
+      "policy": {
+        "effect": "write",
+        "transport": "json",
+        "secrets": "none",
+        "allowedInputs": [
+          "node",
+          "vmid",
+          "disk",
+          "size",
+          "digest"
+        ],
+        "inputPatterns": {
+          "size": "^\\+(?:[1-9][0-9]*(?:\\.[0-9]+)?|0\\.[0-9]*[1-9][0-9]*)[KMGT]$",
+          "disk": "^(?:ide[0-3]|sata[0-5]|scsi(?:[0-9]|[12][0-9]|30)|virtio(?:[0-9]|1[0-5]))$"
+        },
+        "reason": "Confirmed positive relative disk growth only; absolute sizes, shrink and lock bypass remain refused.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Track the returned UPID; never repeat relative growth after uncertain delivery."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/vms/{vmid}",
+            [
+              "VM.Config.Disk"
+            ]
+          ]
+        },
+        "response": {
+          "description": "the task ID.",
+          "type": "string"
+        },
+        "source": "Pinned vendor resize schemas; supported growth only."
+      },
+      "inputs": [
+        {
+          "name": "digest",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "disk",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "node",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "size",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "skiplock",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "vmid",
+          "admitted": true,
+          "sensitive": false
+        }
+      ],
+      "results": {
+        "type": "string",
+        "handling": "public metadata; protected inputs excluded"
+      }
     },
     {
       "id": "OP-GET-635c61d304",
@@ -12602,8 +12740,75 @@
       "method": "PUT",
       "path": "/nodes/{node}/lxc/{vmid}/resize",
       "release": "published-current",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/1060"
+      "admitted": true,
+      "contract": "dist/contracts.json#/contracts/1060",
+      "policy": {
+        "effect": "write",
+        "transport": "json",
+        "secrets": "none",
+        "allowedInputs": [
+          "node",
+          "vmid",
+          "disk",
+          "size",
+          "digest"
+        ],
+        "inputPatterns": {
+          "size": "^\\+(?:[1-9][0-9]*(?:\\.[0-9]+)?|0\\.[0-9]*[1-9][0-9]*)[KMGT]$"
+        },
+        "reason": "Confirmed positive relative disk growth only; absolute sizes, shrink and lock bypass remain refused.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Track the returned UPID; never repeat relative growth after uncertain delivery."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/vms/{vmid}",
+            [
+              "VM.Config.Disk"
+            ],
+            "any",
+            1
+          ]
+        },
+        "response": {
+          "description": "the task ID.",
+          "type": "string"
+        },
+        "source": "Pinned vendor resize schemas; supported growth only."
+      },
+      "inputs": [
+        {
+          "name": "digest",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "disk",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "node",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "size",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "vmid",
+          "admitted": true,
+          "sensitive": false
+        }
+      ],
+      "results": {
+        "type": "string",
+        "handling": "public metadata; protected inputs excluded"
+      }
     },
     {
       "id": "OP-GET-7ebdcfff82",
@@ -14544,8 +14749,79 @@
       "method": "PUT",
       "path": "/nodes/{node}/qemu/{vmid}/resize",
       "release": "published-current",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/1163"
+      "admitted": true,
+      "contract": "dist/contracts.json#/contracts/1163",
+      "policy": {
+        "effect": "write",
+        "transport": "json",
+        "secrets": "none",
+        "allowedInputs": [
+          "node",
+          "vmid",
+          "disk",
+          "size",
+          "digest"
+        ],
+        "inputPatterns": {
+          "size": "^\\+(?:[1-9][0-9]*(?:\\.[0-9]+)?|0\\.[0-9]*[1-9][0-9]*)[KMGT]$",
+          "disk": "^(?:ide[0-3]|sata[0-5]|scsi(?:[0-9]|[12][0-9]|30)|virtio(?:[0-9]|1[0-5]))$"
+        },
+        "reason": "Confirmed positive relative disk growth only; absolute sizes, shrink and lock bypass remain refused.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Track the returned UPID; never repeat relative growth after uncertain delivery."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/vms/{vmid}",
+            [
+              "VM.Config.Disk"
+            ]
+          ]
+        },
+        "response": {
+          "description": "the task ID.",
+          "type": "string"
+        },
+        "source": "Pinned vendor resize schemas; supported growth only."
+      },
+      "inputs": [
+        {
+          "name": "digest",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "disk",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "node",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "size",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "skiplock",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "vmid",
+          "admitted": true,
+          "sensitive": false
+        }
+      ],
+      "results": {
+        "type": "string",
+        "handling": "public metadata; protected inputs excluded"
+      }
     },
     {
       "id": "OP-GET-635c61d304",

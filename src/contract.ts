@@ -32,7 +32,7 @@ export interface Contract {
   parameters: VendorSchema
   returns: VendorSchema
   policy: { effect: string, transport: string, secrets: string, reason: string,
-    allowedInputs?: string[], sensitiveInputs?: string[], reconciliation?: { kind: string, path?: string, reason: string } }
+    allowedInputs?: string[], sensitiveInputs?: string[], inputPatterns?: Record<string, string>, reconciliation?: { kind: string, path?: string, reason: string } }
   invocation: unknown
 }
 export const contracts: Contract[] = JSON.parse(readFileSync(new URL('./contracts.json', import.meta.url), 'utf8')).contracts

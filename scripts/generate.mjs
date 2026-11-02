@@ -54,7 +54,14 @@ const contracts = catalogues.flatMap(catalogue => catalogue.operations.map(opera
   const review = policy.reviewed[routeKey(operation)] ?? reviewWrite(operation) ?? policy.default
   const callable = policy.captureBindings[catalogue.release] === catalogue.captureSha256 && ['read', 'write', 'batch'].includes(review.effect) && ['json', 'managed'].includes(review.transport) && ['none', 'input-refs', 'private-result'].includes(review.secrets)
   const id = operations.find(item => routeKey(item) === routeKey(operation))?.id ?? `OP-${operation.method}-${createHash('sha256').update(routeKey(operation)).digest('hex').slice(0, 10)}`
-  const api = parameterSchema(operation.parameters)
+  const api = parameterSchema({ ...operation.parameters,
+    properties: Object.fromEntries(Object.entries(operation.parameters.properties ?? {}).filter(([name]) =>
+      !review.allowedInputs || review.allowedInputs.includes(name))),
+  })
+  for (const [name, pattern] of Object.entries(review.inputPatterns ?? {})) {
+    if (!api.properties?.[name]) throw new Error('Reviewed constraint names an unknown input')
+    api.properties[name].allOf = [...(api.properties[name].allOf ?? []), { pattern }]
+  }
   for (const name of review.sensitiveInputs ?? []) if (api.properties?.[name]) api.properties[name] = {
     ...JSON.parse(read('src/profile-schema.json')).$defs.secretRef, 'x-secret': true,
   }

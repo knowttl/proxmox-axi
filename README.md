@@ -114,6 +114,8 @@ proxmox-axi duplex create <setup-template> [--api-<parameter> <value>] --preview
 
 Common flags are `--config <absolute-path>`, `--profile <name>`, `--session <id>` and `--format toon|json`.
 Offline `inventory` and `schema` accept `--config` without loading credentials.
+For callable operations, `schema` exposes reviewed inputs and constraints in `invocation.schema`; `parameters` retains the complete vendor schema, including refused inputs.
+Use `invocation.schema` to validate invocation objects shaped as `{ "api": { ... } }`, and check `callable` and `policy` before invoking.
 
 ```sh
 proxmox-axi inventory --catalogue legacy-8.2.7 --format json
@@ -222,13 +224,29 @@ proxmox-axi set '/nodes/{node}/lxc/{vmid}/config' --api-node '<node>' --api-vmid
 Repeat the exact selected command with `--confirm '<confirmation>'` after inspecting its preview.
 Hardware passthrough, executable hooks and other unreviewed configuration branches remain refused.
 
+### Grow a guest disk
+
+Both guests support confirmed `set '/nodes/{node}/qemu/{vmid}/resize'` or the LXC equivalent.
+Supply an ordinary QEMU disk selector (`ide0` through `ide3`, `sata0` through `sata5`, `scsi0` through `scsi30`, or `virtio0` through `virtio15`) or an LXC `rootfs`/mount-point selector from the selected catalogue.
+Only positive relative increments with explicit uppercase `K`, `M`, `G` or `T` units are admitted; absolute targets, shrink, zero, lock bypass and EFI/TPM selectors remain refused.
+Pass the private configuration digest when available to detect concurrent changes.
+
+```sh
+proxmox-axi set '/nodes/{node}/qemu/{vmid}/resize' --api-node '<node>' --api-vmid 100 --api-disk scsi0 --api-size '+8G' --profile lab --preview
+```
+
+Repeat the exact command with `--confirm '<confirmation>'`, then use `task wait` with the returned node, UPID and journal ID.
+An accepted task does not prove completion or that the guest partition/filesystem expanded.
+If delivery is uncertain, inspect the journal/task instead of repeating relative growth, which could add capacity twice.
+Disk attachment changes remain refused pending their separate admission review.
+
 ## Safety
 
 - Ordinary JSON reads use trusted HTTPS, a five-second total deadline and a 64 KiB response bound, and reject redirects.
   Managed transfers have separate administrator-controlled byte and elapsed limits.
 - Operations whose effects, transport or secret handling are not reviewed remain discoverable but uncallable.
   Unresolved policy fields deny invocation, and changing a capture never admits new operations automatically.
-- Writes cover guest power operations, guest destruction, [selected guest configuration settings](#guest-configuration-and-compute-settings), pool management, task cancellation, node execute batches, storage uploads and the reviewed credential/session setup operations.
+- Writes cover guest power operations, guest destruction, [selected guest configuration settings](#guest-configuration-and-compute-settings), growth-only guest disk resize, pool management, task cancellation, node execute batches, storage uploads and the reviewed credential/session setup operations.
   Effectful CIFS/PBS scans use the same preview and confirmation policy even though their vendor method is GET.
 - Inspect `schema create|set|delete <template>` and the generated `write-policy.json` before enabling an operation.
 - Enable an operation by adding its ID to the selected file profile: `writes: { "operations": ["<operation-id>"] }`.
