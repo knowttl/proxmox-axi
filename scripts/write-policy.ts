@@ -51,14 +51,14 @@ export function reviewWrite(operation: Operation) {
     batch || cancel)
   if (!admitted) return undefined
   // Configuration has credentials, hardware passthrough and executable hooks.
-  // Only these ordinary scalar branches have been positively reviewed for S3.
-  const allowedInputs = config ? ['node', 'vmid', 'description', 'name', 'hostname', 'memory', 'cores', 'onboot', 'digest', 'cipassword', 'password'] :
+  // Compute settings admit scalar values and narrowly reviewed property strings only.
+  const allowedInputs = config ? ['node', 'vmid', 'description', 'name', 'hostname', 'memory', 'cores', 'sockets', 'vcpus', 'balloon', 'swap', 'cpu', 'cpulimit', 'cpuunits', 'onboot', 'startup', 'digest', 'cipassword', 'password'] :
     lifecyclePath ? ['node', 'vmid', 'timeout', 'forceStop', 'keepActive', 'skiplock', 'todisk'] :
     guest ? ['node', 'vmid', 'purge', 'destroy-unreferenced-disks', 'force'] : undefined
   return { effect: batch ? 'batch' : 'write', transport: 'json', secrets: config ? 'input-refs' : 'none',
     reason: batch ? 'Vendor execute resolves each ordered node-relative child and reports per-child status; no atomicity.' :
       cancel ? 'Stop an existing UPID; cancellation is a separately confirmed mutation.' :
-      config ? 'Reviewed scalar configuration branches only; credential fields require SecretRefs. Other supplied branches stay refused.' :
+      config ? 'Reviewed compute and startup branches only; CPU feature overrides and host passthrough remain refused, and credential fields require SecretRefs.' :
       lifecyclePath ? 'Guest power-state operation, asynchronous UPID acceptance does not prove completion.' :
       guest ? 'Destroy guest; absence or filtered inventory cannot prove the outcome.' : 'Pool configuration and membership mutation; no automatic retry.',
     allowedInputs, sensitiveInputs: config ? ['cipassword', 'password'] : [],

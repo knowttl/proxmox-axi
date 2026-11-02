@@ -2,6 +2,7 @@ import { readFileSync, writeFileSync } from 'node:fs'
 import { createHash } from 'node:crypto'
 import { captures, replay, routeKey, compareCatalogues } from './catalogue.mjs'
 import { reviewWrite } from './write-policy.ts'
+import { propertyFormatPattern } from '../src/property-format.ts'
 
 const root = new URL('../', import.meta.url)
 const read = path => readFileSync(new URL(path, root), 'utf8')
@@ -26,7 +27,7 @@ function parameterSchema(vendor = {}) {
     result.pattern = `^(?:${pattern})$`
   }
   if (vendor.format) {
-    const pattern = vendor.format === 'pve-command-batch' ? '^[\\s\\S]{1,32768}$' : typeof vendor.format === 'string' ? constraints.formats[vendor.format] : undefined
+    const pattern = vendor.format === 'pve-command-batch' ? '^[\\s\\S]{1,32768}$' : typeof vendor.format === 'string' ? constraints.formats[vendor.format] : propertyFormatPattern(vendor.format)
     if (!pattern) return unresolved('vendor format or property string')
     if (result.pattern) result.allOf = [{ pattern }]
     else result.pattern = pattern
@@ -131,7 +132,7 @@ const outputs = {
     ...['profile list', 'config path', 'help'].map(command => ({ command, effect: 'read', flags: { help: 'boolean', format: 'value' } })),
     { command: 'ls', effect: 'read', flags: { help: 'boolean', format: 'value', session: 'value', limit: 'value', fields: 'value', full: 'boolean' } },
     ...contracts.filter(operation => operation.release === 'published-current' && operation.callable && operation.policy.transport === 'json' && operation.policy.effect === 'read' && operation.returns.type === 'array').map(operation => ({
-      command: `ls ${operation.path}`, effect: 'read', flags: { help: 'boolean', format: 'value', session: 'value', limit: 'value', fields: 'value', full: 'boolean',
+      command: `ls ${operation.path}`, effect: 'read', ...(operation.policy.secrets === 'private-result' ? { privateResult: true } : {}), flags: { help: 'boolean', format: 'value', session: 'value', limit: 'value', fields: 'value', full: 'boolean',
         ...Object.fromEntries(Object.keys(operation.parameters.properties ?? {}).filter(name =>
           operation.path !== '/nodes/{node}/tasks/{upid}/log' || name !== 'download').map(name => [`api-${name}`, 'value'])) } })),
     { command: 'inventory', effect: 'read', flags: { help: 'boolean', format: 'value', catalogue: 'value', full: 'boolean', limit: 'value' } },
@@ -145,7 +146,7 @@ const outputs = {
     const flags = Object.fromEntries([...new Set(variants.flatMap(operation => Object.keys(operation.parameters.properties ?? {})))].filter(name =>
       variants[0].path !== '/nodes/{node}/tasks/{upid}/log' || name !== 'download').map(name => [`api-${name}`, 'value']))
     return [{ command: variants[0].command.join(' '), operationId: variants[0].id, method: variants[0].method, path: variants[0].path, effect: 'read', flags: { help: 'boolean', format: 'value', catalogue: 'value', limit: 'value', fields: 'value', full: 'boolean', session: 'value', ...flags },
-      catalogues: variants.map(operation => operation.release) }]
+      ...(variants[0].policy.secrets === 'private-result' ? { privateResult: true } : {}), catalogues: variants.map(operation => operation.release) }]
   })] },
 }
 for (const [path, value] of Object.entries(outputs)) {

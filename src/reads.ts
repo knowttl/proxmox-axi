@@ -2,6 +2,7 @@ import type { Credentials } from './credentials.js'
 import { buildPath, contracts, selectContract, validateResponse, type Contract } from './contract.js'
 import { executeRead, readVersion } from './transport.js'
 import { Failure } from './errors.js'
+import { resultBinding } from './private-results.js'
 
 export function capability(version: string) {
   const major = Number(/^(\d+)\./.exec(version)?.[1])
@@ -31,6 +32,8 @@ export async function readOperation(credentials: Credentials, initial: Contract,
   if (initial.policy.effect !== 'read') throw new Failure('WRITE_DISABLED', 'Operation requires the write execution policy.', 'Use create, set or delete with a preview and exact confirmation.')
   // Validate before any version or permission request.
   buildPath(initial, values)
+  const privateResult = initial.policy.secrets === 'private-result'
+  if (privateResult) credentials.results.sink()
   let selected = initial
   let compatibility: ReturnType<typeof capability> | undefined
   if (!explicitCatalogue && initial.path !== '/version') {
@@ -55,6 +58,11 @@ export async function readOperation(credentials: Credentials, initial: Contract,
   }
   const envelope = await executeRead(credentials, buildPath(selected, values), true) as { data: unknown, total?: number }
   validateResponse(envelope.data, selected.returns)
+  if (privateResult) {
+    await credentials.results.deliver(resultBinding(credentials.origin, credentials.tokenId, selected.id,
+      `${selected.release} ${buildPath(selected, values)}`), envelope.data)
+    envelope.data = { privateResult: true }
+  }
   // The storage index can include backend configuration beyond its declared identifier.
   if (selected.path === '/storage') envelope.data = (envelope.data as { storage: string }[]).map(({ storage }) => ({ storage }))
   if (selected.path === '/version' || selected.path === '/nodes/{node}/version') {

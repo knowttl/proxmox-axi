@@ -3495,14 +3495,6 @@
       "contract": "dist/contracts.json#/contracts/357"
     },
     {
-      "id": "OP-GET-7066e6cdde",
-      "method": "GET",
-      "path": "/nodes/{node}/lxc/{vmid}/config",
-      "release": "legacy-8.2.7",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/358"
-    },
-    {
       "id": "OP-PUT-224f55de4f",
       "method": "PUT",
       "path": "/nodes/{node}/lxc/{vmid}/config",
@@ -3513,7 +3505,7 @@
         "effect": "write",
         "transport": "json",
         "secrets": "input-refs",
-        "reason": "Reviewed scalar configuration branches only; credential fields require SecretRefs. Other supplied branches stay refused.",
+        "reason": "Reviewed compute and startup branches only; CPU feature overrides and host passthrough remain refused, and credential fields require SecretRefs.",
         "allowedInputs": [
           "node",
           "vmid",
@@ -3522,7 +3514,15 @@
           "hostname",
           "memory",
           "cores",
+          "sockets",
+          "vcpus",
+          "balloon",
+          "swap",
+          "cpu",
+          "cpulimit",
+          "cpuunits",
           "onboot",
+          "startup",
           "digest",
           "cipassword",
           "password"
@@ -3580,12 +3580,12 @@
         },
         {
           "name": "cpulimit",
-          "admitted": false,
+          "admitted": true,
           "sensitive": false
         },
         {
           "name": "cpuunits",
-          "admitted": false,
+          "admitted": true,
           "sensitive": false
         },
         {
@@ -3690,12 +3690,12 @@
         },
         {
           "name": "startup",
-          "admitted": false,
+          "admitted": true,
           "sensitive": false
         },
         {
           "name": "swap",
-          "admitted": false,
+          "admitted": true,
           "sensitive": false
         },
         {
@@ -4044,14 +4044,6 @@
       "contract": "dist/contracts.json#/contracts/388"
     },
     {
-      "id": "OP-GET-055effe38c",
-      "method": "GET",
-      "path": "/nodes/{node}/lxc/{vmid}/pending",
-      "release": "legacy-8.2.7",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/389"
-    },
-    {
       "id": "OP-POST-1099246fc8",
       "method": "POST",
       "path": "/nodes/{node}/lxc/{vmid}/remote_migrate",
@@ -4208,14 +4200,6 @@
       "release": "legacy-8.2.7",
       "admitted": false,
       "contract": "dist/contracts.json#/contracts/402"
-    },
-    {
-      "id": "OP-GET-3e89cf9759",
-      "method": "GET",
-      "path": "/nodes/{node}/lxc/{vmid}/status/current",
-      "release": "legacy-8.2.7",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/403"
     },
     {
       "id": "OP-POST-2bc4d554ca",
@@ -5157,14 +5141,6 @@
       "contract": "dist/contracts.json#/contracts/457"
     },
     {
-      "id": "OP-GET-c4dfe973bb",
-      "method": "GET",
-      "path": "/nodes/{node}/qemu/{vmid}/config",
-      "release": "legacy-8.2.7",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/458"
-    },
-    {
       "id": "OP-POST-40cb92c83f",
       "method": "POST",
       "path": "/nodes/{node}/qemu/{vmid}/config",
@@ -5183,7 +5159,7 @@
         "effect": "write",
         "transport": "json",
         "secrets": "input-refs",
-        "reason": "Reviewed scalar configuration branches only; credential fields require SecretRefs. Other supplied branches stay refused.",
+        "reason": "Reviewed compute and startup branches only; CPU feature overrides and host passthrough remain refused, and credential fields require SecretRefs.",
         "allowedInputs": [
           "node",
           "vmid",
@@ -5192,7 +5168,15 @@
           "hostname",
           "memory",
           "cores",
+          "sockets",
+          "vcpus",
+          "balloon",
+          "swap",
+          "cpu",
+          "cpulimit",
+          "cpuunits",
           "onboot",
+          "startup",
           "digest",
           "cipassword",
           "password"
@@ -5272,7 +5256,7 @@
         },
         {
           "name": "balloon",
-          "admitted": false,
+          "admitted": true,
           "sensitive": false
         },
         {
@@ -5327,17 +5311,17 @@
         },
         {
           "name": "cpu",
-          "admitted": false,
+          "admitted": true,
           "sensitive": false
         },
         {
           "name": "cpulimit",
-          "admitted": false,
+          "admitted": true,
           "sensitive": false
         },
         {
           "name": "cpuunits",
-          "admitted": false,
+          "admitted": true,
           "sensitive": false
         },
         {
@@ -5562,7 +5546,7 @@
         },
         {
           "name": "sockets",
-          "admitted": false,
+          "admitted": true,
           "sensitive": false
         },
         {
@@ -5582,7 +5566,7 @@
         },
         {
           "name": "startup",
-          "admitted": false,
+          "admitted": true,
           "sensitive": false
         },
         {
@@ -5622,7 +5606,7 @@
         },
         {
           "name": "vcpus",
-          "admitted": false,
+          "admitted": true,
           "sensitive": false
         },
         {
@@ -5979,14 +5963,6 @@
       "contract": "dist/contracts.json#/contracts/490"
     },
     {
-      "id": "OP-GET-95bc0cc390",
-      "method": "GET",
-      "path": "/nodes/{node}/qemu/{vmid}/pending",
-      "release": "legacy-8.2.7",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/491"
-    },
-    {
       "id": "OP-POST-1f65c9980d",
       "method": "POST",
       "path": "/nodes/{node}/qemu/{vmid}/remote_migrate",
@@ -6151,14 +6127,6 @@
       "release": "legacy-8.2.7",
       "admitted": false,
       "contract": "dist/contracts.json#/contracts/505"
-    },
-    {
-      "id": "OP-GET-51ca5330c0",
-      "method": "GET",
-      "path": "/nodes/{node}/qemu/{vmid}/status/current",
-      "release": "legacy-8.2.7",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/506"
     },
     {
       "id": "OP-POST-345014c6ff",
@@ -12055,14 +12023,6 @@
       "contract": "dist/contracts.json#/contracts/1025"
     },
     {
-      "id": "OP-GET-7066e6cdde",
-      "method": "GET",
-      "path": "/nodes/{node}/lxc/{vmid}/config",
-      "release": "published-current",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/1026"
-    },
-    {
       "id": "OP-PUT-224f55de4f",
       "method": "PUT",
       "path": "/nodes/{node}/lxc/{vmid}/config",
@@ -12073,7 +12033,7 @@
         "effect": "write",
         "transport": "json",
         "secrets": "input-refs",
-        "reason": "Reviewed scalar configuration branches only; credential fields require SecretRefs. Other supplied branches stay refused.",
+        "reason": "Reviewed compute and startup branches only; CPU feature overrides and host passthrough remain refused, and credential fields require SecretRefs.",
         "allowedInputs": [
           "node",
           "vmid",
@@ -12082,7 +12042,15 @@
           "hostname",
           "memory",
           "cores",
+          "sockets",
+          "vcpus",
+          "balloon",
+          "swap",
+          "cpu",
+          "cpulimit",
+          "cpuunits",
           "onboot",
+          "startup",
           "digest",
           "cipassword",
           "password"
@@ -12140,12 +12108,12 @@
         },
         {
           "name": "cpulimit",
-          "admitted": false,
+          "admitted": true,
           "sensitive": false
         },
         {
           "name": "cpuunits",
-          "admitted": false,
+          "admitted": true,
           "sensitive": false
         },
         {
@@ -12260,12 +12228,12 @@
         },
         {
           "name": "startup",
-          "admitted": false,
+          "admitted": true,
           "sensitive": false
         },
         {
           "name": "swap",
-          "admitted": false,
+          "admitted": true,
           "sensitive": false
         },
         {
@@ -12622,14 +12590,6 @@
       "contract": "dist/contracts.json#/contracts/1057"
     },
     {
-      "id": "OP-GET-055effe38c",
-      "method": "GET",
-      "path": "/nodes/{node}/lxc/{vmid}/pending",
-      "release": "published-current",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/1058"
-    },
-    {
       "id": "OP-POST-1099246fc8",
       "method": "POST",
       "path": "/nodes/{node}/lxc/{vmid}/remote_migrate",
@@ -12786,14 +12746,6 @@
       "release": "published-current",
       "admitted": false,
       "contract": "dist/contracts.json#/contracts/1071"
-    },
-    {
-      "id": "OP-GET-3e89cf9759",
-      "method": "GET",
-      "path": "/nodes/{node}/lxc/{vmid}/status/current",
-      "release": "published-current",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/1072"
     },
     {
       "id": "OP-POST-2bc4d554ca",
@@ -13740,14 +13692,6 @@
       "contract": "dist/contracts.json#/contracts/1126"
     },
     {
-      "id": "OP-GET-c4dfe973bb",
-      "method": "GET",
-      "path": "/nodes/{node}/qemu/{vmid}/config",
-      "release": "published-current",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/1127"
-    },
-    {
       "id": "OP-POST-40cb92c83f",
       "method": "POST",
       "path": "/nodes/{node}/qemu/{vmid}/config",
@@ -13766,7 +13710,7 @@
         "effect": "write",
         "transport": "json",
         "secrets": "input-refs",
-        "reason": "Reviewed scalar configuration branches only; credential fields require SecretRefs. Other supplied branches stay refused.",
+        "reason": "Reviewed compute and startup branches only; CPU feature overrides and host passthrough remain refused, and credential fields require SecretRefs.",
         "allowedInputs": [
           "node",
           "vmid",
@@ -13775,7 +13719,15 @@
           "hostname",
           "memory",
           "cores",
+          "sockets",
+          "vcpus",
+          "balloon",
+          "swap",
+          "cpu",
+          "cpulimit",
+          "cpuunits",
           "onboot",
+          "startup",
           "digest",
           "cipassword",
           "password"
@@ -13860,7 +13812,7 @@
         },
         {
           "name": "balloon",
-          "admitted": false,
+          "admitted": true,
           "sensitive": false
         },
         {
@@ -13915,17 +13867,17 @@
         },
         {
           "name": "cpu",
-          "admitted": false,
+          "admitted": true,
           "sensitive": false
         },
         {
           "name": "cpulimit",
-          "admitted": false,
+          "admitted": true,
           "sensitive": false
         },
         {
           "name": "cpuunits",
-          "admitted": false,
+          "admitted": true,
           "sensitive": false
         },
         {
@@ -14155,7 +14107,7 @@
         },
         {
           "name": "sockets",
-          "admitted": false,
+          "admitted": true,
           "sensitive": false
         },
         {
@@ -14175,7 +14127,7 @@
         },
         {
           "name": "startup",
-          "admitted": false,
+          "admitted": true,
           "sensitive": false
         },
         {
@@ -14215,7 +14167,7 @@
         },
         {
           "name": "vcpus",
-          "admitted": false,
+          "admitted": true,
           "sensitive": false
         },
         {
@@ -14580,14 +14532,6 @@
       "contract": "dist/contracts.json#/contracts/1160"
     },
     {
-      "id": "OP-GET-95bc0cc390",
-      "method": "GET",
-      "path": "/nodes/{node}/qemu/{vmid}/pending",
-      "release": "published-current",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/1161"
-    },
-    {
       "id": "OP-POST-1f65c9980d",
       "method": "POST",
       "path": "/nodes/{node}/qemu/{vmid}/remote_migrate",
@@ -14752,14 +14696,6 @@
       "release": "published-current",
       "admitted": false,
       "contract": "dist/contracts.json#/contracts/1175"
-    },
-    {
-      "id": "OP-GET-51ca5330c0",
-      "method": "GET",
-      "path": "/nodes/{node}/qemu/{vmid}/status/current",
-      "release": "published-current",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/1176"
     },
     {
       "id": "OP-POST-345014c6ff",

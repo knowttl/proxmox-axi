@@ -458,7 +458,7 @@ async function verify(values, prepared, scratch) {
         const args = hosted ? ['proxmox-axi', ...route.args] : route.args
         const identity = hosted ? 'hosted-canary' : 'environment-canary'
         const callable = route.callable && !(hosted && route.operation.path === '/nodes/{node}/tasks/{upid}/log' && Object.hasOwn(route.values, 'download'))
-        const expected = callable ? route.operation.path === '/version' ?
+        const expected = route.privateResult ? { exitCode: hosted ? 2 : 1, requests: 0, error: hosted ? 'INVALID_INPUT' : 'PRIVATE_SINK_REQUIRED', hostBoundary: hosted } : callable ? route.operation.path === '/version' ?
           { exitCode: 0, requests: 1, version: true, identity } :
           { exitCode: 0, requests: 1, path: route.expectedPath, data: route.response, identity } :
           { exitCode: hosted || route.managed ? 2 : 1, requests: 0, error: hosted || route.managed ? 'INVALID_INPUT' : route.reviewedWrite ? 'WRITE_DISABLED' : 'CONTRACT_UNRESOLVED', hostBoundary: hosted }

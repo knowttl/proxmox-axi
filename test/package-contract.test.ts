@@ -13,7 +13,7 @@ const execute = promisify(execFile)
 const root = fileURLToPath(new URL('../../', import.meta.url))
 // Published modules and data from the admission inventory's pinned sources.
 // redact.js belonged to an older release; redaction now lives in private-results.js.
-const modules = ['cli', 'contract', 'credentials', 'errors', 'journal', 'tasks', 'writes',
+const modules = ['cli', 'contract', 'credentials', 'errors', 'journal', 'tasks', 'writes', 'property-format',
   'presentation', 'private-file', 'reads', 'transport', 'windows-acl']
 const data = ['artium-invocations.json', 'write-policy.json', 'axi-credential.schema.json',
   'dist/contracts.json', 'dist/operation-policy.json', 'dist/operations.json',

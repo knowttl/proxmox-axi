@@ -32694,8 +32694,7 @@
                 },
                 "dnszoneprefix": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^(?=.{1,255}$)[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?(?:\\.[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?)*$"
                 },
                 "gateway": {
                   "type": "string",
@@ -33072,8 +33071,7 @@
                 },
                 "dnszoneprefix": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^(?=.{1,255}$)[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?(?:\\.[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?)*$"
                 },
                 "gateway": {
                   "type": "string",
@@ -33519,8 +33517,7 @@
                 },
                 "dnszone": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^(?=.{1,255}$)[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?(?:\\.[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?)*$"
                 },
                 "dp-id": {
                   "type": "integer"
@@ -34065,8 +34062,7 @@
                 },
                 "dnszone": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^(?=.{1,255}$)[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?(?:\\.[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?)*$"
                 },
                 "dp-id": {
                   "type": "integer"
@@ -48617,8 +48613,7 @@
                 "hostname": {
                   "type": "string",
                   "maxLength": 255,
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^(?=.{1,255}$)[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?(?:\\.[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?)*$"
                 },
                 "ignore-unpack-errors": {
                   "type": "boolean"
@@ -48714,8 +48709,7 @@
                 },
                 "startup": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^(?:(?:order=)?[0-9]+(?:,up=[0-9]+)?(?:,down=[0-9]+)?|up=[0-9]+(?:,down=[0-9]+)?|down=[0-9]+)$"
                 },
                 "storage": {
                   "type": "string",
@@ -49207,8 +49201,7 @@
                 },
                 "hostname": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^(?=.{1,255}$)[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?(?:\\.[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?)*$"
                 },
                 "newid": {
                   "type": "integer",
@@ -49858,12 +49851,12 @@
       "id": "OP-GET-7066e6cdde",
       "release": "legacy-8.2.7",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "read",
+        "transport": "json",
+        "secrets": "private-result",
+        "reason": "Container configuration may contain protected data; validated payload is delivered only through the inherited private result pipe."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "get",
         "/nodes/{node}/lxc/{vmid}/config"
@@ -50536,7 +50529,7 @@
         "effect": "write",
         "transport": "json",
         "secrets": "input-refs",
-        "reason": "Reviewed scalar configuration branches only; credential fields require SecretRefs. Other supplied branches stay refused.",
+        "reason": "Reviewed compute and startup branches only; CPU feature overrides and host passthrough remain refused, and credential fields require SecretRefs.",
         "allowedInputs": [
           "node",
           "vmid",
@@ -50545,7 +50538,15 @@
           "hostname",
           "memory",
           "cores",
+          "sockets",
+          "vcpus",
+          "balloon",
+          "swap",
+          "cpu",
+          "cpulimit",
+          "cpuunits",
           "onboot",
+          "startup",
           "digest",
           "cipassword",
           "password"
@@ -50666,8 +50667,7 @@
                 "hostname": {
                   "type": "string",
                   "maxLength": 255,
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^(?=.{1,255}$)[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?(?:\\.[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?)*$"
                 },
                 "lock": {
                   "enum": [
@@ -50743,8 +50743,7 @@
                 },
                 "startup": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^(?:(?:order=)?[0-9]+(?:,up=[0-9]+)?(?:,down=[0-9]+)?|up=[0-9]+(?:,down=[0-9]+)?|down=[0-9]+)$"
                 },
                 "swap": {
                   "type": "integer",
@@ -57476,12 +57475,12 @@
       "id": "OP-GET-055effe38c",
       "release": "legacy-8.2.7",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "read",
+        "transport": "json",
+        "secrets": "private-result",
+        "reason": "Current and pending container values can include protected data; validated rows use the inherited private result pipe."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "get",
         "/nodes/{node}/lxc/{vmid}/pending"
@@ -59947,12 +59946,12 @@
       "id": "OP-GET-3e89cf9759",
       "release": "legacy-8.2.7",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "read",
+        "transport": "json",
+        "secrets": "none",
+        "reason": "Existing container power state, CPU, memory and I/O metrics; no guest or host lifecycle control."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "get",
         "/nodes/{node}/lxc/{vmid}/status/current"
@@ -66239,8 +66238,7 @@
                 },
                 "cpu": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^(?:cputype=)?(?![Hh][Oo][Ss][Tt]$)[A-Za-z0-9][A-Za-z0-9_.-]*$"
                 },
                 "cpulimit": {
                   "type": "number",
@@ -66369,8 +66367,7 @@
                 },
                 "memory": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^(?:current=)?(?:1[6-9]|[2-9][0-9]|[1-9][0-9]{2,})$"
                 },
                 "migrate_downtime": {
                   "type": "number",
@@ -66382,8 +66379,7 @@
                 },
                 "name": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^(?=.{1,255}$)[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?(?:\\.[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?)*$"
                 },
                 "nameserver": {
                   "type": "string",
@@ -66509,8 +66505,7 @@
                 },
                 "startup": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^(?:(?:order=)?[0-9]+(?:,up=[0-9]+)?(?:,down=[0-9]+)?|up=[0-9]+(?:,down=[0-9]+)?|down=[0-9]+)$"
                 },
                 "storage": {
                   "type": "string",
@@ -69939,8 +69934,7 @@
                 },
                 "name": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^(?=.{1,255}$)[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?(?:\\.[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?)*$"
                 },
                 "newid": {
                   "type": "integer",
@@ -72723,12 +72717,12 @@
       "id": "OP-GET-c4dfe973bb",
       "release": "legacy-8.2.7",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "read",
+        "transport": "json",
+        "secrets": "private-result",
+        "reason": "Guest configuration may contain cloud-init credentials; validated payload is delivered only through the inherited private result pipe."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "get",
         "/nodes/{node}/qemu/{vmid}/config"
@@ -75437,8 +75431,7 @@
                 },
                 "cpu": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^(?:cputype=)?(?![Hh][Oo][Ss][Tt]$)[A-Za-z0-9][A-Za-z0-9_.-]*$"
                 },
                 "cpulimit": {
                   "type": "number",
@@ -75572,8 +75565,7 @@
                 },
                 "memory": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^(?:current=)?(?:1[6-9]|[2-9][0-9]|[1-9][0-9]{2,})$"
                 },
                 "migrate_downtime": {
                   "type": "number",
@@ -75585,8 +75577,7 @@
                 },
                 "name": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^(?=.{1,255}$)[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?(?:\\.[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?)*$"
                 },
                 "nameserver": {
                   "type": "string",
@@ -75712,8 +75703,7 @@
                 },
                 "startup": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^(?:(?:order=)?[0-9]+(?:,up=[0-9]+)?(?:,down=[0-9]+)?|up=[0-9]+(?:,down=[0-9]+)?|down=[0-9]+)$"
                 },
                 "tablet": {
                   "type": "boolean"
@@ -78325,7 +78315,7 @@
         "effect": "write",
         "transport": "json",
         "secrets": "input-refs",
-        "reason": "Reviewed scalar configuration branches only; credential fields require SecretRefs. Other supplied branches stay refused.",
+        "reason": "Reviewed compute and startup branches only; CPU feature overrides and host passthrough remain refused, and credential fields require SecretRefs.",
         "allowedInputs": [
           "node",
           "vmid",
@@ -78334,7 +78324,15 @@
           "hostname",
           "memory",
           "cores",
+          "sockets",
+          "vcpus",
+          "balloon",
+          "swap",
+          "cpu",
+          "cpulimit",
+          "cpuunits",
           "onboot",
+          "startup",
           "digest",
           "cipassword",
           "password"
@@ -78507,8 +78505,7 @@
                 },
                 "cpu": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^(?:cputype=)?(?![Hh][Oo][Ss][Tt]$)[A-Za-z0-9][A-Za-z0-9_.-]*$"
                 },
                 "cpulimit": {
                   "type": "number",
@@ -78638,8 +78635,7 @@
                 },
                 "memory": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^(?:current=)?(?:1[6-9]|[2-9][0-9]|[1-9][0-9]{2,})$"
                 },
                 "migrate_downtime": {
                   "type": "number",
@@ -78651,8 +78647,7 @@
                 },
                 "name": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^(?=.{1,255}$)[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?(?:\\.[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?)*$"
                 },
                 "nameserver": {
                   "type": "string",
@@ -78778,8 +78773,7 @@
                 },
                 "startup": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^(?:(?:order=)?[0-9]+(?:,up=[0-9]+)?(?:,down=[0-9]+)?|up=[0-9]+(?:,down=[0-9]+)?|down=[0-9]+)$"
                 },
                 "tablet": {
                   "type": "boolean"
@@ -84943,12 +84937,12 @@
       "id": "OP-GET-95bc0cc390",
       "release": "legacy-8.2.7",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "read",
+        "transport": "json",
+        "secrets": "private-result",
+        "reason": "Current and pending configuration values can include credentials; validated rows use the inherited private result pipe."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "get",
         "/nodes/{node}/qemu/{vmid}/pending"
@@ -87165,12 +87159,12 @@
       "id": "OP-GET-51ca5330c0",
       "release": "legacy-8.2.7",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "read",
+        "transport": "json",
+        "secrets": "none",
+        "reason": "Existing guest power state, CPU, memory and I/O metrics; no guest or host lifecycle control."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "get",
         "/nodes/{node}/qemu/{vmid}/status/current"
@@ -148526,8 +148520,7 @@
                 },
                 "dnszoneprefix": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^(?=.{1,255}$)[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?(?:\\.[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?)*$"
                 },
                 "gateway": {
                   "type": "string",
@@ -148926,8 +148919,7 @@
                 },
                 "dnszoneprefix": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^(?=.{1,255}$)[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?(?:\\.[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?)*$"
                 },
                 "gateway": {
                   "type": "string",
@@ -149684,8 +149676,7 @@
                 },
                 "dnszone": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^(?=.{1,255}$)[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?(?:\\.[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?)*$"
                 },
                 "dp-id": {
                   "type": "integer"
@@ -150614,8 +150605,7 @@
                 },
                 "dnszone": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^(?=.{1,255}$)[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?(?:\\.[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?)*$"
                 },
                 "dp-id": {
                   "type": "integer"
@@ -166385,8 +166375,7 @@
                 "hostname": {
                   "type": "string",
                   "maxLength": 255,
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^(?=.{1,255}$)[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?(?:\\.[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?)*$"
                 },
                 "ignore-unpack-errors": {
                   "type": "boolean"
@@ -166482,8 +166471,7 @@
                 },
                 "startup": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^(?:(?:order=)?[0-9]+(?:,up=[0-9]+)?(?:,down=[0-9]+)?|up=[0-9]+(?:,down=[0-9]+)?|down=[0-9]+)$"
                 },
                 "storage": {
                   "type": "string",
@@ -166975,8 +166963,7 @@
                 },
                 "hostname": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^(?=.{1,255}$)[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?(?:\\.[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?)*$"
                 },
                 "newid": {
                   "type": "integer",
@@ -167667,12 +167654,12 @@
       "id": "OP-GET-7066e6cdde",
       "release": "published-current",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "read",
+        "transport": "json",
+        "secrets": "private-result",
+        "reason": "Container configuration may contain protected data; validated payload is delivered only through the inherited private result pipe."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "get",
         "/nodes/{node}/lxc/{vmid}/config"
@@ -168386,7 +168373,7 @@
         "effect": "write",
         "transport": "json",
         "secrets": "input-refs",
-        "reason": "Reviewed scalar configuration branches only; credential fields require SecretRefs. Other supplied branches stay refused.",
+        "reason": "Reviewed compute and startup branches only; CPU feature overrides and host passthrough remain refused, and credential fields require SecretRefs.",
         "allowedInputs": [
           "node",
           "vmid",
@@ -168395,7 +168382,15 @@
           "hostname",
           "memory",
           "cores",
+          "sockets",
+          "vcpus",
+          "balloon",
+          "swap",
+          "cpu",
+          "cpulimit",
+          "cpuunits",
           "onboot",
+          "startup",
           "digest",
           "cipassword",
           "password"
@@ -168526,8 +168521,7 @@
                 "hostname": {
                   "type": "string",
                   "maxLength": 255,
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^(?=.{1,255}$)[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?(?:\\.[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?)*$"
                 },
                 "lock": {
                   "enum": [
@@ -168603,8 +168597,7 @@
                 },
                 "startup": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^(?:(?:order=)?[0-9]+(?:,up=[0-9]+)?(?:,down=[0-9]+)?|up=[0-9]+(?:,down=[0-9]+)?|down=[0-9]+)$"
                 },
                 "swap": {
                   "type": "integer",
@@ -175613,12 +175606,12 @@
       "id": "OP-GET-055effe38c",
       "release": "published-current",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "read",
+        "transport": "json",
+        "secrets": "private-result",
+        "reason": "Current and pending container values can include protected data; validated rows use the inherited private result pipe."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "get",
         "/nodes/{node}/lxc/{vmid}/pending"
@@ -178109,12 +178102,12 @@
       "id": "OP-GET-3e89cf9759",
       "release": "published-current",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "read",
+        "transport": "json",
+        "secrets": "none",
+        "reason": "Existing container power state, CPU, memory and I/O metrics; no guest or host lifecycle control."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "get",
         "/nodes/{node}/lxc/{vmid}/status/current"
@@ -184449,8 +184442,7 @@
                 },
                 "cpu": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^(?:cputype=)?(?![Hh][Oo][Ss][Tt]$)[A-Za-z0-9][A-Za-z0-9_.-]*$"
                 },
                 "cpulimit": {
                   "type": "number",
@@ -184587,8 +184579,7 @@
                 },
                 "memory": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^(?:current=)?(?:1[6-9]|[2-9][0-9]|[1-9][0-9]{2,})$"
                 },
                 "migrate_downtime": {
                   "type": "number",
@@ -184600,8 +184591,7 @@
                 },
                 "name": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^(?=.{1,255}$)[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?(?:\\.[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?)*$"
                 },
                 "nameserver": {
                   "type": "string",
@@ -184727,8 +184717,7 @@
                 },
                 "startup": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^(?:(?:order=)?[0-9]+(?:,up=[0-9]+)?(?:,down=[0-9]+)?|up=[0-9]+(?:,down=[0-9]+)?|down=[0-9]+)$"
                 },
                 "storage": {
                   "type": "string",
@@ -188265,8 +188254,7 @@
                 },
                 "name": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^(?=.{1,255}$)[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?(?:\\.[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?)*$"
                 },
                 "newid": {
                   "type": "integer",
@@ -191099,12 +191087,12 @@
       "id": "OP-GET-c4dfe973bb",
       "release": "published-current",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "read",
+        "transport": "json",
+        "secrets": "private-result",
+        "reason": "Guest configuration may contain cloud-init credentials; validated payload is delivered only through the inherited private result pipe."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "get",
         "/nodes/{node}/qemu/{vmid}/config"
@@ -193774,8 +193762,7 @@
                 },
                 "cpu": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^(?:cputype=)?(?![Hh][Oo][Ss][Tt]$)[A-Za-z0-9][A-Za-z0-9_.-]*$"
                 },
                 "cpulimit": {
                   "type": "number",
@@ -193914,8 +193901,7 @@
                 },
                 "memory": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^(?:current=)?(?:1[6-9]|[2-9][0-9]|[1-9][0-9]{2,})$"
                 },
                 "migrate_downtime": {
                   "type": "number",
@@ -193927,8 +193913,7 @@
                 },
                 "name": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^(?=.{1,255}$)[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?(?:\\.[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?)*$"
                 },
                 "nameserver": {
                   "type": "string",
@@ -194054,8 +194039,7 @@
                 },
                 "startup": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^(?:(?:order=)?[0-9]+(?:,up=[0-9]+)?(?:,down=[0-9]+)?|up=[0-9]+(?:,down=[0-9]+)?|down=[0-9]+)$"
                 },
                 "tablet": {
                   "type": "boolean"
@@ -196625,7 +196609,7 @@
         "effect": "write",
         "transport": "json",
         "secrets": "input-refs",
-        "reason": "Reviewed scalar configuration branches only; credential fields require SecretRefs. Other supplied branches stay refused.",
+        "reason": "Reviewed compute and startup branches only; CPU feature overrides and host passthrough remain refused, and credential fields require SecretRefs.",
         "allowedInputs": [
           "node",
           "vmid",
@@ -196634,7 +196618,15 @@
           "hostname",
           "memory",
           "cores",
+          "sockets",
+          "vcpus",
+          "balloon",
+          "swap",
+          "cpu",
+          "cpulimit",
+          "cpuunits",
           "onboot",
+          "startup",
           "digest",
           "cipassword",
           "password"
@@ -196810,8 +196802,7 @@
                 },
                 "cpu": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^(?:cputype=)?(?![Hh][Oo][Ss][Tt]$)[A-Za-z0-9][A-Za-z0-9_.-]*$"
                 },
                 "cpulimit": {
                   "type": "number",
@@ -196946,8 +196937,7 @@
                 },
                 "memory": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^(?:current=)?(?:1[6-9]|[2-9][0-9]|[1-9][0-9]{2,})$"
                 },
                 "migrate_downtime": {
                   "type": "number",
@@ -196959,8 +196949,7 @@
                 },
                 "name": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^(?=.{1,255}$)[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?(?:\\.[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?)*$"
                 },
                 "nameserver": {
                   "type": "string",
@@ -197086,8 +197075,7 @@
                 },
                 "startup": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^(?:(?:order=)?[0-9]+(?:,up=[0-9]+)?(?:,down=[0-9]+)?|up=[0-9]+(?:,down=[0-9]+)?|down=[0-9]+)$"
                 },
                 "tablet": {
                   "type": "boolean"
@@ -203529,12 +203517,12 @@
       "id": "OP-GET-95bc0cc390",
       "release": "published-current",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "read",
+        "transport": "json",
+        "secrets": "private-result",
+        "reason": "Current and pending configuration values can include credentials; validated rows use the inherited private result pipe."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "get",
         "/nodes/{node}/qemu/{vmid}/pending"
@@ -205787,12 +205775,12 @@
       "id": "OP-GET-51ca5330c0",
       "release": "published-current",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "read",
+        "transport": "json",
+        "secrets": "none",
+        "reason": "Existing guest power state, CPU, memory and I/O metrics; no guest or host lifecycle control."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "get",
         "/nodes/{node}/qemu/{vmid}/status/current"

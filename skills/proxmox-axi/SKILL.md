@@ -38,6 +38,10 @@ Use `--fields`, `--limit` and `--full` when more detail is needed within the out
 
 ## Discover operations and complete confirmed tasks
 
+For QEMU/LXC resource metrics, read `/nodes/{node}/qemu/{vmid}/status/current` or its LXC equivalent with the selected node, VMID and profile.
+For configuration and `/pending` reads, follow the [private result contract](../../docs/s4-contract.md), including pipe setup and receiver binding validation.
+Use the [guest configuration and compute settings guide](../../README.md#guest-configuration-and-compute-settings) for supported settings, input constraints and digest handling.
+
 Run `proxmox-axi inventory` or `proxmox-axi schema <method> '<template>'` offline before choosing an operation and its supported inputs.
 Discoverable routes may remain refused; never bypass admission or broaden permissions to work around a refusal.
 For an authorized mutation, use its existing `create`, `set` or `delete` command with `--preview`, inspect the selected target and inputs, then repeat the exact request with `--confirm '<confirmation>'`.

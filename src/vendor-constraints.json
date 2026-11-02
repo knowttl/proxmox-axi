@@ -2,6 +2,9 @@
   "unsupportedPatternMarkers": ["(?", "\\p", "\\A", "\\z"],
   "patterns": { "(?^:[A-Za-z][A-Za-z0-9\\.\\-_]+)": "[A-Za-z][A-Za-z0-9._-]+" },
   "formats": {
+    "dns-name": "^(?=.{1,255}$)[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?(?:\\.[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?)*$",
+    "pve-vm-cpu-conf": "^(?:cputype=)?(?![Hh][Oo][Ss][Tt]$)[A-Za-z0-9][A-Za-z0-9_.-]*$",
+    "pve-startup-order": "^(?:(?:order=)?[0-9]+(?:,up=[0-9]+)?(?:,down=[0-9]+)?|up=[0-9]+(?:,down=[0-9]+)?|down=[0-9]+)$",
     "pve-storage-server": "^[A-Za-z0-9][A-Za-z0-9.:-]*$",
     "pem-string": "^-----BEGIN [A-Z ]*PRIVATE KEY-----[\\s\\S]+-----END [A-Z ]*PRIVATE KEY-----\\s*$",
     "pem-certificate-chain": "^(?:\\s*-----BEGIN CERTIFICATE-----[\\s\\S]+?-----END CERTIFICATE-----)+\\s*$",

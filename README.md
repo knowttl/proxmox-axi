@@ -196,13 +196,39 @@ For example, a protected config can keep two independent profiles with separate 
 Supply credentials through the referenced secret source and set file ownership and permissions as described under [Configuration](#configuration).
 These reads do not grant storage administration, node power control, or cluster membership changes.
 
+### Guest configuration and compute settings
+
+QEMU and LXC current status reads expose power state and resource metrics:
+
+```sh
+proxmox-axi get '/nodes/{node}/qemu/{vmid}/status/current' --api-node '<node>' --api-vmid 100 --profile lab
+proxmox-axi get '/nodes/{node}/lxc/{vmid}/status/current' --api-node '<node>' --api-vmid 101 --profile lab
+```
+
+`get '/nodes/{node}/qemu/{vmid}/config'`, the LXC equivalent, and both guests' `/pending` reads require a caller-owned private result pipe because their payloads can contain credentials.
+Use the [private result contract](docs/s4-contract.md) for pipe setup, delivery metadata and payload handling.
+
+Confirmed `set .../config` supports the settings present in each guest's selected contract: names/description, cores, CPU limits/weights, memory, onboot and startup order; QEMU also supports sockets, vCPUs, balloon memory and a CPU model, while LXC supports swap.
+QEMU memory accepts `2048` or `current=2048` in MiB, with a minimum of 16; LXC memory and swap use integer MB values.
+CPU configuration accepts a model identifier, optionally prefixed with `cputype=`, and refuses `host` and feature-override subproperties.
+Startup strings use canonical order: optional `order` first, then `up`, then `down`, with no duplicate keys; a bare integer is also accepted for `order`.
+Pass a configuration digest when available to detect concurrent changes.
+
+```sh
+proxmox-axi set '/nodes/{node}/qemu/{vmid}/config' --api-node '<node>' --api-vmid 100 --api-cores 4 --api-sockets 1 --api-memory current=2048 --api-balloon 1024 --api-cpu x86-64-v2-AES --api-startup order=2,up=10,down=15 --profile lab --preview
+proxmox-axi set '/nodes/{node}/lxc/{vmid}/config' --api-node '<node>' --api-vmid 101 --api-memory 2048 --api-swap 512 --api-cpulimit 2 --profile lab --preview
+```
+
+Repeat the exact selected command with `--confirm '<confirmation>'` after inspecting its preview.
+Hardware passthrough, executable hooks and other unreviewed configuration branches remain refused.
+
 ## Safety
 
 - Ordinary JSON reads use trusted HTTPS, a five-second total deadline and a 64 KiB response bound, and reject redirects.
   Managed transfers have separate administrator-controlled byte and elapsed limits.
 - Operations whose effects, transport or secret handling are not reviewed remain discoverable but uncallable.
   Unresolved policy fields deny invocation, and changing a capture never admits new operations automatically.
-- Writes cover guest power operations, guest destruction, selected scalar configuration branches, pool management, task cancellation, node execute batches, storage uploads and the reviewed credential/session setup operations.
+- Writes cover guest power operations, guest destruction, [selected guest configuration settings](#guest-configuration-and-compute-settings), pool management, task cancellation, node execute batches, storage uploads and the reviewed credential/session setup operations.
   Effectful CIFS/PBS scans use the same preview and confirmation policy even though their vendor method is GET.
 - Inspect `schema create|set|delete <template>` and the generated `write-policy.json` before enabling an operation.
 - Enable an operation by adding its ID to the selected file profile: `writes: { "operations": ["<operation-id>"] }`.
@@ -310,6 +336,7 @@ No insecure-TLS flag or automatic trust update exists.
 - TOON is the default, and `--format json` preserves the same structured result.
 - Lists default to 100 compact rows.
   `--limit <1-1000>` changes the display limit, `--fields` chooses fields, and `--full` includes all received rows and, unless `--fields` is supplied, all fields retained after safety filtering.
+  Protected configuration and pending-setting reads follow the [private result contract](docs/s4-contract.md) instead of list display formatting.
   See [Infrastructure discovery across profiles](#infrastructure-discovery-across-profiles) for storage index filtering.
   Unknown `--fields` names return `INVALID_INPUT` with available names from the selected response contract.
   Except for `/version`, automatic reads validate field names after target catalogue detection; an explicit `--catalogue` validates them before network access.
