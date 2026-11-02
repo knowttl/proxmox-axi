@@ -38,14 +38,10 @@ Use `--fields`, `--limit` and `--full` when more detail is needed within the out
 
 ## Discover operations and complete confirmed tasks
 
-For QEMU/LXC resource metrics, read `/nodes/{node}/qemu/{vmid}/status/current` or its LXC equivalent with the selected node, VMID and profile.
-Configuration and `/pending` reads require a caller-owned `PROXMOX_AXI_RESULT_FD` private pipe; they return delivery metadata on stdout and the complete validated payload through the private frame contract.
+Use the [guest configuration and compute settings guide](../../README.md#guest-configuration-and-compute-settings) for status reads, supported settings and input syntax.
+For configuration and pending-setting reads, follow the [private result contract](../../docs/s4-contract.md).
 Never redirect that payload into public logs or terminal output.
 Use private configuration digests to guard concurrent modifications when changing settings.
-Confirmed configuration updates support cores, limits/weights, memory, names/description and startup behavior; QEMU adds sockets, vCPUs, ballooning and an emulated CPU model, while LXC adds swap.
-Use QEMU memory as `2048` or `current=2048`; use integer MB for LXC memory and swap.
-CPU models accept only the model identifier or `cputype=<model>`; host CPU passthrough and feature flags stay refused.
-Startup keys must appear in canonical order (`order`, `up`, `down`) without duplicates.
 
 Run `proxmox-axi inventory` or `proxmox-axi schema <method> '<template>'` offline before choosing an operation and its supported inputs.
 Discoverable routes may remain refused; never bypass admission or broaden permissions to work around a refusal.

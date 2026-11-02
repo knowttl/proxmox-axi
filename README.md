@@ -206,14 +206,12 @@ proxmox-axi get '/nodes/{node}/lxc/{vmid}/status/current' --api-node '<node>' --
 ```
 
 `get '/nodes/{node}/qemu/{vmid}/config'`, the LXC equivalent, and both guests' `/pending` reads require a caller-owned private result pipe because their payloads can contain credentials.
-Supply `PROXMOX_AXI_RESULT_FD` using the [private result contract](docs/s4-contract.md); stdout contains `data: { "privateResult": true }` after delivery.
-The complete validated payload travels privately, independently of ordinary table display flags, and is never written to the journal.
-Without a valid pipe these reads fail before contacting the provider.
+Use the [private result contract](docs/s4-contract.md) for pipe setup, delivery metadata and payload handling.
 
 Confirmed `set .../config` supports the settings present in each guest's selected contract: names/description, cores, CPU limits/weights, memory, onboot and startup order; QEMU also supports sockets, vCPUs, balloon memory and a CPU model, while LXC supports swap.
 QEMU memory accepts `2048` or `current=2048` in MiB, with a minimum of 16; LXC memory and swap use integer MB values.
 CPU configuration accepts a model identifier, optionally prefixed with `cputype=`, and refuses `host` and feature-override subproperties.
-Startup strings use canonical order: optional `order` first, then `up`, then `down`, with no duplicate keys.
+Startup strings use canonical order: optional `order` first, then `up`, then `down`, with no duplicate keys; a bare integer is also accepted for `order`.
 Pass a configuration digest when available to detect concurrent changes.
 
 ```sh
@@ -230,7 +228,7 @@ Hardware passthrough, executable hooks and other unreviewed configuration branch
   Managed transfers have separate administrator-controlled byte and elapsed limits.
 - Operations whose effects, transport or secret handling are not reviewed remain discoverable but uncallable.
   Unresolved policy fields deny invocation, and changing a capture never admits new operations automatically.
-- Writes cover guest power operations, guest destruction, selected scalar configuration branches, pool management, task cancellation, node execute batches, storage uploads and the reviewed credential/session setup operations.
+- Writes cover guest power operations, guest destruction, [selected guest configuration settings](#guest-configuration-and-compute-settings), pool management, task cancellation, node execute batches, storage uploads and the reviewed credential/session setup operations.
   Effectful CIFS/PBS scans use the same preview and confirmation policy even though their vendor method is GET.
 - Inspect `schema create|set|delete <template>` and the generated `write-policy.json` before enabling an operation.
 - Enable an operation by adding its ID to the selected file profile: `writes: { "operations": ["<operation-id>"] }`.
