@@ -25,7 +25,6 @@ const help = {
     '--profile <name> (default canonical profile selection)', '--format toon|json (default toon)', '--session <id> (explicit memory session)',
     '--catalogue legacy-8.2.7|published-current (default detect target version; explicit selection is unverified)',
     '--limit <1-1000> (default 100 display rows)', '--fields <comma-separated names>', '--full (all received rows and fields; 65536-byte cap)',
-    '--view invocation|vendor (schema only; default invocation)', '--offset <nonnegative integer> (vendor schema page)',
     '--api-<parameter> <value> (vendor parameter)', '--body-file <absolute-path|-> (JSON, 64 KiB, five seconds)', '--help'],
   examples: ['proxmox-axi get /version', 'proxmox-axi get /version --profile lab --format json'],
 }
@@ -91,6 +90,7 @@ export async function main(args: string[]): Promise<void> {
     format = options['--format'] ?? 'toon'
     if (!['toon', 'json'].includes(format)) { format = 'toon'; throw usage('Format must be toon or json.') }
     if (positional[0] === 'help') { positional.shift(); options.help = 'true' }
+    if (positional[0] !== 'schema' && (options['--view'] !== undefined || options['--offset'] !== undefined)) throw usage('--view and --offset apply to schema only.')
     const transferring = positional[0] === 'transfer'
     const duplex = positional[0] === 'duplex'
     if (duplex && options.help) {
@@ -173,7 +173,9 @@ export async function main(args: string[]): Promise<void> {
       if (Object.keys(options).some(option => option !== 'help' && !names.includes(option))) throw usage(`Valid flags: ${names.join(', ')}.`)
       output({ purpose: key === 'doctor' ? 'Check private-file protection and perform one bounded version read.' : `Inspect ${key}.`,
         usage: `proxmox-axi ${usages[key]}`, examples: key === 'schema' ? ['proxmox-axi schema get /version', 'proxmox-axi schema get /nodes --catalogue published-current'] :
-          [`proxmox-axi ${key}`, `proxmox-axi ${key} --format json`], flags: help.flags.filter(flag => names.some(name => flag.startsWith(name))) })
+          [`proxmox-axi ${key}`, `proxmox-axi ${key} --format json`], flags: [...help.flags,
+          ...(key === 'schema' ? ['--view invocation|vendor (default invocation)', '--offset <nonnegative integer> (vendor schema page)'] : [])]
+          .filter(flag => names.some(name => flag.startsWith(name))) })
       return
     }
     if (command === 'config path' || command === 'profile list') {

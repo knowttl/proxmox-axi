@@ -73,6 +73,17 @@ test('infrastructure discovery through named profiles', async t => {
       return { code: result.code, stdout: result.stdout, stderr: result.stderr }
     }
   }
+  for (const route of [['get', '/nodes'], ['ls', '/nodes'], ['ls']]) for (const flag of [
+    ['--view', 'vendor'], ['--offset', '10'],
+  ]) for (const profile of ['lab', 'missing']) {
+    await t.test(`${route.join(' ')} refuses ${flag[0]} before credentials and HTTP with ${profile} profile`, async () => {
+      requests.length = 0
+      const result = await command([...route, ...flag, '--profile', profile])
+      assert.equal(result.code, 2, result.stdout + result.stderr)
+      assert.deepEqual(JSON.parse(result.stdout).error, { code: 'INVALID_INPUT', message: '--view and --offset apply to schema only.' })
+      assert.deepEqual(requests, [])
+    })
+  }
   const downloadBody = join(scratch, 'download.json')
   await writeFile(downloadBody, JSON.stringify({ download: true }), { mode: 0o600 })
   for (const route of [['get', logPath], ['ls', logPath], ['task', 'log']]) for (const input of [

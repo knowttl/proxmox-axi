@@ -8,6 +8,39 @@ import { captures, replay } from '../scripts/catalogue.mjs'
 import { verifyDiscovery } from '../scripts/route-cases.mjs'
 import policy from '../src/operation-policy.json' with { type: 'json' }
 
+for (const args of [
+  [], ['get'], ['get', '/version'], ['ls'], ['ls', '/nodes'],
+  ['create'], ['set'], ['delete'], ['post'], ['put'],
+  ['set', '/nodes/{node}/qemu/{vmid}/resize'], ['task'], ['task', 'status'], ['task', 'cancel'],
+  ['journal', 'show', 'synthetic'], ['auth'], ['auth', 'status'], ['auth', 'acquire'],
+  ['home'], ['doctor'], ['inventory'], ['config', 'path'], ['profile', 'list'], ['transfer'], ['duplex'],
+]) {
+  test(`${args.join(' ') || 'root'} help excludes schema-only flags`, () => {
+    const result = spawnSync(process.execPath, ['bin/proxmox-axi.mjs', ...args, '--help', '--format', 'json'], { encoding: 'utf8' })
+    assert.equal(result.status, 0, result.stdout + result.stderr)
+    const flags = JSON.parse(result.stdout).flags.map(flag => flag.split(' ')[0])
+    assert.equal(flags.includes('--view'), false)
+    assert.equal(flags.includes('--offset'), false)
+  })
+  for (const flag of [['--view', 'vendor'], ['--offset', '10']]) {
+    test(`${args.join(' ') || 'root'} refuses schema-only ${flag[0]}`, () => {
+      const result = spawnSync(process.execPath, ['bin/proxmox-axi.mjs', ...args, ...flag, '--format', 'json'], { encoding: 'utf8' })
+      assert.equal(result.status, 2, result.stdout + result.stderr)
+      assert.deepEqual(JSON.parse(result.stdout).error, { code: 'INVALID_INPUT', message: '--view and --offset apply to schema only.' })
+    })
+  }
+}
+
+for (const args of [['schema'], ['schema', 'get', '/nodes'], ['help', 'schema']]) {
+  test(`${args.join(' ')} help includes schema-only flags`, () => {
+    const result = spawnSync(process.execPath, ['bin/proxmox-axi.mjs', ...args, '--help', '--format', 'json'], { encoding: 'utf8' })
+    assert.equal(result.status, 0, result.stdout + result.stderr)
+    const flags = JSON.parse(result.stdout).flags.map(flag => flag.split(' ')[0])
+    assert.equal(flags.includes('--view'), true)
+    assert.equal(flags.includes('--offset'), true)
+  })
+}
+
 test('vendor schema refuses a cursor outside its parameter list', () => {
   const result = spawnSync(process.execPath, ['bin/proxmox-axi.mjs', 'schema', 'set', '/nodes/{node}/qemu/{vmid}/config',
     '--view', 'vendor', '--offset', String(Number.MAX_SAFE_INTEGER), '--format', 'json'], { cwd: new URL('..', import.meta.url), encoding: 'utf8' })
