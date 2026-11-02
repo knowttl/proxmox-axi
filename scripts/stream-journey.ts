@@ -325,6 +325,7 @@ export async function exerciseStreamJourney(options: Journey) {
           mode = bound
           const result = await run(`#25-${bound}-bound`, [...args, '--confirm', String(preview.output.confirmation)], 1, undefined, extra)
           assert.equal((result.output.error as { code: string }).code, 'WRITE_UNCERTAIN', '#25 stalled, lifetime and quota failures remain uncertain')
+          if (bound === 'lifetime-peer') assert.equal(result.bytes.length, 0, '#25 lifetime expiry precedes delivery of the progressing provider frame')
           await peerClosed
           mode = 'success'
         }
