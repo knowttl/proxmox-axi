@@ -73,6 +73,27 @@ test('infrastructure discovery through named profiles', async t => {
       return { code: result.code, stdout: result.stdout, stderr: result.stderr }
     }
   }
+  const downloadBody = join(scratch, 'download.json')
+  await writeFile(downloadBody, JSON.stringify({ download: true }), { mode: 0o600 })
+  for (const route of [['get', logPath], ['ls', logPath], ['task', 'log']]) for (const input of [
+    { name: 'flag', args: ['--api-download', 'true'] },
+    { name: 'body-file', args: ['--body-file', downloadBody] },
+  ]) for (const profile of ['lab', 'missing']) {
+    await t.test(`#6 ${route[0]} refuses download ${input.name} before credentials and HTTP with ${profile} profile`, async () => {
+      requests.length = 0
+      const result = await command([...route, '--api-node', 'node-a', '--api-upid', upid, ...input.args, '--profile', profile])
+      assert.equal(result.code, 2, result.stdout + result.stderr)
+      assert.equal(JSON.parse(result.stdout).error.code, 'INVALID_INPUT')
+      assert.deepEqual(requests, [])
+    })
+  }
+  for (const args of [[], ['--api-download', 'false']]) {
+    await t.test(`#6 task log preserves numbered logs with ${args.length ? 'download=false' : 'default input'}`, async () => {
+      const result = await command(['task', 'log', '--api-node', 'node-a', '--api-upid', upid, ...args, '--profile', 'lab'])
+      assert.equal(result.code, 0, result.stdout + result.stderr)
+      assert.deepEqual(JSON.parse(result.stdout).data, logLines)
+    })
+  }
   await t.test('profile listing does not resolve token references or contact either host', async () => {
     requests.length = 0
     const result = await execute(process.execPath, [executable, 'profile', 'list', '--config', config, '--format', 'json'],
