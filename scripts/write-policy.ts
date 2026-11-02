@@ -41,6 +41,14 @@ export function reviewWrite(operation: Operation) {
   const guest = /^\/nodes\/\{node\}\/(qemu|lxc)\/\{vmid\}$/.test(path)
   const lifecyclePath = /^\/nodes\/\{node\}\/(qemu|lxc)\/\{vmid\}\/status\/(start|stop|shutdown|reboot|reset|resume|suspend)$/.test(path)
   const config = /^\/nodes\/\{node\}\/(qemu|lxc)\/\{vmid\}\/config$/.test(path)
+  const resize = method === 'PUT' && /^\/nodes\/\{node\}\/(qemu|lxc)\/\{vmid\}\/resize$/.test(path) && name === 'resize_vm'
+  if (resize && operation.allowtoken !== 0) return { effect: 'write', transport: 'json', secrets: 'none',
+    allowedInputs: ['node', 'vmid', 'disk', 'size', 'digest'],
+    inputPatterns: { size: '^\\+(?:[1-9][0-9]*(?:\\.[0-9]+)?|0\\.[0-9]*[1-9][0-9]*)[KMGT]$',
+      ...(path.includes('/qemu/') ? { disk: '^(?:ide[0-3]|sata[0-5]|scsi(?:[0-9]|[12][0-9]|30)|virtio(?:[0-9]|1[0-5]))$' } : {}) },
+    reason: 'Confirmed positive relative disk growth only; absolute sizes, shrink and lock bypass remain refused.',
+    reconciliation: { kind: 'none', reason: 'Track the returned UPID; never repeat relative growth after uncertain delivery.' },
+    privileges: operation.permissions, response: operation.returns, source: 'Pinned vendor resize schemas; supported growth only.' }
   const batch = path === '/nodes/{node}/execute' && method === 'POST' && name === 'execute'
   const cancel = path === '/nodes/{node}/tasks/{upid}' && method === 'DELETE' && name === 'stop_task'
   const admitted = operation.allowtoken !== 0 && (

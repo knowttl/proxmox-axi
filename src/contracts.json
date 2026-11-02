@@ -58050,12 +58050,42 @@
       "id": "OP-PUT-73d95c22c9",
       "release": "legacy-8.2.7",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "write",
+        "transport": "json",
+        "secrets": "none",
+        "allowedInputs": [
+          "node",
+          "vmid",
+          "disk",
+          "size",
+          "digest"
+        ],
+        "inputPatterns": {
+          "size": "^\\+(?:[1-9][0-9]*(?:\\.[0-9]+)?|0\\.[0-9]*[1-9][0-9]*)[KMGT]$"
+        },
+        "reason": "Confirmed positive relative disk growth only; absolute sizes, shrink and lock bypass remain refused.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Track the returned UPID; never repeat relative growth after uncertain delivery."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/vms/{vmid}",
+            [
+              "VM.Config.Disk"
+            ],
+            "any",
+            1
+          ]
+        },
+        "response": {
+          "description": "the task ID.",
+          "type": "string"
+        },
+        "source": "Pinned vendor resize schemas; supported growth only."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "put",
         "/nodes/{node}/lxc/{vmid}/resize"
@@ -58344,7 +58374,12 @@
                 },
                 "size": {
                   "type": "string",
-                  "pattern": "^(?:\\+?\\d+(\\.\\d+)?[KMGT]?)$"
+                  "pattern": "^(?:\\+?\\d+(\\.\\d+)?[KMGT]?)$",
+                  "allOf": [
+                    {
+                      "pattern": "^\\+(?:[1-9][0-9]*(?:\\.[0-9]+)?|0\\.[0-9]*[1-9][0-9]*)[KMGT]$"
+                    }
+                  ]
                 },
                 "vmid": {
                   "type": "integer",
@@ -85299,12 +85334,41 @@
       "id": "OP-PUT-dbad102805",
       "release": "legacy-8.2.7",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "write",
+        "transport": "json",
+        "secrets": "none",
+        "allowedInputs": [
+          "node",
+          "vmid",
+          "disk",
+          "size",
+          "digest"
+        ],
+        "inputPatterns": {
+          "size": "^\\+(?:[1-9][0-9]*(?:\\.[0-9]+)?|0\\.[0-9]*[1-9][0-9]*)[KMGT]$",
+          "disk": "^(?:ide[0-3]|sata[0-5]|scsi(?:[0-9]|[12][0-9]|30)|virtio(?:[0-9]|1[0-5]))$"
+        },
+        "reason": "Confirmed positive relative disk growth only; absolute sizes, shrink and lock bypass remain refused.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Track the returned UPID; never repeat relative growth after uncertain delivery."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/vms/{vmid}",
+            [
+              "VM.Config.Disk"
+            ]
+          ]
+        },
+        "response": {
+          "description": "the task ID.",
+          "type": "string"
+        },
+        "source": "Pinned vendor resize schemas; supported growth only."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "put",
         "/nodes/{node}/qemu/{vmid}/resize"
@@ -85387,7 +85451,12 @@
                     "efidisk0",
                     "tpmstate0"
                   ],
-                  "type": "string"
+                  "type": "string",
+                  "allOf": [
+                    {
+                      "pattern": "^(?:ide[0-3]|sata[0-5]|scsi(?:[0-9]|[12][0-9]|30)|virtio(?:[0-9]|1[0-5]))$"
+                    }
+                  ]
                 },
                 "node": {
                   "type": "string",
@@ -85395,7 +85464,12 @@
                 },
                 "size": {
                   "type": "string",
-                  "pattern": "^(?:\\+?\\d+(\\.\\d+)?[KMGT]?)$"
+                  "pattern": "^(?:\\+?\\d+(\\.\\d+)?[KMGT]?)$",
+                  "allOf": [
+                    {
+                      "pattern": "^\\+(?:[1-9][0-9]*(?:\\.[0-9]+)?|0\\.[0-9]*[1-9][0-9]*)[KMGT]$"
+                    }
+                  ]
                 },
                 "skiplock": {
                   "type": "boolean"
@@ -176181,12 +176255,42 @@
       "id": "OP-PUT-73d95c22c9",
       "release": "published-current",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "write",
+        "transport": "json",
+        "secrets": "none",
+        "allowedInputs": [
+          "node",
+          "vmid",
+          "disk",
+          "size",
+          "digest"
+        ],
+        "inputPatterns": {
+          "size": "^\\+(?:[1-9][0-9]*(?:\\.[0-9]+)?|0\\.[0-9]*[1-9][0-9]*)[KMGT]$"
+        },
+        "reason": "Confirmed positive relative disk growth only; absolute sizes, shrink and lock bypass remain refused.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Track the returned UPID; never repeat relative growth after uncertain delivery."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/vms/{vmid}",
+            [
+              "VM.Config.Disk"
+            ],
+            "any",
+            1
+          ]
+        },
+        "response": {
+          "description": "the task ID.",
+          "type": "string"
+        },
+        "source": "Pinned vendor resize schemas; supported growth only."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "put",
         "/nodes/{node}/lxc/{vmid}/resize"
@@ -176475,7 +176579,12 @@
                 },
                 "size": {
                   "type": "string",
-                  "pattern": "^(?:\\+?\\d+(\\.\\d+)?[KMGT]?)$"
+                  "pattern": "^(?:\\+?\\d+(\\.\\d+)?[KMGT]?)$",
+                  "allOf": [
+                    {
+                      "pattern": "^\\+(?:[1-9][0-9]*(?:\\.[0-9]+)?|0\\.[0-9]*[1-9][0-9]*)[KMGT]$"
+                    }
+                  ]
                 },
                 "vmid": {
                   "type": "integer",
@@ -203879,12 +203988,41 @@
       "id": "OP-PUT-dbad102805",
       "release": "published-current",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "write",
+        "transport": "json",
+        "secrets": "none",
+        "allowedInputs": [
+          "node",
+          "vmid",
+          "disk",
+          "size",
+          "digest"
+        ],
+        "inputPatterns": {
+          "size": "^\\+(?:[1-9][0-9]*(?:\\.[0-9]+)?|0\\.[0-9]*[1-9][0-9]*)[KMGT]$",
+          "disk": "^(?:ide[0-3]|sata[0-5]|scsi(?:[0-9]|[12][0-9]|30)|virtio(?:[0-9]|1[0-5]))$"
+        },
+        "reason": "Confirmed positive relative disk growth only; absolute sizes, shrink and lock bypass remain refused.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Track the returned UPID; never repeat relative growth after uncertain delivery."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/vms/{vmid}",
+            [
+              "VM.Config.Disk"
+            ]
+          ]
+        },
+        "response": {
+          "description": "the task ID.",
+          "type": "string"
+        },
+        "source": "Pinned vendor resize schemas; supported growth only."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "put",
         "/nodes/{node}/qemu/{vmid}/resize"
@@ -203967,7 +204105,12 @@
                     "efidisk0",
                     "tpmstate0"
                   ],
-                  "type": "string"
+                  "type": "string",
+                  "allOf": [
+                    {
+                      "pattern": "^(?:ide[0-3]|sata[0-5]|scsi(?:[0-9]|[12][0-9]|30)|virtio(?:[0-9]|1[0-5]))$"
+                    }
+                  ]
                 },
                 "node": {
                   "type": "string",
@@ -203975,7 +204118,12 @@
                 },
                 "size": {
                   "type": "string",
-                  "pattern": "^(?:\\+?\\d+(\\.\\d+)?[KMGT]?)$"
+                  "pattern": "^(?:\\+?\\d+(\\.\\d+)?[KMGT]?)$",
+                  "allOf": [
+                    {
+                      "pattern": "^\\+(?:[1-9][0-9]*(?:\\.[0-9]+)?|0\\.[0-9]*[1-9][0-9]*)[KMGT]$"
+                    }
+                  ]
                 },
                 "skiplock": {
                   "type": "boolean"

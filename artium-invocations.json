@@ -1285,6 +1285,27 @@
       }
     },
     {
+      "command": "set /nodes/{node}/lxc/{vmid}/resize",
+      "operationId": "OP-PUT-73d95c22c9",
+      "method": "PUT",
+      "path": "/nodes/{node}/lxc/{vmid}/resize",
+      "sensitiveInputs": [],
+      "privateResult": false,
+      "effect": "write",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "preview": "boolean",
+        "confirm": "value",
+        "session": "value",
+        "api-digest": "value",
+        "api-disk": "value",
+        "api-node": "value",
+        "api-size": "value",
+        "api-vmid": "value"
+      }
+    },
+    {
       "command": "set /nodes/{node}/qemu/{vmid}/config",
       "operationId": "OP-PUT-41cd6542bd",
       "method": "PUT",
@@ -1315,6 +1336,27 @@
         "api-sockets": "value",
         "api-startup": "value",
         "api-vcpus": "value",
+        "api-vmid": "value"
+      }
+    },
+    {
+      "command": "set /nodes/{node}/qemu/{vmid}/resize",
+      "operationId": "OP-PUT-dbad102805",
+      "method": "PUT",
+      "path": "/nodes/{node}/qemu/{vmid}/resize",
+      "sensitiveInputs": [],
+      "privateResult": false,
+      "effect": "write",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "preview": "boolean",
+        "confirm": "value",
+        "session": "value",
+        "api-digest": "value",
+        "api-disk": "value",
+        "api-node": "value",
+        "api-size": "value",
         "api-vmid": "value"
       }
     },
