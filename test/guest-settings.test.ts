@@ -30,7 +30,7 @@ const guests = [
   } },
 ]
 
-test('guest settings use private reads and confirmed compute writes', async t => {
+test('guest settings use private reads and confirmed configuration writes', async t => {
   const scratch = await mkdtemp(join(tmpdir(), 'proxmox-guest-settings-'))
   t.after(() => rm(scratch, { recursive: true, force: true }))
   const caFile = join(scratch, 'server.crt')
@@ -159,6 +159,55 @@ test('guest settings use private reads and confirmed compute writes', async t =>
     ['qemu', 'name', 'bad/name', 'INVALID_INPUT', 2], ['qemu', 'hookscript', 'local:snippets/script', 'CONTRACT_UNRESOLVED', 1],
     ['qemu', 'hostpci0', '0000:00:00.0', 'INVALID_INPUT', 2],
   ]
+  for (const contract of releases) for (const { family, initial } of guests) {
+    const settings: Record<string, string> = family === 'qemu' ? {
+      net31: 'virtio=02:00:00:00:00:10,bridge=vmbr0,firewall=1,link_down=0,rate=10.5,tag=42',
+      ide2: 'local:iso/installer.iso,media=cdrom', boot: 'order=ide2;net31', agent: 'enabled=1',
+    } : { net31: 'name=eth1,bridge=vmbr0,firewall=1,gw=192.0.2.1,hwaddr=02:00:00:00:00:11,ip=192.0.2.10/24,ip6=auto,link_down=0,rate=10.5,tag=42,type=veth' }
+    await t.test(`${contract.release} ${family} confirms reviewed NIC and boot settings and refuses changed network inputs`, async () => {
+      version = contract.version
+      state[family] = { ...initial }
+      const schema = await command(['schema', 'set', configPath(family), '--catalogue', contract.release])
+      assert.equal(schema.code, 0, schema.stdout + schema.stderr)
+      const validate = new Ajv({ strict: false }).compile(JSON.parse(schema.stdout).invocation.schema)
+      assert.equal(validate({ api: { node: 'node-a', vmid: 100, ...settings } }), true)
+      assert.equal(validate({ api: { node: 'node-a', vmid: 100, net31: settings.net31!.replace('tag=42', 'tag=4095') } }), false)
+      const args = ['set', configPath(family), ...target, '--api-digest', digest,
+        ...Object.entries(settings).flatMap(([name, value]) => [`--api-${name}`, value])]
+      const preview = await command([...args, '--preview'])
+      assert.equal(preview.code, 0, preview.stdout + preview.stderr)
+      assert.deepEqual(state[family], initial)
+      const changedArgs = args.map(value => value.replace('bridge=vmbr0', 'bridge=vmbr1'))
+      const changed = await command([...changedArgs, '--confirm', JSON.parse(preview.stdout).confirmation])
+      assert.equal(JSON.parse(changed.stdout).error.code, 'CONFIRMATION_MISMATCH')
+      assert.deepEqual(state[family], initial)
+      const result = await command([...args, '--confirm', JSON.parse(preview.stdout).confirmation])
+      assert.equal(result.code, 0, result.stdout + result.stderr)
+      const observed = await command(['get', configPath(family), ...target], true)
+      assert.deepEqual(observed.frame?.payload, { ...initial, ...settings })
+      const remove = ['set', configPath(family), ...target, '--api-delete', 'net31',
+        ...(family === 'qemu' ? ['--api-boot', 'order=ide2', '--api-agent', '0'] : [])]
+      const removePreview = await command([...remove, '--preview'])
+      assert.equal(removePreview.code, 0, removePreview.stdout + removePreview.stderr)
+      assert.equal((state[family] as Record<string, unknown>).net31, settings.net31)
+      const removed = await command([...remove, '--confirm', JSON.parse(removePreview.stdout).confirmation])
+      assert.equal(removed.code, 0, removed.stdout + removed.stderr)
+      assert.equal(Object.hasOwn(state[family]!, 'net31'), false)
+    })
+  }
+  refusals.push(
+    ['qemu', 'net32', 'virtio,bridge=vmbr0', 'INVALID_INPUT', 2],
+    ['qemu', 'net0', 'virtio=01:00:00:00:00:10,bridge=vmbr0', 'INVALID_INPUT', 2],
+    ['qemu', 'net0', 'virtio,bridge=vmbr0,tag=4095', 'INVALID_INPUT', 2],
+    ['qemu', 'net0', 'virtio,bridge=vmbr0,bridge=vmbr1', 'INVALID_INPUT', 2],
+    ['qemu', 'net0', 'virtio,host-tunnel=1', 'INVALID_INPUT', 2],
+    ['lxc', 'net0', 'name=eth0,bridge=vmbr0,ip=999.0.0.1/24', 'INVALID_INPUT', 2],
+    ['lxc', 'net0', 'name=eth0,ip6=2001:db8::1/64', 'INVALID_INPUT', 2],
+    ['qemu', 'boot', 'order=hostpci0;ide2', 'INVALID_INPUT', 2],
+    ['qemu', 'agent', '1,freeze-fs=0', 'INVALID_INPUT', 2],
+    ['qemu', 'ide2', 'local:iso/../installer.iso,media=cdrom', 'INVALID_INPUT', 2],
+    ['qemu', 'ide2', '/host/installer.iso,media=cdrom', 'INVALID_INPUT', 2],
+  )
   for (const contract of releases) for (const { family } of guests) {
     const added = family === 'qemu' ? { scsi30: 'local-lvm:8,backup=1,cache=none,discard=on,format=raw,iothread=1' } :
       { rootfs: 'local-lvm:subvol-100-disk-0,acl=1', mp255: 'local-lvm:8,mp=/mnt/data,backup=1' }

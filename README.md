@@ -253,6 +253,21 @@ proxmox-axi set '/nodes/{node}/lxc/{vmid}/config' --api-node '<node>' --api-vmid
 
 Repeat the exact command with its confirmation after inspecting the preview.
 
+### Guest networking, boot media and agent setup
+
+Confirmed QEMU/LXC configuration updates support concrete `net0` through `net31` devices with reviewed property strings.
+QEMU also supports ordered boot devices, managed ISO attachment/ejection and agent enablement.
+See the [guest networking and boot reference](skills/proxmox-axi/references/guest-management.md#guest-networking-and-boot) for canonical modifier order, supported models, addresses and remaining refusals.
+
+```sh
+proxmox-axi set '/nodes/{node}/qemu/{vmid}/config' --api-node '<node>' --api-vmid 100 --api-net0 'virtio,bridge=vmbr0,firewall=1,tag=42' --profile lab --preview
+proxmox-axi set '/nodes/{node}/qemu/{vmid}/config' --api-node '<node>' --api-vmid 100 --api-ide2 'local:iso/installer.iso,media=cdrom' --api-boot 'order=ide2;scsi0;net0' --api-agent enabled=1 --profile lab --preview
+proxmox-axi set '/nodes/{node}/lxc/{vmid}/config' --api-node '<node>' --api-vmid 101 --api-net0 'name=eth0,bridge=vmbr0,firewall=1,ip=dhcp,ip6=auto,type=veth' --profile lab --preview
+```
+
+Repeat the exact command with its confirmation after inspecting the preview.
+Follow the [guest networking and boot reference](skills/proxmox-axi/references/guest-management.md#guest-networking-and-boot) for NIC replacement/removal safeguards, host-network boundaries and guest-agent prerequisites.
+
 ## Safety
 
 - Ordinary JSON reads use trusted HTTPS, a five-second total deadline and a 64 KiB response bound, and reject redirects.
