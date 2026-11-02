@@ -109,6 +109,7 @@ async function exchange(peer: Socket, channel: Socket, limits: ReturnType<typeof
   const upload = (async () => {
     let pending = Buffer.alloc(0)
     for await (const chunk of channel.iterator({ destroyOnReturn: false })) {
+      activity()
       pending = Buffer.concat([pending, Buffer.from(chunk)])
       if (pending.length > limits.frameBytes + 65540) throw failed('Input frame exceeds its quota.')
       while (pending.length >= 4) {
@@ -131,6 +132,7 @@ async function exchange(peer: Socket, channel: Socket, limits: ReturnType<typeof
   try {
     let pending = Buffer.alloc(0), fragments: Buffer[] = [], fragmentBytes = 0, fragmented = false
     for await (const chunk of peer) {
+      activity()
       pending = Buffer.concat([pending, Buffer.from(chunk)])
       if (pending.length > limits.frameBytes + 65550) throw failed('Peer frame exceeds its quota.')
       while (pending.length >= 2) {

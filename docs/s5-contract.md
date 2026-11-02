@@ -58,6 +58,8 @@ Each direction of the inherited byte channel carries a four-byte big-endian payl
 WebSocket continuation frames are assembled into the original binary message.
 Frames are limited to 1 MiB and each direction to `PROXMOX_AXI_DUPLEX_BYTES` (default 64 MiB).
 `PROXMOX_AXI_DUPLEX_IDLE_MS` defaults to 30 seconds; `PROXMOX_AXI_DUPLEX_MS` defaults to five minutes and cannot exceed 30 minutes.
+Incoming byte chunks from either the caller or provider refresh the idle timer, including partial length prefixes and frames.
+Continued progress does not extend the session lifetime or relax frame and byte quotas.
 Connection establishment has a five-second bound.
 Input EOF requests a normal WebSocket close while retaining the output half until final peer frames arrive.
 Cancellation, quota failures, abnormal close and interrupted setup retain an uncertain write outcome and close the provider connection.
