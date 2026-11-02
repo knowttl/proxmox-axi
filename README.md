@@ -260,6 +260,23 @@ No insecure-TLS flag or automatic trust update exists.
 
 ## Development
 
+S6 checks exercise native Linux and immutable package admission against fake services with process-level outbound networking denied.
+Use an absolute output directory outside the checkout:
+
+```sh
+pnpm verify:acceptance -- --task S6.1 --pack "$PWD/evidence" --out "$RUN/S6.1" --network fake-only --through standalone --native-platform current --repeat-through S6
+pnpm verify:acceptance -- --task S6.2 --pack "$PWD/evidence" --out "$RUN/S6.2" --network fake-only --through standalone --all-route-variants --all-outcomes --repeat-through S6
+```
+
+`admission-delta.json` retains installed file hashes, archive integrity, baseline fixture identity and unresolved admission counts for the next release-candidate Artium fold.
+S6 installs the sealed 0.0.1 baseline beside the owned package offline and records both executed versions and archive identities.
+Use `node /absolute/owned-package/bin/proxmox-axi.mjs --version` to select the owned executable when a baseline `proxmox-axi` is on PATH.
+Current-package S6 `--through both` hosted journeys are deferred to that fold, which runs once per release candidate rather than per slice.
+These gates validate the infrastructure and currently admitted capabilities.
+They do not certify full release completeness: unreviewed operations remain uncallable, and their expected refusals do not prove runtime support.
+Native Windows, live commissioning and the Artium fold remain pending.
+Artium journeys are opt-in through the existing fixture environment variables and `--through both`; configured tests explicitly skip them when no fixture is supplied.
+
 Use Node 24.14.0 (pinned in `.node-version`; the supported minimum is 24.11.0) and pnpm 10.22.0.
 The lockfile pins every transitive dependency and its integrity, and the `fast-uri` override pins 3.1.8.
 
@@ -290,7 +307,8 @@ Policy and data sources:
 
 `pnpm test` runs native and offline tests only, including rejection of an explicitly requested hosted journey with missing fixture inputs.
 The package-contract test packs and installs the tarball offline, checks its file list and CLI bin entry, runs `--help` and `--version`, and imports the modules and JSON artifacts consumed by Artium.
-It requires npm, pnpm and tar, with production dependencies already available in the local pnpm store.
+It also runs the package admission and coexistence checks described above and, on Linux, the native configuration and journal journeys.
+It requires npm, pnpm and tar, plus OpenSSL on Linux, with both the owned package's and sealed baseline's production dependencies already available in the local pnpm store.
 Hosted tests are opt-in and skip with `Artium fixture not supplied` unless an externally prepared, pinned local fixture is selected:
 
 ```sh
@@ -308,7 +326,7 @@ The public acceptance entry installs a packed tarball into an isolated consumer 
 It uses real loopback HTTPS and synthetic credentials inside a Linux user/network namespace containing only loopback.
 An external connection must fail with `ENETUNREACH` before any product journey runs.
 Linux user/network namespaces, iproute2 and OpenSSL are required, and missing isolation fails the check.
-Package installation can fetch dependencies before the isolated journeys start.
+Package installation runs offline; see [Tests](#tests) for the required cached dependencies.
 
 ```sh
 pnpm verify:acceptance -- --task S1.1 --pack /absolute/path/to/pack --out /absolute/new/run/S1.1 --network fake-only --through standalone

@@ -1,11 +1,13 @@
 import assert from 'node:assert/strict'
 import { execFile } from 'node:child_process'
-import { mkdtemp, readFile, readdir, rm, writeFile } from 'node:fs/promises'
+import { chmod, mkdtemp, readFile, readdir, rm, unlink, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { promisify } from 'node:util'
 import test from 'node:test'
+import { verifyPackageAdmission } from '../scripts/package-admission.js'
+import { exerciseNativeJourney } from '../scripts/native-journey.js'
 
 const execute = promisify(execFile)
 const root = fileURLToPath(new URL('../../', import.meta.url))
@@ -17,7 +19,7 @@ const data = ['artium-invocations.json', 'write-policy.json', 'axi-credential.sc
   'dist/contracts.json', 'dist/operation-policy.json', 'dist/operations.json',
   'dist/profile-schema.json', 'dist/vendor-constraints.json']
 
-test('packed package installs offline and exposes the CLI and admission contracts', { timeout: 25000 }, async () => {
+test('packed package installs offline and exposes the CLI and admission contracts', { timeout: 60000 }, async () => {
   const scratch = await mkdtemp(join(tmpdir(), 'proxmox-package-'))
   const manifest = JSON.parse(await readFile(join(root, 'package.json'), 'utf8')) as {
     name: string, version: string, bin: Record<string, string>, pnpm: { overrides: Record<string, string> }
@@ -44,7 +46,7 @@ test('packed package installs offline and exposes the CLI and admission contract
       'inventory.json', 'catalogue-diff.json', 'help.json'])
     for (const path of files) {
       assert.ok(allowedRoot.has(path) || path === 'bin/proxmox-axi.mjs' || path === 'docs/s4-contract.md' ||
-        /^dist\/[a-z][a-z-]*(?:\.js|\.d\.ts|\.json)$/.test(path), `unexpected published file: ${path}`)
+        path === 'docs/s5-contract.md' || /^dist\/[a-z][a-z-]*(?:\.js|\.d\.ts|\.json)$/.test(path), `unexpected published file: ${path}`)
       assert.doesNotMatch(path, /(?:^|\/)(?:test|tests|node_modules|src)(?:\/|$)|\.map$|\.test\./)
     }
     await writeFile(join(scratch, 'package.json'), JSON.stringify({ private: true, type: 'module',
@@ -74,5 +76,33 @@ test('packed package installs offline and exposes the CLI and admission contract
         await import(url, { with: { type: 'json' } });
       }
     `])
+    const admission = await verifyPackageAdmission(root, installed, tarball, scratch)
+    assert.equal(admission.status, 'pass')
+    assert.equal(admission.baseline.version, '0.0.1')
+    assert.equal(admission.coexistence.status, 'pass')
+    assert.deepEqual(admission.coexistence.selections, [
+      { order: 'baseline-first', unqualified: '0.0.1', owned: manifest.version },
+      { order: 'owned-first', unqualified: manifest.version, owned: manifest.version },
+    ])
+    assert.equal(admission.completeness.variants, 1285)
+    if (process.platform === 'linux') {
+      const caFile = join(scratch, 'server.crt')
+      await run('openssl', ['req', '-x509', '-newkey', 'rsa:2048', '-nodes', '-days', '1',
+        '-keyout', join(scratch, 'server.key'), '-out', caFile, '-subj', '/CN=localhost',
+        '-addext', 'subjectAltName=IP:127.0.0.1', '-addext', 'basicConstraints=critical,CA:TRUE'])
+      await chmod(caFile, 0o600)
+      const cases: Record<string, unknown>[] = []
+      await exerciseNativeJourney({ scratch, installed, executable: join(installed, 'bin/proxmox-axi.mjs'), caFile,
+        env: { ...env, PROXMOX_AXI_TOKEN: 'CANARY-native-journal' }, cases,
+        command: async (command, args, options) => {
+          const result = await execute(command, args, { cwd: scratch, env: options.env, timeout: 15000 })
+          return { code: 0, stdout: result.stdout, stderr: result.stderr }
+        } })
+      assert.equal(cases.filter(row => row.restart === 'success').length, 3)
+    }
+    // pnpm may hardlink package files to its shared store; break that link first.
+    await unlink(join(installed, 'dist/cli.js'))
+    await writeFile(join(installed, 'dist/cli.js'), 'throw new Error("altered executable")\n')
+    await assert.rejects(verifyPackageAdmission(root, installed, tarball, scratch), /Installed dist matches the current build/)
   } finally { await rm(scratch, { recursive: true, force: true }) }
 })
