@@ -10,13 +10,14 @@ Hosted reads use the authenticated request ID described below instead.
 Executing a secret-producing operation requires a caller-owned inherited pipe before upstream transmission.
 Write previews may perform bounded version reads without a private sink and never request the protected result.
 `PROXMOX_AXI_RESULT_FD` selects its descriptor, which must be at least 3 and refer to a pipe or socket.
+Launch the CLI executable directly from the caller that owns that pipe.
 Terminals, regular files, stdout and stderr are refused.
 There is no output-file fallback and no automatic retry after creation or uncertain delivery.
 Each frame contains a four-byte unsigned big-endian payload length followed by at most 65536 bytes of UTF-8 JSON.
 The JSON shape is `{ "version": 1, "binding": { "origin": "...", "identity": "...", "operation": "...", "request": "...", "actor": "...", "credentialRevision": "..." }, "payload": ... }`.
 Standalone request bindings are SHA-256 fingerprints; the host supplies an authenticated request ID, actor and credential revision.
 Receivers validate framing, version and every expected binding before accepting the payload.
-Broken delivery after transmission returns an uncertain result and consumes its confirmation.
+Broken delivery after transmission returns an uncertain result; for a confirmed mutation, its confirmation remains consumed.
 
 SecretRef-resolved input values and newly returned protected values are registered before releasing public provider content.
 Provider content is scanned/redacted across raw, URL-encoded, JSON-escaped and base64 forms after response chunks are assembled.

@@ -336,6 +336,7 @@ No insecure-TLS flag or automatic trust update exists.
 - TOON is the default, and `--format json` preserves the same structured result.
 - Lists default to 100 compact rows.
   `--limit <1-1000>` changes the display limit, `--fields` chooses fields, and `--full` includes all received rows and, unless `--fields` is supplied, all fields retained after safety filtering.
+  Protected configuration and pending-setting reads follow the [private result contract](docs/s4-contract.md) instead of list display formatting.
   See [Infrastructure discovery across profiles](#infrastructure-discovery-across-profiles) for storage index filtering.
   Unknown `--fields` names return `INVALID_INPUT` with available names from the selected response contract.
   Except for `/version`, automatic reads validate field names after target catalogue detection; an explicit `--catalogue` validates them before network access.
