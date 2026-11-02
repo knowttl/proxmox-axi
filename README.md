@@ -319,7 +319,7 @@ Policy and data sources:
 `pnpm test` runs native and offline tests only, including rejection of an explicitly requested hosted journey with missing fixture inputs.
 The package-contract test packs and installs the tarball offline, checks its file list and CLI bin entry, runs `--help` and `--version`, and imports the modules and JSON artifacts consumed by Artium.
 It also runs the package admission and coexistence checks described above and, on Linux, the native configuration and journal journeys.
-It requires npm, pnpm and tar, plus OpenSSL on Linux, with both the owned package's and sealed baseline's production dependencies already available in the local pnpm store.
+It requires npm, pnpm and tar, with both the owned package's and sealed baseline's production dependencies already available in the local pnpm store.
 Hosted tests are opt-in and skip with `Artium fixture not supplied` unless an externally prepared, pinned local fixture is selected:
 
 ```sh
@@ -360,6 +360,7 @@ Hosted S5 proof is optional per slice; select `--through both` only when the pin
 Use this repository's `evidence` directory for `--pack`, and create the parent run directory first.
 The task output directory must be new and outside the checkout.
 The driver verifies retained fixture hashes and records package integrity, fixture identity, sanitized public transcripts, case outcomes and the fake request ledger.
+Before retaining each public transcript, it rejects canaries in raw, JSON-escaped or URL-encoded form in either stdout or stderr.
 Private scratch state and canary values are removed before it returns.
 
 Explicit acceptance with `--through both` requires both external fixture inputs and fails if either is missing or its pinned identity differs.

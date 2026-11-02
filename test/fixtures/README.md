@@ -7,3 +7,7 @@ This baseline is distinct from the hosted admission archive pinned in `test/arti
 Session identifiers, credentials and description text are synthetic replacements.
 The refusal cases model HTTP validation, authentication and permission responses, including the observed `Pool.Allocate` refusal.
 Their envelopes are constructed boundary fixtures rather than exact wire recordings.
+
+`localhost-cert.pem` and `localhost-key.pem` are public test-only TLS material for the package-contract test's Linux loopback journeys.
+The certificate is valid from 2020 through 2099 to tolerate host clock steps and covers `localhost` and `127.0.0.1`.
+Never use this public private key for real services.
