@@ -44,7 +44,7 @@ That reference ships inside this skill folder and includes private pipe setup, r
 
 Run `proxmox-axi inventory` or `proxmox-axi schema <method> '<template>'` offline before choosing an operation and its supported inputs.
 Discoverable routes may remain refused; never bypass admission or broaden permissions to work around a refusal.
-For an authorized mutation, use its existing `create`, `set` or `delete` command with `--preview`, inspect the selected target and inputs, then repeat the exact request with `--confirm '<confirmation>'`.
+For an authorized mutation, use the command shown by its schema with `--preview`, inspect the selected target and inputs, then repeat the exact request with `--confirm '<confirmation>'`.
 Changed targets, profiles, inputs or policy require a fresh preview.
 Supply sensitive inputs through supported env/file SecretRefs in a protected body file, never literal password or token arguments.
 Treat a returned UPID as pending and use `proxmox-axi task wait --api-node '<node>' --api-upid '<UPID>' --journal '<intent-id>' --profile '<profile>'` to observe completion.

@@ -395,7 +395,7 @@ Only reviewed managed backup sources are admitted; force overwrite, raw host pat
   Unresolved policy fields deny invocation, and changing a capture never admits new operations automatically.
 - Writes cover [QEMU creation and cloning](#create-and-clone-qemu-guests), [LXC creation and cloning](#create-and-clone-lxc-guests), [backup restoration](#restore-guest-backups), [confirmed guest execution and status retrieval](#confirmed-guest-execution), guest power operations, guest destruction, [selected guest configuration settings](#guest-configuration-and-compute-settings), [managed disk attachments](#manage-disk-attachments), growth-only guest disk resize, pool management, task cancellation, node execute batches, [media uploads and catalogue installation](#discover-and-install-guest-media), [guest backups](#guest-backups) and the reviewed credential/session setup operations.
   Effectful CIFS/PBS scans use the same preview and confirmation policy even though their vendor method is GET.
-- Inspect `schema create|set|delete <template>` and the generated `write-policy.json` before enabling an operation.
+- Inspect `schema get|create|set|delete <template>` and the generated `write-policy.json` before enabling an operation.
 - Enable an operation by adding its ID to the selected file profile: `writes: { "operations": ["<operation-id>"] }`.
   Environment-only profiles cannot enable writes.
 - Hosted use needs the host's independent `hostWrites` policy with `allowWrites: true` and the exact operation IDs.
