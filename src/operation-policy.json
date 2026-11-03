@@ -11,6 +11,9 @@
     "reason": "Requires operation-specific effect, transport and secret review before admission."
   },
   "reviewed": {
+    "GET /nodes/{node}/aplinfo": { "effect": "read", "transport": "json", "secrets": "none", "outputFields": ["template", "package", "version", "type", "os", "architecture", "section"], "reason": "Appliance catalogue identifiers and classification only; provider URLs, descriptions and undeclared fields are excluded even with full output." },
+    "GET /nodes/{node}/storage/{storage}/content": { "effect": "read", "transport": "json", "secrets": "none", "outputFields": ["volid", "format", "size", "approximate-size", "used", "vmid", "ctime", "protected"], "reason": "Permission-scoped volume discovery; notes, provider paths and undeclared metadata are excluded even with full output." },
+    "GET /nodes/{node}/storage/{storage}/content/{volume}": { "effect": "read", "transport": "json", "secrets": "none", "inputFormats": { "volume": "pve-managed-volume" }, "outputFields": ["format", "size", "used", "protected"], "reason": "Volume format and capacity metadata only; host paths, notes and undeclared fields are excluded even with full output." },
     "GET /nodes/{node}/qemu/{vmid}/cloudinit": { "effect": "read", "transport": "json", "secrets": "private-result", "reason": "Cloud-init current/pending values may contain credentials; validated rows require the inherited private result pipe." },
     "GET /nodes/{node}/qemu/{vmid}/config": { "effect": "read", "transport": "json", "secrets": "private-result", "reason": "Guest configuration may contain cloud-init credentials; validated payload is delivered only through the inherited private result pipe." },
     "GET /nodes/{node}/lxc/{vmid}/config": { "effect": "read", "transport": "json", "secrets": "private-result", "reason": "Container configuration may contain protected data; validated payload is delivered only through the inherited private result pipe." },

@@ -22,7 +22,7 @@ function inventoryVisibility(path: string, permissions: unknown): string {
 }
 
 export function validateFields(contract: Contract, fields?: string[]): void {
-  const known = Object.keys(contract.returns.items?.properties ?? contract.returns.properties ?? {})
+  const known = contract.policy.outputFields ?? Object.keys(contract.returns.items?.properties ?? contract.returns.properties ?? {})
   const unknown = fields?.filter(field => !known.includes(field)) ?? []
   if (unknown.length) throw new Failure('INVALID_INPUT', `Unknown fields: ${unknown.join(', ')}.`, `Available fields: ${known.join(', ')}.`, 2)
 }
@@ -58,6 +58,19 @@ export async function readOperation(credentials: Credentials, initial: Contract,
   }
   const envelope = await executeRead(credentials, buildPath(selected, values), true) as { data: unknown, total?: number }
   validateResponse(envelope.data, selected.returns)
+  if (selected.policy.outputFields) {
+    const names = selected.policy.outputFields
+    const properties = selected.returns.items?.properties ?? selected.returns.properties ?? {}
+    const project = (value: unknown) => {
+      const row = value as Record<string, unknown>
+      const projected = Object.fromEntries(names.filter(name => Object.hasOwn(row, name)).map(name => [name, row[name]]))
+      // The appliance catalogue declares no row properties; reviewed identifiers are strings.
+      validateResponse(projected, { type: 'object', properties: Object.fromEntries(names.map(name =>
+        [name, properties[name] ?? { type: 'string', optional: 1 }])) })
+      return projected
+    }
+    envelope.data = Array.isArray(envelope.data) ? envelope.data.map(project) : project(envelope.data)
+  }
   if (privateResult) {
     await credentials.results.deliver(resultBinding(credentials.origin, credentials.tokenId, selected.id,
       `${selected.release} ${buildPath(selected, values)}`), envelope.data)

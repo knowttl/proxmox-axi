@@ -34588,12 +34588,21 @@
       "id": "OP-GET-66bdd31664",
       "release": "legacy-8.2.7",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "read",
+        "transport": "json",
+        "secrets": "none",
+        "outputFields": [
+          "template",
+          "package",
+          "version",
+          "type",
+          "os",
+          "architecture",
+          "section"
+        ],
+        "reason": "Appliance catalogue identifiers and classification only; provider URLs, descriptions and undeclared fields are excluded even with full output."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "get",
         "/nodes/{node}/aplinfo"
@@ -34683,12 +34692,37 @@
       "id": "OP-POST-9b2e201640",
       "release": "legacy-8.2.7",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "write",
+        "transport": "json",
+        "secrets": "none",
+        "allowedInputs": [
+          "node",
+          "storage",
+          "template"
+        ],
+        "inputPatterns": {
+          "template": "^[A-Za-z0-9][A-Za-z0-9._-]*\\.tar\\.(?:zst|xz|gz)$"
+        },
+        "reason": "Confirmed installation of a provider-catalogue container template; URLs and arbitrary downloads remain refused.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Track the returned download UPID and inspect storage content after success; never retry uncertain installation automatically."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/storage/{storage}",
+            [
+              "Datastore.AllocateTemplate"
+            ]
+          ]
+        },
+        "response": {
+          "type": "string"
+        },
+        "source": "Pinned apl_download schemas and provider catalogue lookup; existing effect and task contracts."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "post",
         "/nodes/{node}/aplinfo"
@@ -34715,7 +34749,12 @@
                 },
                 "template": {
                   "type": "string",
-                  "maxLength": 255
+                  "maxLength": 255,
+                  "allOf": [
+                    {
+                      "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*\\.tar\\.(?:zst|xz|gz)$"
+                    }
+                  ]
                 }
               },
               "required": [
@@ -96539,12 +96578,22 @@
       "id": "OP-GET-090607ccf4",
       "release": "legacy-8.2.7",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "read",
+        "transport": "json",
+        "secrets": "none",
+        "outputFields": [
+          "volid",
+          "format",
+          "size",
+          "approximate-size",
+          "used",
+          "vmid",
+          "ctime",
+          "protected"
+        ],
+        "reason": "Permission-scoped volume discovery; notes, provider paths and undeclared metadata are excluded even with full output."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "get",
         "/nodes/{node}/storage/{storage}/content"
@@ -96940,12 +96989,21 @@
       "id": "OP-GET-d6c763e6d8",
       "release": "legacy-8.2.7",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "read",
+        "transport": "json",
+        "secrets": "none",
+        "inputFormats": {
+          "volume": "pve-managed-volume"
+        },
+        "outputFields": [
+          "format",
+          "size",
+          "used",
+          "protected"
+        ],
+        "reason": "Volume format and capacity metadata only; host paths, notes and undeclared fields are excluded even with full output."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "get",
         "/nodes/{node}/storage/{storage}/content/{volume}"
@@ -96971,7 +97029,8 @@
                   "pattern": "^[A-Za-z][A-Za-z0-9._-]*$"
                 },
                 "volume": {
-                  "type": "string"
+                  "type": "string",
+                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*:[A-Za-z0-9][A-Za-z0-9._:-]*(?:/[A-Za-z0-9][A-Za-z0-9._:-]*)*$"
                 }
               },
               "required": [
@@ -153917,12 +153976,21 @@
       "id": "OP-GET-66bdd31664",
       "release": "published-current",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "read",
+        "transport": "json",
+        "secrets": "none",
+        "outputFields": [
+          "template",
+          "package",
+          "version",
+          "type",
+          "os",
+          "architecture",
+          "section"
+        ],
+        "reason": "Appliance catalogue identifiers and classification only; provider URLs, descriptions and undeclared fields are excluded even with full output."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "get",
         "/nodes/{node}/aplinfo"
@@ -154012,12 +154080,37 @@
       "id": "OP-POST-9b2e201640",
       "release": "published-current",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "write",
+        "transport": "json",
+        "secrets": "none",
+        "allowedInputs": [
+          "node",
+          "storage",
+          "template"
+        ],
+        "inputPatterns": {
+          "template": "^[A-Za-z0-9][A-Za-z0-9._-]*\\.tar\\.(?:zst|xz|gz)$"
+        },
+        "reason": "Confirmed installation of a provider-catalogue container template; URLs and arbitrary downloads remain refused.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Track the returned download UPID and inspect storage content after success; never retry uncertain installation automatically."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/storage/{storage}",
+            [
+              "Datastore.AllocateTemplate"
+            ]
+          ]
+        },
+        "response": {
+          "type": "string"
+        },
+        "source": "Pinned apl_download schemas and provider catalogue lookup; existing effect and task contracts."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "post",
         "/nodes/{node}/aplinfo"
@@ -154044,7 +154137,12 @@
                 },
                 "template": {
                   "type": "string",
-                  "maxLength": 255
+                  "maxLength": 255,
+                  "allOf": [
+                    {
+                      "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*\\.tar\\.(?:zst|xz|gz)$"
+                    }
+                  ]
                 }
               },
               "required": [
@@ -219119,12 +219217,22 @@
       "id": "OP-GET-090607ccf4",
       "release": "published-current",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "read",
+        "transport": "json",
+        "secrets": "none",
+        "outputFields": [
+          "volid",
+          "format",
+          "size",
+          "approximate-size",
+          "used",
+          "vmid",
+          "ctime",
+          "protected"
+        ],
+        "reason": "Permission-scoped volume discovery; notes, provider paths and undeclared metadata are excluded even with full output."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "get",
         "/nodes/{node}/storage/{storage}/content"
@@ -219520,12 +219628,21 @@
       "id": "OP-GET-d6c763e6d8",
       "release": "published-current",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "read",
+        "transport": "json",
+        "secrets": "none",
+        "inputFormats": {
+          "volume": "pve-managed-volume"
+        },
+        "outputFields": [
+          "format",
+          "size",
+          "used",
+          "protected"
+        ],
+        "reason": "Volume format and capacity metadata only; host paths, notes and undeclared fields are excluded even with full output."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "get",
         "/nodes/{node}/storage/{storage}/content/{volume}"
@@ -219551,7 +219668,8 @@
                   "pattern": "^[A-Za-z][A-Za-z0-9._-]*$"
                 },
                 "volume": {
-                  "type": "string"
+                  "type": "string",
+                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*:[A-Za-z0-9][A-Za-z0-9._:-]*(?:/[A-Za-z0-9][A-Za-z0-9._:-]*)*$"
                 }
               },
               "required": [

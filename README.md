@@ -282,6 +282,20 @@ Confirm each exact preview separately; regeneration returns synchronous success 
 `get .../cloudinit` exposes protected current/pending values only through the inherited private result pipe, including before regeneration.
 Cloud-init dumps, custom snippets and unreviewed input branches remain refused.
 
+### Discover and install guest media
+
+List managed ISO images, container templates, guest disks or backups, or inspect the provider's appliance catalogue:
+
+```sh
+proxmox-axi get '/nodes/{node}/storage/{storage}/content' --api-node '<node>' --api-storage local --api-content iso --profile lab
+proxmox-axi get '/nodes/{node}/aplinfo' --api-node '<node>' --profile lab
+proxmox-axi create '/nodes/{node}/aplinfo' --api-node '<node>' --api-storage local --api-template '<catalogue-template>.tar.zst' --profile lab --preview
+```
+
+The [media reference](skills/proxmox-axi/references/guest-management.md#iso-and-container-template-media) covers reviewed content-detail fields, catalogue installation and local ISO/template uploads through the existing private managed byte channel.
+Every upload/install needs exact preview confirmation; wait for the returned task and inspect storage content before using the media.
+Provider paths, notes and undeclared catalogue fields stay excluded even with `--full`.
+
 ### Create and clone QEMU guests
 
 Create a blank QEMU guest or clone an existing template with a preview:
