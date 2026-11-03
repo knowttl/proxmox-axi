@@ -44,7 +44,8 @@ There is no task UPID to pass to `task wait` for this update.
 After a provider refusal or uncertain delivery, inspect `journal show '<intent-id>'` and the selected options before deciding on recovery; never automatically retry or disable protection to regain access.
 `journal reconcile` compares supplied settings only and cannot establish effective filtering or attribute a matching configuration to this request.
 
-Option delete/reset selectors, logging/filter/conntrack/backend changes, SDN-vnet firewall operations, aliases, IP sets and security-group administration remain refused in this admission.
+Option delete/reset selectors, logging/filter/conntrack/backend changes, SDN-vnet firewall operations and security-group administration remain refused in this admission.
+For admitted alias and IP-set operations, follow [Aliases and IP sets](#aliases-and-ip-sets).
 
 ## Ordered firewall rules
 
