@@ -209,8 +209,7 @@ proxmox-axi get '/nodes/{node}/qemu/{vmid}/status/current' --api-node '<node>' -
 proxmox-axi get '/nodes/{node}/lxc/{vmid}/status/current' --api-node '<node>' --api-vmid 101 --profile lab
 ```
 
-`get '/nodes/{node}/qemu/{vmid}/config'`, the LXC equivalent, and both guests' `/pending` reads require a caller-owned private result pipe because their payloads can contain credentials.
-Use the [private result contract](docs/s4-contract.md) for pipe setup, delivery metadata and payload handling.
+For protected guest reads, follow the [guest private-read guidance](skills/proxmox-axi/references/guest-management.md#private-configuration-reads) for covered operations, pipe setup, delivery metadata and payload handling.
 
 Confirmed `set .../config` supports the settings present in each guest's selected contract: names/description, cores, CPU limits/weights, memory, onboot and startup order; QEMU also supports sockets, vCPUs, balloon memory and a CPU model, while LXC supports swap.
 QEMU memory accepts `2048` or `current=2048` in MiB, with a minimum of 16; LXC memory and swap use integer MB values.
@@ -267,6 +266,21 @@ proxmox-axi set '/nodes/{node}/lxc/{vmid}/config' --api-node '<node>' --api-vmid
 
 Repeat the exact command with its confirmation after inspecting the preview.
 Follow the [guest networking and boot reference](skills/proxmox-axi/references/guest-management.md#guest-networking-and-boot) for NIC replacement/removal safeguards, host-network boundaries and guest-agent prerequisites.
+
+### Cloud-init onboarding
+
+Confirmed QEMU configuration updates now support `ciuser`, SecretRef-only `cipassword`, percent-encoded SSH public keys, `ipconfig0` through `ipconfig31`, DNS settings and ordinary `storage:cloudinit` media.
+QEMU and LXC configuration updates support space-separated reviewed IPv4 DNS servers and DNS search domains.
+See the [cloud-init onboarding reference](skills/proxmox-axi/references/guest-management.md#cloud-init-onboarding) for input constraints and secret handling.
+
+```sh
+proxmox-axi set '/nodes/{node}/qemu/{vmid}/config' --api-node '<node>' --api-vmid 100 --api-ciuser deployer --api-ipconfig0 'ip=dhcp,ip6=auto' --api-ide2 'local-lvm:cloudinit' --profile lab --preview
+proxmox-axi set '/nodes/{node}/qemu/{vmid}/cloudinit' --api-node '<node>' --api-vmid 100 --profile lab --preview
+```
+
+Confirm each exact preview separately; regeneration returns synchronous success rather than a UPID.
+`get .../cloudinit` exposes protected current/pending values only through the inherited private result pipe, including before regeneration.
+Cloud-init dumps, custom snippets and unreviewed input branches remain refused.
 
 ## Safety
 

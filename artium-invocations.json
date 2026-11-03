@@ -1278,9 +1278,11 @@
         "api-digest": "value",
         "api-hostname": "value",
         "api-memory": "value",
+        "api-nameserver": "value",
         "api-node": "value",
         "api-onboot": "value",
         "api-rootfs": "value",
+        "api-searchdomain": "value",
         "api-startup": "value",
         "api-swap": "value",
         "api-vmid": "value",
@@ -1596,6 +1598,24 @@
       }
     },
     {
+      "command": "set /nodes/{node}/qemu/{vmid}/cloudinit",
+      "operationId": "OP-PUT-483437800e",
+      "method": "PUT",
+      "path": "/nodes/{node}/qemu/{vmid}/cloudinit",
+      "sensitiveInputs": [],
+      "privateResult": false,
+      "effect": "write",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "preview": "boolean",
+        "confirm": "value",
+        "session": "value",
+        "api-node": "value",
+        "api-vmid": "value"
+      }
+    },
+    {
       "command": "set /nodes/{node}/qemu/{vmid}/config",
       "operationId": "OP-PUT-41cd6542bd",
       "method": "PUT",
@@ -1615,6 +1635,7 @@
         "api-agent": "value",
         "api-balloon": "value",
         "api-boot": "value",
+        "api-ciuser": "value",
         "api-cores": "value",
         "api-cpu": "value",
         "api-cpulimit": "value",
@@ -1624,9 +1645,12 @@
         "api-digest": "value",
         "api-memory": "value",
         "api-name": "value",
+        "api-nameserver": "value",
         "api-node": "value",
         "api-onboot": "value",
+        "api-searchdomain": "value",
         "api-sockets": "value",
+        "api-sshkeys": "value",
         "api-startup": "value",
         "api-vcpus": "value",
         "api-vmid": "value",
@@ -1718,7 +1742,39 @@
         "api-net28": "value",
         "api-net29": "value",
         "api-net30": "value",
-        "api-net31": "value"
+        "api-net31": "value",
+        "api-ipconfig0": "value",
+        "api-ipconfig1": "value",
+        "api-ipconfig2": "value",
+        "api-ipconfig3": "value",
+        "api-ipconfig4": "value",
+        "api-ipconfig5": "value",
+        "api-ipconfig6": "value",
+        "api-ipconfig7": "value",
+        "api-ipconfig8": "value",
+        "api-ipconfig9": "value",
+        "api-ipconfig10": "value",
+        "api-ipconfig11": "value",
+        "api-ipconfig12": "value",
+        "api-ipconfig13": "value",
+        "api-ipconfig14": "value",
+        "api-ipconfig15": "value",
+        "api-ipconfig16": "value",
+        "api-ipconfig17": "value",
+        "api-ipconfig18": "value",
+        "api-ipconfig19": "value",
+        "api-ipconfig20": "value",
+        "api-ipconfig21": "value",
+        "api-ipconfig22": "value",
+        "api-ipconfig23": "value",
+        "api-ipconfig24": "value",
+        "api-ipconfig25": "value",
+        "api-ipconfig26": "value",
+        "api-ipconfig27": "value",
+        "api-ipconfig28": "value",
+        "api-ipconfig29": "value",
+        "api-ipconfig30": "value",
+        "api-ipconfig31": "value"
       }
     },
     {
@@ -1904,6 +1960,21 @@
         "full": "boolean",
         "api-full": "value",
         "api-node": "value"
+      }
+    },
+    {
+      "command": "ls /nodes/{node}/qemu/{vmid}/cloudinit",
+      "effect": "read",
+      "privateResult": true,
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "session": "value",
+        "limit": "value",
+        "fields": "value",
+        "full": "boolean",
+        "api-node": "value",
+        "api-vmid": "value"
       }
     },
     {
@@ -9705,6 +9776,29 @@
         "api-full": "value",
         "api-node": "value"
       },
+      "catalogues": [
+        "legacy-8.2.7",
+        "published-current"
+      ]
+    },
+    {
+      "command": "get /nodes/{node}/qemu/{vmid}/cloudinit",
+      "operationId": "OP-GET-9305ccd805",
+      "method": "GET",
+      "path": "/nodes/{node}/qemu/{vmid}/cloudinit",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value",
+        "limit": "value",
+        "fields": "value",
+        "full": "boolean",
+        "session": "value",
+        "api-node": "value",
+        "api-vmid": "value"
+      },
+      "privateResult": true,
       "catalogues": [
         "legacy-8.2.7",
         "published-current"

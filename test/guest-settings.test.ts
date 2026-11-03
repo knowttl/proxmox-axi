@@ -17,6 +17,8 @@ const environment = Object.fromEntries(Object.entries(process.env).filter(([key]
 const hash = (value: string) => createHash('sha256').update(value).digest('hex')
 const configPath = (family: string) => `/nodes/{node}/${family}/{vmid}/config`
 const canary = 'CANARY-private-guest-credential'
+const cloudPassword = 'CANARY-cloud-init+password/with space'
+const publicKey = `ssh-ed25519 ${Buffer.from('0000000b7373682d6564323535313900000020d75a980182b10ab7d54bfed3c964073a0ee172f3daa62325af021a68f707511a', 'hex').toString('base64')} fixture`
 const digest = '0123456789012345678901234567890123456789'
 const releases = [{ release: 'legacy-8.2.7', version: '8.2.7' }, { release: 'published-current', version: '9.2.1' }]
 const guests = [
@@ -37,7 +39,7 @@ test('guest settings use private reads and confirmed configuration writes', asyn
   await execute('openssl', ['req', '-x509', '-newkey', 'rsa:2048', '-nodes', '-days', '1', '-subj', '/CN=localhost',
     '-addext', 'subjectAltName=IP:127.0.0.1', '-keyout', join(scratch, 'server.key'), '-out', caFile])
   await chmod(caFile, 0o600)
-  let version = '8.2.7', malformed = false
+  let version = '8.2.7', malformed = false, rejectCloudPassword = false, imagePassword = canary
   const requests: { method: string, path: string }[] = []
   const state: Record<string, Record<string, unknown>> = Object.fromEntries(guests.map(guest => [guest.family, { ...guest.initial }]))
   const server = createServer({ key: await readFile(join(scratch, 'server.key')), cert: await readFile(caFile) }, async (request, response) => {
@@ -46,7 +48,14 @@ test('guest settings use private reads and confirmed configuration writes', asyn
     if (request.method === 'PUT') {
       const chunks: Buffer[] = []
       for await (const chunk of request) chunks.push(Buffer.from(chunk))
-      for (const [name, value] of new URLSearchParams(Buffer.concat(chunks).toString())) {
+      const inputs = new URLSearchParams(Buffer.concat(chunks).toString())
+      if (rejectCloudPassword && inputs.has('cipassword')) {
+        response.statusCode = 400
+        response.end(JSON.stringify({ message: `Rejected ${cloudPassword} ${encodeURIComponent(cloudPassword)} ${Buffer.from(cloudPassword).toString('base64')}` }))
+        return
+      }
+      if (request.url!.endsWith('/cloudinit')) imagePassword = String(state.qemu!.cipassword)
+      for (const [name, value] of inputs) {
         if (name === 'delete') { for (const slot of value.split(',')) delete state[family]![slot]; continue }
         state[family]![name] = ['cores', 'sockets', 'vcpus', 'balloon', 'swap', 'cpulimit', 'cpuunits', 'onboot'].includes(name) || (name === 'memory' && family === 'lxc') ? Number(value) : value
       }
@@ -56,6 +65,8 @@ test('guest settings use private reads and confirmed configuration writes', asyn
     const data = request.url!.endsWith('/version') ? { version, release: 'synthetic', repoid: 'synthetic' } :
       request.url!.endsWith('/config') ? malformed ? { digest: 123, password: canary } : state[family] :
       request.url!.endsWith('/pending') ? [{ key: malformed ? 123 : 'cipassword', value: canary, pending: `${canary}-pending` }] :
+      request.url!.endsWith('/cloudinit') ? [{ key: malformed ? 123 : 'cipassword', value: imagePassword,
+        ...(imagePassword !== state.qemu!.cipassword ? { pending: String(state.qemu!.cipassword) } : {}) }] :
       { ha: {}, status: 'running', vmid: malformed ? '100' : 100, cpus: 2, maxmem: 536870912 }
     response.end(JSON.stringify({ data }))
   })
@@ -65,11 +76,12 @@ test('guest settings use private reads and confirmed configuration writes', asyn
   const config = join(scratch, 'config.json'), log = join(scratch, 'writes.log')
   await writeFile(config, JSON.stringify({ version: 1, defaultProfile: 'lab', profiles: { lab: {
     auth: 'api-token', origin, tokenId: 'synthetic@pve!test', token: { env: 'GUEST_SETTINGS_TOKEN' }, caBundle: caFile,
-    writes: { operations: ['qemu', 'lxc'].map(family => `OP-PUT-${hash(`PUT ${configPath(family)}`).slice(0, 10)}`) },
+    writes: { operations: [...['qemu', 'lxc'].map(family => `OP-PUT-${hash(`PUT ${configPath(family)}`).slice(0, 10)}`),
+      `OP-PUT-${hash('PUT /nodes/{node}/qemu/{vmid}/cloudinit').slice(0, 10)}`] },
   } } }), { mode: 0o600 })
   const command = async (args: string[], privateResult = false) => {
     const child = spawn(process.execPath, [executable, ...args, '--config', config, '--format', 'json'], {
-      env: { ...environment, GUEST_SETTINGS_TOKEN: 'synthetic-token', PROXMOX_AXI_WRITE_LOG: log, PROXMOX_AXI_RESULT_FD: privateResult ? '3' : '' },
+      env: { ...environment, GUEST_SETTINGS_TOKEN: 'synthetic-token', CLOUD_INIT_PASSWORD: cloudPassword, PROXMOX_AXI_WRITE_LOG: log, PROXMOX_AXI_RESULT_FD: privateResult ? '3' : '' },
       stdio: ['ignore', 'pipe', 'pipe', ...(privateResult ? ['pipe' as const] : [])],
     })
     let stdout = '', stderr = '', bytes = Buffer.alloc(0)
@@ -91,6 +103,7 @@ test('guest settings use private reads and confirmed configuration writes', asyn
     for (const { suffix, expected } of [
       { suffix: 'config', expected: state[family] },
       { suffix: 'pending', expected: [{ key: 'cipassword', value: canary, pending: `${canary}-pending` }] },
+      ...(family === 'qemu' ? [{ suffix: 'cloudinit', expected: [{ key: 'cipassword', value: canary }] }] : []),
     ]) {
       const path = `/nodes/{node}/${family}/{vmid}/${suffix}`
       await t.test(`${release} ${family} ${suffix} requires a private pipe before network access`, async () => {
@@ -129,6 +142,53 @@ test('guest settings use private reads and confirmed configuration writes', asyn
     })
   }
   await assert.rejects(readdir(`${log}.d`), { code: 'ENOENT' })
+  for (const contract of releases) {
+    await t.test(`${contract.release} onboards cloud-init and regenerates media without exposing password inputs`, async () => {
+      version = contract.version
+      state.qemu = { ...guests[0]!.initial }
+      imagePassword = canary
+      const settings = { ciuser: 'deployer', cipassword: { env: 'CLOUD_INIT_PASSWORD' }, sshkeys: encodeURIComponent(`${publicKey}\n${publicKey}\n`),
+        ipconfig31: 'ip=192.0.2.10/24,gw=192.0.2.1,ip6=auto', nameserver: '192.0.2.53 192.0.2.54', searchdomain: 'example.test lab.test', ide2: 'local-lvm:cloudinit' }
+      const body = join(scratch, 'cloud-init.json')
+      await writeFile(body, JSON.stringify(settings), { mode: 0o600 })
+      const schema = await command(['schema', 'set', configPath('qemu'), '--catalogue', contract.release])
+      assert.equal(schema.code, 0, schema.stdout + schema.stderr)
+      const validate = new Ajv({ strict: false }).compile(JSON.parse(schema.stdout).invocation.schema)
+      assert.equal(validate({ api: { node: 'node-a', vmid: 100, ...settings } }), true)
+      assert.equal(validate({ api: { node: 'node-a', vmid: 100, ipconfig0: 'ip=dhcp,ip6=auto' } }), true)
+      const args = ['set', configPath('qemu'), ...target, '--body-file', body]
+      const preview = await command([...args, '--preview'])
+      assert.equal(preview.code, 0, preview.stdout + preview.stderr)
+      const result = await command([...args, '--confirm', JSON.parse(preview.stdout).confirmation])
+      assert.equal(result.code, 0, result.stdout + result.stderr)
+      const observed = await command(['get', configPath('qemu'), ...target], true)
+      assert.deepEqual(observed.frame?.payload, { ...guests[0]!.initial, ...settings, cipassword: cloudPassword })
+      const route = '/nodes/{node}/qemu/{vmid}/cloudinit'
+      const pending = await command(['get', route, ...target], true)
+      assert.deepEqual(pending.frame?.payload, [{ key: 'cipassword', value: canary, pending: cloudPassword }])
+      const regeneration = ['set', route, ...target]
+      const regenerationPreview = await command([...regeneration, '--preview'])
+      assert.equal(regenerationPreview.code, 0, regenerationPreview.stdout + regenerationPreview.stderr)
+      assert.equal(imagePassword, canary)
+      const regenerated = await command([...regeneration, '--confirm', JSON.parse(regenerationPreview.stdout).confirmation])
+      assert.equal(regenerated.code, 0, regenerated.stdout + regenerated.stderr)
+      const current = await command(['get', route, ...target], true)
+      assert.deepEqual(current.frame?.payload, [{ key: 'cipassword', value: cloudPassword }])
+      const journal = await command(['journal', 'show', JSON.parse(result.stdout).id])
+      assert.equal(JSON.parse(journal.stdout).journal.status, 'success')
+      const rejectedPreview = await command([...args, '--preview'])
+      assert.equal(rejectedPreview.code, 0, rejectedPreview.stdout + rejectedPreview.stderr)
+      rejectCloudPassword = true
+      const rejected = await command([...args, '--confirm', JSON.parse(rejectedPreview.stdout).confirmation])
+      rejectCloudPassword = false
+      assert.notEqual(rejected.code, 0)
+      const failed = await command(['journal', 'show', JSON.parse(rejectedPreview.stdout).id])
+      assert.equal(JSON.parse(failed.stdout).journal.status, 'failed')
+      const durable = await Promise.all((await readdir(`${log}.d`)).filter(name => name.endsWith('.json')).map(name => readFile(join(`${log}.d`, name), 'utf8')))
+      const publicOutput = [preview, result, observed, pending, regenerationPreview, regenerated, current, journal, rejectedPreview, rejected, failed].map(value => value.stdout + value.stderr).join('') + durable.join('')
+      for (const secret of [cloudPassword, encodeURIComponent(cloudPassword), Buffer.from(cloudPassword).toString('base64')]) assert.equal(publicOutput.includes(secret), false)
+    })
+  }
   for (const contract of releases) for (const { family, initial, settings } of guests) {
     const { release } = contract
     version = contract.version
@@ -163,7 +223,8 @@ test('guest settings use private reads and confirmed configuration writes', asyn
     const settings: Record<string, string> = family === 'qemu' ? {
       net31: 'virtio=02:00:00:00:00:10,bridge=vmbr0,firewall=1,link_down=0,rate=10.5,tag=42',
       ide2: 'local:iso/installer.iso,media=cdrom', boot: 'order=ide2;net31', agent: 'enabled=1',
-    } : { net31: 'name=eth1,bridge=vmbr0,firewall=1,gw=192.0.2.1,hwaddr=02:00:00:00:00:11,ip=192.0.2.10/24,ip6=auto,link_down=0,rate=10.5,tag=42,type=veth' }
+    } : { net31: 'name=eth1,bridge=vmbr0,firewall=1,gw=192.0.2.1,hwaddr=02:00:00:00:00:11,ip=192.0.2.10/24,ip6=auto,link_down=0,rate=10.5,tag=42,type=veth',
+      nameserver: '192.0.2.53 192.0.2.54', searchdomain: 'example.test lab.test' }
     await t.test(`${contract.release} ${family} confirms reviewed NIC and boot settings and refuses changed network inputs`, async () => {
       version = contract.version
       state[family] = { ...initial }
@@ -207,6 +268,14 @@ test('guest settings use private reads and confirmed configuration writes', asyn
     ['qemu', 'agent', '1,freeze-fs=0', 'INVALID_INPUT', 2],
     ['qemu', 'ide2', 'local:iso/../installer.iso,media=cdrom', 'INVALID_INPUT', 2],
     ['qemu', 'ide2', '/host/installer.iso,media=cdrom', 'INVALID_INPUT', 2],
+    ['qemu', 'ciuser', 'bad:user', 'INVALID_INPUT', 2],
+    ['qemu', 'sshkeys', encodeURIComponent(`command="run" ${publicKey}`), 'INVALID_INPUT', 2],
+    ['qemu', 'sshkeys', encodeURIComponent(`${publicKey}\ncommand="run" ${publicKey}`), 'INVALID_INPUT', 2],
+    ['qemu', 'ipconfig32', 'ip=dhcp', 'INVALID_INPUT', 2],
+    ['qemu', 'ipconfig0', 'ip=dhcp,gw=192.0.2.1', 'INVALID_INPUT', 2],
+    ['qemu', 'ipconfig0', 'ip=999.0.0.1/24', 'INVALID_INPUT', 2],
+    ['qemu', 'nameserver', '999.0.0.1', 'INVALID_INPUT', 2],
+    ['lxc', 'searchdomain', 'bad/domain', 'INVALID_INPUT', 2],
   )
   for (const contract of releases) for (const { family } of guests) {
     const added = family === 'qemu' ? { scsi30: 'local-lvm:8,backup=1,cache=none,discard=on,format=raw,iothread=1' } :

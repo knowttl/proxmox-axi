@@ -39,7 +39,7 @@ Use `--fields`, `--limit` and `--full` when more detail is needed within the out
 ## Discover operations and complete confirmed tasks
 
 For QEMU/LXC resource metrics, read `/nodes/{node}/qemu/{vmid}/status/current` or its LXC equivalent with the selected node, VMID and profile.
-For configuration and `/pending` reads, compute settings, guest NICs/boot/agent setup, managed disks and growth-only disk resize, follow the [guest management reference](references/guest-management.md).
+For protected configuration/cloud-init reads, onboarding, compute settings, guest NICs/boot/agent setup, managed disks and growth-only disk resize, follow the [guest management reference](references/guest-management.md).
 That reference ships inside this skill folder and includes private pipe setup, receiver bindings, input constraints and digest handling.
 
 Run `proxmox-axi inventory` or `proxmox-axi schema <method> '<template>'` offline before choosing an operation and its supported inputs.

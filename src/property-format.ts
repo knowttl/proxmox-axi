@@ -1,4 +1,24 @@
 // Both invocation discovery and runtime validation must recognize the same reviewed inline format.
+const octet = '(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])'
+const ipv4 = `${octet}(?:\\.${octet}){3}`
+const dnsLabel = '[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?'
+const dnsName = `${dnsLabel}(?:\\.${dnsLabel})*`
+const encodedBase64 = '(?:[A-Za-z0-9]|%2[BbFf])'
+const encodedKey = `(?:ssh-ed25519|ssh-rsa|ecdsa-sha2-nistp256)%20(?=(?:${encodedBase64}){32})(?:${encodedBase64}{4})*(?:${encodedBase64}{2}%3[Dd]%3[Dd]|${encodedBase64}{3}%3[Dd])?(?:%20(?:[A-Za-z0-9._~-]|%20|%40|%2[Bb]|%3[Aa])+)?`
+export const cloudInitSshKeysPattern = `^${encodedKey}(?:%0[Aa]${encodedKey})*(?:%0[Aa])?$`
+
+export function namedFormatPattern(name: string): string | undefined {
+  if (name === 'dns-name') return `^(?=.{1,255}$)${dnsName}$`
+  if (name === 'dns-name-list') return `^(?=.{1,255}$)${dnsName}(?: ${dnsName})*$`
+  if (['address-list', 'lxc-ip-with-ll-iface-list'].includes(name)) return `^${ipv4}(?: ${ipv4})*$`
+  if (name === 'urlencoded') return '^(?:[A-Za-z0-9._~-]|%[0-9A-Fa-f]{2})+$'
+  if (name === 'pve-qm-ipconfig') {
+    const automatic6 = '(?:auto|dhcp)'
+    return `^(?:ip=dhcp(?:,ip6=${automatic6})?|ip=${ipv4}/(?:[0-9]|[12][0-9]|3[0-2])(?:,gw=${ipv4})?(?:,ip6=${automatic6})?|ip6=${automatic6})$`
+  }
+  return undefined
+}
+
 export function propertyFormatPattern(format: Record<string, Record<string, unknown>>): string | undefined {
   const positive = '(?:[1-9][0-9]*(?:\\.[0-9]+)?|0\\.[0-9]*[1-9][0-9]*)'
   const storage = '[A-Za-z][A-Za-z0-9._-]*:'
@@ -13,8 +33,6 @@ export function propertyFormatPattern(format: Record<string, Record<string, unkn
     return `^(?:(?:model=)?${model}|${model}=${mac})(?:,bridge=${identifier})?(?:,firewall=[01])?(?:,link_down=[01])?(?:,rate=${rate})?(?:,tag=${tag})?$`
   }
   if (format.name?.type === 'string' && format.ip?.format === 'pve-ipv4-config') {
-    const octet = '(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])'
-    const ipv4 = `${octet}(?:\\.${octet}){3}`
     return `^name=${identifier}(?:,bridge=${identifier})?(?:,firewall=[01])?(?:,gw=${ipv4})?(?:,hwaddr=${mac})?(?:,ip=(?:dhcp|manual|${ipv4}/(?:[0-9]|[12][0-9]|3[0-2])))?(?:,ip6=(?:auto|dhcp|manual))?(?:,link_down=[01])?(?:,rate=${rate})?(?:,tag=${tag})?(?:,type=veth)?$`
   }
   if (format.enabled?.type === 'boolean' && format.enabled.default_key === 1 && format.type?.default === 'virtio') return '^(?:enabled=)?[01]$'
@@ -23,7 +41,8 @@ export function propertyFormatPattern(format: Record<string, Record<string, unkn
     const options: Record<string, string> = { backup: '[01]', cache: '(?:none|writethrough|writeback|directsync)', discard: '(?:ignore|on)',
       format: '(?:raw|qcow2|vmdk)', iothread: '[01]', ssd: '[01]', ro: '[01]' }
     const disk = `(?:file=)?${volume}${Object.entries(options).filter(([key]) => Object.hasOwn(format, key)).map(([key, value]) => `(?:,${key}=${value})?`).join('')}`
-    const media = Array.isArray(format.media?.enum) && format.media.enum.includes('cdrom') ? `|(?:file=)?(?:${storage}iso/[A-Za-z0-9][A-Za-z0-9._-]*\\.iso|none),media=cdrom` : ''
+    const media = Array.isArray(format.media?.enum) && format.media.enum.includes('cdrom') ?
+      `|(?:file=)?(?:${storage}iso/[A-Za-z0-9][A-Za-z0-9._-]*\\.iso|none),media=cdrom|(?:file=)?${storage}cloudinit(?:,media=cdrom)?` : ''
     return `^(?:${disk}${media})$`
   }
   if (format.volume?.format === 'pve-lxc-mp-string') {

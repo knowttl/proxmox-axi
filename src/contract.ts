@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs'
 import { createPrivateKey, X509Certificate } from 'node:crypto'
 import { Failure } from './errors.js'
 import constraints from './vendor-constraints.json' with { type: 'json' }
-import { parameterProperties, propertyFormatPattern } from './property-format.js'
+import { namedFormatPattern, parameterProperties, propertyFormatPattern } from './property-format.js'
 
 export interface VendorSchema {
   type?: string
@@ -94,7 +94,8 @@ export function validateValue(value: unknown, schema: VendorSchema): void {
         if (!Array.isArray(batch) || batch.length === 0 || batch.length > 64 || Buffer.byteLength(value) > 32768) throw invalid()
         return
       }
-      const format = formats[schema.format]
+      const pattern = namedFormatPattern(schema.format)
+      const format = formats[schema.format] ?? (pattern ? new RegExp(pattern) : undefined)
       if (!format) throw unsupported()
       if (!format.test(value)) throw invalid()
     } else if (schema.format) {

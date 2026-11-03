@@ -11,6 +11,7 @@
     "reason": "Requires operation-specific effect, transport and secret review before admission."
   },
   "reviewed": {
+    "GET /nodes/{node}/qemu/{vmid}/cloudinit": { "effect": "read", "transport": "json", "secrets": "private-result", "reason": "Cloud-init current/pending values may contain credentials; validated rows require the inherited private result pipe." },
     "GET /nodes/{node}/qemu/{vmid}/config": { "effect": "read", "transport": "json", "secrets": "private-result", "reason": "Guest configuration may contain cloud-init credentials; validated payload is delivered only through the inherited private result pipe." },
     "GET /nodes/{node}/lxc/{vmid}/config": { "effect": "read", "transport": "json", "secrets": "private-result", "reason": "Container configuration may contain protected data; validated payload is delivered only through the inherited private result pipe." },
     "GET /nodes/{node}/qemu/{vmid}/pending": { "effect": "read", "transport": "json", "secrets": "private-result", "reason": "Current and pending configuration values can include credentials; validated rows use the inherited private result pipe." },
