@@ -243,7 +243,8 @@ Preview QEMU `create '/nodes/{node}/qemu'` with a new VMID, `--api-archive '<qem
 For LXC, use `create '/nodes/{node}/lxc'` with a new VMID, `--api-ostemplate '<lxc-backup-volume-id>'`, explicit `--api-restore 1` and destination storage.
 Sources must use the reviewed dump-archive or PBS volume-ID forms described above and match the guest family; stdin, raw host paths, unqualified filenames and other content remain refused.
 LXC templates require creation mode without a restore flag; a backup requires restore mode, and destination storage is mandatory for either family's restore.
-Already reviewed guest settings can override restored settings; optional `bwlimit` and `unique` are restore-only inputs.
+Already reviewed guest settings can override restored settings, except QEMU drive slots (`ide`, `sata`, `scsi` and `virtio`), including ISO and cloud-init attachments.
+QEMU restores inherit drives from the backup and map them to destination storage; optional `bwlimit` and `unique` are restore-only inputs.
 Use `--api-unique 1` to request fresh Ethernet identities when the original guest may still exist, and leave start unset or `0` until onboarding is checked.
 Live/background startup during import remains refused; optional `start=1` is a separately bound request to start after completion.
 All LXC requests retain the fixed unprivileged setting, including restore; inspect the source privilege/mount configuration and select a compatible backup.

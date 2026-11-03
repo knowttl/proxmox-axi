@@ -68775,6 +68775,65 @@
             "requiredInputs": [
               "archive",
               "storage"
+            ],
+            "forbiddenInputs": [
+              "ide0",
+              "ide1",
+              "ide2",
+              "ide3",
+              "sata0",
+              "sata1",
+              "sata2",
+              "sata3",
+              "sata4",
+              "sata5",
+              "scsi0",
+              "scsi1",
+              "scsi2",
+              "scsi3",
+              "scsi4",
+              "scsi5",
+              "scsi6",
+              "scsi7",
+              "scsi8",
+              "scsi9",
+              "scsi10",
+              "scsi11",
+              "scsi12",
+              "scsi13",
+              "scsi14",
+              "scsi15",
+              "scsi16",
+              "scsi17",
+              "scsi18",
+              "scsi19",
+              "scsi20",
+              "scsi21",
+              "scsi22",
+              "scsi23",
+              "scsi24",
+              "scsi25",
+              "scsi26",
+              "scsi27",
+              "scsi28",
+              "scsi29",
+              "scsi30",
+              "virtio0",
+              "virtio1",
+              "virtio2",
+              "virtio3",
+              "virtio4",
+              "virtio5",
+              "virtio6",
+              "virtio7",
+              "virtio8",
+              "virtio9",
+              "virtio10",
+              "virtio11",
+              "virtio12",
+              "virtio13",
+              "virtio14",
+              "virtio15"
             ]
           }
         ],
@@ -69446,7 +69505,296 @@
                     "archive",
                     "storage"
                   ],
-                  "properties": {}
+                  "properties": {},
+                  "not": {
+                    "anyOf": [
+                      {
+                        "required": [
+                          "ide0"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "ide1"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "ide2"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "ide3"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "sata0"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "sata1"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "sata2"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "sata3"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "sata4"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "sata5"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "scsi0"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "scsi1"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "scsi2"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "scsi3"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "scsi4"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "scsi5"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "scsi6"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "scsi7"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "scsi8"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "scsi9"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "scsi10"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "scsi11"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "scsi12"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "scsi13"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "scsi14"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "scsi15"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "scsi16"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "scsi17"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "scsi18"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "scsi19"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "scsi20"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "scsi21"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "scsi22"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "scsi23"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "scsi24"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "scsi25"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "scsi26"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "scsi27"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "scsi28"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "scsi29"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "scsi30"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "virtio0"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "virtio1"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "virtio2"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "virtio3"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "virtio4"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "virtio5"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "virtio6"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "virtio7"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "virtio8"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "virtio9"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "virtio10"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "virtio11"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "virtio12"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "virtio13"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "virtio14"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "virtio15"
+                        ]
+                      }
+                    ]
+                  }
                 }
               ]
             }
@@ -190092,6 +190440,65 @@
             "requiredInputs": [
               "archive",
               "storage"
+            ],
+            "forbiddenInputs": [
+              "ide0",
+              "ide1",
+              "ide2",
+              "ide3",
+              "sata0",
+              "sata1",
+              "sata2",
+              "sata3",
+              "sata4",
+              "sata5",
+              "scsi0",
+              "scsi1",
+              "scsi2",
+              "scsi3",
+              "scsi4",
+              "scsi5",
+              "scsi6",
+              "scsi7",
+              "scsi8",
+              "scsi9",
+              "scsi10",
+              "scsi11",
+              "scsi12",
+              "scsi13",
+              "scsi14",
+              "scsi15",
+              "scsi16",
+              "scsi17",
+              "scsi18",
+              "scsi19",
+              "scsi20",
+              "scsi21",
+              "scsi22",
+              "scsi23",
+              "scsi24",
+              "scsi25",
+              "scsi26",
+              "scsi27",
+              "scsi28",
+              "scsi29",
+              "scsi30",
+              "virtio0",
+              "virtio1",
+              "virtio2",
+              "virtio3",
+              "virtio4",
+              "virtio5",
+              "virtio6",
+              "virtio7",
+              "virtio8",
+              "virtio9",
+              "virtio10",
+              "virtio11",
+              "virtio12",
+              "virtio13",
+              "virtio14",
+              "virtio15"
             ]
           }
         ],
@@ -190763,7 +191170,296 @@
                     "archive",
                     "storage"
                   ],
-                  "properties": {}
+                  "properties": {},
+                  "not": {
+                    "anyOf": [
+                      {
+                        "required": [
+                          "ide0"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "ide1"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "ide2"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "ide3"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "sata0"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "sata1"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "sata2"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "sata3"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "sata4"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "sata5"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "scsi0"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "scsi1"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "scsi2"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "scsi3"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "scsi4"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "scsi5"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "scsi6"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "scsi7"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "scsi8"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "scsi9"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "scsi10"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "scsi11"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "scsi12"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "scsi13"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "scsi14"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "scsi15"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "scsi16"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "scsi17"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "scsi18"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "scsi19"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "scsi20"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "scsi21"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "scsi22"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "scsi23"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "scsi24"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "scsi25"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "scsi26"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "scsi27"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "scsi28"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "scsi29"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "scsi30"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "virtio0"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "virtio1"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "virtio2"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "virtio3"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "virtio4"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "virtio5"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "virtio6"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "virtio7"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "virtio8"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "virtio9"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "virtio10"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "virtio11"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "virtio12"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "virtio13"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "virtio14"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "virtio15"
+                        ]
+                      }
+                    ]
+                  }
                 }
               ]
             }

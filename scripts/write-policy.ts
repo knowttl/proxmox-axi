@@ -131,7 +131,7 @@ export function reviewWrite(operation: Operation) {
       [...settingInputs.filter(name => !['hostname', 'swap', 'digest', 'password'].includes(name)), 'bios', 'scsihw', 'ostype', 'pool', 'start', 'archive', 'storage', 'bwlimit', 'unique'] :
       [...settingInputs.filter(name => !['name', 'sockets', 'vcpus', 'balloon', 'cpu', 'cipassword', 'digest'].includes(name)), 'ostemplate', 'storage', 'unprivileged', 'ssh-public-keys', 'pool', 'start', 'restore', 'bwlimit', 'unique'] : allowedInputs,
     ...(create ? { inputCases: qemu ? [
-      { forbiddenInputs: ['archive', 'storage', 'bwlimit', 'unique'] }, { requiredInputs: ['archive', 'storage'] },
+      { forbiddenInputs: ['archive', 'storage', 'bwlimit', 'unique'] }, { requiredInputs: ['archive', 'storage'], forbiddenInputs: slots },
     ] : [
       { forbiddenInputs: ['restore', 'bwlimit', 'unique'], inputPatterns: { ostemplate: '^[A-Za-z][A-Za-z0-9._-]*:vztmpl/[A-Za-z0-9][A-Za-z0-9._-]*\\.tar\\.(?:zst|xz|gz)$' } },
       { requiredInputs: ['storage'], requiredValues: { restore: true }, inputPatterns: { ostemplate: backupVolumePattern('lxc') } },

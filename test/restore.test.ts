@@ -29,6 +29,8 @@ for (const family of ['qemu', 'lxc']) test(`${family} restores use reviewed sour
   const tasks = new Map<string, { id: number, failed: boolean, config: Record<string, unknown> }>()
   const requests: string[] = []
   let version = '8.2.7', sequence = 0, failNext = false, malformed = false
+  let batchMode = 'success'
+  const batchUpid = 'UPID:node-a:00000001:00000001:00000001:qmstart:100:synthetic@pve:'
   const server = createServer({ key: await readFile(new URL('../../test/fixtures/localhost-key.pem', import.meta.url)), cert: await readFile(caFile) }, async (request, response) => {
     const url = new URL(request.url!, 'https://fake.invalid'), path = url.pathname
     requests.push(`${request.method} ${path}`)
@@ -41,6 +43,21 @@ for (const family of ['qemu', 'lxc']) test(`${family} restores use reviewed sour
       const chunks: Buffer[] = []
       for await (const chunk of request) chunks.push(Buffer.from(chunk))
       const body = Object.fromEntries(new URLSearchParams(Buffer.concat(chunks).toString())), id = Number(body.vmid)
+      if (path.endsWith('/execute')) {
+        type Command = { method: string, path: string, args?: { commands?: string, volume?: string } }
+        const apply = (commands: Command[]): unknown[] => commands.map(child => {
+          if (child.path === 'execute') return { status: 200, data: apply(JSON.parse(child.args!.commands!)) }
+          if (child.method === 'GET') {
+            assert.equal(child.path, 'vzdump/extractconfig')
+            assert.equal(child.args?.volume, archive)
+            return batchMode === 'refused-read' ? { status: 403 } : { status: 200, data: batchMode === 'invalid-read' ? { password: canary } : text }
+          }
+          assert.equal(child.method, 'POST')
+          assert.equal(child.path, 'qemu/100/status/start')
+          return { status: 200, data: batchMode === 'invalid-upid' ? 'invalid-task' : batchUpid }
+        })
+        response.end(JSON.stringify({ data: apply(JSON.parse(body.commands!)) })); return
+      }
       if (guests.has(id)) { response.writeHead(400).end(JSON.stringify({ message: 'VMID already exists' })); return }
       assert.ok([archive, pbs].includes(body[qemu ? 'archive' : 'ostemplate']!))
       assert.equal(body.storage, 'local-lvm')
@@ -72,7 +89,8 @@ for (const family of ['qemu', 'lxc']) test(`${family} restores use reviewed sour
   await writeFile(config, JSON.stringify({ version: 1, defaultProfile: 'lab', profiles: { lab: {
     auth: 'api-token', origin: `https://127.0.0.1:${(server.address() as AddressInfo).port}`, caBundle: caFile,
     tokenId: 'synthetic@pve!test', token: { env: 'RESTORE_TOKEN' }, writes: { operations: [
-      `OP-POST-${createHash('sha256').update(`POST ${createPath}`).digest('hex').slice(0, 10)}`,
+      ...[['POST', createPath], ['POST', '/nodes/{node}/execute'], ['GET', extractPath], ['POST', '/nodes/{node}/qemu/{vmid}/status/start']].map(([method, path]) =>
+        `OP-${method}-${createHash('sha256').update(`${method} ${path}`).digest('hex').slice(0, 10)}`),
     ] },
   } } }), { mode: 0o600 })
   const command = async (args: string[], privateResult = false) => {
@@ -95,6 +113,61 @@ for (const family of ['qemu', 'lxc']) test(`${family} restores use reviewed sour
     ...(!qemu ? ['--api-restore', '1'] : []), '--api-memory', '2048', '--api-unique', '1', '--api-start', '0', '--api-bwlimit', '1024']
   for (const release of [{ name: 'legacy-8.2.7', version: '8.2.7' }, { name: 'published-current', version: '9.2.1' }]) {
     version = release.version
+    if (qemu) await t.test(`${release.name} refuses restore drives while preserving ordinary creation`, async () => {
+      const schema = await command(['schema', 'create', createPath, '--catalogue', release.name])
+      const validate = new Ajv({ strict: false }).compile(schema.data.invocation.schema)
+      for (const [prefix, count] of [['ide', 4], ['sata', 6], ['scsi', 31], ['virtio', 16]] as const) {
+        for (let index = 0; index < count; index++) {
+          const slot = `${prefix}${index}`
+          assert.equal(validate({ api: { ...values, [slot]: 'local-lvm:8' } }), false, slot)
+          assert.equal(validate({ api: { node: 'node-a', vmid: 200, [slot]: 'local-lvm:8' } }), true, slot)
+        }
+      }
+      for (const [slot, value] of [
+        ['ide0', 'local-lvm:8'], ['ide3', 'local-lvm:8'], ['sata0', 'local-lvm:8'], ['sata5', 'local-lvm:8'],
+        ['scsi0', 'local-lvm:8'], ['scsi30', 'local-lvm:8'], ['virtio0', 'local-lvm:8'], ['virtio15', 'local-lvm:8'],
+        ['ide2', 'local:iso/installer.iso,media=cdrom'], ['ide2', 'local-lvm:cloudinit'],
+      ]) {
+        assert.equal(validate({ api: { ...values, [slot!]: value } }), false)
+        requests.length = 0
+        const refused = await command([...args, `--api-${slot}`, value!, '--preview'])
+        assert.equal(refused.data.error.code, 'INVALID_INPUT')
+        assert.equal(requests.length, 0)
+        const created = await command(['create', createPath, ...node, '--api-vmid', '200', `--api-${slot}`, value!, '--preview'])
+        assert.equal(created.code, 0, JSON.stringify(created.data))
+        assert.equal(created.data.status, 'preview')
+        assert.equal(requests.some(row => row.startsWith('POST')), false)
+      }
+    })
+    if (qemu) for (const nested of [false, true]) for (const mode of ['success', 'invalid-read', 'refused-read', 'accepted', 'invalid-upid']) {
+      await t.test(`${release.name} ${nested ? 'nested' : 'flat'} private backup batch ${mode}`, async () => {
+        batchMode = mode
+        const children = [{ method: 'GET', path: 'vzdump/extractconfig', args: { volume: archive } },
+          ...(['accepted', 'invalid-upid'].includes(mode) ? [{ method: 'POST', path: 'qemu/100/status/start' }] : [])]
+        const commands = JSON.stringify(nested ? [{ method: 'POST', path: 'execute', args: { commands: JSON.stringify(children) } }] : children)
+        const call = ['create', '/nodes/{node}/execute', ...node, '--api-commands', commands]
+        const preview = await command([...call, '--preview'])
+        assert.equal(preview.code, 0, JSON.stringify(preview.data))
+        requests.length = 0
+        const missing = await command([...call, '--confirm', preview.data.confirmation])
+        assert.equal(missing.data.error.code, 'PRIVATE_SINK_REQUIRED')
+        assert.equal(requests.length, 0)
+        const result = await command([...call, '--confirm', preview.data.confirmation], true)
+        const expected = mode === 'invalid-read' || mode === 'invalid-upid' ? 'uncertain' : mode === 'refused-read' ? 'failed' : mode
+        assert.equal(result.code, ['success', 'accepted'].includes(expected) ? 0 : 1, JSON.stringify(result.data))
+        assert.equal(result.data.status, expected)
+        const leaf = nested ? result.data.children[0].children : result.data.children
+        assert.equal(leaf[0].status, mode === 'invalid-read' ? 'uncertain' : mode === 'refused-read' ? 'failed' : 'success')
+        if (mode === 'accepted') assert.equal(leaf[1].upid, batchUpid)
+        if (mode === 'invalid-upid') assert.equal(leaf[1].status, 'uncertain')
+        const payload = nested ? result.payload[0].data : result.payload
+        if (mode !== 'refused-read' && mode !== 'invalid-read') assert.equal(payload[0].data, text)
+        const retained = await command(['journal', 'show', result.data.id])
+        assert.equal(retained.data.journal.status, expected)
+        assert.deepEqual(retained.data.journal.children, result.data.children)
+        assert.equal(requests.filter(row => row.startsWith('POST')).length, 1)
+      })
+    }
     for (const source of [archive, pbs]) await t.test(`${release.name} restores ${source.split(':')[0]} to a new guest after private inspection and task completion`, async () => {
       guests.delete(200)
       const inspected = await command(['get', extractPath, ...node, '--api-volume', source], true)

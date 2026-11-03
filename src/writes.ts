@@ -244,6 +244,7 @@ function mergeOutcomes(records: JournalRecord['children'], outcomes: ChildOutcom
 }
 
 function resultStatus(call: Invocation, data: unknown, results: Credentials['results']): Outcome {
+  if (call.contract.policy.effect === 'read') return { status: 'success', children: [] }
   if (call.contract.policy.effect !== 'batch') {
     if (typeof data === 'string') {
       if (!/^UPID:[A-Za-z0-9.-]+:[a-fA-F0-9]+:[a-fA-F0-9]+:[a-fA-F0-9]+:[^:\s]+:[^:\s]*:[^:\s]+:$/.test(data) || results.redact(data) !== data) throw new Failure('INVALID_RESPONSE', 'Mutation returned an unsafe task identifier.', 'Inspect the uncertain journal.')
