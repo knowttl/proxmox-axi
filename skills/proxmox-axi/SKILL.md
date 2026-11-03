@@ -39,12 +39,12 @@ Use `--fields`, `--limit` and `--full` when more detail is needed within the out
 ## Discover operations and complete confirmed tasks
 
 For QEMU/LXC resource metrics, read `/nodes/{node}/qemu/{vmid}/status/current` or its LXC equivalent with the selected node, VMID and profile.
-For private guest-agent readiness/first-boot checks, backup/restore, snapshots, media discovery/uploads, QEMU/LXC creation/cloning, protected reads, onboarding, compute settings, guest NICs/boot/agent setup, managed disks and growth-only disk resize, follow the [guest management reference](references/guest-management.md).
+For confirmed guest execution/onboarding, private guest-agent readiness/first-boot checks, backup/restore, snapshots, media discovery/uploads, QEMU/LXC creation/cloning, protected reads, compute settings, guest NICs/boot/agent setup, managed disks and growth-only disk resize, follow the [guest management reference](references/guest-management.md).
 That reference ships inside this skill folder and includes private pipe setup, receiver bindings, input constraints and digest handling.
 
 Run `proxmox-axi inventory` or `proxmox-axi schema <method> '<template>'` offline before choosing an operation and its supported inputs.
 Discoverable routes may remain refused; never bypass admission or broaden permissions to work around a refusal.
-For an authorized mutation, use its existing `create`, `set` or `delete` command with `--preview`, inspect the selected target and inputs, then repeat the exact request with `--confirm '<confirmation>'`.
+For an authorized mutation, use the command shown by its schema with `--preview`, inspect the selected target and inputs, then repeat the exact request with `--confirm '<confirmation>'`.
 Changed targets, profiles, inputs or policy require a fresh preview.
 Supply sensitive inputs through supported env/file SecretRefs in a protected body file, never literal password or token arguments.
 Treat a returned UPID as pending and use `proxmox-axi task wait --api-node '<node>' --api-upid '<UPID>' --journal '<intent-id>' --profile '<profile>'` to observe completion.

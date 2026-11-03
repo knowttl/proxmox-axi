@@ -132,7 +132,7 @@ test('guest readiness and first-boot files remain private without mutation grant
       assert.equal(result.value.transfer.bytes, result.bytes.length)
     })
   }
-  for (const path of [base, `${base}/exec`, `${base}/file-write`, `${base}/fsfreeze-freeze`]) {
+  for (const path of [base, `${base}/set-user-password`, `${base}/file-write`, `${base}/fsfreeze-freeze`]) {
     await t.test(`keeps unreviewed ${path} dispatch refused`, async () => {
       requests.length = 0
       const result = await command(['post', path, ...target])

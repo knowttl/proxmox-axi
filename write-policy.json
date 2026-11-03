@@ -10388,16 +10388,167 @@
       "method": "POST",
       "path": "/nodes/{node}/qemu/{vmid}/agent/exec",
       "release": "legacy-8.2.7",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/429"
+      "admitted": true,
+      "contract": "dist/contracts.json#/contracts/429",
+      "policy": {
+        "effect": "write",
+        "transport": "json",
+        "secrets": "private-result",
+        "allowedInputs": [
+          "node",
+          "vmid",
+          "command"
+        ],
+        "sensitiveInputs": [
+          "command"
+        ],
+        "inputFormats": {
+          "command": "pve-guest-argv"
+        },
+        "reason": "Confirmed guest execution using a SecretRef containing JSON argv; bounded private PID delivery, metadata-only journal, no stdin and no automatic retry.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Retain the private guest PID and execution result; status retrieval can consume completed output. Never repeat uncertain execution or retrieval automatically."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/vms/{vmid}",
+            [
+              "VM.Monitor"
+            ]
+          ]
+        },
+        "response": {
+          "properties": {
+            "pid": {
+              "description": "The PID of the process started by the guest-agent.",
+              "type": "integer"
+            }
+          },
+          "type": "object"
+        },
+        "source": "Pinned guest exec/status schemas, provider QEMU agent implementation and QEMU completed-process reaping contract."
+      },
+      "inputs": [
+        {
+          "name": "command",
+          "admitted": true,
+          "sensitive": true
+        },
+        {
+          "name": "input-data",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "node",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "vmid",
+          "admitted": true,
+          "sensitive": false
+        }
+      ],
+      "results": {
+        "type": "object",
+        "handling": "versioned inherited private pipe; public metadata only"
+      }
     },
     {
       "id": "OP-GET-5c2615eea3",
       "method": "GET",
       "path": "/nodes/{node}/qemu/{vmid}/agent/exec-status",
       "release": "legacy-8.2.7",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/430"
+      "admitted": true,
+      "contract": "dist/contracts.json#/contracts/430",
+      "policy": {
+        "effect": "write",
+        "transport": "json",
+        "secrets": "private-result",
+        "allowedInputs": [
+          "node",
+          "vmid",
+          "pid"
+        ],
+        "reason": "Confirmed guest execution-status retrieval; completed queries reap the process record, so GET retains write grants and exact confirmation. Process output is private.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Retain the private guest PID and execution result; status retrieval can consume completed output. Never repeat uncertain execution or retrieval automatically."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/vms/{vmid}",
+            [
+              "VM.Monitor"
+            ]
+          ]
+        },
+        "response": {
+          "properties": {
+            "err-data": {
+              "description": "stderr of the process",
+              "optional": 1,
+              "type": "string"
+            },
+            "err-truncated": {
+              "description": "true if stderr was not fully captured",
+              "optional": 1,
+              "type": "boolean"
+            },
+            "exitcode": {
+              "description": "process exit code if it was normally terminated.",
+              "optional": 1,
+              "type": "integer"
+            },
+            "exited": {
+              "description": "Tells if the given command has exited yet.",
+              "type": "boolean"
+            },
+            "out-data": {
+              "description": "stdout of the process",
+              "optional": 1,
+              "type": "string"
+            },
+            "out-truncated": {
+              "description": "true if stdout was not fully captured",
+              "optional": 1,
+              "type": "boolean"
+            },
+            "signal": {
+              "description": "signal number or exception code if the process was abnormally terminated.",
+              "optional": 1,
+              "type": "integer"
+            }
+          },
+          "type": "object"
+        },
+        "source": "Pinned guest exec/status schemas, provider QEMU agent implementation and QEMU completed-process reaping contract."
+      },
+      "inputs": [
+        {
+          "name": "node",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "pid",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "vmid",
+          "admitted": true,
+          "sensitive": false
+        }
+      ],
+      "results": {
+        "type": "object",
+        "handling": "versioned inherited private pipe; public metadata only"
+      }
     },
     {
       "id": "OP-POST-7ee3321116",
@@ -25790,16 +25941,167 @@
       "method": "POST",
       "path": "/nodes/{node}/qemu/{vmid}/agent/exec",
       "release": "published-current",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/1098"
+      "admitted": true,
+      "contract": "dist/contracts.json#/contracts/1098",
+      "policy": {
+        "effect": "write",
+        "transport": "json",
+        "secrets": "private-result",
+        "allowedInputs": [
+          "node",
+          "vmid",
+          "command"
+        ],
+        "sensitiveInputs": [
+          "command"
+        ],
+        "inputFormats": {
+          "command": "pve-guest-argv"
+        },
+        "reason": "Confirmed guest execution using a SecretRef containing JSON argv; bounded private PID delivery, metadata-only journal, no stdin and no automatic retry.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Retain the private guest PID and execution result; status retrieval can consume completed output. Never repeat uncertain execution or retrieval automatically."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/vms/{vmid}",
+            [
+              "VM.GuestAgent.Unrestricted"
+            ]
+          ]
+        },
+        "response": {
+          "properties": {
+            "pid": {
+              "description": "The PID of the process started by the guest-agent.",
+              "type": "integer"
+            }
+          },
+          "type": "object"
+        },
+        "source": "Pinned guest exec/status schemas, provider QEMU agent implementation and QEMU completed-process reaping contract."
+      },
+      "inputs": [
+        {
+          "name": "command",
+          "admitted": true,
+          "sensitive": true
+        },
+        {
+          "name": "input-data",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "node",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "vmid",
+          "admitted": true,
+          "sensitive": false
+        }
+      ],
+      "results": {
+        "type": "object",
+        "handling": "versioned inherited private pipe; public metadata only"
+      }
     },
     {
       "id": "OP-GET-5c2615eea3",
       "method": "GET",
       "path": "/nodes/{node}/qemu/{vmid}/agent/exec-status",
       "release": "published-current",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/1099"
+      "admitted": true,
+      "contract": "dist/contracts.json#/contracts/1099",
+      "policy": {
+        "effect": "write",
+        "transport": "json",
+        "secrets": "private-result",
+        "allowedInputs": [
+          "node",
+          "vmid",
+          "pid"
+        ],
+        "reason": "Confirmed guest execution-status retrieval; completed queries reap the process record, so GET retains write grants and exact confirmation. Process output is private.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Retain the private guest PID and execution result; status retrieval can consume completed output. Never repeat uncertain execution or retrieval automatically."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/vms/{vmid}",
+            [
+              "VM.GuestAgent.Unrestricted"
+            ]
+          ]
+        },
+        "response": {
+          "properties": {
+            "err-data": {
+              "description": "stderr of the process",
+              "optional": 1,
+              "type": "string"
+            },
+            "err-truncated": {
+              "description": "true if stderr was not fully captured",
+              "optional": 1,
+              "type": "boolean"
+            },
+            "exitcode": {
+              "description": "process exit code if it was normally terminated.",
+              "optional": 1,
+              "type": "integer"
+            },
+            "exited": {
+              "description": "Tells if the given command has exited yet.",
+              "type": "boolean"
+            },
+            "out-data": {
+              "description": "stdout of the process",
+              "optional": 1,
+              "type": "string"
+            },
+            "out-truncated": {
+              "description": "true if stdout was not fully captured",
+              "optional": 1,
+              "type": "boolean"
+            },
+            "signal": {
+              "description": "signal number or exception code if the process was abnormally terminated.",
+              "optional": 1,
+              "type": "integer"
+            }
+          },
+          "type": "object"
+        },
+        "source": "Pinned guest exec/status schemas, provider QEMU agent implementation and QEMU completed-process reaping contract."
+      },
+      "inputs": [
+        {
+          "name": "node",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "pid",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "vmid",
+          "admitted": true,
+          "sensitive": false
+        }
+      ],
+      "results": {
+        "type": "object",
+        "handling": "versioned inherited private pipe; public metadata only"
+      }
     },
     {
       "id": "OP-POST-7ee3321116",

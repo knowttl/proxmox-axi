@@ -57,7 +57,11 @@ async function invocation(credentials: Credentials, contract: Contract, input: R
     if (!secret) throw new Failure('AUTH_REQUIRED', 'An operation secret reference is empty.', 'Supply the selected secret source.')
     credentials.results.register(secret)
     revisions.push({ reference: value, secret })
-    values[name] = secret
+    if (contract.parameters.properties?.[name]?.type === 'array') {
+      if (Buffer.byteLength(secret) > 65536) throw new Failure('INVALID_INPUT', 'An array SecretRef exceeds 65536 bytes.', 'Supply a smaller protected JSON array.', 2)
+      try { values[name] = JSON.parse(secret) }
+      catch { throw new Failure('INVALID_INPUT', 'An array SecretRef must contain JSON.', 'Supply a protected JSON array through the reference.', 2) }
+    } else values[name] = secret
   }
   const children: Invocation[] = []
   if (contract.policy.effect === 'batch') {
