@@ -1,6 +1,6 @@
 import type { Credentials } from './credentials.js'
 import { buildPath, contracts, selectContract, validateResponse, type Contract } from './contract.js'
-import { executeRead, readVersion } from './transport.js'
+import { executeRead, executeRequest, readVersion } from './transport.js'
 import { Failure } from './errors.js'
 import { resultBinding } from './private-results.js'
 
@@ -56,7 +56,18 @@ export async function readOperation(credentials: Credentials, initial: Contract,
       visibility = inventoryVisibility(selected.path, permissions)
     }
   }
-  const envelope = await executeRead(credentials, buildPath(selected, values), true) as { data: unknown, total?: number }
+  let envelope: { data: unknown, total?: number }
+  try {
+    envelope = await executeRequest(credentials, buildPath(selected, values), { method: selected.method, envelope: true }) as typeof envelope
+  } catch (error) {
+    if (selected.path.startsWith('/nodes/{node}/qemu/{vmid}/agent/') && error instanceof Failure &&
+      (error.code === 'TIMEOUT' || (error.httpStatus ?? 0) >= 500)) {
+      throw new Failure(error.code, error.message,
+        'Check guest power state, QEMU agent enablement, the guest-agent service and supported commands. This request did not establish readiness; it does not prove the VM is unhealthy.',
+        error.exitCode, error.httpStatus)
+    }
+    throw error
+  }
   validateResponse(envelope.data, selected.returns)
   if (selected.policy.outputFields) {
     const names = selected.policy.outputFields

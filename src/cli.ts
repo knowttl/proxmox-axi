@@ -341,7 +341,7 @@ export async function main(args: string[]): Promise<void> {
     } else {
       const selected = contract ?? selectContract('GET', '/version', release)
       const result = await readOperation(credentials, selected, values, options['--catalogue'], fields)
-      const next = `proxmox-axi schema get ${selected.path} --catalogue ${options['--catalogue'] ?? result.compatibility?.catalogue ?? selected.release}`
+      const next = `proxmox-axi schema ${selected.method.toLowerCase()} ${selected.path} --catalogue ${options['--catalogue'] ?? result.compatibility?.catalogue ?? selected.release}`
       const safeData = presentRead({ ...result, data: credentials.results.sanitize(result.data),
         ...(result.compatibility ? { compatibility: { ...result.compatibility, version: credentials.results.redact(result.compatibility.version) } } : {}) },
         selected.path, { limit, full: !!options['--full'], ...(fields ? { fields } : {}), next }) as Record<string, unknown>

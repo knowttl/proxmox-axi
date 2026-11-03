@@ -10690,6 +10690,98 @@
       ]
     },
     {
+      "command": "get /nodes/{node}/qemu/{vmid}/agent/get-host-name",
+      "operationId": "OP-GET-0d16cd1e0d",
+      "method": "GET",
+      "path": "/nodes/{node}/qemu/{vmid}/agent/get-host-name",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value",
+        "limit": "value",
+        "fields": "value",
+        "full": "boolean",
+        "session": "value",
+        "api-node": "value",
+        "api-vmid": "value"
+      },
+      "privateResult": true,
+      "catalogues": [
+        "legacy-8.2.7",
+        "published-current"
+      ]
+    },
+    {
+      "command": "get /nodes/{node}/qemu/{vmid}/agent/get-osinfo",
+      "operationId": "OP-GET-f14d9ebca7",
+      "method": "GET",
+      "path": "/nodes/{node}/qemu/{vmid}/agent/get-osinfo",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value",
+        "limit": "value",
+        "fields": "value",
+        "full": "boolean",
+        "session": "value",
+        "api-node": "value",
+        "api-vmid": "value"
+      },
+      "privateResult": true,
+      "catalogues": [
+        "legacy-8.2.7",
+        "published-current"
+      ]
+    },
+    {
+      "command": "get /nodes/{node}/qemu/{vmid}/agent/info",
+      "operationId": "OP-GET-6b38a4bfb7",
+      "method": "GET",
+      "path": "/nodes/{node}/qemu/{vmid}/agent/info",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value",
+        "limit": "value",
+        "fields": "value",
+        "full": "boolean",
+        "session": "value",
+        "api-node": "value",
+        "api-vmid": "value"
+      },
+      "privateResult": true,
+      "catalogues": [
+        "legacy-8.2.7",
+        "published-current"
+      ]
+    },
+    {
+      "command": "get /nodes/{node}/qemu/{vmid}/agent/network-get-interfaces",
+      "operationId": "OP-GET-eaa842e754",
+      "method": "GET",
+      "path": "/nodes/{node}/qemu/{vmid}/agent/network-get-interfaces",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value",
+        "limit": "value",
+        "fields": "value",
+        "full": "boolean",
+        "session": "value",
+        "api-node": "value",
+        "api-vmid": "value"
+      },
+      "privateResult": true,
+      "catalogues": [
+        "legacy-8.2.7",
+        "published-current"
+      ]
+    },
+    {
       "command": "get /nodes/{node}/qemu/{vmid}/cloudinit",
       "operationId": "OP-GET-9305ccd805",
       "method": "GET",
@@ -11124,6 +11216,29 @@
         "full": "boolean",
         "session": "value"
       },
+      "catalogues": [
+        "legacy-8.2.7",
+        "published-current"
+      ]
+    },
+    {
+      "command": "post /nodes/{node}/qemu/{vmid}/agent/ping",
+      "operationId": "OP-POST-6d15fad8ab",
+      "method": "POST",
+      "path": "/nodes/{node}/qemu/{vmid}/agent/ping",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value",
+        "limit": "value",
+        "fields": "value",
+        "full": "boolean",
+        "session": "value",
+        "api-node": "value",
+        "api-vmid": "value"
+      },
+      "privateResult": true,
       "catalogues": [
         "legacy-8.2.7",
         "published-current"

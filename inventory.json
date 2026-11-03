@@ -10859,23 +10859,23 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "read",
+            "transport": "json",
+            "secrets": "private-result",
+            "reason": "Guest hostname observation only; identity details and undeclared guest-provided fields require the inherited private result pipe."
           },
           "contract": "dist/contracts.json#/contracts/438"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "read",
+            "transport": "json",
+            "secrets": "private-result",
+            "reason": "Guest hostname observation only; identity details and undeclared guest-provided fields require the inherited private result pipe."
           },
           "contract": "dist/contracts.json#/contracts/1107"
         }
@@ -10958,23 +10958,23 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "read",
+            "transport": "json",
+            "secrets": "private-result",
+            "reason": "Guest operating-system observation only; complete bounded guest-provided metadata requires the inherited private result pipe."
           },
           "contract": "dist/contracts.json#/contracts/441"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "read",
+            "transport": "json",
+            "secrets": "private-result",
+            "reason": "Guest operating-system observation only; complete bounded guest-provided metadata requires the inherited private result pipe."
           },
           "contract": "dist/contracts.json#/contracts/1110"
         }
@@ -11123,23 +11123,23 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "read",
+            "transport": "json",
+            "secrets": "private-result",
+            "reason": "Guest-agent version and supported command information only; complete bounded guest-provided data is delivered through the inherited private result pipe."
           },
           "contract": "dist/contracts.json#/contracts/446"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "read",
+            "transport": "json",
+            "secrets": "private-result",
+            "reason": "Guest-agent version and supported command information only; complete bounded guest-provided data is delivered through the inherited private result pipe."
           },
           "contract": "dist/contracts.json#/contracts/1115"
         }
@@ -11156,23 +11156,23 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "read",
+            "transport": "json",
+            "secrets": "private-result",
+            "reason": "Guest interface and address observation only, without host or guest network changes; complete bounded guest network details require the inherited private result pipe."
           },
           "contract": "dist/contracts.json#/contracts/447"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "read",
+            "transport": "json",
+            "secrets": "private-result",
+            "reason": "Guest interface and address observation only, without host or guest network changes; complete bounded guest network details require the inherited private result pipe."
           },
           "contract": "dist/contracts.json#/contracts/1116"
         }
@@ -20675,23 +20675,23 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "read",
+            "transport": "json",
+            "secrets": "private-result",
+            "reason": "Exact non-mutating guest-ping responsiveness probe, using its vendor POST method; the bounded guest-provided wrapper requires the inherited private result pipe and does not admit generic agent dispatch."
           },
           "contract": "dist/contracts.json#/contracts/448"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "read",
+            "transport": "json",
+            "secrets": "private-result",
+            "reason": "Exact non-mutating guest-ping responsiveness probe, using its vendor POST method; the bounded guest-provided wrapper requires the inherited private result pipe and does not admit generic agent dispatch."
           },
           "contract": "dist/contracts.json#/contracts/1117"
         }

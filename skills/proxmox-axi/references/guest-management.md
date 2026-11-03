@@ -6,6 +6,7 @@ Read `/nodes/{node}/qemu/{vmid}/status/current` or its LXC equivalent for ordina
 ## Private configuration reads
 
 QEMU and LXC configuration, `/snapshot/{snapname}/config` and `/pending` GETs, including the `ls` aliases for pending-setting reads, QEMU `/cloudinit` GETs and backup `/vzdump/extractconfig` reads require a caller-owned inherited pipe or socket selected by `PROXMOX_AXI_RESULT_FD` (descriptor 3 or higher).
+The [guest-agent readiness reads](#guest-agent-readiness-and-first-boot-checks) also require this channel.
 These payloads can contain credentials.
 Launch the CLI executable directly from the caller that owns that pipe.
 Terminals, regular files, stdout and stderr are refused, and a missing private pipe fails before provider access.
@@ -254,3 +255,55 @@ Both provider creation routes refuse existing destination IDs without force; for
 A changed backup source or destination setting invalidates the original confirmation.
 Wait on the returned node/UPID with the journal ID and profile, then inspect the destination configuration privately.
 Failed tasks can leave partial destination state; inspect it and the journal before manual recovery, without automatically retrying or deleting anything.
+
+## Guest-agent readiness and first-boot checks
+
+Wait for the confirmed guest start task to complete before requesting agent readiness.
+The VM must have QEMU agent communication enabled, and a compatible guest-agent service must be installed and running inside it.
+Agent enablement in VM configuration alone does not establish responsiveness.
+Carry the selected profile, node and VMID through every request and let the CLI detect the target catalogue.
+
+These exact JSON routes use the [private result pipe](#private-configuration-reads), including their undeclared guest-provided fields, with only completion metadata on stdout.
+Prepare that pipe before launching any of these commands directly from its owner:
+
+```sh
+proxmox-axi get '/nodes/{node}/qemu/{vmid}/agent/info' --api-node '<node>' --api-vmid 100 --profile '<profile>'
+proxmox-axi post '/nodes/{node}/qemu/{vmid}/agent/ping' --api-node '<node>' --api-vmid 100 --profile '<profile>'
+proxmox-axi get '/nodes/{node}/qemu/{vmid}/agent/get-host-name' --api-node '<node>' --api-vmid 100 --profile '<profile>'
+proxmox-axi get '/nodes/{node}/qemu/{vmid}/agent/get-osinfo' --api-node '<node>' --api-vmid 100 --profile '<profile>'
+proxmox-axi get '/nodes/{node}/qemu/{vmid}/agent/network-get-interfaces' --api-node '<node>' --api-vmid 100 --profile '<profile>'
+```
+
+Each private payload retains the provider's `result` wrapper.
+Inspect `info.result.supported_commands` and each command's enabled status before assuming support inside a particular image.
+Ping intentionally uses POST, as specified by the provider implementation.
+The QEMU protocol defines it as a responsiveness probe; this exact endpoint is a read effect and needs no mutation grant or preview/confirmation.
+Standalone readiness reads create no journal and remain available in read-only mode; confirmed batches still require the wrapper and each child's explicit policy grants.
+The current catalogue requires `VM.GuestAgent.Audit` or `VM.GuestAgent.Unrestricted`; the legacy catalogue requires `VM.Monitor`.
+Provider permissions remain authoritative.
+
+Requests retain the five-second JSON deadline and 65536-byte response bound.
+An agent server error or timeout gives prerequisite guidance without publishing vendor free text.
+Permission errors still require correcting access; unavailable or unsupported agents do not prove that the VM is unhealthy.
+Successful ping proves responsiveness at that instant, not cloud-init completion, network reachability from another machine or application health.
+Do not automatically retry or continuously poll; inspect prerequisites before an explicit new request.
+
+For a Linux image using a known first-boot marker, read only the approved guest path privately.
+Use a caller-owned pipe/socket selected by `PROXMOX_AXI_STREAM_FD` (descriptor 3 or higher), distinct from stdout, stderr and any private result pipe.
+It carries unframed file bytes; stdout carries transfer completion metadata, byte count, digest, encoding and truncation state.
+Do not log the file bytes or send them to the terminal.
+For a current-catalogue image using the cloud-init boot marker, a bounded example is:
+
+```sh
+proxmox-axi transfer get '/nodes/{node}/qemu/{vmid}/agent/file-read' --api-node '<node>' --api-vmid 100 --api-file '/var/lib/cloud/instance/boot-finished' --api-count 4096 --api-offset 0 --api-decode 1 --response-format guest-file --profile '<profile>'
+```
+
+The path is inside the guest and depends on its image; an absent marker does not establish provisioning failure.
+Current contracts support count (1 through 16777216), offset and decode; select a small count for onboarding checks.
+Legacy contracts support only file/node/VMID and report `encoding: legacy-unknown`; omit count/offset/decode and do not assume UTF-8 or use raw export.
+The legacy transfer remains bounded by the managed transport quota and fixed envelope budget, but it cannot request a smaller provider read.
+The byte receiver must verify successful exit, transfer status/count/digest and the reported encoding before interpreting content, and discard partial bytes after any error.
+`truncated: true` or `unknown` does not establish complete file delivery; increasing an offset or quota is a separate explicit read.
+File-read uses its separate provider permission, `VM.GuestAgent.FileRead` or `VM.GuestAgent.Unrestricted` in the current catalogue, and `VM.Monitor` in the legacy catalogue.
+Guest file contents can include credentials, so summarize only approved non-sensitive readiness facts.
+Generic agent command dispatch, execution, file writes, password changes, freeze/thaw, trimming and agent lifecycle commands remain refused.

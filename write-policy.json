@@ -10448,14 +10448,6 @@
       "contract": "dist/contracts.json#/contracts/437"
     },
     {
-      "id": "OP-GET-0d16cd1e0d",
-      "method": "GET",
-      "path": "/nodes/{node}/qemu/{vmid}/agent/get-host-name",
-      "release": "legacy-8.2.7",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/438"
-    },
-    {
       "id": "OP-GET-10051635b3",
       "method": "GET",
       "path": "/nodes/{node}/qemu/{vmid}/agent/get-memory-block-info",
@@ -10470,14 +10462,6 @@
       "release": "legacy-8.2.7",
       "admitted": false,
       "contract": "dist/contracts.json#/contracts/440"
-    },
-    {
-      "id": "OP-GET-f14d9ebca7",
-      "method": "GET",
-      "path": "/nodes/{node}/qemu/{vmid}/agent/get-osinfo",
-      "release": "legacy-8.2.7",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/441"
     },
     {
       "id": "OP-GET-654c7d8aa0",
@@ -10510,30 +10494,6 @@
       "release": "legacy-8.2.7",
       "admitted": false,
       "contract": "dist/contracts.json#/contracts/445"
-    },
-    {
-      "id": "OP-GET-6b38a4bfb7",
-      "method": "GET",
-      "path": "/nodes/{node}/qemu/{vmid}/agent/info",
-      "release": "legacy-8.2.7",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/446"
-    },
-    {
-      "id": "OP-GET-eaa842e754",
-      "method": "GET",
-      "path": "/nodes/{node}/qemu/{vmid}/agent/network-get-interfaces",
-      "release": "legacy-8.2.7",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/447"
-    },
-    {
-      "id": "OP-POST-6d15fad8ab",
-      "method": "POST",
-      "path": "/nodes/{node}/qemu/{vmid}/agent/ping",
-      "release": "legacy-8.2.7",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/448"
     },
     {
       "id": "OP-POST-43a50d8721",
@@ -25890,14 +25850,6 @@
       "contract": "dist/contracts.json#/contracts/1106"
     },
     {
-      "id": "OP-GET-0d16cd1e0d",
-      "method": "GET",
-      "path": "/nodes/{node}/qemu/{vmid}/agent/get-host-name",
-      "release": "published-current",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/1107"
-    },
-    {
       "id": "OP-GET-10051635b3",
       "method": "GET",
       "path": "/nodes/{node}/qemu/{vmid}/agent/get-memory-block-info",
@@ -25912,14 +25864,6 @@
       "release": "published-current",
       "admitted": false,
       "contract": "dist/contracts.json#/contracts/1109"
-    },
-    {
-      "id": "OP-GET-f14d9ebca7",
-      "method": "GET",
-      "path": "/nodes/{node}/qemu/{vmid}/agent/get-osinfo",
-      "release": "published-current",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/1110"
     },
     {
       "id": "OP-GET-654c7d8aa0",
@@ -25952,30 +25896,6 @@
       "release": "published-current",
       "admitted": false,
       "contract": "dist/contracts.json#/contracts/1114"
-    },
-    {
-      "id": "OP-GET-6b38a4bfb7",
-      "method": "GET",
-      "path": "/nodes/{node}/qemu/{vmid}/agent/info",
-      "release": "published-current",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/1115"
-    },
-    {
-      "id": "OP-GET-eaa842e754",
-      "method": "GET",
-      "path": "/nodes/{node}/qemu/{vmid}/agent/network-get-interfaces",
-      "release": "published-current",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/1116"
-    },
-    {
-      "id": "OP-POST-6d15fad8ab",
-      "method": "POST",
-      "path": "/nodes/{node}/qemu/{vmid}/agent/ping",
-      "release": "published-current",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/1117"
     },
     {
       "id": "OP-POST-43a50d8721",
