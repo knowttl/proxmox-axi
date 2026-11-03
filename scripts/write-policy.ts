@@ -67,10 +67,11 @@ export function reviewWrite(operation: Operation) {
       allowedInputs: ['node', 'vmid', 'group', ...(method === 'POST' ? fields : ['pos', 'digest', ...(method === 'PUT' ? [...fields, 'moveto'] : [])])]
         .filter(key => operation.parameters.properties?.[key]), requiredInputs: path !== rulesPath ? ['pos'] : [],
       ...(method === 'POST' ? { fixedInputs: { enable: 0 } } : {}), ...(inputCases ? { inputCases } : {}),
-      ...(method !== 'DELETE' ? { inputPatterns: { type: guestRules ? '^(?:in|out|group)$' : '^(?:in|out)$', action: guestRules ? namedFormatPattern('pve-firewall-group')! : actions,
-        ...(path.includes('/{vmid}/') ? { iface: '^net(?:[0-9]|[12][0-9]|3[01])$' } : {}) }, inputFormats: {
-        source: 'pve-firewall-address', dest: 'pve-firewall-address', proto: 'pve-firewall-protocol', sport: 'pve-firewall-port', dport: 'pve-firewall-port', iface: 'pve-firewall-interface', group: 'pve-firewall-group',
-      } } : {}),
+      inputFormats: { group: 'pve-firewall-group', ...(method !== 'DELETE' ? {
+        source: 'pve-firewall-address', dest: 'pve-firewall-address', proto: 'pve-firewall-protocol', sport: 'pve-firewall-port', dport: 'pve-firewall-port', iface: 'pve-firewall-interface',
+      } : {}) },
+      ...(method !== 'DELETE' ? { inputPatterns: { type: guestRules ? '^(?:in|out|group)$' : '^(?:in|out)$', ...(!guestRules ? { action: actions } : {}),
+        ...(path.includes('/{vmid}/') ? { iface: '^net(?:[0-9]|[12][0-9]|3[01])$' } : {}) } } : {}),
       confirmationWarnings: [{ message: 'Firewall rule changes can cut off management access or change protection. Inspect the complete private ordered plan before confirming.' },
         ...(groupRules ? [{ message: 'SHARED GROUP: this ordered change affects every existing cluster, node or guest reference, including management traffic. Audit those dependencies explicitly.' }] : []),
         ...(method === 'POST' ? [{ message: 'NON-ATOMIC CREATE: the provider ignores creation digests and prepends this fixed disabled rule. Unexpected observed order remains uncertain; enabling requires a separate fresh digest-guarded confirmation.' }] :

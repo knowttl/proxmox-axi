@@ -53,8 +53,9 @@ test('ordered firewall changes stage disabled creation and guard later mutations
       }
       if (mode === 'metadata-reject') { response.writeHead(400).end(JSON.stringify({ message: canary })); return }
       if (state.has(`${wire(groups)}/${fields.group}`)) { response.writeHead(400).end(JSON.stringify({ message: 'group already exists' })); return }
-      state.set(`${wire(groups)}/${fields.group}`, [])
-      if (fields.comment !== undefined) groupComments.set(fields.group!, fields.comment)
+      const group = fields.group!.toLowerCase()
+      state.set(`${wire(groups)}/${group}`, [])
+      if (fields.comment !== undefined) groupComments.set(group, fields.comment)
       response.end(JSON.stringify({ data: null })); return
     }
     const match = /^(.*(?:\/rules|\/groups\/[^/]+))(?:\/(\d+))?$/.exec(path)!
@@ -349,15 +350,48 @@ test('ordered firewall changes stage disabled creation and guard later mutations
       assert.equal(state.has(wire(definition, 'rejected')), false)
       mode = 'success'
     })
-    await t.test(`${release.name} a reference named ACCEPT preserves its group identity without an accept-all claim`, async () => {
+    await t.test(`${release.name} a canonical accept group survives discovery and reference staging`, async () => {
       mode = 'success'
-      state.set(wire(definition, 'ACCEPT'), [{ type: 'in', action: 'DROP', enable: 1 }])
+      state.delete(wire(definition, 'accept'))
+      assert.equal((await confirmed('create', groups, { group: 'accept' })).value.status, 'success')
+      assert.equal((await command('get', groups, {})).frame.payload.some((row: Rule) => row.group === 'accept'), true)
+      assert.equal((await confirmed('create', definition, { group: 'accept', type: 'in', action: 'DROP' })).value.status, 'success')
       state.set(wire(scopes[2]!.path), [])
-      const api = { ...scopes[2]!.target, type: 'group', action: 'ACCEPT' }, preview = await command('create', scopes[2]!.path, api, ['--preview'])
+      const api = { ...scopes[2]!.target, type: 'group', action: 'accept' }, preview = await command('create', scopes[2]!.path, api, ['--preview'])
       assert.equal(preview.frame.payload.referencedGroup.rules[0].action, 'DROP')
       assert.equal(JSON.stringify(preview.value.warnings).includes('ACCEPT-ALL RULE'), false)
       assert.equal((await command('create', scopes[2]!.path, api, ['--confirm', preview.value.confirmation])).value.status, 'success')
       assert.equal((await command('get', scopes[2]!.path, scopes[2]!.target)).frame.payload[0].type, 'group')
+    })
+    for (const [verb, path, api] of [
+      ['create', groups, { group: 'Web' }],
+      ['delete', definition, { group: 'Web' }],
+      ['get', definition, { group: 'Web' }],
+      ['get', groupItem, { group: 'Web', pos: 0 }],
+      ['create', definition, { group: 'Web', type: 'in', action: 'ACCEPT' }],
+      ['set', groupItem, { group: 'Web', pos: 0, enable: 0 }],
+      ['delete', groupItem, { group: 'Web', pos: 0 }],
+      ...scopes.slice(2, 4).flatMap(guest => [
+        ['create', guest.path, { ...guest.target, type: 'group', action: 'Web' }],
+        ['set', `${guest.path}/{pos}`, { ...guest.target, pos: 0, type: 'group', action: 'Web' }],
+      ] as const),
+    ] as const) await t.test(`${release.name} refuses noncanonical identity for ${verb} ${path}`, async () => {
+      const before = requests.length
+      const result = await command(verb, path, api, verb === 'get' ? [] : ['--preview'])
+      assert.equal(result.value.error.code, 'INVALID_INPUT')
+      assert.equal(requests.length, before)
+      const schema = await execute(process.execPath, [executable, 'schema', verb, path, '--catalogue', release.name, '--format', 'json'], { env: environment })
+      const validate = new Ajv({ strict: false }).compile(JSON.parse(schema.stdout).invocation.schema)
+      assert.equal(validate({ api }), false)
+    })
+    for (const guest of scopes.slice(2, 4)) for (const verb of ['create', 'set']) await t.test(`${release.name} ${guest.name} ${verb} schema distinguishes packet actions from reference names`, async () => {
+      const path = verb === 'create' ? guest.path : `${guest.path}/{pos}`
+      const schema = await execute(process.execPath, [executable, 'schema', verb, path, '--catalogue', release.name, '--format', 'json'], { env: environment })
+      const validate = new Ajv({ strict: false }).compile(JSON.parse(schema.stdout).invocation.schema)
+      const target = { ...guest.target, ...(verb === 'set' ? { pos: 0 } : {}) }
+      for (const type of ['in', 'out']) for (const action of ['ACCEPT', 'DROP', 'REJECT']) assert.equal(validate({ api: { ...target, type, action } }), true)
+      assert.equal(validate({ api: { ...target, type: 'group', action: 'web' } }), true)
+      assert.equal(validate({ api: { ...target, type: 'group', action: 'ACCEPT' } }), false)
     })
     const scope = scopes[2]!, item = `${scope.path}/{pos}`, create = { ...scope.target, type: 'in', action: 'ACCEPT' }
     for (const method of ['create', 'set', 'reorder', 'delete']) await t.test(`${release.name} diagnostic-only changes invalidate ${method} confirmation`, async () => {

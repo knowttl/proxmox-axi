@@ -151,7 +151,9 @@ On uncertainty, inspect the selected scope privately without retrying; no operat
 ## Security groups and guest references
 
 Discover definitions privately with `get '/cluster/firewall/groups'` and ordered contents with `get '/cluster/firewall/groups/{group}'`.
-Group names are case-sensitive, 2-18 characters, start with a letter and contain only letters, digits, underscores or hyphens.
+Group names must be canonical lowercase, 2-18 characters, start with a lowercase letter and contain only lowercase letters, digits, underscores or hyphens.
+The provider lowercases definition names when loading configuration; uppercase definition identities, group-rule targets and guest group-reference actions are refused locally.
+Ordinary packet actions remain uppercase `ACCEPT`, `DROP` and `REJECT`.
 Enable each exact mutation ID in the selected profile and independent host policy, and prepare the inherited private result pipe before reading plans or confirming writes.
 Optional definition-creation comments use the existing body-file SecretRef convention; literal comments are refused.
 

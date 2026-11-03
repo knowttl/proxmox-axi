@@ -637,6 +637,9 @@
             "requiredInputs": [
               "pos"
             ],
+            "inputFormats": {
+              "group": "pve-firewall-group"
+            },
             "confirmationWarnings": [
               {
                 "message": "Firewall rule changes can cut off management access or change protection. Inspect the complete private ordered plan before confirming."
@@ -688,6 +691,9 @@
             "requiredInputs": [
               "pos"
             ],
+            "inputFormats": {
+              "group": "pve-firewall-group"
+            },
             "confirmationWarnings": [
               {
                 "message": "Firewall rule changes can cut off management access or change protection. Inspect the complete private ordered plan before confirming."
@@ -965,6 +971,9 @@
             "requiredInputs": [
               "pos"
             ],
+            "inputFormats": {
+              "group": "pve-firewall-group"
+            },
             "confirmationWarnings": [
               {
                 "message": "Firewall rule changes can cut off management access or change protection. Inspect the complete private ordered plan before confirming."
@@ -1012,6 +1021,9 @@
             "requiredInputs": [
               "pos"
             ],
+            "inputFormats": {
+              "group": "pve-firewall-group"
+            },
             "confirmationWarnings": [
               {
                 "message": "Firewall rule changes can cut off management access or change protection. Inspect the complete private ordered plan before confirming."
@@ -2325,6 +2337,9 @@
             "requiredInputs": [
               "pos"
             ],
+            "inputFormats": {
+              "group": "pve-firewall-group"
+            },
             "confirmationWarnings": [
               {
                 "message": "Firewall rule changes can cut off management access or change protection. Inspect the complete private ordered plan before confirming."
@@ -2373,6 +2388,9 @@
             "requiredInputs": [
               "pos"
             ],
+            "inputFormats": {
+              "group": "pve-firewall-group"
+            },
             "confirmationWarnings": [
               {
                 "message": "Firewall rule changes can cut off management access or change protection. Inspect the complete private ordered plan before confirming."
@@ -2857,6 +2875,9 @@
             "requiredInputs": [
               "pos"
             ],
+            "inputFormats": {
+              "group": "pve-firewall-group"
+            },
             "confirmationWarnings": [
               {
                 "message": "Firewall rule changes can cut off management access or change protection. Inspect the complete private ordered plan before confirming."
@@ -2906,6 +2927,9 @@
             "requiredInputs": [
               "pos"
             ],
+            "inputFormats": {
+              "group": "pve-firewall-group"
+            },
             "confirmationWarnings": [
               {
                 "message": "Firewall rule changes can cut off management access or change protection. Inspect the complete private ordered plan before confirming."
@@ -3541,6 +3565,9 @@
             "requiredInputs": [
               "pos"
             ],
+            "inputFormats": {
+              "group": "pve-firewall-group"
+            },
             "confirmationWarnings": [
               {
                 "message": "Firewall rule changes can cut off management access or change protection. Inspect the complete private ordered plan before confirming."
@@ -3590,6 +3617,9 @@
             "requiredInputs": [
               "pos"
             ],
+            "inputFormats": {
+              "group": "pve-firewall-group"
+            },
             "confirmationWarnings": [
               {
                 "message": "Firewall rule changes can cut off management access or change protection. Inspect the complete private ordered plan before confirming."
@@ -5758,6 +5788,9 @@
             "effect": "read",
             "transport": "json",
             "secrets": "private-result",
+            "inputFormats": {
+              "group": "pve-firewall-group"
+            },
             "reason": "Complete ordered group rules, comments and native rules digest require private results."
           },
           "contract": "dist/contracts.json#/contracts/94"
@@ -5769,6 +5802,9 @@
             "effect": "read",
             "transport": "json",
             "secrets": "private-result",
+            "inputFormats": {
+              "group": "pve-firewall-group"
+            },
             "reason": "Complete ordered group rules, comments and native rules digest require private results."
           },
           "contract": "dist/contracts.json#/contracts/709"
@@ -5791,6 +5827,9 @@
             "effect": "read",
             "transport": "json",
             "secrets": "private-result",
+            "inputFormats": {
+              "group": "pve-firewall-group"
+            },
             "reason": "One group rule and its native list digest require private results."
           },
           "contract": "dist/contracts.json#/contracts/97"
@@ -5802,6 +5841,9 @@
             "effect": "read",
             "transport": "json",
             "secrets": "private-result",
+            "inputFormats": {
+              "group": "pve-firewall-group"
+            },
             "reason": "One group rule and its native list digest require private results."
           },
           "contract": "dist/contracts.json#/contracts/712"
@@ -16772,18 +16814,18 @@
             "fixedInputs": {
               "enable": 0
             },
-            "inputPatterns": {
-              "type": "^(?:in|out)$",
-              "action": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
-            },
             "inputFormats": {
+              "group": "pve-firewall-group",
               "source": "pve-firewall-address",
               "dest": "pve-firewall-address",
               "proto": "pve-firewall-protocol",
               "sport": "pve-firewall-port",
               "dport": "pve-firewall-port",
-              "iface": "pve-firewall-interface",
-              "group": "pve-firewall-group"
+              "iface": "pve-firewall-interface"
+            },
+            "inputPatterns": {
+              "type": "^(?:in|out)$",
+              "action": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
             },
             "confirmationWarnings": [
               {
@@ -16843,18 +16885,18 @@
             "fixedInputs": {
               "enable": 0
             },
-            "inputPatterns": {
-              "type": "^(?:in|out)$",
-              "action": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
-            },
             "inputFormats": {
+              "group": "pve-firewall-group",
               "source": "pve-firewall-address",
               "dest": "pve-firewall-address",
               "proto": "pve-firewall-protocol",
               "sport": "pve-firewall-port",
               "dport": "pve-firewall-port",
-              "iface": "pve-firewall-interface",
-              "group": "pve-firewall-group"
+              "iface": "pve-firewall-interface"
+            },
+            "inputPatterns": {
+              "type": "^(?:in|out)$",
+              "action": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
             },
             "confirmationWarnings": [
               {
@@ -17141,18 +17183,18 @@
             "fixedInputs": {
               "enable": 0
             },
-            "inputPatterns": {
-              "type": "^(?:in|out)$",
-              "action": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
-            },
             "inputFormats": {
+              "group": "pve-firewall-group",
               "source": "pve-firewall-address",
               "dest": "pve-firewall-address",
               "proto": "pve-firewall-protocol",
               "sport": "pve-firewall-port",
               "dport": "pve-firewall-port",
-              "iface": "pve-firewall-interface",
-              "group": "pve-firewall-group"
+              "iface": "pve-firewall-interface"
+            },
+            "inputPatterns": {
+              "type": "^(?:in|out)$",
+              "action": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
             },
             "confirmationWarnings": [
               {
@@ -17209,18 +17251,18 @@
             "fixedInputs": {
               "enable": 0
             },
-            "inputPatterns": {
-              "type": "^(?:in|out)$",
-              "action": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
-            },
             "inputFormats": {
+              "group": "pve-firewall-group",
               "source": "pve-firewall-address",
               "dest": "pve-firewall-address",
               "proto": "pve-firewall-protocol",
               "sport": "pve-firewall-port",
               "dport": "pve-firewall-port",
-              "iface": "pve-firewall-interface",
-              "group": "pve-firewall-group"
+              "iface": "pve-firewall-interface"
+            },
+            "inputPatterns": {
+              "type": "^(?:in|out)$",
+              "action": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
             },
             "confirmationWarnings": [
               {
@@ -19373,18 +19415,18 @@
             "fixedInputs": {
               "enable": 0
             },
-            "inputPatterns": {
-              "type": "^(?:in|out)$",
-              "action": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
-            },
             "inputFormats": {
+              "group": "pve-firewall-group",
               "source": "pve-firewall-address",
               "dest": "pve-firewall-address",
               "proto": "pve-firewall-protocol",
               "sport": "pve-firewall-port",
               "dport": "pve-firewall-port",
-              "iface": "pve-firewall-interface",
-              "group": "pve-firewall-group"
+              "iface": "pve-firewall-interface"
+            },
+            "inputPatterns": {
+              "type": "^(?:in|out)$",
+              "action": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
             },
             "confirmationWarnings": [
               {
@@ -19442,18 +19484,18 @@
             "fixedInputs": {
               "enable": 0
             },
-            "inputPatterns": {
-              "type": "^(?:in|out)$",
-              "action": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
-            },
             "inputFormats": {
+              "group": "pve-firewall-group",
               "source": "pve-firewall-address",
               "dest": "pve-firewall-address",
               "proto": "pve-firewall-protocol",
               "sport": "pve-firewall-port",
               "dport": "pve-firewall-port",
-              "iface": "pve-firewall-interface",
-              "group": "pve-firewall-group"
+              "iface": "pve-firewall-interface"
+            },
+            "inputPatterns": {
+              "type": "^(?:in|out)$",
+              "action": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
             },
             "confirmationWarnings": [
               {
@@ -20816,23 +20858,22 @@
                   "dport"
                 ],
                 "inputPatterns": {
-                  "action": "^[A-Za-z][A-Za-z0-9_-]{1,17}$(?![\\s\\S])"
+                  "action": "^[a-z][a-z0-9_-]{1,17}$(?![\\s\\S])"
                 }
               }
             ],
-            "inputPatterns": {
-              "type": "^(?:in|out|group)$",
-              "action": "^[A-Za-z][A-Za-z0-9_-]{1,17}$(?![\\s\\S])",
-              "iface": "^net(?:[0-9]|[12][0-9]|3[01])$"
-            },
             "inputFormats": {
+              "group": "pve-firewall-group",
               "source": "pve-firewall-address",
               "dest": "pve-firewall-address",
               "proto": "pve-firewall-protocol",
               "sport": "pve-firewall-port",
               "dport": "pve-firewall-port",
-              "iface": "pve-firewall-interface",
-              "group": "pve-firewall-group"
+              "iface": "pve-firewall-interface"
+            },
+            "inputPatterns": {
+              "type": "^(?:in|out|group)$",
+              "iface": "^net(?:[0-9]|[12][0-9]|3[01])$"
             },
             "confirmationWarnings": [
               {
@@ -20920,23 +20961,22 @@
                   "dport"
                 ],
                 "inputPatterns": {
-                  "action": "^[A-Za-z][A-Za-z0-9_-]{1,17}$(?![\\s\\S])"
+                  "action": "^[a-z][a-z0-9_-]{1,17}$(?![\\s\\S])"
                 }
               }
             ],
-            "inputPatterns": {
-              "type": "^(?:in|out|group)$",
-              "action": "^[A-Za-z][A-Za-z0-9_-]{1,17}$(?![\\s\\S])",
-              "iface": "^net(?:[0-9]|[12][0-9]|3[01])$"
-            },
             "inputFormats": {
+              "group": "pve-firewall-group",
               "source": "pve-firewall-address",
               "dest": "pve-firewall-address",
               "proto": "pve-firewall-protocol",
               "sport": "pve-firewall-port",
               "dport": "pve-firewall-port",
-              "iface": "pve-firewall-interface",
-              "group": "pve-firewall-group"
+              "iface": "pve-firewall-interface"
+            },
+            "inputPatterns": {
+              "type": "^(?:in|out|group)$",
+              "iface": "^net(?:[0-9]|[12][0-9]|3[01])$"
             },
             "confirmationWarnings": [
               {
@@ -23929,23 +23969,22 @@
                   "dport"
                 ],
                 "inputPatterns": {
-                  "action": "^[A-Za-z][A-Za-z0-9_-]{1,17}$(?![\\s\\S])"
+                  "action": "^[a-z][a-z0-9_-]{1,17}$(?![\\s\\S])"
                 }
               }
             ],
-            "inputPatterns": {
-              "type": "^(?:in|out|group)$",
-              "action": "^[A-Za-z][A-Za-z0-9_-]{1,17}$(?![\\s\\S])",
-              "iface": "^net(?:[0-9]|[12][0-9]|3[01])$"
-            },
             "inputFormats": {
+              "group": "pve-firewall-group",
               "source": "pve-firewall-address",
               "dest": "pve-firewall-address",
               "proto": "pve-firewall-protocol",
               "sport": "pve-firewall-port",
               "dport": "pve-firewall-port",
-              "iface": "pve-firewall-interface",
-              "group": "pve-firewall-group"
+              "iface": "pve-firewall-interface"
+            },
+            "inputPatterns": {
+              "type": "^(?:in|out|group)$",
+              "iface": "^net(?:[0-9]|[12][0-9]|3[01])$"
             },
             "confirmationWarnings": [
               {
@@ -24033,23 +24072,22 @@
                   "dport"
                 ],
                 "inputPatterns": {
-                  "action": "^[A-Za-z][A-Za-z0-9_-]{1,17}$(?![\\s\\S])"
+                  "action": "^[a-z][a-z0-9_-]{1,17}$(?![\\s\\S])"
                 }
               }
             ],
-            "inputPatterns": {
-              "type": "^(?:in|out|group)$",
-              "action": "^[A-Za-z][A-Za-z0-9_-]{1,17}$(?![\\s\\S])",
-              "iface": "^net(?:[0-9]|[12][0-9]|3[01])$"
-            },
             "inputFormats": {
+              "group": "pve-firewall-group",
               "source": "pve-firewall-address",
               "dest": "pve-firewall-address",
               "proto": "pve-firewall-protocol",
               "sport": "pve-firewall-port",
               "dport": "pve-firewall-port",
-              "iface": "pve-firewall-interface",
-              "group": "pve-firewall-group"
+              "iface": "pve-firewall-interface"
+            },
+            "inputPatterns": {
+              "type": "^(?:in|out|group)$",
+              "iface": "^net(?:[0-9]|[12][0-9]|3[01])$"
             },
             "confirmationWarnings": [
               {
@@ -27478,18 +27516,18 @@
                 ]
               }
             ],
-            "inputPatterns": {
-              "type": "^(?:in|out)$",
-              "action": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
-            },
             "inputFormats": {
+              "group": "pve-firewall-group",
               "source": "pve-firewall-address",
               "dest": "pve-firewall-address",
               "proto": "pve-firewall-protocol",
               "sport": "pve-firewall-port",
               "dport": "pve-firewall-port",
-              "iface": "pve-firewall-interface",
-              "group": "pve-firewall-group"
+              "iface": "pve-firewall-interface"
+            },
+            "inputPatterns": {
+              "type": "^(?:in|out)$",
+              "action": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
             },
             "confirmationWarnings": [
               {
@@ -27588,18 +27626,18 @@
                 ]
               }
             ],
-            "inputPatterns": {
-              "type": "^(?:in|out)$",
-              "action": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
-            },
             "inputFormats": {
+              "group": "pve-firewall-group",
               "source": "pve-firewall-address",
               "dest": "pve-firewall-address",
               "proto": "pve-firewall-protocol",
               "sport": "pve-firewall-port",
               "dport": "pve-firewall-port",
-              "iface": "pve-firewall-interface",
-              "group": "pve-firewall-group"
+              "iface": "pve-firewall-interface"
+            },
+            "inputPatterns": {
+              "type": "^(?:in|out)$",
+              "action": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
             },
             "confirmationWarnings": [
               {
@@ -28038,18 +28076,18 @@
                 ]
               }
             ],
-            "inputPatterns": {
-              "type": "^(?:in|out)$",
-              "action": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
-            },
             "inputFormats": {
+              "group": "pve-firewall-group",
               "source": "pve-firewall-address",
               "dest": "pve-firewall-address",
               "proto": "pve-firewall-protocol",
               "sport": "pve-firewall-port",
               "dport": "pve-firewall-port",
-              "iface": "pve-firewall-interface",
-              "group": "pve-firewall-group"
+              "iface": "pve-firewall-interface"
+            },
+            "inputPatterns": {
+              "type": "^(?:in|out)$",
+              "action": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
             },
             "confirmationWarnings": [
               {
@@ -28146,18 +28184,18 @@
                 ]
               }
             ],
-            "inputPatterns": {
-              "type": "^(?:in|out)$",
-              "action": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
-            },
             "inputFormats": {
+              "group": "pve-firewall-group",
               "source": "pve-firewall-address",
               "dest": "pve-firewall-address",
               "proto": "pve-firewall-protocol",
               "sport": "pve-firewall-port",
               "dport": "pve-firewall-port",
-              "iface": "pve-firewall-interface",
-              "group": "pve-firewall-group"
+              "iface": "pve-firewall-interface"
+            },
+            "inputPatterns": {
+              "type": "^(?:in|out)$",
+              "action": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
             },
             "confirmationWarnings": [
               {
@@ -29573,18 +29611,18 @@
                 ]
               }
             ],
-            "inputPatterns": {
-              "type": "^(?:in|out)$",
-              "action": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
-            },
             "inputFormats": {
+              "group": "pve-firewall-group",
               "source": "pve-firewall-address",
               "dest": "pve-firewall-address",
               "proto": "pve-firewall-protocol",
               "sport": "pve-firewall-port",
               "dport": "pve-firewall-port",
-              "iface": "pve-firewall-interface",
-              "group": "pve-firewall-group"
+              "iface": "pve-firewall-interface"
+            },
+            "inputPatterns": {
+              "type": "^(?:in|out)$",
+              "action": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
             },
             "confirmationWarnings": [
               {
@@ -29682,18 +29720,18 @@
                 ]
               }
             ],
-            "inputPatterns": {
-              "type": "^(?:in|out)$",
-              "action": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
-            },
             "inputFormats": {
+              "group": "pve-firewall-group",
               "source": "pve-firewall-address",
               "dest": "pve-firewall-address",
               "proto": "pve-firewall-protocol",
               "sport": "pve-firewall-port",
               "dport": "pve-firewall-port",
-              "iface": "pve-firewall-interface",
-              "group": "pve-firewall-group"
+              "iface": "pve-firewall-interface"
+            },
+            "inputPatterns": {
+              "type": "^(?:in|out)$",
+              "action": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
             },
             "confirmationWarnings": [
               {
@@ -30963,7 +31001,7 @@
                   "enable"
                 ],
                 "inputPatterns": {
-                  "action": "^[A-Za-z][A-Za-z0-9_-]{1,17}$(?![\\s\\S])"
+                  "action": "^[a-z][a-z0-9_-]{1,17}$(?![\\s\\S])"
                 }
               },
               {
@@ -31027,7 +31065,7 @@
                   "dport"
                 ],
                 "inputPatterns": {
-                  "action": "^[A-Za-z][A-Za-z0-9_-]{1,17}$(?![\\s\\S])"
+                  "action": "^[a-z][a-z0-9_-]{1,17}$(?![\\s\\S])"
                 }
               },
               {
@@ -31093,7 +31131,7 @@
                   "dport"
                 ],
                 "inputPatterns": {
-                  "action": "^[A-Za-z][A-Za-z0-9_-]{1,17}$(?![\\s\\S])"
+                  "action": "^[a-z][a-z0-9_-]{1,17}$(?![\\s\\S])"
                 }
               },
               {
@@ -31122,19 +31160,18 @@
                 }
               }
             ],
-            "inputPatterns": {
-              "type": "^(?:in|out|group)$",
-              "action": "^[A-Za-z][A-Za-z0-9_-]{1,17}$(?![\\s\\S])",
-              "iface": "^net(?:[0-9]|[12][0-9]|3[01])$"
-            },
             "inputFormats": {
+              "group": "pve-firewall-group",
               "source": "pve-firewall-address",
               "dest": "pve-firewall-address",
               "proto": "pve-firewall-protocol",
               "sport": "pve-firewall-port",
               "dport": "pve-firewall-port",
-              "iface": "pve-firewall-interface",
-              "group": "pve-firewall-group"
+              "iface": "pve-firewall-interface"
+            },
+            "inputPatterns": {
+              "type": "^(?:in|out|group)$",
+              "iface": "^net(?:[0-9]|[12][0-9]|3[01])$"
             },
             "confirmationWarnings": [
               {
@@ -31247,7 +31284,7 @@
                   "enable"
                 ],
                 "inputPatterns": {
-                  "action": "^[A-Za-z][A-Za-z0-9_-]{1,17}$(?![\\s\\S])"
+                  "action": "^[a-z][a-z0-9_-]{1,17}$(?![\\s\\S])"
                 }
               },
               {
@@ -31311,7 +31348,7 @@
                   "dport"
                 ],
                 "inputPatterns": {
-                  "action": "^[A-Za-z][A-Za-z0-9_-]{1,17}$(?![\\s\\S])"
+                  "action": "^[a-z][a-z0-9_-]{1,17}$(?![\\s\\S])"
                 }
               },
               {
@@ -31377,7 +31414,7 @@
                   "dport"
                 ],
                 "inputPatterns": {
-                  "action": "^[A-Za-z][A-Za-z0-9_-]{1,17}$(?![\\s\\S])"
+                  "action": "^[a-z][a-z0-9_-]{1,17}$(?![\\s\\S])"
                 }
               },
               {
@@ -31406,19 +31443,18 @@
                 }
               }
             ],
-            "inputPatterns": {
-              "type": "^(?:in|out|group)$",
-              "action": "^[A-Za-z][A-Za-z0-9_-]{1,17}$(?![\\s\\S])",
-              "iface": "^net(?:[0-9]|[12][0-9]|3[01])$"
-            },
             "inputFormats": {
+              "group": "pve-firewall-group",
               "source": "pve-firewall-address",
               "dest": "pve-firewall-address",
               "proto": "pve-firewall-protocol",
               "sport": "pve-firewall-port",
               "dport": "pve-firewall-port",
-              "iface": "pve-firewall-interface",
-              "group": "pve-firewall-group"
+              "iface": "pve-firewall-interface"
+            },
+            "inputPatterns": {
+              "type": "^(?:in|out|group)$",
+              "iface": "^net(?:[0-9]|[12][0-9]|3[01])$"
             },
             "confirmationWarnings": [
               {
@@ -32637,7 +32673,7 @@
                   "enable"
                 ],
                 "inputPatterns": {
-                  "action": "^[A-Za-z][A-Za-z0-9_-]{1,17}$(?![\\s\\S])"
+                  "action": "^[a-z][a-z0-9_-]{1,17}$(?![\\s\\S])"
                 }
               },
               {
@@ -32701,7 +32737,7 @@
                   "dport"
                 ],
                 "inputPatterns": {
-                  "action": "^[A-Za-z][A-Za-z0-9_-]{1,17}$(?![\\s\\S])"
+                  "action": "^[a-z][a-z0-9_-]{1,17}$(?![\\s\\S])"
                 }
               },
               {
@@ -32767,7 +32803,7 @@
                   "dport"
                 ],
                 "inputPatterns": {
-                  "action": "^[A-Za-z][A-Za-z0-9_-]{1,17}$(?![\\s\\S])"
+                  "action": "^[a-z][a-z0-9_-]{1,17}$(?![\\s\\S])"
                 }
               },
               {
@@ -32796,19 +32832,18 @@
                 }
               }
             ],
-            "inputPatterns": {
-              "type": "^(?:in|out|group)$",
-              "action": "^[A-Za-z][A-Za-z0-9_-]{1,17}$(?![\\s\\S])",
-              "iface": "^net(?:[0-9]|[12][0-9]|3[01])$"
-            },
             "inputFormats": {
+              "group": "pve-firewall-group",
               "source": "pve-firewall-address",
               "dest": "pve-firewall-address",
               "proto": "pve-firewall-protocol",
               "sport": "pve-firewall-port",
               "dport": "pve-firewall-port",
-              "iface": "pve-firewall-interface",
-              "group": "pve-firewall-group"
+              "iface": "pve-firewall-interface"
+            },
+            "inputPatterns": {
+              "type": "^(?:in|out|group)$",
+              "iface": "^net(?:[0-9]|[12][0-9]|3[01])$"
             },
             "confirmationWarnings": [
               {
@@ -32921,7 +32956,7 @@
                   "enable"
                 ],
                 "inputPatterns": {
-                  "action": "^[A-Za-z][A-Za-z0-9_-]{1,17}$(?![\\s\\S])"
+                  "action": "^[a-z][a-z0-9_-]{1,17}$(?![\\s\\S])"
                 }
               },
               {
@@ -32985,7 +33020,7 @@
                   "dport"
                 ],
                 "inputPatterns": {
-                  "action": "^[A-Za-z][A-Za-z0-9_-]{1,17}$(?![\\s\\S])"
+                  "action": "^[a-z][a-z0-9_-]{1,17}$(?![\\s\\S])"
                 }
               },
               {
@@ -33051,7 +33086,7 @@
                   "dport"
                 ],
                 "inputPatterns": {
-                  "action": "^[A-Za-z][A-Za-z0-9_-]{1,17}$(?![\\s\\S])"
+                  "action": "^[a-z][a-z0-9_-]{1,17}$(?![\\s\\S])"
                 }
               },
               {
@@ -33080,19 +33115,18 @@
                 }
               }
             ],
-            "inputPatterns": {
-              "type": "^(?:in|out|group)$",
-              "action": "^[A-Za-z][A-Za-z0-9_-]{1,17}$(?![\\s\\S])",
-              "iface": "^net(?:[0-9]|[12][0-9]|3[01])$"
-            },
             "inputFormats": {
+              "group": "pve-firewall-group",
               "source": "pve-firewall-address",
               "dest": "pve-firewall-address",
               "proto": "pve-firewall-protocol",
               "sport": "pve-firewall-port",
               "dport": "pve-firewall-port",
-              "iface": "pve-firewall-interface",
-              "group": "pve-firewall-group"
+              "iface": "pve-firewall-interface"
+            },
+            "inputPatterns": {
+              "type": "^(?:in|out|group)$",
+              "iface": "^net(?:[0-9]|[12][0-9]|3[01])$"
             },
             "confirmationWarnings": [
               {
