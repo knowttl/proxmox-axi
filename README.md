@@ -267,6 +267,22 @@ proxmox-axi set '/nodes/{node}/lxc/{vmid}/config' --api-node '<node>' --api-vmid
 Repeat the exact command with its confirmation after inspecting the preview.
 Follow the [guest networking and boot reference](skills/proxmox-axi/references/guest-management.md#guest-networking-and-boot) for NIC replacement/removal safeguards, host-network boundaries and guest-agent prerequisites.
 
+### Guest-agent readiness and first-boot checks
+
+After the guest start task completes, use the exact QEMU agent `info`, `get-host-name`, `get-osinfo`, `network-get-interfaces` and `ping` routes to inspect readiness.
+All five require the inherited private result pipe described in the [readiness reference](skills/proxmox-axi/references/guest-management.md#guest-agent-readiness-and-first-boot-checks), including with `--full`.
+
+```sh
+proxmox-axi get '/nodes/{node}/qemu/{vmid}/agent/info' --api-node '<node>' --api-vmid 100 --profile lab
+proxmox-axi post '/nodes/{node}/qemu/{vmid}/agent/ping' --api-node '<node>' --api-vmid 100 --profile lab
+```
+
+Ping uses the provider's POST method but is a reviewed read, without mutation permission, confirmation or a standalone journal.
+It establishes agent responsiveness, not cloud-init completion or application health.
+Agent failures require checking guest power, agent enablement and the service inside the VM; they do not establish that the VM is unhealthy.
+For approved first-boot marker files, reuse `transfer get .../agent/file-read --response-format guest-file` with a private byte channel, preserving the selected release's encoding, size and truncation limits.
+Generic guest-agent dispatch, execution and file writes remain refused.
+
 ### Cloud-init onboarding
 
 Confirmed QEMU configuration updates now support `ciuser`, SecretRef-only `cipassword`, percent-encoded SSH public keys, `ipconfig0` through `ipconfig31`, DNS settings and ordinary `storage:cloudinit` media.

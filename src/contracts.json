@@ -71398,12 +71398,12 @@
       "id": "OP-GET-0d16cd1e0d",
       "release": "legacy-8.2.7",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "read",
+        "transport": "json",
+        "secrets": "private-result",
+        "reason": "Guest hostname observation only; identity details and undeclared guest-provided fields require the inherited private result pipe."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "get",
         "/nodes/{node}/qemu/{vmid}/agent/get-host-name"
@@ -71692,12 +71692,12 @@
       "id": "OP-GET-f14d9ebca7",
       "release": "legacy-8.2.7",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "read",
+        "transport": "json",
+        "secrets": "private-result",
+        "reason": "Guest operating-system observation only; complete bounded guest-provided metadata requires the inherited private result pipe."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "get",
         "/nodes/{node}/qemu/{vmid}/agent/get-osinfo"
@@ -72182,12 +72182,12 @@
       "id": "OP-GET-6b38a4bfb7",
       "release": "legacy-8.2.7",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "read",
+        "transport": "json",
+        "secrets": "private-result",
+        "reason": "Guest-agent version and supported command information only; complete bounded guest-provided data is delivered through the inherited private result pipe."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "get",
         "/nodes/{node}/qemu/{vmid}/agent/info"
@@ -72280,12 +72280,12 @@
       "id": "OP-GET-eaa842e754",
       "release": "legacy-8.2.7",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "read",
+        "transport": "json",
+        "secrets": "private-result",
+        "reason": "Guest interface and address observation only, without host or guest network changes; complete bounded guest network details require the inherited private result pipe."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "get",
         "/nodes/{node}/qemu/{vmid}/agent/network-get-interfaces"
@@ -72378,12 +72378,12 @@
       "id": "OP-POST-6d15fad8ab",
       "release": "legacy-8.2.7",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "read",
+        "transport": "json",
+        "secrets": "private-result",
+        "reason": "Exact non-mutating guest-ping responsiveness probe, using its vendor POST method; the bounded guest-provided wrapper requires the inherited private result pipe and does not admit generic agent dispatch."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "post",
         "/nodes/{node}/qemu/{vmid}/agent/ping"
@@ -193129,12 +193129,12 @@
       "id": "OP-GET-0d16cd1e0d",
       "release": "published-current",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "read",
+        "transport": "json",
+        "secrets": "private-result",
+        "reason": "Guest hostname observation only; identity details and undeclared guest-provided fields require the inherited private result pipe."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "get",
         "/nodes/{node}/qemu/{vmid}/agent/get-host-name"
@@ -193432,12 +193432,12 @@
       "id": "OP-GET-f14d9ebca7",
       "release": "published-current",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "read",
+        "transport": "json",
+        "secrets": "private-result",
+        "reason": "Guest operating-system observation only; complete bounded guest-provided metadata requires the inherited private result pipe."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "get",
         "/nodes/{node}/qemu/{vmid}/agent/get-osinfo"
@@ -193937,12 +193937,12 @@
       "id": "OP-GET-6b38a4bfb7",
       "release": "published-current",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "read",
+        "transport": "json",
+        "secrets": "private-result",
+        "reason": "Guest-agent version and supported command information only; complete bounded guest-provided data is delivered through the inherited private result pipe."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "get",
         "/nodes/{node}/qemu/{vmid}/agent/info"
@@ -194038,12 +194038,12 @@
       "id": "OP-GET-eaa842e754",
       "release": "published-current",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "read",
+        "transport": "json",
+        "secrets": "private-result",
+        "reason": "Guest interface and address observation only, without host or guest network changes; complete bounded guest network details require the inherited private result pipe."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "get",
         "/nodes/{node}/qemu/{vmid}/agent/network-get-interfaces"
@@ -194139,12 +194139,12 @@
       "id": "OP-POST-6d15fad8ab",
       "release": "published-current",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "read",
+        "transport": "json",
+        "secrets": "private-result",
+        "reason": "Exact non-mutating guest-ping responsiveness probe, using its vendor POST method; the bounded guest-provided wrapper requires the inherited private result pipe and does not admit generic agent dispatch."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "post",
         "/nodes/{node}/qemu/{vmid}/agent/ping"
