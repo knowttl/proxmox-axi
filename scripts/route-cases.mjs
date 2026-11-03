@@ -23,9 +23,10 @@ export function* routeCases(catalogues, policy) {
     const privateResult = callable && review.secrets === 'private-result'
     const values = {}
     const properties = operation.parameters?.properties ?? {}
-    for (const [name, schema] of Object.entries(properties)) if (!schema.optional) {
+    for (const [name, schema] of Object.entries(properties)) if (!schema.optional || operation.path.includes(`{${name}}`)) {
       if (name === 'node') values[name] = 'pve-test'
       else if (name === 'upid') values[name] = 'UPID:pve-test:00000001:00000002:00000003:vzdump:100:synthetic@pve:'
+      else if (review.inputFormats?.[name] === 'pve-managed-volume') values[name] = 'local:iso/installer.iso'
       else if (schema.enum) values[name] = schema.enum[0]
       else if (schema.type === 'integer' || schema.type === 'number') values[name] = schema.minimum ?? 1
       else if (schema.type === 'boolean') values[name] = false
@@ -41,6 +42,8 @@ export function* routeCases(catalogues, policy) {
       const taskLogDownload = operation.method === 'GET' && operation.path === '/nodes/{node}/tasks/{upid}/log' && variant.values.download === true
       const args = [operation.method.toLowerCase(), operation.path, '--catalogue', catalogue.release, '--format', 'json', ...(reviewedWrite ? [] : ['--full'])]
       const response = operation.path.endsWith('/version') ? { version: '8.2.7', release: '8.2', repoid: '3e0176e6bb2ade3b' } : responseFixture(operation.returns ?? {})
+      const project = row => Object.fromEntries(Object.entries(row).filter(([name]) => review.outputFields.includes(name)))
+      const publicResponse = review.outputFields ? Array.isArray(response) ? response.map(project) : project(response) : response
       if (callable) for (const [name, value] of Object.entries(variant.values)) args.push(`--api-${name}`, String(value))
       let path = operation.path
       const query = []
@@ -54,6 +57,7 @@ export function* routeCases(catalogues, policy) {
         managed: taskLogDownload || reviewWrite(operation)?.transport === 'managed', args,
         values: variant.values,
         response,
+        publicResponse,
         expectedPath: `/api2/json${path}${query.length ? `?${query.join('&')}` : ''}` }
     }
   }
