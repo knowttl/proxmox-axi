@@ -1329,20 +1329,148 @@
       "contract": "dist/contracts.json#/contracts/107"
     },
     {
-      "id": "OP-GET-a93fc732fd",
-      "method": "GET",
-      "path": "/cluster/firewall/options",
-      "release": "legacy-8.2.7",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/108"
-    },
-    {
       "id": "OP-PUT-95d330d1b6",
       "method": "PUT",
       "path": "/cluster/firewall/options",
       "release": "legacy-8.2.7",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/109"
+      "admitted": true,
+      "contract": "dist/contracts.json#/contracts/109",
+      "policy": {
+        "effect": "write",
+        "transport": "json",
+        "secrets": "none",
+        "allowedInputs": [
+          "enable",
+          "policy_in",
+          "policy_out",
+          "policy_forward",
+          "digest"
+        ],
+        "inputCases": [
+          {
+            "forbiddenInputs": [
+              "enable"
+            ]
+          },
+          {
+            "requiredValues": {
+              "enable": 0
+            }
+          },
+          {
+            "requiredValues": {
+              "enable": 1
+            }
+          }
+        ],
+        "confirmationWarnings": [
+          {
+            "message": "Firewall configuration changes can cut off management access. Review the exact target, settings and recovery access before confirming."
+          },
+          {
+            "when": {
+              "input": "enable",
+              "values": [
+                false,
+                0
+              ]
+            },
+            "message": "FIREWALL PROTECTION DISABLED: this request disables firewall protection at the selected scope."
+          },
+          {
+            "when": {
+              "input": "policy_in",
+              "values": [
+                "ACCEPT"
+              ]
+            },
+            "message": "DEFAULT ACCEPT: policy_in will accept unmatched traffic at the selected scope. Explicitly authorize this default allowance."
+          },
+          {
+            "when": {
+              "input": "policy_out",
+              "values": [
+                "ACCEPT"
+              ]
+            },
+            "message": "DEFAULT ACCEPT: policy_out will accept unmatched traffic at the selected scope. Explicitly authorize this default allowance."
+          },
+          {
+            "when": {
+              "input": "policy_forward",
+              "values": [
+                "ACCEPT"
+              ]
+            },
+            "message": "DEFAULT ACCEPT: policy_forward will accept unmatched traffic at the selected scope. Explicitly authorize this default allowance."
+          }
+        ],
+        "reason": "Confirmed firewall enable/default-policy configuration only; disabling protection and ACCEPT defaults are prominently disclosed. Backend, filter, delete and other selectors remain refused.",
+        "reconciliation": {
+          "kind": "read",
+          "path": "/cluster/firewall/options",
+          "reason": "Observe supplied firewall settings only; configuration equality does not establish effective filtering or management reachability."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/",
+            [
+              "Sys.Modify"
+            ]
+          ]
+        },
+        "response": {
+          "type": "null"
+        },
+        "source": "Pinned firewall get_options/set_options schemas and provider firewall documentation; shared exact confirmation and journal policy."
+      },
+      "inputs": [
+        {
+          "name": "delete",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "digest",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "ebtables",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "enable",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "log_ratelimit",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "policy_forward",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "policy_in",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "policy_out",
+          "admitted": true,
+          "sensitive": false
+        }
+      ],
+      "results": {
+        "type": "null",
+        "handling": "public metadata; protected inputs excluded"
+      }
     },
     {
       "id": "OP-GET-5ec3662eef",
@@ -3333,20 +3461,199 @@
       "contract": "dist/contracts.json#/contracts/337"
     },
     {
-      "id": "OP-GET-75276fb252",
-      "method": "GET",
-      "path": "/nodes/{node}/firewall/options",
-      "release": "legacy-8.2.7",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/338"
-    },
-    {
       "id": "OP-PUT-5276603317",
       "method": "PUT",
       "path": "/nodes/{node}/firewall/options",
       "release": "legacy-8.2.7",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/339"
+      "admitted": true,
+      "contract": "dist/contracts.json#/contracts/339",
+      "policy": {
+        "effect": "write",
+        "transport": "json",
+        "secrets": "none",
+        "allowedInputs": [
+          "node",
+          "enable",
+          "digest"
+        ],
+        "confirmationWarnings": [
+          {
+            "message": "Firewall configuration changes can cut off management access. Review the exact target, settings and recovery access before confirming."
+          },
+          {
+            "when": {
+              "input": "enable",
+              "values": [
+                false,
+                0
+              ]
+            },
+            "message": "FIREWALL PROTECTION DISABLED: this request disables firewall protection at the selected scope."
+          },
+          {
+            "when": {
+              "input": "policy_in",
+              "values": [
+                "ACCEPT"
+              ]
+            },
+            "message": "DEFAULT ACCEPT: policy_in will accept unmatched traffic at the selected scope. Explicitly authorize this default allowance."
+          },
+          {
+            "when": {
+              "input": "policy_out",
+              "values": [
+                "ACCEPT"
+              ]
+            },
+            "message": "DEFAULT ACCEPT: policy_out will accept unmatched traffic at the selected scope. Explicitly authorize this default allowance."
+          },
+          {
+            "when": {
+              "input": "policy_forward",
+              "values": [
+                "ACCEPT"
+              ]
+            },
+            "message": "DEFAULT ACCEPT: policy_forward will accept unmatched traffic at the selected scope. Explicitly authorize this default allowance."
+          }
+        ],
+        "reason": "Confirmed firewall enable/default-policy configuration only; disabling protection and ACCEPT defaults are prominently disclosed. Backend, filter, delete and other selectors remain refused.",
+        "reconciliation": {
+          "kind": "read",
+          "path": "/nodes/{node}/firewall/options",
+          "reason": "Observe supplied firewall settings only; configuration equality does not establish effective filtering or management reachability."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/nodes/{node}",
+            [
+              "Sys.Modify"
+            ]
+          ]
+        },
+        "response": {
+          "type": "null"
+        },
+        "source": "Pinned firewall get_options/set_options schemas and provider firewall documentation; shared exact confirmation and journal policy."
+      },
+      "inputs": [
+        {
+          "name": "delete",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "digest",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "enable",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "log_level_forward",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "log_level_in",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "log_level_out",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "log_nf_conntrack",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "ndp",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "nf_conntrack_allow_invalid",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "nf_conntrack_helpers",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "nf_conntrack_max",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "nf_conntrack_tcp_timeout_established",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "nf_conntrack_tcp_timeout_syn_recv",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "nftables",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "node",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "nosmurfs",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "protection_synflood",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "protection_synflood_burst",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "protection_synflood_rate",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "smurf_log_level",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "tcp_flags_log_level",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "tcpflags",
+          "admitted": false,
+          "sensitive": false
+        }
+      ],
+      "results": {
+        "type": "null",
+        "handling": "public metadata; protected inputs excluded"
+      }
     },
     {
       "id": "OP-GET-affa73c601",
@@ -7796,20 +8103,162 @@
       "contract": "dist/contracts.json#/contracts/375"
     },
     {
-      "id": "OP-GET-9f1f43e78f",
-      "method": "GET",
-      "path": "/nodes/{node}/lxc/{vmid}/firewall/options",
-      "release": "legacy-8.2.7",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/376"
-    },
-    {
       "id": "OP-PUT-b84103fb70",
       "method": "PUT",
       "path": "/nodes/{node}/lxc/{vmid}/firewall/options",
       "release": "legacy-8.2.7",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/377"
+      "admitted": true,
+      "contract": "dist/contracts.json#/contracts/377",
+      "policy": {
+        "effect": "write",
+        "transport": "json",
+        "secrets": "none",
+        "allowedInputs": [
+          "node",
+          "vmid",
+          "enable",
+          "policy_in",
+          "policy_out",
+          "digest"
+        ],
+        "confirmationWarnings": [
+          {
+            "message": "Firewall configuration changes can cut off management access. Review the exact target, settings and recovery access before confirming."
+          },
+          {
+            "when": {
+              "input": "enable",
+              "values": [
+                false,
+                0
+              ]
+            },
+            "message": "FIREWALL PROTECTION DISABLED: this request disables firewall protection at the selected scope."
+          },
+          {
+            "when": {
+              "input": "policy_in",
+              "values": [
+                "ACCEPT"
+              ]
+            },
+            "message": "DEFAULT ACCEPT: policy_in will accept unmatched traffic at the selected scope. Explicitly authorize this default allowance."
+          },
+          {
+            "when": {
+              "input": "policy_out",
+              "values": [
+                "ACCEPT"
+              ]
+            },
+            "message": "DEFAULT ACCEPT: policy_out will accept unmatched traffic at the selected scope. Explicitly authorize this default allowance."
+          },
+          {
+            "when": {
+              "input": "policy_forward",
+              "values": [
+                "ACCEPT"
+              ]
+            },
+            "message": "DEFAULT ACCEPT: policy_forward will accept unmatched traffic at the selected scope. Explicitly authorize this default allowance."
+          }
+        ],
+        "reason": "Confirmed firewall enable/default-policy configuration only; disabling protection and ACCEPT defaults are prominently disclosed. Backend, filter, delete and other selectors remain refused.",
+        "reconciliation": {
+          "kind": "read",
+          "path": "/nodes/{node}/lxc/{vmid}/firewall/options",
+          "reason": "Observe supplied firewall settings only; configuration equality does not establish effective filtering or management reachability."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/vms/{vmid}",
+            [
+              "VM.Config.Network"
+            ]
+          ]
+        },
+        "response": {
+          "type": "null"
+        },
+        "source": "Pinned firewall get_options/set_options schemas and provider firewall documentation; shared exact confirmation and journal policy."
+      },
+      "inputs": [
+        {
+          "name": "delete",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "dhcp",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "digest",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "enable",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "ipfilter",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "log_level_in",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "log_level_out",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "macfilter",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "ndp",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "node",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "policy_in",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "policy_out",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "radv",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "vmid",
+          "admitted": true,
+          "sensitive": false
+        }
+      ],
+      "results": {
+        "type": "null",
+        "handling": "public metadata; protected inputs excluded"
+      }
     },
     {
       "id": "OP-GET-6c4d217e49",
@@ -12257,20 +12706,162 @@
       "contract": "dist/contracts.json#/contracts/476"
     },
     {
-      "id": "OP-GET-ea412bbbf8",
-      "method": "GET",
-      "path": "/nodes/{node}/qemu/{vmid}/firewall/options",
-      "release": "legacy-8.2.7",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/477"
-    },
-    {
       "id": "OP-PUT-68ea5099b4",
       "method": "PUT",
       "path": "/nodes/{node}/qemu/{vmid}/firewall/options",
       "release": "legacy-8.2.7",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/478"
+      "admitted": true,
+      "contract": "dist/contracts.json#/contracts/478",
+      "policy": {
+        "effect": "write",
+        "transport": "json",
+        "secrets": "none",
+        "allowedInputs": [
+          "node",
+          "vmid",
+          "enable",
+          "policy_in",
+          "policy_out",
+          "digest"
+        ],
+        "confirmationWarnings": [
+          {
+            "message": "Firewall configuration changes can cut off management access. Review the exact target, settings and recovery access before confirming."
+          },
+          {
+            "when": {
+              "input": "enable",
+              "values": [
+                false,
+                0
+              ]
+            },
+            "message": "FIREWALL PROTECTION DISABLED: this request disables firewall protection at the selected scope."
+          },
+          {
+            "when": {
+              "input": "policy_in",
+              "values": [
+                "ACCEPT"
+              ]
+            },
+            "message": "DEFAULT ACCEPT: policy_in will accept unmatched traffic at the selected scope. Explicitly authorize this default allowance."
+          },
+          {
+            "when": {
+              "input": "policy_out",
+              "values": [
+                "ACCEPT"
+              ]
+            },
+            "message": "DEFAULT ACCEPT: policy_out will accept unmatched traffic at the selected scope. Explicitly authorize this default allowance."
+          },
+          {
+            "when": {
+              "input": "policy_forward",
+              "values": [
+                "ACCEPT"
+              ]
+            },
+            "message": "DEFAULT ACCEPT: policy_forward will accept unmatched traffic at the selected scope. Explicitly authorize this default allowance."
+          }
+        ],
+        "reason": "Confirmed firewall enable/default-policy configuration only; disabling protection and ACCEPT defaults are prominently disclosed. Backend, filter, delete and other selectors remain refused.",
+        "reconciliation": {
+          "kind": "read",
+          "path": "/nodes/{node}/qemu/{vmid}/firewall/options",
+          "reason": "Observe supplied firewall settings only; configuration equality does not establish effective filtering or management reachability."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/vms/{vmid}",
+            [
+              "VM.Config.Network"
+            ]
+          ]
+        },
+        "response": {
+          "type": "null"
+        },
+        "source": "Pinned firewall get_options/set_options schemas and provider firewall documentation; shared exact confirmation and journal policy."
+      },
+      "inputs": [
+        {
+          "name": "delete",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "dhcp",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "digest",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "enable",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "ipfilter",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "log_level_in",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "log_level_out",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "macfilter",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "ndp",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "node",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "policy_in",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "policy_out",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "radv",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "vmid",
+          "admitted": true,
+          "sensitive": false
+        }
+      ],
+      "results": {
+        "type": "null",
+        "handling": "public metadata; protected inputs excluded"
+      }
     },
     {
       "id": "OP-GET-4f270c4bc4",
@@ -16405,20 +16996,148 @@
       "contract": "dist/contracts.json#/contracts/722"
     },
     {
-      "id": "OP-GET-a93fc732fd",
-      "method": "GET",
-      "path": "/cluster/firewall/options",
-      "release": "published-current",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/723"
-    },
-    {
       "id": "OP-PUT-95d330d1b6",
       "method": "PUT",
       "path": "/cluster/firewall/options",
       "release": "published-current",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/724"
+      "admitted": true,
+      "contract": "dist/contracts.json#/contracts/724",
+      "policy": {
+        "effect": "write",
+        "transport": "json",
+        "secrets": "none",
+        "allowedInputs": [
+          "enable",
+          "policy_in",
+          "policy_out",
+          "policy_forward",
+          "digest"
+        ],
+        "inputCases": [
+          {
+            "forbiddenInputs": [
+              "enable"
+            ]
+          },
+          {
+            "requiredValues": {
+              "enable": 0
+            }
+          },
+          {
+            "requiredValues": {
+              "enable": 1
+            }
+          }
+        ],
+        "confirmationWarnings": [
+          {
+            "message": "Firewall configuration changes can cut off management access. Review the exact target, settings and recovery access before confirming."
+          },
+          {
+            "when": {
+              "input": "enable",
+              "values": [
+                false,
+                0
+              ]
+            },
+            "message": "FIREWALL PROTECTION DISABLED: this request disables firewall protection at the selected scope."
+          },
+          {
+            "when": {
+              "input": "policy_in",
+              "values": [
+                "ACCEPT"
+              ]
+            },
+            "message": "DEFAULT ACCEPT: policy_in will accept unmatched traffic at the selected scope. Explicitly authorize this default allowance."
+          },
+          {
+            "when": {
+              "input": "policy_out",
+              "values": [
+                "ACCEPT"
+              ]
+            },
+            "message": "DEFAULT ACCEPT: policy_out will accept unmatched traffic at the selected scope. Explicitly authorize this default allowance."
+          },
+          {
+            "when": {
+              "input": "policy_forward",
+              "values": [
+                "ACCEPT"
+              ]
+            },
+            "message": "DEFAULT ACCEPT: policy_forward will accept unmatched traffic at the selected scope. Explicitly authorize this default allowance."
+          }
+        ],
+        "reason": "Confirmed firewall enable/default-policy configuration only; disabling protection and ACCEPT defaults are prominently disclosed. Backend, filter, delete and other selectors remain refused.",
+        "reconciliation": {
+          "kind": "read",
+          "path": "/cluster/firewall/options",
+          "reason": "Observe supplied firewall settings only; configuration equality does not establish effective filtering or management reachability."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/",
+            [
+              "Sys.Modify"
+            ]
+          ]
+        },
+        "response": {
+          "type": "null"
+        },
+        "source": "Pinned firewall get_options/set_options schemas and provider firewall documentation; shared exact confirmation and journal policy."
+      },
+      "inputs": [
+        {
+          "name": "delete",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "digest",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "ebtables",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "enable",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "log_ratelimit",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "policy_forward",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "policy_in",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "policy_out",
+          "admitted": true,
+          "sensitive": false
+        }
+      ],
+      "results": {
+        "type": "null",
+        "handling": "public metadata; protected inputs excluded"
+      }
     },
     {
       "id": "OP-GET-5ec3662eef",
@@ -18833,20 +19552,199 @@
       "contract": "dist/contracts.json#/contracts/1005"
     },
     {
-      "id": "OP-GET-75276fb252",
-      "method": "GET",
-      "path": "/nodes/{node}/firewall/options",
-      "release": "published-current",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/1006"
-    },
-    {
       "id": "OP-PUT-5276603317",
       "method": "PUT",
       "path": "/nodes/{node}/firewall/options",
       "release": "published-current",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/1007"
+      "admitted": true,
+      "contract": "dist/contracts.json#/contracts/1007",
+      "policy": {
+        "effect": "write",
+        "transport": "json",
+        "secrets": "none",
+        "allowedInputs": [
+          "node",
+          "enable",
+          "digest"
+        ],
+        "confirmationWarnings": [
+          {
+            "message": "Firewall configuration changes can cut off management access. Review the exact target, settings and recovery access before confirming."
+          },
+          {
+            "when": {
+              "input": "enable",
+              "values": [
+                false,
+                0
+              ]
+            },
+            "message": "FIREWALL PROTECTION DISABLED: this request disables firewall protection at the selected scope."
+          },
+          {
+            "when": {
+              "input": "policy_in",
+              "values": [
+                "ACCEPT"
+              ]
+            },
+            "message": "DEFAULT ACCEPT: policy_in will accept unmatched traffic at the selected scope. Explicitly authorize this default allowance."
+          },
+          {
+            "when": {
+              "input": "policy_out",
+              "values": [
+                "ACCEPT"
+              ]
+            },
+            "message": "DEFAULT ACCEPT: policy_out will accept unmatched traffic at the selected scope. Explicitly authorize this default allowance."
+          },
+          {
+            "when": {
+              "input": "policy_forward",
+              "values": [
+                "ACCEPT"
+              ]
+            },
+            "message": "DEFAULT ACCEPT: policy_forward will accept unmatched traffic at the selected scope. Explicitly authorize this default allowance."
+          }
+        ],
+        "reason": "Confirmed firewall enable/default-policy configuration only; disabling protection and ACCEPT defaults are prominently disclosed. Backend, filter, delete and other selectors remain refused.",
+        "reconciliation": {
+          "kind": "read",
+          "path": "/nodes/{node}/firewall/options",
+          "reason": "Observe supplied firewall settings only; configuration equality does not establish effective filtering or management reachability."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/nodes/{node}",
+            [
+              "Sys.Modify"
+            ]
+          ]
+        },
+        "response": {
+          "type": "null"
+        },
+        "source": "Pinned firewall get_options/set_options schemas and provider firewall documentation; shared exact confirmation and journal policy."
+      },
+      "inputs": [
+        {
+          "name": "delete",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "digest",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "enable",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "log_level_forward",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "log_level_in",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "log_level_out",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "log_nf_conntrack",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "ndp",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "nf_conntrack_allow_invalid",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "nf_conntrack_helpers",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "nf_conntrack_max",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "nf_conntrack_tcp_timeout_established",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "nf_conntrack_tcp_timeout_syn_recv",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "nftables",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "node",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "nosmurfs",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "protection_synflood",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "protection_synflood_burst",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "protection_synflood_rate",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "smurf_log_level",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "tcp_flags_log_level",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "tcpflags",
+          "admitted": false,
+          "sensitive": false
+        }
+      ],
+      "results": {
+        "type": "null",
+        "handling": "public metadata; protected inputs excluded"
+      }
     },
     {
       "id": "OP-GET-affa73c601",
@@ -23321,20 +24219,162 @@
       "contract": "dist/contracts.json#/contracts/1043"
     },
     {
-      "id": "OP-GET-9f1f43e78f",
-      "method": "GET",
-      "path": "/nodes/{node}/lxc/{vmid}/firewall/options",
-      "release": "published-current",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/1044"
-    },
-    {
       "id": "OP-PUT-b84103fb70",
       "method": "PUT",
       "path": "/nodes/{node}/lxc/{vmid}/firewall/options",
       "release": "published-current",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/1045"
+      "admitted": true,
+      "contract": "dist/contracts.json#/contracts/1045",
+      "policy": {
+        "effect": "write",
+        "transport": "json",
+        "secrets": "none",
+        "allowedInputs": [
+          "node",
+          "vmid",
+          "enable",
+          "policy_in",
+          "policy_out",
+          "digest"
+        ],
+        "confirmationWarnings": [
+          {
+            "message": "Firewall configuration changes can cut off management access. Review the exact target, settings and recovery access before confirming."
+          },
+          {
+            "when": {
+              "input": "enable",
+              "values": [
+                false,
+                0
+              ]
+            },
+            "message": "FIREWALL PROTECTION DISABLED: this request disables firewall protection at the selected scope."
+          },
+          {
+            "when": {
+              "input": "policy_in",
+              "values": [
+                "ACCEPT"
+              ]
+            },
+            "message": "DEFAULT ACCEPT: policy_in will accept unmatched traffic at the selected scope. Explicitly authorize this default allowance."
+          },
+          {
+            "when": {
+              "input": "policy_out",
+              "values": [
+                "ACCEPT"
+              ]
+            },
+            "message": "DEFAULT ACCEPT: policy_out will accept unmatched traffic at the selected scope. Explicitly authorize this default allowance."
+          },
+          {
+            "when": {
+              "input": "policy_forward",
+              "values": [
+                "ACCEPT"
+              ]
+            },
+            "message": "DEFAULT ACCEPT: policy_forward will accept unmatched traffic at the selected scope. Explicitly authorize this default allowance."
+          }
+        ],
+        "reason": "Confirmed firewall enable/default-policy configuration only; disabling protection and ACCEPT defaults are prominently disclosed. Backend, filter, delete and other selectors remain refused.",
+        "reconciliation": {
+          "kind": "read",
+          "path": "/nodes/{node}/lxc/{vmid}/firewall/options",
+          "reason": "Observe supplied firewall settings only; configuration equality does not establish effective filtering or management reachability."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/vms/{vmid}",
+            [
+              "VM.Config.Network"
+            ]
+          ]
+        },
+        "response": {
+          "type": "null"
+        },
+        "source": "Pinned firewall get_options/set_options schemas and provider firewall documentation; shared exact confirmation and journal policy."
+      },
+      "inputs": [
+        {
+          "name": "delete",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "dhcp",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "digest",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "enable",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "ipfilter",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "log_level_in",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "log_level_out",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "macfilter",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "ndp",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "node",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "policy_in",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "policy_out",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "radv",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "vmid",
+          "admitted": true,
+          "sensitive": false
+        }
+      ],
+      "results": {
+        "type": "null",
+        "handling": "public metadata; protected inputs excluded"
+      }
     },
     {
       "id": "OP-GET-6c4d217e49",
@@ -27828,20 +28868,162 @@
       "contract": "dist/contracts.json#/contracts/1146"
     },
     {
-      "id": "OP-GET-ea412bbbf8",
-      "method": "GET",
-      "path": "/nodes/{node}/qemu/{vmid}/firewall/options",
-      "release": "published-current",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/1147"
-    },
-    {
       "id": "OP-PUT-68ea5099b4",
       "method": "PUT",
       "path": "/nodes/{node}/qemu/{vmid}/firewall/options",
       "release": "published-current",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/1148"
+      "admitted": true,
+      "contract": "dist/contracts.json#/contracts/1148",
+      "policy": {
+        "effect": "write",
+        "transport": "json",
+        "secrets": "none",
+        "allowedInputs": [
+          "node",
+          "vmid",
+          "enable",
+          "policy_in",
+          "policy_out",
+          "digest"
+        ],
+        "confirmationWarnings": [
+          {
+            "message": "Firewall configuration changes can cut off management access. Review the exact target, settings and recovery access before confirming."
+          },
+          {
+            "when": {
+              "input": "enable",
+              "values": [
+                false,
+                0
+              ]
+            },
+            "message": "FIREWALL PROTECTION DISABLED: this request disables firewall protection at the selected scope."
+          },
+          {
+            "when": {
+              "input": "policy_in",
+              "values": [
+                "ACCEPT"
+              ]
+            },
+            "message": "DEFAULT ACCEPT: policy_in will accept unmatched traffic at the selected scope. Explicitly authorize this default allowance."
+          },
+          {
+            "when": {
+              "input": "policy_out",
+              "values": [
+                "ACCEPT"
+              ]
+            },
+            "message": "DEFAULT ACCEPT: policy_out will accept unmatched traffic at the selected scope. Explicitly authorize this default allowance."
+          },
+          {
+            "when": {
+              "input": "policy_forward",
+              "values": [
+                "ACCEPT"
+              ]
+            },
+            "message": "DEFAULT ACCEPT: policy_forward will accept unmatched traffic at the selected scope. Explicitly authorize this default allowance."
+          }
+        ],
+        "reason": "Confirmed firewall enable/default-policy configuration only; disabling protection and ACCEPT defaults are prominently disclosed. Backend, filter, delete and other selectors remain refused.",
+        "reconciliation": {
+          "kind": "read",
+          "path": "/nodes/{node}/qemu/{vmid}/firewall/options",
+          "reason": "Observe supplied firewall settings only; configuration equality does not establish effective filtering or management reachability."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/vms/{vmid}",
+            [
+              "VM.Config.Network"
+            ]
+          ]
+        },
+        "response": {
+          "type": "null"
+        },
+        "source": "Pinned firewall get_options/set_options schemas and provider firewall documentation; shared exact confirmation and journal policy."
+      },
+      "inputs": [
+        {
+          "name": "delete",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "dhcp",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "digest",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "enable",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "ipfilter",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "log_level_in",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "log_level_out",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "macfilter",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "ndp",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "node",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "policy_in",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "policy_out",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "radv",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "vmid",
+          "admitted": true,
+          "sensitive": false
+        }
+      ],
+      "results": {
+        "type": "null",
+        "handling": "public metadata; protected inputs excluded"
+      }
     },
     {
       "id": "OP-GET-4f270c4bc4",

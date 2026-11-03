@@ -15303,12 +15303,19 @@
       "id": "OP-GET-a93fc732fd",
       "release": "legacy-8.2.7",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "read",
+        "transport": "json",
+        "secrets": "none",
+        "outputFields": [
+          "enable",
+          "policy_in",
+          "policy_out",
+          "policy_forward",
+          "digest"
+        ],
+        "reason": "Cluster firewall enable/default policies and concurrency digest only; undeclared and unrelated settings are excluded even with full output."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "get",
         "/cluster/firewall/options"
@@ -15457,12 +15464,96 @@
       "id": "OP-PUT-95d330d1b6",
       "release": "legacy-8.2.7",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "write",
+        "transport": "json",
+        "secrets": "none",
+        "allowedInputs": [
+          "enable",
+          "policy_in",
+          "policy_out",
+          "policy_forward",
+          "digest"
+        ],
+        "inputCases": [
+          {
+            "forbiddenInputs": [
+              "enable"
+            ]
+          },
+          {
+            "requiredValues": {
+              "enable": 0
+            }
+          },
+          {
+            "requiredValues": {
+              "enable": 1
+            }
+          }
+        ],
+        "confirmationWarnings": [
+          {
+            "message": "Firewall configuration changes can cut off management access. Review the exact target, settings and recovery access before confirming."
+          },
+          {
+            "when": {
+              "input": "enable",
+              "values": [
+                false,
+                0
+              ]
+            },
+            "message": "FIREWALL PROTECTION DISABLED: this request disables firewall protection at the selected scope."
+          },
+          {
+            "when": {
+              "input": "policy_in",
+              "values": [
+                "ACCEPT"
+              ]
+            },
+            "message": "DEFAULT ACCEPT: policy_in will accept unmatched traffic at the selected scope. Explicitly authorize this default allowance."
+          },
+          {
+            "when": {
+              "input": "policy_out",
+              "values": [
+                "ACCEPT"
+              ]
+            },
+            "message": "DEFAULT ACCEPT: policy_out will accept unmatched traffic at the selected scope. Explicitly authorize this default allowance."
+          },
+          {
+            "when": {
+              "input": "policy_forward",
+              "values": [
+                "ACCEPT"
+              ]
+            },
+            "message": "DEFAULT ACCEPT: policy_forward will accept unmatched traffic at the selected scope. Explicitly authorize this default allowance."
+          }
+        ],
+        "reason": "Confirmed firewall enable/default-policy configuration only; disabling protection and ACCEPT defaults are prominently disclosed. Backend, filter, delete and other selectors remain refused.",
+        "reconciliation": {
+          "kind": "read",
+          "path": "/cluster/firewall/options",
+          "reason": "Observe supplied firewall settings only; configuration equality does not establish effective filtering or management reachability."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/",
+            [
+              "Sys.Modify"
+            ]
+          ]
+        },
+        "response": {
+          "type": "null"
+        },
+        "source": "Pinned firewall get_options/set_options schemas and provider firewall documentation; shared exact confirmation and journal policy."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "put",
         "/cluster/firewall/options"
@@ -15479,25 +15570,13 @@
               "type": "object",
               "additionalProperties": false,
               "properties": {
-                "delete": {
-                  "type": "string",
-                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*(?:[,; ][A-Za-z][A-Za-z0-9._-]*)*$"
-                },
                 "digest": {
                   "type": "string",
                   "maxLength": 64
                 },
-                "ebtables": {
-                  "type": "boolean"
-                },
                 "enable": {
                   "type": "integer",
                   "minimum": 0
-                },
-                "log_ratelimit": {
-                  "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
                 },
                 "policy_forward": {
                   "enum": [
@@ -15524,7 +15603,42 @@
                 }
               },
               "required": [],
-              "dependencies": {}
+              "dependencies": {},
+              "anyOf": [
+                {
+                  "required": [],
+                  "properties": {},
+                  "not": {
+                    "anyOf": [
+                      {
+                        "required": [
+                          "enable"
+                        ]
+                      }
+                    ]
+                  }
+                },
+                {
+                  "required": [
+                    "enable"
+                  ],
+                  "properties": {
+                    "enable": {
+                      "const": 0
+                    }
+                  }
+                },
+                {
+                  "required": [
+                    "enable"
+                  ],
+                  "properties": {
+                    "enable": {
+                      "const": 1
+                    }
+                  }
+                }
+              ]
             }
           },
           "required": [
@@ -45334,12 +45448,16 @@
       "id": "OP-GET-75276fb252",
       "release": "legacy-8.2.7",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "read",
+        "transport": "json",
+        "secrets": "none",
+        "outputFields": [
+          "enable",
+          "digest"
+        ],
+        "reason": "Node firewall enable setting and concurrency digest only; this scope has no default-policy inputs."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "get",
         "/nodes/{node}/firewall/options"
@@ -45611,12 +45729,77 @@
       "id": "OP-PUT-5276603317",
       "release": "legacy-8.2.7",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "write",
+        "transport": "json",
+        "secrets": "none",
+        "allowedInputs": [
+          "node",
+          "enable",
+          "digest"
+        ],
+        "confirmationWarnings": [
+          {
+            "message": "Firewall configuration changes can cut off management access. Review the exact target, settings and recovery access before confirming."
+          },
+          {
+            "when": {
+              "input": "enable",
+              "values": [
+                false,
+                0
+              ]
+            },
+            "message": "FIREWALL PROTECTION DISABLED: this request disables firewall protection at the selected scope."
+          },
+          {
+            "when": {
+              "input": "policy_in",
+              "values": [
+                "ACCEPT"
+              ]
+            },
+            "message": "DEFAULT ACCEPT: policy_in will accept unmatched traffic at the selected scope. Explicitly authorize this default allowance."
+          },
+          {
+            "when": {
+              "input": "policy_out",
+              "values": [
+                "ACCEPT"
+              ]
+            },
+            "message": "DEFAULT ACCEPT: policy_out will accept unmatched traffic at the selected scope. Explicitly authorize this default allowance."
+          },
+          {
+            "when": {
+              "input": "policy_forward",
+              "values": [
+                "ACCEPT"
+              ]
+            },
+            "message": "DEFAULT ACCEPT: policy_forward will accept unmatched traffic at the selected scope. Explicitly authorize this default allowance."
+          }
+        ],
+        "reason": "Confirmed firewall enable/default-policy configuration only; disabling protection and ACCEPT defaults are prominently disclosed. Backend, filter, delete and other selectors remain refused.",
+        "reconciliation": {
+          "kind": "read",
+          "path": "/nodes/{node}/firewall/options",
+          "reason": "Observe supplied firewall settings only; configuration equality does not establish effective filtering or management reachability."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/nodes/{node}",
+            [
+              "Sys.Modify"
+            ]
+          ]
+        },
+        "response": {
+          "type": "null"
+        },
+        "source": "Pinned firewall get_options/set_options schemas and provider firewall documentation; shared exact confirmation and journal policy."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "put",
         "/nodes/{node}/firewall/options"
@@ -45633,10 +45816,6 @@
               "type": "object",
               "additionalProperties": false,
               "properties": {
-                "delete": {
-                  "type": "string",
-                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*(?:[,; ][A-Za-z][A-Za-z0-9._-]*)*$"
-                },
                 "digest": {
                   "type": "string",
                   "maxLength": 64
@@ -45644,124 +45823,9 @@
                 "enable": {
                   "type": "boolean"
                 },
-                "log_level_forward": {
-                  "enum": [
-                    "emerg",
-                    "alert",
-                    "crit",
-                    "err",
-                    "warning",
-                    "notice",
-                    "info",
-                    "debug",
-                    "nolog"
-                  ],
-                  "type": "string"
-                },
-                "log_level_in": {
-                  "enum": [
-                    "emerg",
-                    "alert",
-                    "crit",
-                    "err",
-                    "warning",
-                    "notice",
-                    "info",
-                    "debug",
-                    "nolog"
-                  ],
-                  "type": "string"
-                },
-                "log_level_out": {
-                  "enum": [
-                    "emerg",
-                    "alert",
-                    "crit",
-                    "err",
-                    "warning",
-                    "notice",
-                    "info",
-                    "debug",
-                    "nolog"
-                  ],
-                  "type": "string"
-                },
-                "log_nf_conntrack": {
-                  "type": "boolean"
-                },
-                "ndp": {
-                  "type": "boolean"
-                },
-                "nf_conntrack_allow_invalid": {
-                  "type": "boolean"
-                },
-                "nf_conntrack_helpers": {
-                  "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
-                },
-                "nf_conntrack_max": {
-                  "type": "integer",
-                  "minimum": 32768
-                },
-                "nf_conntrack_tcp_timeout_established": {
-                  "type": "integer",
-                  "minimum": 7875
-                },
-                "nf_conntrack_tcp_timeout_syn_recv": {
-                  "type": "integer",
-                  "minimum": 30,
-                  "maximum": 60
-                },
-                "nftables": {
-                  "type": "boolean"
-                },
                 "node": {
                   "type": "string",
                   "pattern": "^[A-Za-z0-9][A-Za-z0-9.-]*$"
-                },
-                "nosmurfs": {
-                  "type": "boolean"
-                },
-                "protection_synflood": {
-                  "type": "boolean"
-                },
-                "protection_synflood_burst": {
-                  "type": "integer"
-                },
-                "protection_synflood_rate": {
-                  "type": "integer"
-                },
-                "smurf_log_level": {
-                  "enum": [
-                    "emerg",
-                    "alert",
-                    "crit",
-                    "err",
-                    "warning",
-                    "notice",
-                    "info",
-                    "debug",
-                    "nolog"
-                  ],
-                  "type": "string"
-                },
-                "tcp_flags_log_level": {
-                  "enum": [
-                    "emerg",
-                    "alert",
-                    "crit",
-                    "err",
-                    "warning",
-                    "notice",
-                    "info",
-                    "debug",
-                    "nolog"
-                  ],
-                  "type": "string"
-                },
-                "tcpflags": {
-                  "type": "boolean"
                 }
               },
               "required": [
@@ -55392,12 +55456,18 @@
       "id": "OP-GET-9f1f43e78f",
       "release": "legacy-8.2.7",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "read",
+        "transport": "json",
+        "secrets": "none",
+        "outputFields": [
+          "enable",
+          "policy_in",
+          "policy_out",
+          "digest"
+        ],
+        "reason": "Guest firewall enable/default policies and concurrency digest only; undeclared and unrelated settings are excluded even with full output."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "get",
         "/nodes/{node}/lxc/{vmid}/firewall/options"
@@ -55595,12 +55665,80 @@
       "id": "OP-PUT-b84103fb70",
       "release": "legacy-8.2.7",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "write",
+        "transport": "json",
+        "secrets": "none",
+        "allowedInputs": [
+          "node",
+          "vmid",
+          "enable",
+          "policy_in",
+          "policy_out",
+          "digest"
+        ],
+        "confirmationWarnings": [
+          {
+            "message": "Firewall configuration changes can cut off management access. Review the exact target, settings and recovery access before confirming."
+          },
+          {
+            "when": {
+              "input": "enable",
+              "values": [
+                false,
+                0
+              ]
+            },
+            "message": "FIREWALL PROTECTION DISABLED: this request disables firewall protection at the selected scope."
+          },
+          {
+            "when": {
+              "input": "policy_in",
+              "values": [
+                "ACCEPT"
+              ]
+            },
+            "message": "DEFAULT ACCEPT: policy_in will accept unmatched traffic at the selected scope. Explicitly authorize this default allowance."
+          },
+          {
+            "when": {
+              "input": "policy_out",
+              "values": [
+                "ACCEPT"
+              ]
+            },
+            "message": "DEFAULT ACCEPT: policy_out will accept unmatched traffic at the selected scope. Explicitly authorize this default allowance."
+          },
+          {
+            "when": {
+              "input": "policy_forward",
+              "values": [
+                "ACCEPT"
+              ]
+            },
+            "message": "DEFAULT ACCEPT: policy_forward will accept unmatched traffic at the selected scope. Explicitly authorize this default allowance."
+          }
+        ],
+        "reason": "Confirmed firewall enable/default-policy configuration only; disabling protection and ACCEPT defaults are prominently disclosed. Backend, filter, delete and other selectors remain refused.",
+        "reconciliation": {
+          "kind": "read",
+          "path": "/nodes/{node}/lxc/{vmid}/firewall/options",
+          "reason": "Observe supplied firewall settings only; configuration equality does not establish effective filtering or management reachability."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/vms/{vmid}",
+            [
+              "VM.Config.Network"
+            ]
+          ]
+        },
+        "response": {
+          "type": "null"
+        },
+        "source": "Pinned firewall get_options/set_options schemas and provider firewall documentation; shared exact confirmation and journal policy."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "put",
         "/nodes/{node}/lxc/{vmid}/firewall/options"
@@ -55617,55 +55755,11 @@
               "type": "object",
               "additionalProperties": false,
               "properties": {
-                "delete": {
-                  "type": "string",
-                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*(?:[,; ][A-Za-z][A-Za-z0-9._-]*)*$"
-                },
-                "dhcp": {
-                  "type": "boolean"
-                },
                 "digest": {
                   "type": "string",
                   "maxLength": 64
                 },
                 "enable": {
-                  "type": "boolean"
-                },
-                "ipfilter": {
-                  "type": "boolean"
-                },
-                "log_level_in": {
-                  "enum": [
-                    "emerg",
-                    "alert",
-                    "crit",
-                    "err",
-                    "warning",
-                    "notice",
-                    "info",
-                    "debug",
-                    "nolog"
-                  ],
-                  "type": "string"
-                },
-                "log_level_out": {
-                  "enum": [
-                    "emerg",
-                    "alert",
-                    "crit",
-                    "err",
-                    "warning",
-                    "notice",
-                    "info",
-                    "debug",
-                    "nolog"
-                  ],
-                  "type": "string"
-                },
-                "macfilter": {
-                  "type": "boolean"
-                },
-                "ndp": {
                   "type": "boolean"
                 },
                 "node": {
@@ -55687,9 +55781,6 @@
                     "DROP"
                   ],
                   "type": "string"
-                },
-                "radv": {
-                  "type": "boolean"
                 },
                 "vmid": {
                   "type": "integer",
@@ -84695,12 +84786,18 @@
       "id": "OP-GET-ea412bbbf8",
       "release": "legacy-8.2.7",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "read",
+        "transport": "json",
+        "secrets": "none",
+        "outputFields": [
+          "enable",
+          "policy_in",
+          "policy_out",
+          "digest"
+        ],
+        "reason": "Guest firewall enable/default policies and concurrency digest only; undeclared and unrelated settings are excluded even with full output."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "get",
         "/nodes/{node}/qemu/{vmid}/firewall/options"
@@ -84898,12 +84995,80 @@
       "id": "OP-PUT-68ea5099b4",
       "release": "legacy-8.2.7",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "write",
+        "transport": "json",
+        "secrets": "none",
+        "allowedInputs": [
+          "node",
+          "vmid",
+          "enable",
+          "policy_in",
+          "policy_out",
+          "digest"
+        ],
+        "confirmationWarnings": [
+          {
+            "message": "Firewall configuration changes can cut off management access. Review the exact target, settings and recovery access before confirming."
+          },
+          {
+            "when": {
+              "input": "enable",
+              "values": [
+                false,
+                0
+              ]
+            },
+            "message": "FIREWALL PROTECTION DISABLED: this request disables firewall protection at the selected scope."
+          },
+          {
+            "when": {
+              "input": "policy_in",
+              "values": [
+                "ACCEPT"
+              ]
+            },
+            "message": "DEFAULT ACCEPT: policy_in will accept unmatched traffic at the selected scope. Explicitly authorize this default allowance."
+          },
+          {
+            "when": {
+              "input": "policy_out",
+              "values": [
+                "ACCEPT"
+              ]
+            },
+            "message": "DEFAULT ACCEPT: policy_out will accept unmatched traffic at the selected scope. Explicitly authorize this default allowance."
+          },
+          {
+            "when": {
+              "input": "policy_forward",
+              "values": [
+                "ACCEPT"
+              ]
+            },
+            "message": "DEFAULT ACCEPT: policy_forward will accept unmatched traffic at the selected scope. Explicitly authorize this default allowance."
+          }
+        ],
+        "reason": "Confirmed firewall enable/default-policy configuration only; disabling protection and ACCEPT defaults are prominently disclosed. Backend, filter, delete and other selectors remain refused.",
+        "reconciliation": {
+          "kind": "read",
+          "path": "/nodes/{node}/qemu/{vmid}/firewall/options",
+          "reason": "Observe supplied firewall settings only; configuration equality does not establish effective filtering or management reachability."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/vms/{vmid}",
+            [
+              "VM.Config.Network"
+            ]
+          ]
+        },
+        "response": {
+          "type": "null"
+        },
+        "source": "Pinned firewall get_options/set_options schemas and provider firewall documentation; shared exact confirmation and journal policy."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "put",
         "/nodes/{node}/qemu/{vmid}/firewall/options"
@@ -84920,55 +85085,11 @@
               "type": "object",
               "additionalProperties": false,
               "properties": {
-                "delete": {
-                  "type": "string",
-                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*(?:[,; ][A-Za-z][A-Za-z0-9._-]*)*$"
-                },
-                "dhcp": {
-                  "type": "boolean"
-                },
                 "digest": {
                   "type": "string",
                   "maxLength": 64
                 },
                 "enable": {
-                  "type": "boolean"
-                },
-                "ipfilter": {
-                  "type": "boolean"
-                },
-                "log_level_in": {
-                  "enum": [
-                    "emerg",
-                    "alert",
-                    "crit",
-                    "err",
-                    "warning",
-                    "notice",
-                    "info",
-                    "debug",
-                    "nolog"
-                  ],
-                  "type": "string"
-                },
-                "log_level_out": {
-                  "enum": [
-                    "emerg",
-                    "alert",
-                    "crit",
-                    "err",
-                    "warning",
-                    "notice",
-                    "info",
-                    "debug",
-                    "nolog"
-                  ],
-                  "type": "string"
-                },
-                "macfilter": {
-                  "type": "boolean"
-                },
-                "ndp": {
                   "type": "boolean"
                 },
                 "node": {
@@ -84990,9 +85111,6 @@
                     "DROP"
                   ],
                   "type": "string"
-                },
-                "radv": {
-                  "type": "boolean"
                 },
                 "vmid": {
                   "type": "integer",
@@ -123213,12 +123331,19 @@
       "id": "OP-GET-a93fc732fd",
       "release": "published-current",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "read",
+        "transport": "json",
+        "secrets": "none",
+        "outputFields": [
+          "enable",
+          "policy_in",
+          "policy_out",
+          "policy_forward",
+          "digest"
+        ],
+        "reason": "Cluster firewall enable/default policies and concurrency digest only; undeclared and unrelated settings are excluded even with full output."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "get",
         "/cluster/firewall/options"
@@ -123368,12 +123493,96 @@
       "id": "OP-PUT-95d330d1b6",
       "release": "published-current",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "write",
+        "transport": "json",
+        "secrets": "none",
+        "allowedInputs": [
+          "enable",
+          "policy_in",
+          "policy_out",
+          "policy_forward",
+          "digest"
+        ],
+        "inputCases": [
+          {
+            "forbiddenInputs": [
+              "enable"
+            ]
+          },
+          {
+            "requiredValues": {
+              "enable": 0
+            }
+          },
+          {
+            "requiredValues": {
+              "enable": 1
+            }
+          }
+        ],
+        "confirmationWarnings": [
+          {
+            "message": "Firewall configuration changes can cut off management access. Review the exact target, settings and recovery access before confirming."
+          },
+          {
+            "when": {
+              "input": "enable",
+              "values": [
+                false,
+                0
+              ]
+            },
+            "message": "FIREWALL PROTECTION DISABLED: this request disables firewall protection at the selected scope."
+          },
+          {
+            "when": {
+              "input": "policy_in",
+              "values": [
+                "ACCEPT"
+              ]
+            },
+            "message": "DEFAULT ACCEPT: policy_in will accept unmatched traffic at the selected scope. Explicitly authorize this default allowance."
+          },
+          {
+            "when": {
+              "input": "policy_out",
+              "values": [
+                "ACCEPT"
+              ]
+            },
+            "message": "DEFAULT ACCEPT: policy_out will accept unmatched traffic at the selected scope. Explicitly authorize this default allowance."
+          },
+          {
+            "when": {
+              "input": "policy_forward",
+              "values": [
+                "ACCEPT"
+              ]
+            },
+            "message": "DEFAULT ACCEPT: policy_forward will accept unmatched traffic at the selected scope. Explicitly authorize this default allowance."
+          }
+        ],
+        "reason": "Confirmed firewall enable/default-policy configuration only; disabling protection and ACCEPT defaults are prominently disclosed. Backend, filter, delete and other selectors remain refused.",
+        "reconciliation": {
+          "kind": "read",
+          "path": "/cluster/firewall/options",
+          "reason": "Observe supplied firewall settings only; configuration equality does not establish effective filtering or management reachability."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/",
+            [
+              "Sys.Modify"
+            ]
+          ]
+        },
+        "response": {
+          "type": "null"
+        },
+        "source": "Pinned firewall get_options/set_options schemas and provider firewall documentation; shared exact confirmation and journal policy."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "put",
         "/cluster/firewall/options"
@@ -123390,25 +123599,13 @@
               "type": "object",
               "additionalProperties": false,
               "properties": {
-                "delete": {
-                  "type": "string",
-                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*(?:[,; ][A-Za-z][A-Za-z0-9._-]*)*$"
-                },
                 "digest": {
                   "type": "string",
                   "maxLength": 64
                 },
-                "ebtables": {
-                  "type": "boolean"
-                },
                 "enable": {
                   "type": "integer",
                   "minimum": 0
-                },
-                "log_ratelimit": {
-                  "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
                 },
                 "policy_forward": {
                   "enum": [
@@ -123435,7 +123632,42 @@
                 }
               },
               "required": [],
-              "dependencies": {}
+              "dependencies": {},
+              "anyOf": [
+                {
+                  "required": [],
+                  "properties": {},
+                  "not": {
+                    "anyOf": [
+                      {
+                        "required": [
+                          "enable"
+                        ]
+                      }
+                    ]
+                  }
+                },
+                {
+                  "required": [
+                    "enable"
+                  ],
+                  "properties": {
+                    "enable": {
+                      "const": 0
+                    }
+                  }
+                },
+                {
+                  "required": [
+                    "enable"
+                  ],
+                  "properties": {
+                    "enable": {
+                      "const": 1
+                    }
+                  }
+                }
+              ]
             }
           },
           "required": [
@@ -166434,12 +166666,16 @@
       "id": "OP-GET-75276fb252",
       "release": "published-current",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "read",
+        "transport": "json",
+        "secrets": "none",
+        "outputFields": [
+          "enable",
+          "digest"
+        ],
+        "reason": "Node firewall enable setting and concurrency digest only; this scope has no default-policy inputs."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "get",
         "/nodes/{node}/firewall/options"
@@ -166712,12 +166948,77 @@
       "id": "OP-PUT-5276603317",
       "release": "published-current",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "write",
+        "transport": "json",
+        "secrets": "none",
+        "allowedInputs": [
+          "node",
+          "enable",
+          "digest"
+        ],
+        "confirmationWarnings": [
+          {
+            "message": "Firewall configuration changes can cut off management access. Review the exact target, settings and recovery access before confirming."
+          },
+          {
+            "when": {
+              "input": "enable",
+              "values": [
+                false,
+                0
+              ]
+            },
+            "message": "FIREWALL PROTECTION DISABLED: this request disables firewall protection at the selected scope."
+          },
+          {
+            "when": {
+              "input": "policy_in",
+              "values": [
+                "ACCEPT"
+              ]
+            },
+            "message": "DEFAULT ACCEPT: policy_in will accept unmatched traffic at the selected scope. Explicitly authorize this default allowance."
+          },
+          {
+            "when": {
+              "input": "policy_out",
+              "values": [
+                "ACCEPT"
+              ]
+            },
+            "message": "DEFAULT ACCEPT: policy_out will accept unmatched traffic at the selected scope. Explicitly authorize this default allowance."
+          },
+          {
+            "when": {
+              "input": "policy_forward",
+              "values": [
+                "ACCEPT"
+              ]
+            },
+            "message": "DEFAULT ACCEPT: policy_forward will accept unmatched traffic at the selected scope. Explicitly authorize this default allowance."
+          }
+        ],
+        "reason": "Confirmed firewall enable/default-policy configuration only; disabling protection and ACCEPT defaults are prominently disclosed. Backend, filter, delete and other selectors remain refused.",
+        "reconciliation": {
+          "kind": "read",
+          "path": "/nodes/{node}/firewall/options",
+          "reason": "Observe supplied firewall settings only; configuration equality does not establish effective filtering or management reachability."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/nodes/{node}",
+            [
+              "Sys.Modify"
+            ]
+          ]
+        },
+        "response": {
+          "type": "null"
+        },
+        "source": "Pinned firewall get_options/set_options schemas and provider firewall documentation; shared exact confirmation and journal policy."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "put",
         "/nodes/{node}/firewall/options"
@@ -166734,10 +167035,6 @@
               "type": "object",
               "additionalProperties": false,
               "properties": {
-                "delete": {
-                  "type": "string",
-                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*(?:[,; ][A-Za-z][A-Za-z0-9._-]*)*$"
-                },
                 "digest": {
                   "type": "string",
                   "maxLength": 64
@@ -166745,124 +167042,9 @@
                 "enable": {
                   "type": "boolean"
                 },
-                "log_level_forward": {
-                  "enum": [
-                    "emerg",
-                    "alert",
-                    "crit",
-                    "err",
-                    "warning",
-                    "notice",
-                    "info",
-                    "debug",
-                    "nolog"
-                  ],
-                  "type": "string"
-                },
-                "log_level_in": {
-                  "enum": [
-                    "emerg",
-                    "alert",
-                    "crit",
-                    "err",
-                    "warning",
-                    "notice",
-                    "info",
-                    "debug",
-                    "nolog"
-                  ],
-                  "type": "string"
-                },
-                "log_level_out": {
-                  "enum": [
-                    "emerg",
-                    "alert",
-                    "crit",
-                    "err",
-                    "warning",
-                    "notice",
-                    "info",
-                    "debug",
-                    "nolog"
-                  ],
-                  "type": "string"
-                },
-                "log_nf_conntrack": {
-                  "type": "boolean"
-                },
-                "ndp": {
-                  "type": "boolean"
-                },
-                "nf_conntrack_allow_invalid": {
-                  "type": "boolean"
-                },
-                "nf_conntrack_helpers": {
-                  "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
-                },
-                "nf_conntrack_max": {
-                  "type": "integer",
-                  "minimum": 32768
-                },
-                "nf_conntrack_tcp_timeout_established": {
-                  "type": "integer",
-                  "minimum": 7875
-                },
-                "nf_conntrack_tcp_timeout_syn_recv": {
-                  "type": "integer",
-                  "minimum": 30,
-                  "maximum": 60
-                },
-                "nftables": {
-                  "type": "boolean"
-                },
                 "node": {
                   "type": "string",
                   "pattern": "^[A-Za-z0-9][A-Za-z0-9.-]*$"
-                },
-                "nosmurfs": {
-                  "type": "boolean"
-                },
-                "protection_synflood": {
-                  "type": "boolean"
-                },
-                "protection_synflood_burst": {
-                  "type": "integer"
-                },
-                "protection_synflood_rate": {
-                  "type": "integer"
-                },
-                "smurf_log_level": {
-                  "enum": [
-                    "emerg",
-                    "alert",
-                    "crit",
-                    "err",
-                    "warning",
-                    "notice",
-                    "info",
-                    "debug",
-                    "nolog"
-                  ],
-                  "type": "string"
-                },
-                "tcp_flags_log_level": {
-                  "enum": [
-                    "emerg",
-                    "alert",
-                    "crit",
-                    "err",
-                    "warning",
-                    "notice",
-                    "info",
-                    "debug",
-                    "nolog"
-                  ],
-                  "type": "string"
-                },
-                "tcpflags": {
-                  "type": "boolean"
                 }
               },
               "required": [
@@ -176837,12 +177019,18 @@
       "id": "OP-GET-9f1f43e78f",
       "release": "published-current",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "read",
+        "transport": "json",
+        "secrets": "none",
+        "outputFields": [
+          "enable",
+          "policy_in",
+          "policy_out",
+          "digest"
+        ],
+        "reason": "Guest firewall enable/default policies and concurrency digest only; undeclared and unrelated settings are excluded even with full output."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "get",
         "/nodes/{node}/lxc/{vmid}/firewall/options"
@@ -177040,12 +177228,80 @@
       "id": "OP-PUT-b84103fb70",
       "release": "published-current",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "write",
+        "transport": "json",
+        "secrets": "none",
+        "allowedInputs": [
+          "node",
+          "vmid",
+          "enable",
+          "policy_in",
+          "policy_out",
+          "digest"
+        ],
+        "confirmationWarnings": [
+          {
+            "message": "Firewall configuration changes can cut off management access. Review the exact target, settings and recovery access before confirming."
+          },
+          {
+            "when": {
+              "input": "enable",
+              "values": [
+                false,
+                0
+              ]
+            },
+            "message": "FIREWALL PROTECTION DISABLED: this request disables firewall protection at the selected scope."
+          },
+          {
+            "when": {
+              "input": "policy_in",
+              "values": [
+                "ACCEPT"
+              ]
+            },
+            "message": "DEFAULT ACCEPT: policy_in will accept unmatched traffic at the selected scope. Explicitly authorize this default allowance."
+          },
+          {
+            "when": {
+              "input": "policy_out",
+              "values": [
+                "ACCEPT"
+              ]
+            },
+            "message": "DEFAULT ACCEPT: policy_out will accept unmatched traffic at the selected scope. Explicitly authorize this default allowance."
+          },
+          {
+            "when": {
+              "input": "policy_forward",
+              "values": [
+                "ACCEPT"
+              ]
+            },
+            "message": "DEFAULT ACCEPT: policy_forward will accept unmatched traffic at the selected scope. Explicitly authorize this default allowance."
+          }
+        ],
+        "reason": "Confirmed firewall enable/default-policy configuration only; disabling protection and ACCEPT defaults are prominently disclosed. Backend, filter, delete and other selectors remain refused.",
+        "reconciliation": {
+          "kind": "read",
+          "path": "/nodes/{node}/lxc/{vmid}/firewall/options",
+          "reason": "Observe supplied firewall settings only; configuration equality does not establish effective filtering or management reachability."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/vms/{vmid}",
+            [
+              "VM.Config.Network"
+            ]
+          ]
+        },
+        "response": {
+          "type": "null"
+        },
+        "source": "Pinned firewall get_options/set_options schemas and provider firewall documentation; shared exact confirmation and journal policy."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "put",
         "/nodes/{node}/lxc/{vmid}/firewall/options"
@@ -177062,55 +177318,11 @@
               "type": "object",
               "additionalProperties": false,
               "properties": {
-                "delete": {
-                  "type": "string",
-                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*(?:[,; ][A-Za-z][A-Za-z0-9._-]*)*$"
-                },
-                "dhcp": {
-                  "type": "boolean"
-                },
                 "digest": {
                   "type": "string",
                   "maxLength": 64
                 },
                 "enable": {
-                  "type": "boolean"
-                },
-                "ipfilter": {
-                  "type": "boolean"
-                },
-                "log_level_in": {
-                  "enum": [
-                    "emerg",
-                    "alert",
-                    "crit",
-                    "err",
-                    "warning",
-                    "notice",
-                    "info",
-                    "debug",
-                    "nolog"
-                  ],
-                  "type": "string"
-                },
-                "log_level_out": {
-                  "enum": [
-                    "emerg",
-                    "alert",
-                    "crit",
-                    "err",
-                    "warning",
-                    "notice",
-                    "info",
-                    "debug",
-                    "nolog"
-                  ],
-                  "type": "string"
-                },
-                "macfilter": {
-                  "type": "boolean"
-                },
-                "ndp": {
                   "type": "boolean"
                 },
                 "node": {
@@ -177132,9 +177344,6 @@
                     "DROP"
                   ],
                   "type": "string"
-                },
-                "radv": {
-                  "type": "boolean"
                 },
                 "vmid": {
                   "type": "integer",
@@ -206684,12 +206893,18 @@
       "id": "OP-GET-ea412bbbf8",
       "release": "published-current",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "read",
+        "transport": "json",
+        "secrets": "none",
+        "outputFields": [
+          "enable",
+          "policy_in",
+          "policy_out",
+          "digest"
+        ],
+        "reason": "Guest firewall enable/default policies and concurrency digest only; undeclared and unrelated settings are excluded even with full output."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "get",
         "/nodes/{node}/qemu/{vmid}/firewall/options"
@@ -206887,12 +207102,80 @@
       "id": "OP-PUT-68ea5099b4",
       "release": "published-current",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "write",
+        "transport": "json",
+        "secrets": "none",
+        "allowedInputs": [
+          "node",
+          "vmid",
+          "enable",
+          "policy_in",
+          "policy_out",
+          "digest"
+        ],
+        "confirmationWarnings": [
+          {
+            "message": "Firewall configuration changes can cut off management access. Review the exact target, settings and recovery access before confirming."
+          },
+          {
+            "when": {
+              "input": "enable",
+              "values": [
+                false,
+                0
+              ]
+            },
+            "message": "FIREWALL PROTECTION DISABLED: this request disables firewall protection at the selected scope."
+          },
+          {
+            "when": {
+              "input": "policy_in",
+              "values": [
+                "ACCEPT"
+              ]
+            },
+            "message": "DEFAULT ACCEPT: policy_in will accept unmatched traffic at the selected scope. Explicitly authorize this default allowance."
+          },
+          {
+            "when": {
+              "input": "policy_out",
+              "values": [
+                "ACCEPT"
+              ]
+            },
+            "message": "DEFAULT ACCEPT: policy_out will accept unmatched traffic at the selected scope. Explicitly authorize this default allowance."
+          },
+          {
+            "when": {
+              "input": "policy_forward",
+              "values": [
+                "ACCEPT"
+              ]
+            },
+            "message": "DEFAULT ACCEPT: policy_forward will accept unmatched traffic at the selected scope. Explicitly authorize this default allowance."
+          }
+        ],
+        "reason": "Confirmed firewall enable/default-policy configuration only; disabling protection and ACCEPT defaults are prominently disclosed. Backend, filter, delete and other selectors remain refused.",
+        "reconciliation": {
+          "kind": "read",
+          "path": "/nodes/{node}/qemu/{vmid}/firewall/options",
+          "reason": "Observe supplied firewall settings only; configuration equality does not establish effective filtering or management reachability."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/vms/{vmid}",
+            [
+              "VM.Config.Network"
+            ]
+          ]
+        },
+        "response": {
+          "type": "null"
+        },
+        "source": "Pinned firewall get_options/set_options schemas and provider firewall documentation; shared exact confirmation and journal policy."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "put",
         "/nodes/{node}/qemu/{vmid}/firewall/options"
@@ -206909,55 +207192,11 @@
               "type": "object",
               "additionalProperties": false,
               "properties": {
-                "delete": {
-                  "type": "string",
-                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*(?:[,; ][A-Za-z][A-Za-z0-9._-]*)*$"
-                },
-                "dhcp": {
-                  "type": "boolean"
-                },
                 "digest": {
                   "type": "string",
                   "maxLength": 64
                 },
                 "enable": {
-                  "type": "boolean"
-                },
-                "ipfilter": {
-                  "type": "boolean"
-                },
-                "log_level_in": {
-                  "enum": [
-                    "emerg",
-                    "alert",
-                    "crit",
-                    "err",
-                    "warning",
-                    "notice",
-                    "info",
-                    "debug",
-                    "nolog"
-                  ],
-                  "type": "string"
-                },
-                "log_level_out": {
-                  "enum": [
-                    "emerg",
-                    "alert",
-                    "crit",
-                    "err",
-                    "warning",
-                    "notice",
-                    "info",
-                    "debug",
-                    "nolog"
-                  ],
-                  "type": "string"
-                },
-                "macfilter": {
-                  "type": "boolean"
-                },
-                "ndp": {
                   "type": "boolean"
                 },
                 "node": {
@@ -206979,9 +207218,6 @@
                     "DROP"
                   ],
                   "type": "string"
-                },
-                "radv": {
-                  "type": "boolean"
                 },
                 "vmid": {
                   "type": "integer",

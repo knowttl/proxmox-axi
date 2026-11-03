@@ -200,6 +200,20 @@ For example, a protected config can keep two independent profiles with separate 
 Supply credentials through the referenced secret source and set file ownership and permissions as described under [Configuration](#configuration).
 These reads do not grant storage administration, node power control, or cluster membership changes.
 
+### Firewall options and default policies
+
+Read firewall options and preview enable/default-policy updates for the selected cluster, node or guest:
+
+```sh
+proxmox-axi get '/nodes/{node}/qemu/{vmid}/firewall/options' --api-node '<node>' --api-vmid 100 --profile '<profile>'
+proxmox-axi set '/nodes/{node}/qemu/{vmid}/firewall/options' --api-node '<node>' --api-vmid 100 --api-enable 1 --api-policy_in DROP --api-policy_out ACCEPT --api-digest '<digest>' --profile '<profile>' --preview
+```
+
+Enable the exact mutation ID in the selected profile and any independent host policy, inspect the target/settings and preview `warnings`, then repeat the exact request with `--confirm '<confirmation>'`.
+Firewall changes can cut off management access; review management allowances and recovery access before confirming.
+See the [installed firewall guide](skills/proxmox-axi/references/firewall-management.md) for supported scopes and inputs, read projection, warning meanings, digest handling, filtering prerequisites, verification and recovery.
+For provider filtering and backend behavior, see the [Proxmox firewall documentation](https://github.com/proxmox/pve-docs/blob/master/pve-firewall.adoc).
+
 ### Guest power control
 
 QEMU and LXC support guest `start`, `shutdown`, `stop`, `reboot`, `suspend` and `resume` through `create '/nodes/{node}/<qemu-or-lxc>/{vmid}/status/<action>'`.
@@ -413,7 +427,7 @@ Only reviewed managed backup sources are admitted; force overwrite, raw host pat
   Managed transfers have separate administrator-controlled byte and elapsed limits.
 - Operations whose effects, transport or secret handling are not reviewed remain discoverable but uncallable.
   Unresolved policy fields deny invocation, and changing a capture never admits new operations automatically.
-- Writes cover [QEMU creation and cloning](#create-and-clone-qemu-guests), [LXC creation and cloning](#create-and-clone-lxc-guests), [backup restoration](#restore-guest-backups), [confirmed guest execution and status retrieval](#confirmed-guest-execution), [guest power operations](#guest-power-control), guest destruction, [selected guest configuration settings](#guest-configuration-and-compute-settings), [managed disk attachments](#manage-disk-attachments), growth-only guest disk resize, pool management, task cancellation, node execute batches, [media uploads and catalogue installation](#discover-and-install-guest-media), [guest backups](#guest-backups) and the reviewed credential/session setup operations.
+- Writes cover [QEMU creation and cloning](#create-and-clone-qemu-guests), [LXC creation and cloning](#create-and-clone-lxc-guests), [backup restoration](#restore-guest-backups), [confirmed guest execution and status retrieval](#confirmed-guest-execution), [guest power operations](#guest-power-control), guest destruction, [selected guest configuration settings](#guest-configuration-and-compute-settings), [managed disk attachments](#manage-disk-attachments), growth-only guest disk resize, [firewall options and default policies](skills/proxmox-axi/references/firewall-management.md), pool management, task cancellation, node execute batches, [media uploads and catalogue installation](#discover-and-install-guest-media), [guest backups](#guest-backups) and the reviewed credential/session setup operations.
   Effectful CIFS/PBS scans use the same preview and confirmation policy even though their vendor method is GET.
 - Inspect `schema get|create|set|delete <template>` and the generated `write-policy.json` before enabling an operation.
 - Enable an operation by adding its ID to the selected file profile: `writes: { "operations": ["<operation-id>"] }`.

@@ -2024,6 +2024,46 @@
       }
     },
     {
+      "command": "set /cluster/firewall/options",
+      "operationId": "OP-PUT-95d330d1b6",
+      "method": "PUT",
+      "path": "/cluster/firewall/options",
+      "sensitiveInputs": [],
+      "privateResult": false,
+      "effect": "write",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "preview": "boolean",
+        "confirm": "value",
+        "session": "value",
+        "api-digest": "value",
+        "api-enable": "value",
+        "api-policy_forward": "value",
+        "api-policy_in": "value",
+        "api-policy_out": "value"
+      }
+    },
+    {
+      "command": "set /nodes/{node}/firewall/options",
+      "operationId": "OP-PUT-5276603317",
+      "method": "PUT",
+      "path": "/nodes/{node}/firewall/options",
+      "sensitiveInputs": [],
+      "privateResult": false,
+      "effect": "write",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "preview": "boolean",
+        "confirm": "value",
+        "session": "value",
+        "api-digest": "value",
+        "api-enable": "value",
+        "api-node": "value"
+      }
+    },
+    {
       "command": "set /nodes/{node}/lxc/{vmid}/config",
       "operationId": "OP-PUT-224f55de4f",
       "method": "PUT",
@@ -2347,6 +2387,28 @@
       }
     },
     {
+      "command": "set /nodes/{node}/lxc/{vmid}/firewall/options",
+      "operationId": "OP-PUT-b84103fb70",
+      "method": "PUT",
+      "path": "/nodes/{node}/lxc/{vmid}/firewall/options",
+      "sensitiveInputs": [],
+      "privateResult": false,
+      "effect": "write",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "preview": "boolean",
+        "confirm": "value",
+        "session": "value",
+        "api-digest": "value",
+        "api-enable": "value",
+        "api-node": "value",
+        "api-policy_in": "value",
+        "api-policy_out": "value",
+        "api-vmid": "value"
+      }
+    },
+    {
       "command": "set /nodes/{node}/lxc/{vmid}/resize",
       "operationId": "OP-PUT-73d95c22c9",
       "method": "PUT",
@@ -2545,6 +2607,28 @@
         "api-ipconfig29": "value",
         "api-ipconfig30": "value",
         "api-ipconfig31": "value"
+      }
+    },
+    {
+      "command": "set /nodes/{node}/qemu/{vmid}/firewall/options",
+      "operationId": "OP-PUT-68ea5099b4",
+      "method": "PUT",
+      "path": "/nodes/{node}/qemu/{vmid}/firewall/options",
+      "sensitiveInputs": [],
+      "privateResult": false,
+      "effect": "write",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "preview": "boolean",
+        "confirm": "value",
+        "session": "value",
+        "api-digest": "value",
+        "api-enable": "value",
+        "api-node": "value",
+        "api-policy_in": "value",
+        "api-policy_out": "value",
+        "api-vmid": "value"
       }
     },
     {
@@ -10444,6 +10528,26 @@
       ]
     },
     {
+      "command": "get /cluster/firewall/options",
+      "operationId": "OP-GET-a93fc732fd",
+      "method": "GET",
+      "path": "/cluster/firewall/options",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value",
+        "limit": "value",
+        "fields": "value",
+        "full": "boolean",
+        "session": "value"
+      },
+      "catalogues": [
+        "legacy-8.2.7",
+        "published-current"
+      ]
+    },
+    {
       "command": "get /cluster/nextid",
       "operationId": "OP-GET-46dcf2bd2a",
       "method": "GET",
@@ -10547,6 +10651,27 @@
       ]
     },
     {
+      "command": "get /nodes/{node}/firewall/options",
+      "operationId": "OP-GET-75276fb252",
+      "method": "GET",
+      "path": "/nodes/{node}/firewall/options",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value",
+        "limit": "value",
+        "fields": "value",
+        "full": "boolean",
+        "session": "value",
+        "api-node": "value"
+      },
+      "catalogues": [
+        "legacy-8.2.7",
+        "published-current"
+      ]
+    },
+    {
       "command": "get /nodes/{node}/lxc",
       "operationId": "OP-GET-2b0a4d1f88",
       "method": "GET",
@@ -10587,6 +10712,28 @@
         "api-vmid": "value"
       },
       "privateResult": true,
+      "catalogues": [
+        "legacy-8.2.7",
+        "published-current"
+      ]
+    },
+    {
+      "command": "get /nodes/{node}/lxc/{vmid}/firewall/options",
+      "operationId": "OP-GET-9f1f43e78f",
+      "method": "GET",
+      "path": "/nodes/{node}/lxc/{vmid}/firewall/options",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value",
+        "limit": "value",
+        "fields": "value",
+        "full": "boolean",
+        "session": "value",
+        "api-node": "value",
+        "api-vmid": "value"
+      },
       "catalogues": [
         "legacy-8.2.7",
         "published-current"
@@ -10863,6 +11010,28 @@
         "api-vmid": "value"
       },
       "privateResult": true,
+      "catalogues": [
+        "legacy-8.2.7",
+        "published-current"
+      ]
+    },
+    {
+      "command": "get /nodes/{node}/qemu/{vmid}/firewall/options",
+      "operationId": "OP-GET-ea412bbbf8",
+      "method": "GET",
+      "path": "/nodes/{node}/qemu/{vmid}/firewall/options",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value",
+        "limit": "value",
+        "fields": "value",
+        "full": "boolean",
+        "session": "value",
+        "api-node": "value",
+        "api-vmid": "value"
+      },
       "catalogues": [
         "legacy-8.2.7",
         "published-current"
