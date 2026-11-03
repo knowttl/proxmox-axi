@@ -156,7 +156,7 @@ After task success, verify the resulting privilege and onboarding settings priva
 
 Use `get '/nodes/{node}/storage/{storage}/content'` with node/storage and optional `--api-content iso`, `vztmpl`, `images`, `rootdir` or `backup` to discover managed media and volumes.
 An optional `--api-vmid` filters guest images; inspect the selected schema for supported content selectors.
-Default rows contain volume ID, format and size; `--fields` can request reviewed usage, owner, creation-time and protection metadata.
+Default rows contain volume ID, format, size and approximate size when supplied; `--fields` can request reviewed usage, guest VMID, creation-time and protection metadata.
 Use the same route plus `/{volume}` and `--api-volume '<storage>:iso/<filename>.iso'` to inspect a volume's format, size, usage and protection status.
 Pass the raw managed volume ID; the CLI encodes embedded separators as part of one path parameter.
 Host paths, traversal and pre-encoded separators are refused.
@@ -165,7 +165,8 @@ Permission-scoped lists and empty results do not prove that media is absent or r
 Large responses remain subject to the response/output byte budgets; request a specific content type or VMID when needed.
 
 Use `get '/nodes/{node}/aplinfo' --api-node '<node>'` to list the provider's existing appliance catalogue.
-Rows expose template/package/version/type and reviewed OS/architecture/section fields; source/download URLs and descriptions are excluded even with `--full`.
+Default rows expose template/package/version/type; `--fields` or `--full` can include reviewed OS/architecture/section fields.
+Source/download URLs and descriptions are excluded even with `--full`.
 Preview `create '/nodes/{node}/aplinfo' --api-node '<node>' --api-storage '<storage>' --api-template '<catalogue-template>.tar.zst'` to install a selected catalogue template.
 Only leaf template names ending in `.tar.zst`, `.tar.xz` or `.tar.gz` are admitted; the provider must resolve the name in its catalogue and enforce storage permissions.
 This does not refresh the catalogue, accept a remote URL or admit registry pulls.
