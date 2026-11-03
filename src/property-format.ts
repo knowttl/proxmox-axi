@@ -13,6 +13,7 @@ function sshKeysPattern(encoded: boolean): string {
 export const cloudInitSshKeysPattern = sshKeysPattern(true)
 
 export function namedFormatPattern(name: string): string | undefined {
+  if (name === 'pve-backup-vmid-list') return '^[1-9][0-9]{2,8}(?:,[1-9][0-9]{2,8})*$'
   if (name === 'pve-managed-volume') return '^[A-Za-z][A-Za-z0-9._-]*:[A-Za-z0-9][A-Za-z0-9._:-]*(?:/[A-Za-z0-9][A-Za-z0-9._:-]*)*$'
   if (name === 'openssh-public-keys') return sshKeysPattern(false)
   if (name === 'dns-name') return `^(?=.{1,255}$)${dnsName}$`

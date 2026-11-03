@@ -17,6 +17,24 @@ const pool = new Set(['create_pool', 'update_pool', 'delete_pool'])
 export function reviewWrite(operation: Operation) {
   const { path, method } = operation
   const name = operation.vendorMetadata.name
+  if (method === 'POST' && path === '/nodes/{node}/vzdump' && name === 'vzdump' && operation.allowtoken !== 0) {
+    return { effect: 'write', transport: 'json', secrets: 'none',
+      allowedInputs: ['node', 'vmid', 'storage', 'mode', 'compress', 'bwlimit', 'protected', 'remove'], requiredInputs: ['node', 'vmid', 'storage'],
+      fixedInputs: { remove: false }, inputFormats: { vmid: 'pve-backup-vmid-list' },
+      reason: 'Confirmed backup of explicitly selected guests to managed storage; pruning is disabled and bulk selection, hooks and arbitrary paths remain refused.',
+      reconciliation: { kind: 'none', reason: 'Track the returned backup UPID, then inspect backup content; never repeat uncertain backup creation automatically.' },
+      privileges: operation.permissions, response: operation.returns, source: 'Pinned vzdump schemas; explicit guest selection and no-pruning policy.' }
+  }
+  if (method === 'DELETE' && path === '/nodes/{node}/storage/{storage}/content/{volume}' && name === 'delete' && operation.allowtoken !== 0) {
+    const vmid = '[1-9][0-9]{2,8}', date = '[0-9]{4}_[0-9]{2}_[0-9]{2}-[0-9]{2}_[0-9]{2}_[0-9]{2}'
+    const archive = `vzdump-(?:qemu-${vmid}-${date}\\.vma|lxc-${vmid}-${date}\\.tar)(?:\\.(?:gz|lzo|zst))?`
+    const pbs = `(?:vm|ct)/${vmid}/[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z`
+    return { effect: 'write', transport: 'json', secrets: 'none', allowedInputs: ['node', 'storage', 'volume'], requiredInputs: ['node', 'storage', 'volume'],
+      inputFormats: { volume: 'pve-managed-volume' }, inputPatterns: { volume: `^[A-Za-z][A-Za-z0-9._-]*:backup/(?:${archive}|${pbs})$` },
+      reason: 'Confirmed deletion of one reviewed QEMU/LXC dump archive or PBS guest backup; other content and delayed/null-result variants remain refused.',
+      reconciliation: { kind: 'none', reason: 'Track the returned deletion UPID; an absent or filtered inventory row never proves deletion, and uncertain deletion is never retried automatically.' },
+      privileges: operation.permissions, response: operation.returns, source: 'Pinned content-delete schemas; provider archive/PBS volume grammar and asynchronous deletion contract.' }
+  }
   const snapshot = /^\/nodes\/\{node\}\/(qemu|lxc)\/\{vmid\}\/snapshot$/.test(path) && method === 'POST' && name === 'snapshot'
   const snapshotDelete = /^\/nodes\/\{node\}\/(qemu|lxc)\/\{vmid\}\/snapshot\/\{snapname\}$/.test(path) && method === 'DELETE' && name === 'delsnapshot'
   const rollback = /^\/nodes\/\{node\}\/(qemu|lxc)\/\{vmid\}\/snapshot\/\{snapname\}\/rollback$/.test(path) && method === 'POST' && name === 'rollback'

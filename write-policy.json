@@ -13817,8 +13817,69 @@
       "method": "DELETE",
       "path": "/nodes/{node}/storage/{storage}/content/{volume}",
       "release": "legacy-8.2.7",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/557"
+      "admitted": true,
+      "contract": "dist/contracts.json#/contracts/557",
+      "policy": {
+        "effect": "write",
+        "transport": "json",
+        "secrets": "none",
+        "allowedInputs": [
+          "node",
+          "storage",
+          "volume"
+        ],
+        "requiredInputs": [
+          "node",
+          "storage",
+          "volume"
+        ],
+        "inputFormats": {
+          "volume": "pve-managed-volume"
+        },
+        "inputPatterns": {
+          "volume": "^[A-Za-z][A-Za-z0-9._-]*:backup/(?:vzdump-(?:qemu-[1-9][0-9]{2,8}-[0-9]{4}_[0-9]{2}_[0-9]{2}-[0-9]{2}_[0-9]{2}_[0-9]{2}\\.vma|lxc-[1-9][0-9]{2,8}-[0-9]{4}_[0-9]{2}_[0-9]{2}-[0-9]{2}_[0-9]{2}_[0-9]{2}\\.tar)(?:\\.(?:gz|lzo|zst))?|(?:vm|ct)/[1-9][0-9]{2,8}/[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z)$"
+        },
+        "reason": "Confirmed deletion of one reviewed QEMU/LXC dump archive or PBS guest backup; other content and delayed/null-result variants remain refused.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Track the returned deletion UPID; an absent or filtered inventory row never proves deletion, and uncertain deletion is never retried automatically."
+        },
+        "privileges": {
+          "description": "You need 'Datastore.Allocate' privilege on the storage (or 'Datastore.AllocateSpace' for backup volumes if you have VM.Backup privilege on the VM).",
+          "user": "all"
+        },
+        "response": {
+          "optional": 1,
+          "type": "string"
+        },
+        "source": "Pinned content-delete schemas; provider archive/PBS volume grammar and asynchronous deletion contract."
+      },
+      "inputs": [
+        {
+          "name": "delay",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "node",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "storage",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "volume",
+          "admitted": true,
+          "sensitive": false
+        }
+      ],
+      "results": {
+        "type": "string",
+        "handling": "public metadata; protected inputs excluded"
+      }
     },
     {
       "id": "OP-POST-9476c6bacd",
@@ -14251,8 +14312,233 @@
       "method": "POST",
       "path": "/nodes/{node}/vzdump",
       "release": "legacy-8.2.7",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/588"
+      "admitted": true,
+      "contract": "dist/contracts.json#/contracts/588",
+      "policy": {
+        "effect": "write",
+        "transport": "json",
+        "secrets": "none",
+        "allowedInputs": [
+          "node",
+          "vmid",
+          "storage",
+          "mode",
+          "compress",
+          "bwlimit",
+          "protected",
+          "remove"
+        ],
+        "requiredInputs": [
+          "node",
+          "vmid",
+          "storage"
+        ],
+        "fixedInputs": {
+          "remove": false
+        },
+        "inputFormats": {
+          "vmid": "pve-backup-vmid-list"
+        },
+        "reason": "Confirmed backup of explicitly selected guests to managed storage; pruning is disabled and bulk selection, hooks and arbitrary paths remain refused.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Track the returned backup UPID, then inspect backup content; never repeat uncertain backup creation automatically."
+        },
+        "privileges": {
+          "description": "The user needs 'VM.Backup' permissions on any VM, and 'Datastore.AllocateSpace' on the backup storage (and fleecing storage when fleecing is used). The 'tmpdir', 'dumpdir', 'script' and 'job-id' parameters are restricted to the 'root@pam' user. The 'maxfiles' and 'prune-backups' settings require 'Datastore.Allocate' on the backup storage. The 'bwlimit', 'performance' and 'ionice' parameters require 'Sys.Modify' on '/'.",
+          "user": "all"
+        },
+        "response": {
+          "type": "string"
+        },
+        "source": "Pinned vzdump schemas; explicit guest selection and no-pruning policy."
+      },
+      "inputs": [
+        {
+          "name": "all",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "bwlimit",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "compress",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "dumpdir",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "exclude",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "exclude-path",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "fleecing",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "ionice",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "job-id",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "lockwait",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "mailnotification",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "mailto",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "maxfiles",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "mode",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "node",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "notes-template",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "notification-mode",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "notification-policy",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "notification-target",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "pbs-change-detection-mode",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "performance",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "pigz",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "pool",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "protected",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "prune-backups",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "quiet",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "remove",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "script",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "stdexcludes",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "stdout",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "stop",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "stopwait",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "storage",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "tmpdir",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "vmid",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "zstd",
+          "admitted": false,
+          "sensitive": false
+        }
+      ],
+      "results": {
+        "type": "string",
+        "handling": "public metadata; protected inputs excluded"
+      }
     },
     {
       "id": "OP-GET-9f3fb007bb",
@@ -28967,8 +29253,69 @@
       "method": "DELETE",
       "path": "/nodes/{node}/storage/{storage}/content/{volume}",
       "release": "published-current",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/1235"
+      "admitted": true,
+      "contract": "dist/contracts.json#/contracts/1235",
+      "policy": {
+        "effect": "write",
+        "transport": "json",
+        "secrets": "none",
+        "allowedInputs": [
+          "node",
+          "storage",
+          "volume"
+        ],
+        "requiredInputs": [
+          "node",
+          "storage",
+          "volume"
+        ],
+        "inputFormats": {
+          "volume": "pve-managed-volume"
+        },
+        "inputPatterns": {
+          "volume": "^[A-Za-z][A-Za-z0-9._-]*:backup/(?:vzdump-(?:qemu-[1-9][0-9]{2,8}-[0-9]{4}_[0-9]{2}_[0-9]{2}-[0-9]{2}_[0-9]{2}_[0-9]{2}\\.vma|lxc-[1-9][0-9]{2,8}-[0-9]{4}_[0-9]{2}_[0-9]{2}-[0-9]{2}_[0-9]{2}_[0-9]{2}\\.tar)(?:\\.(?:gz|lzo|zst))?|(?:vm|ct)/[1-9][0-9]{2,8}/[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z)$"
+        },
+        "reason": "Confirmed deletion of one reviewed QEMU/LXC dump archive or PBS guest backup; other content and delayed/null-result variants remain refused.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Track the returned deletion UPID; an absent or filtered inventory row never proves deletion, and uncertain deletion is never retried automatically."
+        },
+        "privileges": {
+          "description": "You need 'Datastore.Allocate' privilege on the storage (or 'Datastore.AllocateSpace' for backup volumes if you have VM.Backup privilege on the VM).",
+          "user": "all"
+        },
+        "response": {
+          "optional": 1,
+          "type": "string"
+        },
+        "source": "Pinned content-delete schemas; provider archive/PBS volume grammar and asynchronous deletion contract."
+      },
+      "inputs": [
+        {
+          "name": "delay",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "node",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "storage",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "volume",
+          "admitted": true,
+          "sensitive": false
+        }
+      ],
+      "results": {
+        "type": "string",
+        "handling": "public metadata; protected inputs excluded"
+      }
     },
     {
       "id": "OP-POST-9476c6bacd",
@@ -29426,8 +29773,218 @@
       "method": "POST",
       "path": "/nodes/{node}/vzdump",
       "release": "published-current",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/1268"
+      "admitted": true,
+      "contract": "dist/contracts.json#/contracts/1268",
+      "policy": {
+        "effect": "write",
+        "transport": "json",
+        "secrets": "none",
+        "allowedInputs": [
+          "node",
+          "vmid",
+          "storage",
+          "mode",
+          "compress",
+          "bwlimit",
+          "protected",
+          "remove"
+        ],
+        "requiredInputs": [
+          "node",
+          "vmid",
+          "storage"
+        ],
+        "fixedInputs": {
+          "remove": false
+        },
+        "inputFormats": {
+          "vmid": "pve-backup-vmid-list"
+        },
+        "reason": "Confirmed backup of explicitly selected guests to managed storage; pruning is disabled and bulk selection, hooks and arbitrary paths remain refused.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Track the returned backup UPID, then inspect backup content; never repeat uncertain backup creation automatically."
+        },
+        "privileges": {
+          "description": "The user needs 'VM.Backup' permissions on any VM, and 'Datastore.AllocateSpace' on the backup storage (and fleecing storage when fleecing is used). The 'tmpdir', 'dumpdir', 'script' and 'job-id' parameters are restricted to the 'root@pam' user. The 'prune-backups' setting requires 'Datastore.Allocate' on the backup storage. The 'bwlimit', 'performance' and 'ionice' parameters require 'Sys.Modify' on '/'. The 'stop' parameter requires 'Sys.Modify' on '/nodes/{node}'",
+          "user": "all"
+        },
+        "response": {
+          "type": "string"
+        },
+        "source": "Pinned vzdump schemas; explicit guest selection and no-pruning policy."
+      },
+      "inputs": [
+        {
+          "name": "all",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "bwlimit",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "compress",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "dumpdir",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "exclude",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "exclude-path",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "fleecing",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "ionice",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "job-id",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "lockwait",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "mailnotification",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "mailto",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "mode",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "node",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "notes-template",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "notification-mode",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "pbs-change-detection-mode",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "performance",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "pigz",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "pool",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "protected",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "prune-backups",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "quiet",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "remove",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "script",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "stdexcludes",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "stdout",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "stop",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "stopwait",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "storage",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "tmpdir",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "vmid",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "zstd",
+          "admitted": false,
+          "sensitive": false
+        }
+      ],
+      "results": {
+        "type": "string",
+        "handling": "public metadata; protected inputs excluded"
+      }
     },
     {
       "id": "OP-GET-9f3fb007bb",

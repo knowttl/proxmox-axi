@@ -2561,23 +2561,81 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "none",
+            "allowedInputs": [
+              "node",
+              "storage",
+              "volume"
+            ],
+            "requiredInputs": [
+              "node",
+              "storage",
+              "volume"
+            ],
+            "inputFormats": {
+              "volume": "pve-managed-volume"
+            },
+            "inputPatterns": {
+              "volume": "^[A-Za-z][A-Za-z0-9._-]*:backup/(?:vzdump-(?:qemu-[1-9][0-9]{2,8}-[0-9]{4}_[0-9]{2}_[0-9]{2}-[0-9]{2}_[0-9]{2}_[0-9]{2}\\.vma|lxc-[1-9][0-9]{2,8}-[0-9]{4}_[0-9]{2}_[0-9]{2}-[0-9]{2}_[0-9]{2}_[0-9]{2}\\.tar)(?:\\.(?:gz|lzo|zst))?|(?:vm|ct)/[1-9][0-9]{2,8}/[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z)$"
+            },
+            "reason": "Confirmed deletion of one reviewed QEMU/LXC dump archive or PBS guest backup; other content and delayed/null-result variants remain refused.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Track the returned deletion UPID; an absent or filtered inventory row never proves deletion, and uncertain deletion is never retried automatically."
+            },
+            "privileges": {
+              "description": "You need 'Datastore.Allocate' privilege on the storage (or 'Datastore.AllocateSpace' for backup volumes if you have VM.Backup privilege on the VM).",
+              "user": "all"
+            },
+            "response": {
+              "optional": 1,
+              "type": "string"
+            },
+            "source": "Pinned content-delete schemas; provider archive/PBS volume grammar and asynchronous deletion contract."
           },
           "contract": "dist/contracts.json#/contracts/557"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "none",
+            "allowedInputs": [
+              "node",
+              "storage",
+              "volume"
+            ],
+            "requiredInputs": [
+              "node",
+              "storage",
+              "volume"
+            ],
+            "inputFormats": {
+              "volume": "pve-managed-volume"
+            },
+            "inputPatterns": {
+              "volume": "^[A-Za-z][A-Za-z0-9._-]*:backup/(?:vzdump-(?:qemu-[1-9][0-9]{2,8}-[0-9]{4}_[0-9]{2}_[0-9]{2}-[0-9]{2}_[0-9]{2}_[0-9]{2}\\.vma|lxc-[1-9][0-9]{2,8}-[0-9]{4}_[0-9]{2}_[0-9]{2}-[0-9]{2}_[0-9]{2}_[0-9]{2}\\.tar)(?:\\.(?:gz|lzo|zst))?|(?:vm|ct)/[1-9][0-9]{2,8}/[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z)$"
+            },
+            "reason": "Confirmed deletion of one reviewed QEMU/LXC dump archive or PBS guest backup; other content and delayed/null-result variants remain refused.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Track the returned deletion UPID; an absent or filtered inventory row never proves deletion, and uncertain deletion is never retried automatically."
+            },
+            "privileges": {
+              "description": "You need 'Datastore.Allocate' privilege on the storage (or 'Datastore.AllocateSpace' for backup volumes if you have VM.Backup privilege on the VM).",
+              "user": "all"
+            },
+            "response": {
+              "optional": 1,
+              "type": "string"
+            },
+            "source": "Pinned content-delete schemas; provider archive/PBS volume grammar and asynchronous deletion contract."
           },
           "contract": "dist/contracts.json#/contracts/1235"
         }
@@ -23187,23 +23245,89 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "none",
+            "allowedInputs": [
+              "node",
+              "vmid",
+              "storage",
+              "mode",
+              "compress",
+              "bwlimit",
+              "protected",
+              "remove"
+            ],
+            "requiredInputs": [
+              "node",
+              "vmid",
+              "storage"
+            ],
+            "fixedInputs": {
+              "remove": false
+            },
+            "inputFormats": {
+              "vmid": "pve-backup-vmid-list"
+            },
+            "reason": "Confirmed backup of explicitly selected guests to managed storage; pruning is disabled and bulk selection, hooks and arbitrary paths remain refused.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Track the returned backup UPID, then inspect backup content; never repeat uncertain backup creation automatically."
+            },
+            "privileges": {
+              "description": "The user needs 'VM.Backup' permissions on any VM, and 'Datastore.AllocateSpace' on the backup storage (and fleecing storage when fleecing is used). The 'tmpdir', 'dumpdir', 'script' and 'job-id' parameters are restricted to the 'root@pam' user. The 'maxfiles' and 'prune-backups' settings require 'Datastore.Allocate' on the backup storage. The 'bwlimit', 'performance' and 'ionice' parameters require 'Sys.Modify' on '/'.",
+              "user": "all"
+            },
+            "response": {
+              "type": "string"
+            },
+            "source": "Pinned vzdump schemas; explicit guest selection and no-pruning policy."
           },
           "contract": "dist/contracts.json#/contracts/588"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "none",
+            "allowedInputs": [
+              "node",
+              "vmid",
+              "storage",
+              "mode",
+              "compress",
+              "bwlimit",
+              "protected",
+              "remove"
+            ],
+            "requiredInputs": [
+              "node",
+              "vmid",
+              "storage"
+            ],
+            "fixedInputs": {
+              "remove": false
+            },
+            "inputFormats": {
+              "vmid": "pve-backup-vmid-list"
+            },
+            "reason": "Confirmed backup of explicitly selected guests to managed storage; pruning is disabled and bulk selection, hooks and arbitrary paths remain refused.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Track the returned backup UPID, then inspect backup content; never repeat uncertain backup creation automatically."
+            },
+            "privileges": {
+              "description": "The user needs 'VM.Backup' permissions on any VM, and 'Datastore.AllocateSpace' on the backup storage (and fleecing storage when fleecing is used). The 'tmpdir', 'dumpdir', 'script' and 'job-id' parameters are restricted to the 'root@pam' user. The 'prune-backups' setting requires 'Datastore.Allocate' on the backup storage. The 'bwlimit', 'performance' and 'ionice' parameters require 'Sys.Modify' on '/'. The 'stop' parameter requires 'Sys.Modify' on '/nodes/{node}'",
+              "user": "all"
+            },
+            "response": {
+              "type": "string"
+            },
+            "source": "Pinned vzdump schemas; explicit guest selection and no-pruning policy."
           },
           "contract": "dist/contracts.json#/contracts/1268"
         }

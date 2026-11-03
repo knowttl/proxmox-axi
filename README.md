@@ -333,13 +333,26 @@ Use the equivalent LXC paths for containers.
 The [snapshot reference](skills/proxmox-axi/references/guest-management.md#guest-snapshots) covers protected configuration reads, confirmation, task completion, RAM-state rollback behavior and remaining refusals.
 Rollback and deletion each require their own exact confirmation; QEMU RAM-state rollback may start the VM even when `start=0`.
 
+### Guest backups
+
+Back up explicitly selected guests to managed storage, then inspect completed backups:
+
+```sh
+proxmox-axi create '/nodes/{node}/vzdump' --api-node '<node>' --api-vmid '100,101' --api-storage backups --api-mode snapshot --api-compress zstd --profile lab --preview
+proxmox-axi get '/nodes/{node}/storage/{storage}/content' --api-node '<node>' --api-storage backups --api-content backup --profile lab
+```
+
+Creation fixes `remove=0` to prevent pruning; implicit guest selection, hooks, arbitrary paths and retention selectors remain refused.
+The [backup reference](skills/proxmox-axi/references/guest-management.md#guest-backups) covers task completion, selected backup modes and separately confirmed deletion of reviewed dump archives or PBS guest backups.
+General media/disk deletion, unprotecting backups and restoration remain refused by this admission.
+
 ## Safety
 
 - Ordinary JSON reads use trusted HTTPS, a five-second total deadline and a 64 KiB response bound, and reject redirects.
   Managed transfers have separate administrator-controlled byte and elapsed limits.
 - Operations whose effects, transport or secret handling are not reviewed remain discoverable but uncallable.
   Unresolved policy fields deny invocation, and changing a capture never admits new operations automatically.
-- Writes cover [QEMU creation and cloning](#create-and-clone-qemu-guests), [LXC creation and cloning](#create-and-clone-lxc-guests), guest power operations, guest destruction, [selected guest configuration settings](#guest-configuration-and-compute-settings), [managed disk attachments](#manage-disk-attachments), growth-only guest disk resize, pool management, task cancellation, node execute batches, [media uploads and catalogue installation](#discover-and-install-guest-media) and the reviewed credential/session setup operations.
+- Writes cover [QEMU creation and cloning](#create-and-clone-qemu-guests), [LXC creation and cloning](#create-and-clone-lxc-guests), guest power operations, guest destruction, [selected guest configuration settings](#guest-configuration-and-compute-settings), [managed disk attachments](#manage-disk-attachments), growth-only guest disk resize, pool management, task cancellation, node execute batches, [media uploads and catalogue installation](#discover-and-install-guest-media), [guest backups](#guest-backups) and the reviewed credential/session setup operations.
   Effectful CIFS/PBS scans use the same preview and confirmation policy even though their vendor method is GET.
 - Inspect `schema create|set|delete <template>` and the generated `write-policy.json` before enabling an operation.
 - Enable an operation by adding its ID to the selected file profile: `writes: { "operations": ["<operation-id>"] }`.

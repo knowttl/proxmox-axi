@@ -97064,12 +97064,41 @@
       "id": "OP-DELETE-1ccf139670",
       "release": "legacy-8.2.7",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "write",
+        "transport": "json",
+        "secrets": "none",
+        "allowedInputs": [
+          "node",
+          "storage",
+          "volume"
+        ],
+        "requiredInputs": [
+          "node",
+          "storage",
+          "volume"
+        ],
+        "inputFormats": {
+          "volume": "pve-managed-volume"
+        },
+        "inputPatterns": {
+          "volume": "^[A-Za-z][A-Za-z0-9._-]*:backup/(?:vzdump-(?:qemu-[1-9][0-9]{2,8}-[0-9]{4}_[0-9]{2}_[0-9]{2}-[0-9]{2}_[0-9]{2}_[0-9]{2}\\.vma|lxc-[1-9][0-9]{2,8}-[0-9]{4}_[0-9]{2}_[0-9]{2}-[0-9]{2}_[0-9]{2}_[0-9]{2}\\.tar)(?:\\.(?:gz|lzo|zst))?|(?:vm|ct)/[1-9][0-9]{2,8}/[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z)$"
+        },
+        "reason": "Confirmed deletion of one reviewed QEMU/LXC dump archive or PBS guest backup; other content and delayed/null-result variants remain refused.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Track the returned deletion UPID; an absent or filtered inventory row never proves deletion, and uncertain deletion is never retried automatically."
+        },
+        "privileges": {
+          "description": "You need 'Datastore.Allocate' privilege on the storage (or 'Datastore.AllocateSpace' for backup volumes if you have VM.Backup privilege on the VM).",
+          "user": "all"
+        },
+        "response": {
+          "optional": 1,
+          "type": "string"
+        },
+        "source": "Pinned content-delete schemas; provider archive/PBS volume grammar and asynchronous deletion contract."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "delete",
         "/nodes/{node}/storage/{storage}/content/{volume}"
@@ -97086,11 +97115,6 @@
               "type": "object",
               "additionalProperties": false,
               "properties": {
-                "delay": {
-                  "type": "integer",
-                  "minimum": 1,
-                  "maximum": 30
-                },
                 "node": {
                   "type": "string",
                   "pattern": "^[A-Za-z0-9][A-Za-z0-9.-]*$"
@@ -97100,12 +97124,19 @@
                   "pattern": "^[A-Za-z][A-Za-z0-9._-]*$"
                 },
                 "volume": {
-                  "type": "string"
+                  "type": "string",
+                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*:[A-Za-z0-9][A-Za-z0-9._:-]*(?:/[A-Za-z0-9][A-Za-z0-9._:-]*)*$",
+                  "allOf": [
+                    {
+                      "pattern": "^[A-Za-z][A-Za-z0-9._-]*:backup/(?:vzdump-(?:qemu-[1-9][0-9]{2,8}-[0-9]{4}_[0-9]{2}_[0-9]{2}-[0-9]{2}_[0-9]{2}_[0-9]{2}\\.vma|lxc-[1-9][0-9]{2,8}-[0-9]{4}_[0-9]{2}_[0-9]{2}-[0-9]{2}_[0-9]{2}_[0-9]{2}\\.tar)(?:\\.(?:gz|lzo|zst))?|(?:vm|ct)/[1-9][0-9]{2,8}/[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z)$"
+                    }
+                  ]
                 }
               },
               "required": [
                 "node",
-                "volume"
+                "volume",
+                "storage"
               ],
               "dependencies": {}
             }
@@ -101431,12 +101462,45 @@
       "id": "OP-POST-4f48560bc6",
       "release": "legacy-8.2.7",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "write",
+        "transport": "json",
+        "secrets": "none",
+        "allowedInputs": [
+          "node",
+          "vmid",
+          "storage",
+          "mode",
+          "compress",
+          "bwlimit",
+          "protected",
+          "remove"
+        ],
+        "requiredInputs": [
+          "node",
+          "vmid",
+          "storage"
+        ],
+        "fixedInputs": {
+          "remove": false
+        },
+        "inputFormats": {
+          "vmid": "pve-backup-vmid-list"
+        },
+        "reason": "Confirmed backup of explicitly selected guests to managed storage; pruning is disabled and bulk selection, hooks and arbitrary paths remain refused.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Track the returned backup UPID, then inspect backup content; never repeat uncertain backup creation automatically."
+        },
+        "privileges": {
+          "description": "The user needs 'VM.Backup' permissions on any VM, and 'Datastore.AllocateSpace' on the backup storage (and fleecing storage when fleecing is used). The 'tmpdir', 'dumpdir', 'script' and 'job-id' parameters are restricted to the 'root@pam' user. The 'maxfiles' and 'prune-backups' settings require 'Datastore.Allocate' on the backup storage. The 'bwlimit', 'performance' and 'ionice' parameters require 'Sys.Modify' on '/'.",
+          "user": "all"
+        },
+        "response": {
+          "type": "string"
+        },
+        "source": "Pinned vzdump schemas; explicit guest selection and no-pruning policy."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "post",
         "/nodes/{node}/vzdump"
@@ -101453,9 +101517,6 @@
               "type": "object",
               "additionalProperties": false,
               "properties": {
-                "all": {
-                  "type": "boolean"
-                },
                 "bwlimit": {
                   "type": "integer",
                   "minimum": 0
@@ -101470,55 +101531,6 @@
                   ],
                   "type": "string"
                 },
-                "dumpdir": {
-                  "type": "string"
-                },
-                "exclude": {
-                  "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
-                },
-                "exclude-path": {
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  }
-                },
-                "fleecing": {
-                  "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
-                },
-                "ionice": {
-                  "type": "integer",
-                  "minimum": 0,
-                  "maximum": 8
-                },
-                "job-id": {
-                  "type": "string",
-                  "maxLength": 50,
-                  "pattern": "^(?:\\S+)$"
-                },
-                "lockwait": {
-                  "type": "integer",
-                  "minimum": 0
-                },
-                "mailnotification": {
-                  "enum": [
-                    "always",
-                    "failure"
-                  ],
-                  "type": "string"
-                },
-                "mailto": {
-                  "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
-                },
-                "maxfiles": {
-                  "type": "integer",
-                  "minimum": 1
-                },
                 "mode": {
                   "enum": [
                     "snapshot",
@@ -101531,100 +101543,29 @@
                   "type": "string",
                   "pattern": "^[A-Za-z0-9][A-Za-z0-9.-]*$"
                 },
-                "notes-template": {
-                  "type": "string",
-                  "maxLength": 1024
-                },
-                "notification-mode": {
-                  "enum": [
-                    "auto",
-                    "legacy-sendmail",
-                    "notification-system"
-                  ],
-                  "type": "string"
-                },
-                "notification-policy": {
-                  "enum": [
-                    "always",
-                    "failure",
-                    "never"
-                  ],
-                  "type": "string"
-                },
-                "notification-target": {
-                  "type": "string",
-                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*$"
-                },
-                "pbs-change-detection-mode": {
-                  "enum": [
-                    "legacy",
-                    "data",
-                    "metadata"
-                  ],
-                  "type": "string"
-                },
-                "performance": {
-                  "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
-                },
-                "pigz": {
-                  "type": "integer"
-                },
-                "pool": {
-                  "type": "string"
-                },
                 "protected": {
                   "type": "boolean"
                 },
-                "prune-backups": {
-                  "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
-                },
-                "quiet": {
-                  "type": "boolean"
-                },
                 "remove": {
-                  "type": "boolean"
-                },
-                "script": {
-                  "type": "string"
-                },
-                "stdexcludes": {
-                  "type": "boolean"
-                },
-                "stdout": {
-                  "type": "boolean"
-                },
-                "stop": {
-                  "type": "boolean"
-                },
-                "stopwait": {
-                  "type": "integer",
-                  "minimum": 0
+                  "type": "boolean",
+                  "const": false,
+                  "default": false
                 },
                 "storage": {
                   "type": "string",
                   "pattern": "^[A-Za-z][A-Za-z0-9._-]*$"
                 },
-                "tmpdir": {
-                  "type": "string"
-                },
                 "vmid": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
-                },
-                "zstd": {
-                  "type": "integer"
+                  "pattern": "^[1-9][0-9]{2,8}(?:,[1-9][0-9]{2,8})*$"
                 }
               },
-              "required": [],
+              "required": [
+                "node",
+                "vmid",
+                "storage"
+              ],
               "dependencies": {
-                "notes-template": [
-                  "storage"
-                ],
                 "protected": [
                   "storage"
                 ]
@@ -219911,12 +219852,41 @@
       "id": "OP-DELETE-1ccf139670",
       "release": "published-current",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "write",
+        "transport": "json",
+        "secrets": "none",
+        "allowedInputs": [
+          "node",
+          "storage",
+          "volume"
+        ],
+        "requiredInputs": [
+          "node",
+          "storage",
+          "volume"
+        ],
+        "inputFormats": {
+          "volume": "pve-managed-volume"
+        },
+        "inputPatterns": {
+          "volume": "^[A-Za-z][A-Za-z0-9._-]*:backup/(?:vzdump-(?:qemu-[1-9][0-9]{2,8}-[0-9]{4}_[0-9]{2}_[0-9]{2}-[0-9]{2}_[0-9]{2}_[0-9]{2}\\.vma|lxc-[1-9][0-9]{2,8}-[0-9]{4}_[0-9]{2}_[0-9]{2}-[0-9]{2}_[0-9]{2}_[0-9]{2}\\.tar)(?:\\.(?:gz|lzo|zst))?|(?:vm|ct)/[1-9][0-9]{2,8}/[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z)$"
+        },
+        "reason": "Confirmed deletion of one reviewed QEMU/LXC dump archive or PBS guest backup; other content and delayed/null-result variants remain refused.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Track the returned deletion UPID; an absent or filtered inventory row never proves deletion, and uncertain deletion is never retried automatically."
+        },
+        "privileges": {
+          "description": "You need 'Datastore.Allocate' privilege on the storage (or 'Datastore.AllocateSpace' for backup volumes if you have VM.Backup privilege on the VM).",
+          "user": "all"
+        },
+        "response": {
+          "optional": 1,
+          "type": "string"
+        },
+        "source": "Pinned content-delete schemas; provider archive/PBS volume grammar and asynchronous deletion contract."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "delete",
         "/nodes/{node}/storage/{storage}/content/{volume}"
@@ -219933,11 +219903,6 @@
               "type": "object",
               "additionalProperties": false,
               "properties": {
-                "delay": {
-                  "type": "integer",
-                  "minimum": 1,
-                  "maximum": 30
-                },
                 "node": {
                   "type": "string",
                   "pattern": "^[A-Za-z0-9][A-Za-z0-9.-]*$"
@@ -219947,12 +219912,19 @@
                   "pattern": "^[A-Za-z][A-Za-z0-9._-]*$"
                 },
                 "volume": {
-                  "type": "string"
+                  "type": "string",
+                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*:[A-Za-z0-9][A-Za-z0-9._:-]*(?:/[A-Za-z0-9][A-Za-z0-9._:-]*)*$",
+                  "allOf": [
+                    {
+                      "pattern": "^[A-Za-z][A-Za-z0-9._-]*:backup/(?:vzdump-(?:qemu-[1-9][0-9]{2,8}-[0-9]{4}_[0-9]{2}_[0-9]{2}-[0-9]{2}_[0-9]{2}_[0-9]{2}\\.vma|lxc-[1-9][0-9]{2,8}-[0-9]{4}_[0-9]{2}_[0-9]{2}-[0-9]{2}_[0-9]{2}_[0-9]{2}\\.tar)(?:\\.(?:gz|lzo|zst))?|(?:vm|ct)/[1-9][0-9]{2,8}/[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z)$"
+                    }
+                  ]
                 }
               },
               "required": [
                 "node",
-                "volume"
+                "volume",
+                "storage"
               ],
               "dependencies": {}
             }
@@ -224581,12 +224553,45 @@
       "id": "OP-POST-4f48560bc6",
       "release": "published-current",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "write",
+        "transport": "json",
+        "secrets": "none",
+        "allowedInputs": [
+          "node",
+          "vmid",
+          "storage",
+          "mode",
+          "compress",
+          "bwlimit",
+          "protected",
+          "remove"
+        ],
+        "requiredInputs": [
+          "node",
+          "vmid",
+          "storage"
+        ],
+        "fixedInputs": {
+          "remove": false
+        },
+        "inputFormats": {
+          "vmid": "pve-backup-vmid-list"
+        },
+        "reason": "Confirmed backup of explicitly selected guests to managed storage; pruning is disabled and bulk selection, hooks and arbitrary paths remain refused.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Track the returned backup UPID, then inspect backup content; never repeat uncertain backup creation automatically."
+        },
+        "privileges": {
+          "description": "The user needs 'VM.Backup' permissions on any VM, and 'Datastore.AllocateSpace' on the backup storage (and fleecing storage when fleecing is used). The 'tmpdir', 'dumpdir', 'script' and 'job-id' parameters are restricted to the 'root@pam' user. The 'prune-backups' setting requires 'Datastore.Allocate' on the backup storage. The 'bwlimit', 'performance' and 'ionice' parameters require 'Sys.Modify' on '/'. The 'stop' parameter requires 'Sys.Modify' on '/nodes/{node}'",
+          "user": "all"
+        },
+        "response": {
+          "type": "string"
+        },
+        "source": "Pinned vzdump schemas; explicit guest selection and no-pruning policy."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "post",
         "/nodes/{node}/vzdump"
@@ -224603,9 +224608,6 @@
               "type": "object",
               "additionalProperties": false,
               "properties": {
-                "all": {
-                  "type": "boolean"
-                },
                 "bwlimit": {
                   "type": "integer",
                   "minimum": 0
@@ -224620,51 +224622,6 @@
                   ],
                   "type": "string"
                 },
-                "dumpdir": {
-                  "type": "string"
-                },
-                "exclude": {
-                  "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
-                },
-                "exclude-path": {
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  }
-                },
-                "fleecing": {
-                  "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
-                },
-                "ionice": {
-                  "type": "integer",
-                  "minimum": 0,
-                  "maximum": 8
-                },
-                "job-id": {
-                  "type": "string",
-                  "maxLength": 50,
-                  "pattern": "^(?:\\S+)$"
-                },
-                "lockwait": {
-                  "type": "integer",
-                  "minimum": 0
-                },
-                "mailnotification": {
-                  "enum": [
-                    "always",
-                    "failure"
-                  ],
-                  "type": "string"
-                },
-                "mailto": {
-                  "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
-                },
                 "mode": {
                   "enum": [
                     "snapshot",
@@ -224677,88 +224634,29 @@
                   "type": "string",
                   "pattern": "^[A-Za-z0-9][A-Za-z0-9.-]*$"
                 },
-                "notes-template": {
-                  "type": "string",
-                  "maxLength": 1024
-                },
-                "notification-mode": {
-                  "enum": [
-                    "auto",
-                    "legacy-sendmail",
-                    "notification-system"
-                  ],
-                  "type": "string"
-                },
-                "pbs-change-detection-mode": {
-                  "enum": [
-                    "legacy",
-                    "data",
-                    "metadata"
-                  ],
-                  "type": "string"
-                },
-                "performance": {
-                  "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
-                },
-                "pigz": {
-                  "type": "integer"
-                },
-                "pool": {
-                  "type": "string"
-                },
                 "protected": {
                   "type": "boolean"
                 },
-                "prune-backups": {
-                  "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
-                },
-                "quiet": {
-                  "type": "boolean"
-                },
                 "remove": {
-                  "type": "boolean"
-                },
-                "script": {
-                  "type": "string"
-                },
-                "stdexcludes": {
-                  "type": "boolean"
-                },
-                "stdout": {
-                  "type": "boolean"
-                },
-                "stop": {
-                  "type": "boolean"
-                },
-                "stopwait": {
-                  "type": "integer",
-                  "minimum": 0
+                  "type": "boolean",
+                  "const": false,
+                  "default": false
                 },
                 "storage": {
                   "type": "string",
                   "pattern": "^[A-Za-z][A-Za-z0-9._-]*$"
                 },
-                "tmpdir": {
-                  "type": "string"
-                },
                 "vmid": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
-                },
-                "zstd": {
-                  "type": "integer"
+                  "pattern": "^[1-9][0-9]{2,8}(?:,[1-9][0-9]{2,8})*$"
                 }
               },
-              "required": [],
+              "required": [
+                "node",
+                "vmid",
+                "storage"
+              ],
               "dependencies": {
-                "notes-template": [
-                  "storage"
-                ],
                 "protected": [
                   "storage"
                 ]
