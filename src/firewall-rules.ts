@@ -36,7 +36,7 @@ export async function prepareRules(credentials: Credentials, contract: Contract,
   if (!contract.policy.stateBinding) return
   const path = contract.policy.stateBinding.path, before = await readRules(credentials, path, values, contract.release)
   const guest = /^\/nodes\/\{node\}\/(qemu|lxc)\/\{vmid\}\/firewall\/rules$/.test(path)
-  const reference = (rule: Rule) => guest && rule.type === 'group' && new RegExp(namedFormatPattern('pve-firewall-group')!).test(String(rule.action))
+  const reference = (rule: Rule) => guest && rule.type === 'group' && /^[A-Za-z][A-Za-z0-9_-]{1,17}$(?![\s\S])/.test(String(rule.action))
   const after = before.map(settings), pos = Number(values.pos)
   const fields = Object.fromEntries(Object.entries(values).filter(([name]) => !contract.path.includes(`{${name}}`) && !['moveto', 'digest'].includes(name)))
   let selected: Rule

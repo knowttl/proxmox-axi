@@ -307,14 +307,27 @@ test('ordered firewall changes stage disabled creation and guard later mutations
         assert.equal((await command('set', item, api, ['--confirm', preview.value.confirmation])).value.error.code, 'CONFIRMATION_USED')
         assert.equal(writes.length, before + 1)
       })
-      await t.test(`${release.name} ${guest.name} orphan references can be disabled and removed without recreating the group`, async () => {
+      for (const action of [name, 'Web']) await t.test(`${release.name} ${guest.name} orphan reference ${action} can be reordered, disabled and removed without recreating the group`, async () => {
         mode = 'success'
         state.delete(groupKey)
-        state.set(guestKey, [{ type: 'group', action: name, enable: 1 }])
-        assert.equal((await confirmed('set', item, { ...guest.target, pos: 0, enable: 0 })).value.status, 'success')
-        assert.equal((await confirmed('delete', item, { ...guest.target, pos: 0 })).value.status, 'success')
-        assert.deepEqual(state.get(guestKey), [])
+        state.delete(wire(definition, 'web'))
+        const orphan = { type: 'group', action, enable: 1 }
+        state.set(guestKey, [{ ...orphan }, ...initial()])
+        const requestStart = requests.length
+        assert.equal((await confirmed('set', item, { ...guest.target, pos: 0, moveto: 3 })).value.status, 'success')
+        assert.equal(writes.at(-1)!.fields.digest, digest([orphan, ...initial()]))
+        assert.equal((await command('get', item, { ...guest.target, pos: 2 })).frame.payload.action, action)
+        assert.equal((await confirmed('set', item, { ...guest.target, pos: 2, enable: 0 })).value.status, 'success')
+        assert.equal(writes.at(-1)!.fields.digest, digest([...initial(), orphan]))
+        assert.deepEqual((await command('get', item, { ...guest.target, pos: 2 })).frame.payload,
+          { ...orphan, enable: 0, pos: 2, digest: digest([...initial(), { ...orphan, enable: 0 }]) })
+        assert.equal((await confirmed('delete', item, { ...guest.target, pos: 2 })).value.status, 'success')
+        assert.equal(writes.at(-1)!.fields.digest, digest([...initial(), { ...orphan, enable: 0 }]))
+        assert.deepEqual((await command('get', guest.path, guest.target)).frame.payload,
+          initial().map((rule, pos) => ({ ...rule, pos, digest: digest(initial()) })))
+        assert.equal(requests.slice(requestStart).some(request => request.includes(wire(groups))), false)
         assert.equal(state.has(groupKey), false)
+        assert.equal(state.has(wire(definition, 'web')), false)
       })
       await t.test(`${release.name} ${guest.name} missing definitions block reference activation`, async () => {
         mode = 'success'
