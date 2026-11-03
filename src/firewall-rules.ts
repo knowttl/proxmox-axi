@@ -36,7 +36,7 @@ export async function prepareRules(credentials: Credentials, contract: Contract,
   if (!contract.policy.stateBinding) return
   const path = contract.policy.stateBinding.path, before = await readRules(credentials, path, values, contract.release)
   const guest = /^\/nodes\/\{node\}\/(qemu|lxc)\/\{vmid\}\/firewall\/rules$/.test(path)
-  const reference = (rule: Rule) => guest && rule.type === 'group' && /^[A-Za-z][A-Za-z0-9_-]{1,17}$(?![\s\S])/.test(String(rule.action))
+  const existingReference = (rule: Rule) => guest && rule.type === 'group' && typeof rule.action === 'string' && /^[A-Za-z][A-Za-z0-9_-]{1,19}$(?![\s\S])/.test(rule.action)
   const after = before.map(settings), pos = Number(values.pos)
   const fields = Object.fromEntries(Object.entries(values).filter(([name]) => !contract.path.includes(`{${name}}`) && !['moveto', 'digest'].includes(name)))
   let selected: Rule
@@ -46,9 +46,9 @@ export async function prepareRules(credentials: Credentials, contract: Contract,
   } else {
     if (!Number.isSafeInteger(pos) || !after[pos]) throw input()
     selected = after[pos]!
-    if ((!['in', 'out'].includes(String(selected.type)) || !['ACCEPT', 'DROP', 'REJECT'].includes(String(selected.action))) && !reference(selected)) throw input()
+    if ((!['in', 'out'].includes(String(selected.type)) || !['ACCEPT', 'DROP', 'REJECT'].includes(String(selected.action))) && !existingReference(selected)) throw input()
     if (values.type !== undefined && (selected.type === 'group') !== (values.type === 'group')) throw input()
-    if (reference(selected) && values.action !== undefined && values.type !== 'group') throw input()
+    if (existingReference(selected) && values.action !== undefined && values.type !== 'group') throw input()
     const digest = before[0]!.digest
     if (values.digest !== undefined && values.digest !== digest) throw new Failure('CONFIRMATION_MISMATCH', 'The supplied rules digest is stale.', 'Read and preview the current ordered rules again.')
     values.digest = digest
@@ -61,7 +61,7 @@ export async function prepareRules(credentials: Credentials, contract: Contract,
       }
     } else Object.assign(selected, fields)
   }
-  if (contract.method !== 'DELETE' && values.moveto === undefined && reference(selected)) {
+  if (contract.method !== 'DELETE' && values.moveto === undefined && existingReference(selected)) {
     delete selected.ipversion
     if (Object.keys(selected).some(name => !['type', 'action', 'enable', 'iface', 'comment'].includes(name))) throw input()
   } else if (contract.method !== 'DELETE' && values.moveto === undefined) {
@@ -82,7 +82,7 @@ export async function prepareRules(credentials: Credentials, contract: Contract,
   const warnings = selected.type !== 'group' && selected.action === 'ACCEPT' && !restrictedAddress && !['proto', 'sport', 'dport', 'macro', 'icmp-type'].some(name => selected[name] !== undefined) ?
     ['ACCEPT-ALL RULE: inspect its disabled/active state and direction explicitly before confirming.'] : []
   let referencedGroup: RulesPlan['referencedGroup']
-  if (reference(selected) && contract.method !== 'DELETE' && values.moveto === undefined &&
+  if (existingReference(selected) && contract.method !== 'DELETE' && values.moveto === undefined &&
     (contract.method === 'POST' || values.enable !== 0 || Object.keys(fields).some(name => name !== 'enable'))) {
     const group = String(selected.action)
     referencedGroup = { group, rules: await readRules(credentials, '/cluster/firewall/groups/{group}', { group }, contract.release) }

@@ -307,12 +307,58 @@ test('ordered firewall changes stage disabled creation and guard later mutations
         assert.equal((await command('set', item, api, ['--confirm', preview.value.confirmation])).value.error.code, 'CONFIRMATION_USED')
         assert.equal(writes.length, before + 1)
       })
-      for (const action of [name, 'Web']) await t.test(`${release.name} ${guest.name} orphan reference ${action} can be reordered, disabled and removed without recreating the group`, async () => {
+      for (const { action, cleanup, creation } of [
+        { action: 'a', cleanup: false, creation: false },
+        { action: 'A', cleanup: false, creation: false },
+        { action: 'web', cleanup: true, creation: true },
+        { action: 'Web', cleanup: true, creation: false },
+        { action: 'abcdefghijklmnopqr', cleanup: true, creation: true },
+        { action: 'abcdefghijklmnopqrs', cleanup: true, creation: false },
+        { action: 'Abcdefghijklmnopqrs', cleanup: true, creation: false },
+        { action: 'abcdefghijklmnopqrst', cleanup: true, creation: false },
+        { action: 'Abcdefghijklmnopqrst', cleanup: true, creation: false },
+        { action: 'a_0123456789-ABCDEFG', cleanup: true, creation: false },
+        { action: 'abcdefghijklmnopqrstu', cleanup: false, creation: false },
+        { action: 'Abcdefghijklmnopqrstu', cleanup: false, creation: false },
+        { action: '1web', cleanup: false, creation: false },
+        { action: '_web', cleanup: false, creation: false },
+        { action: 'web.name', cleanup: false, creation: false },
+      ]) await t.test(`${release.name} ${guest.name} reference ${action} has independent creation and orphan-cleanup boundaries`, async () => {
         mode = 'success'
+        const targetGroup = wire(definition, action.toLowerCase())
+        state.delete(targetGroup)
+        state.set(guestKey, [])
+        if (creation) {
+          assert.equal((await confirmed('create', groups, { group: action })).value.status, 'success')
+          assert.equal((await confirmed('create', guest.path, { ...guest.target, type: 'group', action })).value.status, 'success')
+          assert.equal((await command('get', item, { ...guest.target, pos: 0 })).frame.payload.enable, 0)
+        } else {
+          const count = requests.length
+          for (const [verb, path, api] of [
+            ['create', groups, { group: action }],
+            ['create', guest.path, { ...guest.target, type: 'group', action }],
+            ['set', item, { ...guest.target, pos: 0, type: 'group', action }],
+          ] as const) assert.equal((await command(verb, path, api, ['--preview'])).value.error.code, 'INVALID_INPUT')
+          assert.equal(requests.length, count)
+        }
         state.delete(groupKey)
-        state.delete(wire(definition, 'web'))
+        state.delete(targetGroup)
         const orphan = { type: 'group', action, enable: 1 }
         state.set(guestKey, [{ ...orphan }, ...initial()])
+        assert.equal((await command('get', item, { ...guest.target, pos: 0 })).frame.payload.action, action)
+        assert.deepEqual((await command('get', guest.path, guest.target)).frame.payload,
+          [orphan, ...initial()].map((rule, pos) => ({ ...rule, pos, digest: digest([orphan, ...initial()]) })))
+        if (!cleanup) {
+          const count = writes.length
+          for (const [verb, api] of [
+            ['set', { ...guest.target, pos: 0, moveto: 3 }],
+            ['set', { ...guest.target, pos: 0, enable: 0 }],
+            ['delete', { ...guest.target, pos: 0 }],
+          ] as const) assert.equal((await command(verb, item, api, ['--preview'])).value.error.code, 'INVALID_INPUT')
+          assert.equal(writes.length, count)
+          assert.deepEqual(state.get(guestKey), [orphan, ...initial()])
+          return
+        }
         const requestStart = requests.length
         assert.equal((await confirmed('set', item, { ...guest.target, pos: 0, moveto: 3 })).value.status, 'success')
         assert.equal(writes.at(-1)!.fields.digest, digest([orphan, ...initial()]))
@@ -327,7 +373,7 @@ test('ordered firewall changes stage disabled creation and guard later mutations
           initial().map((rule, pos) => ({ ...rule, pos, digest: digest(initial()) })))
         assert.equal(requests.slice(requestStart).some(request => request.includes(wire(groups))), false)
         assert.equal(state.has(groupKey), false)
-        assert.equal(state.has(wire(definition, 'web')), false)
+        assert.equal(state.has(targetGroup), false)
       })
       await t.test(`${release.name} ${guest.name} missing definitions block reference activation`, async () => {
         mode = 'success'
