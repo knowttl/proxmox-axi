@@ -268,6 +268,21 @@ proxmox-axi set '/nodes/{node}/lxc/{vmid}/config' --api-node '<node>' --api-vmid
 Repeat the exact command with its confirmation after inspecting the preview.
 Follow the [guest networking and boot reference](skills/proxmox-axi/references/guest-management.md#guest-networking-and-boot) for NIC replacement/removal safeguards, host-network boundaries and guest-agent prerequisites.
 
+### Cloud-init onboarding
+
+Confirmed QEMU configuration updates now support `ciuser`, SecretRef-only `cipassword`, percent-encoded SSH public keys, `ipconfig0` through `ipconfig31`, DNS settings and ordinary `storage:cloudinit` media.
+QEMU and LXC configuration updates support space-separated reviewed IPv4 DNS servers and DNS search domains.
+See the [cloud-init onboarding reference](skills/proxmox-axi/references/guest-management.md#cloud-init-onboarding) for input constraints and secret handling.
+
+```sh
+proxmox-axi set '/nodes/{node}/qemu/{vmid}/config' --api-node '<node>' --api-vmid 100 --api-ciuser deployer --api-ipconfig0 'ip=dhcp,ip6=auto' --api-ide2 'local-lvm:cloudinit' --profile lab --preview
+proxmox-axi set '/nodes/{node}/qemu/{vmid}/cloudinit' --api-node '<node>' --api-vmid 100 --profile lab --preview
+```
+
+Confirm each exact preview separately; regeneration returns synchronous success rather than a UPID.
+`get .../cloudinit` exposes protected current/pending values only through the inherited private result pipe, including before regeneration.
+Cloud-init dumps, custom snippets and unreviewed input branches remain refused.
+
 ## Safety
 
 - Ordinary JSON reads use trusted HTTPS, a five-second total deadline and a 64 KiB response bound, and reject redirects.

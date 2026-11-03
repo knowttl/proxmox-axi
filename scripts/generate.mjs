@@ -2,7 +2,7 @@ import { readFileSync, writeFileSync } from 'node:fs'
 import { createHash } from 'node:crypto'
 import { captures, replay, routeKey, compareCatalogues } from './catalogue.mjs'
 import { reviewWrite } from './write-policy.ts'
-import { parameterProperties, propertyFormatPattern } from '../src/property-format.ts'
+import { namedFormatPattern, parameterProperties, propertyFormatPattern } from '../src/property-format.ts'
 
 const root = new URL('../', import.meta.url)
 const read = path => readFileSync(new URL(path, root), 'utf8')
@@ -27,7 +27,7 @@ function parameterSchema(vendor = {}) {
     result.pattern = `^(?:${pattern})$`
   }
   if (vendor.format) {
-    const pattern = vendor.format === 'pve-command-batch' ? '^[\\s\\S]{1,32768}$' : typeof vendor.format === 'string' ? constraints.formats[vendor.format] : propertyFormatPattern(vendor.format)
+    const pattern = vendor.format === 'pve-command-batch' ? '^[\\s\\S]{1,32768}$' : typeof vendor.format === 'string' ? constraints.formats[vendor.format] ?? namedFormatPattern(vendor.format) : propertyFormatPattern(vendor.format)
     if (!pattern) return unresolved('vendor format or property string')
     if (result.pattern) result.allOf = [{ pattern }]
     else result.pattern = pattern

@@ -67,6 +67,30 @@ Keep the method, template, catalogue and format unchanged between pages.
 Both JSON and TOON pages retain complete parameter entries and root metadata within the 65536-byte output bound; a parameter that cannot fit is refused with `OUTPUT_LIMIT`, never truncated.
 The full original vendor schemas also ship in `dist/contracts.json`.
 
+## Cloud-init onboarding
+
+Use confirmed QEMU `set .../config` with `ciuser`, `sshkeys`, `ipconfig0`-`ipconfig31`, DNS settings and a cloud-init volume such as `ide2=local-lvm:cloudinit`.
+Usernames are lowercase Unix-style names up to 32 characters.
+Read private configuration and use its digest when available before replacing settings.
+Supply passwords only as `"cipassword": { "env": "VM_BOOT_PASSWORD" }` or a protected file SecretRef in the protected `--body-file` input.
+Never put password values in arguments, terminal output, logs or journal notes.
+SSH keys are preferable to passwords and must be valid OpenSSH public keys.
+For QEMU `sshkeys`, percent-encode the public key text once, including spaces and LF separators, as with `encodeURIComponent`; the CLI applies the outer HTTP form encoding itself.
+Reviewed key types are ssh-ed25519, ssh-rsa and ecdsa-sha2-nistp256, with simple ASCII comments and one key per line.
+Authorized-key command/options prefixes, blank lines, private keys and other key types remain refused.
+
+Cloud-init IP settings use canonical order: `ip=<IPv4/CIDR>` followed by optional `gw=<IPv4>` and `ip6=auto|dhcp`, or `ip=dhcp` followed by optional dynamic IPv6, or dynamic IPv6 alone.
+A gateway requires static IPv4; static IPv6/gw6 and manual QEMU IP modes remain refused.
+For QEMU or LXC, `nameserver` is a single-space-separated list of IPv4 addresses and `searchdomain` is a single-space-separated DNS-name list up to 255 characters.
+IPv6/scoped DNS servers and custom cloud-init snippets remain refused.
+LXC raw SSH-key/password provisioning is creation-only and remains for the LXC creation slice; this update does not add unsupported LXC config fields.
+
+After confirming configuration, preview and separately confirm `set '/nodes/{node}/qemu/{vmid}/cloudinit'` to regenerate managed media.
+It returns synchronous success with no UPID; after uncertain delivery, inspect independently rather than repeat automatically.
+`get` on that same route requires the private result pipe described above because current and pending values can contain credentials.
+Keep that payload private and inspect whether pending values have been applied.
+Cloud-init dumps remain refused, and regenerating media does not prove that the guest has booted or applied its configuration.
+
 ## Managed disk configuration
 
 Use confirmed `set .../config` with concrete QEMU slots `ide0`-`ide3`, `sata0`-`sata5`, `scsi0`-`scsi30`, `virtio0`-`virtio15`, or LXC `rootfs`/`mp0`-`mp255`.

@@ -1,5 +1,6 @@
 // These names and paths identify reviewed vendor operations, not method-based admission.
 // The generated table retains every other route with an explicit refusal.
+import { cloudInitSshKeysPattern, namedFormatPattern } from '../src/property-format.ts'
 interface Operation {
   method: string
   path: string
@@ -41,6 +42,12 @@ export function reviewWrite(operation: Operation) {
   const guest = /^\/nodes\/\{node\}\/(qemu|lxc)\/\{vmid\}$/.test(path)
   const lifecyclePath = /^\/nodes\/\{node\}\/(qemu|lxc)\/\{vmid\}\/status\/(start|stop|shutdown|reboot|reset|resume|suspend)$/.test(path)
   const config = /^\/nodes\/\{node\}\/(qemu|lxc)\/\{vmid\}\/config$/.test(path)
+  if (method === 'PUT' && path === '/nodes/{node}/qemu/{vmid}/cloudinit' && name === 'cloudinit_update' && operation.allowtoken !== 0) {
+    return { effect: 'write', transport: 'json', secrets: 'none', allowedInputs: ['node', 'vmid'],
+      reason: 'Confirmed regeneration of managed cloud-init media after reviewed configuration changes.',
+      reconciliation: { kind: 'none', reason: 'Inspect private current/pending cloud-init values independently; never regenerate automatically after uncertain delivery.' },
+      privileges: operation.permissions, response: operation.returns, source: 'Pinned cloudinit_update schemas; synchronous null response.' }
+  }
   const resize = method === 'PUT' && /^\/nodes\/\{node\}\/(qemu|lxc)\/\{vmid\}\/resize$/.test(path) && name === 'resize_vm'
   if (resize && operation.allowtoken !== 0) return { effect: 'write', transport: 'json', secrets: 'none',
     allowedInputs: ['node', 'vmid', 'disk', 'size', 'digest'],
@@ -63,6 +70,7 @@ export function reviewWrite(operation: Operation) {
   const disks = path.includes('/qemu/') ? [['ide', 4], ['sata', 6], ['scsi', 31], ['virtio', 16]] as const : [['mp', 256]] as const
   const slots = disks.flatMap(([prefix, count]) => Array.from({ length: count }, (_, index) => `${prefix}${index}`))
   const networkSlots = Array.from({ length: 32 }, (_, index) => `net${index}`)
+  const ipconfigSlots = Array.from({ length: 32 }, (_, index) => `ipconfig${index}`)
   const removableSlots = [...slots, ...networkSlots]
   const allowedInputs = config ? ['node', 'vmid', 'description', 'name', 'hostname', 'memory', 'cores', 'sockets', 'vcpus', 'balloon', 'swap', 'cpu', 'cpulimit', 'cpuunits', 'onboot', 'startup', 'digest', 'cipassword', 'password'] :
     lifecyclePath ? ['node', 'vmid', 'timeout', 'forceStop', 'keepActive', 'skiplock', 'todisk'] :
@@ -70,12 +78,13 @@ export function reviewWrite(operation: Operation) {
   return { effect: batch ? 'batch' : 'write', transport: 'json', secrets: config ? 'input-refs' : 'none',
     reason: batch ? 'Vendor execute resolves each ordered node-relative child and reports per-child status; no atomicity.' :
       cancel ? 'Stop an existing UPID; cancellation is a separately confirmed mutation.' :
-      config ? 'Reviewed compute, managed disks, guest NICs, boot media/order and agent enablement; numbered slots/removal selectors are explicit, host passthrough remains refused, and credentials require SecretRefs.' :
+      config ? 'Reviewed compute, managed disks, guest networking, boot/agent and cloud-init onboarding; numbered slots/removal selectors are explicit, host passthrough remains refused, and credentials require SecretRefs.' :
       lifecyclePath ? 'Guest power-state operation, asynchronous UPID acceptance does not prove completion.' :
       guest ? 'Destroy guest; absence or filtered inventory cannot prove the outcome.' : 'Pool configuration and membership mutation; no automatic retry.',
-    allowedInputs: config ? [...allowedInputs!, ...slots, ...networkSlots, ...(path.includes('/lxc/') ? ['rootfs'] : ['boot', 'agent']), 'delete'] : allowedInputs,
+    allowedInputs: config ? [...allowedInputs!, ...slots, ...networkSlots, 'nameserver', 'searchdomain', ...(path.includes('/lxc/') ? ['rootfs'] : ['boot', 'agent', 'ciuser', 'sshkeys', ...ipconfigSlots]), 'delete'] : allowedInputs,
     ...(config ? { inputPatterns: { delete: `^(?:${removableSlots.join('|')})(?:,(?:${removableSlots.join('|')}))*$`,
-      ...(path.includes('/qemu/') ? { boot: `^order=(?:${removableSlots.join('|')})(?:;(?:${removableSlots.join('|')}))*$` } : {}) } } : {}),
+      searchdomain: namedFormatPattern('dns-name-list')!, ...(path.includes('/qemu/') ? { ciuser: '^[a-z_][a-z0-9_-]{0,31}$', sshkeys: cloudInitSshKeysPattern,
+        boot: `^order=(?:${removableSlots.join('|')})(?:;(?:${removableSlots.join('|')}))*$` } : {}) } } : {}),
     sensitiveInputs: config ? ['cipassword', 'password'] : [],
     reconciliation: config ? { kind: 'read', path, reason: 'Direct configuration observation may confirm supplied fields; missing fields never prove failure.' } :
       lifecyclePath ? { kind: 'read', path: path.replace(/\/status\/[^/]+$/, '/status/current'), reason: 'Direct guest status observation; only requested stable start/stop states can be confirmed.' } :
