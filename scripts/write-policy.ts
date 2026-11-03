@@ -1,6 +1,6 @@
 // These names and paths identify reviewed vendor operations, not method-based admission.
 // The generated table retains every other route with an explicit refusal.
-import { cloudInitSshKeysPattern, namedFormatPattern } from '../src/property-format.ts'
+import { backupVolumePattern, cloudInitSshKeysPattern, namedFormatPattern } from '../src/property-format.ts'
 interface Operation {
   method: string
   path: string
@@ -26,11 +26,8 @@ export function reviewWrite(operation: Operation) {
       privileges: operation.permissions, response: operation.returns, source: 'Pinned vzdump schemas; explicit guest selection and no-pruning policy.' }
   }
   if (method === 'DELETE' && path === '/nodes/{node}/storage/{storage}/content/{volume}' && name === 'delete' && operation.allowtoken !== 0) {
-    const vmid = '[1-9][0-9]{2,8}', date = '[0-9]{4}_[0-9]{2}_[0-9]{2}-[0-9]{2}_[0-9]{2}_[0-9]{2}'
-    const archive = `vzdump-(?:qemu-${vmid}-${date}\\.vma|lxc-${vmid}-${date}\\.tar)(?:\\.(?:gz|lzo|zst))?`
-    const pbs = `(?:vm|ct)/${vmid}/[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z`
     return { effect: 'write', transport: 'json', secrets: 'none', allowedInputs: ['node', 'storage', 'volume'], requiredInputs: ['node', 'storage', 'volume'],
-      inputFormats: { volume: 'pve-managed-volume' }, inputPatterns: { volume: `^[A-Za-z][A-Za-z0-9._-]*:backup/(?:${archive}|${pbs})$` },
+      inputFormats: { volume: 'pve-managed-volume' }, inputPatterns: { volume: backupVolumePattern() },
       reason: 'Confirmed deletion of one reviewed QEMU/LXC dump archive or PBS guest backup; other content and delayed/null-result variants remain refused.',
       reconciliation: { kind: 'none', reason: 'Track the returned deletion UPID; an absent or filtered inventory row never proves deletion, and uncertain deletion is never retried automatically.' },
       privileges: operation.permissions, response: operation.returns, source: 'Pinned content-delete schemas; provider archive/PBS volume grammar and asynchronous deletion contract.' }
@@ -126,18 +123,23 @@ export function reviewWrite(operation: Operation) {
   return { effect: batch ? 'batch' : 'write', transport: 'json', secrets: settings ? 'input-refs' : 'none',
     reason: batch ? 'Vendor execute resolves each ordered node-relative child and reports per-child status; no atomicity.' :
       cancel ? 'Stop an existing UPID; cancellation is a separately confirmed mutation.' :
-      create ? 'Confirmed guest creation with reviewed compute, managed storage, networking and onboarding; LXC is fixed unprivileged, and restore, overwrite and unreviewed host features remain refused.' :
+      create ? 'Confirmed guest creation or fresh-ID restore from a reviewed backup to explicit managed storage; LXC stays unprivileged, and force, live restore, host paths and unreviewed host features remain refused.' :
       config ? 'Reviewed compute, managed disks, guest networking, boot/agent and cloud-init onboarding; numbered slots/removal selectors are explicit, host passthrough remains refused, and credentials require SecretRefs.' :
       lifecyclePath ? 'Guest power-state operation, asynchronous UPID acceptance does not prove completion.' :
       guest ? 'Destroy guest; absence or filtered inventory cannot prove the outcome.' : 'Pool configuration and membership mutation; no automatic retry.',
     allowedInputs: config ? [...settingInputs, 'delete'] : create ? qemu ?
-      [...settingInputs.filter(name => !['hostname', 'swap', 'digest', 'password'].includes(name)), 'bios', 'scsihw', 'ostype', 'pool', 'start'] :
-      [...settingInputs.filter(name => !['name', 'sockets', 'vcpus', 'balloon', 'cpu', 'cipassword', 'digest'].includes(name)), 'ostemplate', 'storage', 'unprivileged', 'ssh-public-keys', 'pool', 'start'] : allowedInputs,
-    ...(create && !qemu ? { fixedInputs: { unprivileged: true }, inputFormats: { 'ssh-public-keys': 'openssh-public-keys' } } : {}),
+      [...settingInputs.filter(name => !['hostname', 'swap', 'digest', 'password'].includes(name)), 'bios', 'scsihw', 'ostype', 'pool', 'start', 'archive', 'storage', 'bwlimit', 'unique'] :
+      [...settingInputs.filter(name => !['name', 'sockets', 'vcpus', 'balloon', 'cpu', 'cipassword', 'digest'].includes(name)), 'ostemplate', 'storage', 'unprivileged', 'ssh-public-keys', 'pool', 'start', 'restore', 'bwlimit', 'unique'] : allowedInputs,
+    ...(create ? { inputCases: qemu ? [
+      { forbiddenInputs: ['archive', 'storage', 'bwlimit', 'unique'] }, { requiredInputs: ['archive', 'storage'], forbiddenInputs: slots },
+    ] : [
+      { forbiddenInputs: ['restore', 'bwlimit', 'unique'], inputPatterns: { ostemplate: '^[A-Za-z][A-Za-z0-9._-]*:vztmpl/[A-Za-z0-9][A-Za-z0-9._-]*\\.tar\\.(?:zst|xz|gz)$' } },
+      { requiredInputs: ['storage'], requiredValues: { restore: true }, inputPatterns: { ostemplate: backupVolumePattern('lxc') } },
+    ] } : {}),
+    ...(create && !qemu ? { fixedInputs: { unprivileged: true }, inputFormats: { 'ssh-public-keys': 'openssh-public-keys', ostemplate: 'pve-managed-volume' } } : {}),
     ...(settings ? { inputPatterns: { ...(config ? { delete: `^(?:${removableSlots.join('|')})(?:,(?:${removableSlots.join('|')}))*$` } : {}),
       searchdomain: namedFormatPattern('dns-name-list')!, ...(qemu ? { ciuser: '^[a-z_][a-z0-9_-]{0,31}$', sshkeys: cloudInitSshKeysPattern,
-        boot: `^order=(?:${removableSlots.join('|')})(?:;(?:${removableSlots.join('|')}))*$` } :
-        create ? { ostemplate: '^[A-Za-z][A-Za-z0-9._-]*:vztmpl/[A-Za-z0-9][A-Za-z0-9._-]*\\.tar\\.(?:zst|xz|gz)$' } : {}) } } : {}),
+        boot: `^order=(?:${removableSlots.join('|')})(?:;(?:${removableSlots.join('|')}))*$`, ...(create ? { archive: backupVolumePattern('qemu') } : {}) } : {}) } } : {}),
     sensitiveInputs: create ? [qemu ? 'cipassword' : 'password'] : config ? ['cipassword', 'password'] : [],
     reconciliation: config ? { kind: 'read', path, reason: 'Direct configuration observation may confirm supplied fields; missing fields never prove failure.' } :
       lifecyclePath ? { kind: 'read', path: path.replace(/\/status\/[^/]+$/, '/status/current'), reason: 'Direct guest status observation; only requested stable start/stop states can be confirmed.' } :

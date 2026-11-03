@@ -48565,7 +48565,7 @@
         "effect": "write",
         "transport": "json",
         "secrets": "input-refs",
-        "reason": "Confirmed guest creation with reviewed compute, managed storage, networking and onboarding; LXC is fixed unprivileged, and restore, overwrite and unreviewed host features remain refused.",
+        "reason": "Confirmed guest creation or fresh-ID restore from a reviewed backup to explicit managed storage; LXC stays unprivileged, and force, live restore, host paths and unreviewed host features remain refused.",
         "allowedInputs": [
           "node",
           "vmid",
@@ -48875,17 +48875,43 @@
           "unprivileged",
           "ssh-public-keys",
           "pool",
-          "start"
+          "start",
+          "restore",
+          "bwlimit",
+          "unique"
+        ],
+        "inputCases": [
+          {
+            "forbiddenInputs": [
+              "restore",
+              "bwlimit",
+              "unique"
+            ],
+            "inputPatterns": {
+              "ostemplate": "^[A-Za-z][A-Za-z0-9._-]*:vztmpl/[A-Za-z0-9][A-Za-z0-9._-]*\\.tar\\.(?:zst|xz|gz)$"
+            }
+          },
+          {
+            "requiredInputs": [
+              "storage"
+            ],
+            "requiredValues": {
+              "restore": true
+            },
+            "inputPatterns": {
+              "ostemplate": "^[A-Za-z][A-Za-z0-9._-]*:backup/(?:vzdump-(?:lxc-[1-9][0-9]{2,8}-[0-9]{4}_[0-9]{2}_[0-9]{2}-[0-9]{2}_[0-9]{2}_[0-9]{2}\\.tar)(?:\\.(?:gz|lzo|zst))?|ct/[1-9][0-9]{2,8}/[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z)$"
+            }
+          }
         ],
         "fixedInputs": {
           "unprivileged": true
         },
         "inputFormats": {
-          "ssh-public-keys": "openssh-public-keys"
+          "ssh-public-keys": "openssh-public-keys",
+          "ostemplate": "pve-managed-volume"
         },
         "inputPatterns": {
-          "searchdomain": "^(?=.{1,255}$)[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?(?:\\.[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?)*(?: [A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?(?:\\.[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?)*)*$",
-          "ostemplate": "^[A-Za-z][A-Za-z0-9._-]*:vztmpl/[A-Za-z0-9][A-Za-z0-9._-]*\\.tar\\.(?:zst|xz|gz)$"
+          "searchdomain": "^(?=.{1,255}$)[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?(?:\\.[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?)*(?: [A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?(?:\\.[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?)*)*$"
         },
         "sensitiveInputs": [
           "password"
@@ -48920,6 +48946,10 @@
               "type": "object",
               "additionalProperties": false,
               "properties": {
+                "bwlimit": {
+                  "type": "number",
+                  "minimum": 0
+                },
                 "cores": {
                   "type": "integer",
                   "minimum": 1,
@@ -48962,11 +48992,7 @@
                 "ostemplate": {
                   "type": "string",
                   "maxLength": 255,
-                  "allOf": [
-                    {
-                      "pattern": "^[A-Za-z][A-Za-z0-9._-]*:vztmpl/[A-Za-z0-9][A-Za-z0-9._-]*\\.tar\\.(?:zst|xz|gz)$"
-                    }
-                  ]
+                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*:[A-Za-z0-9][A-Za-z0-9._:-]*(?:/[A-Za-z0-9][A-Za-z0-9._:-]*)*$"
                 },
                 "password": {
                   "oneOf": [
@@ -49003,6 +49029,9 @@
                   "type": "string",
                   "pattern": "^[A-Za-z][A-Za-z0-9._-]*$"
                 },
+                "restore": {
+                  "type": "boolean"
+                },
                 "rootfs": {
                   "type": "string",
                   "pattern": "^(?:volume=)?[A-Za-z][A-Za-z0-9._-]*:(?:(?:[1-9][0-9]*(?:\\.[0-9]+)?|0\\.[0-9]*[1-9][0-9]*)|(?:vm|subvol)-[1-9][0-9]*-disk-[0-9]+(?:\\.raw)?)(?:,acl=[01])?(?:,quota=[01])?(?:,ro=[01])?$"
@@ -49034,6 +49063,9 @@
                 "swap": {
                   "type": "integer",
                   "minimum": 0
+                },
+                "unique": {
+                  "type": "boolean"
                 },
                 "unprivileged": {
                   "type": "boolean",
@@ -49916,7 +49948,11 @@
                 "ostemplate",
                 "vmid"
               ],
-              "dependencies": {},
+              "dependencies": {
+                "unique": [
+                  "restore"
+                ]
+              },
               "$defs": {
                 "mp": {
                   "type": "string",
@@ -49926,7 +49962,50 @@
                   "type": "string",
                   "pattern": "^name=[A-Za-z][A-Za-z0-9_.-]{0,14}(?:,bridge=[A-Za-z][A-Za-z0-9_.-]{0,14})?(?:,firewall=[01])?(?:,gw=(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])(?:\\.(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])){3})?(?:,hwaddr=[0-9A-Fa-f][02468AaCcEe](?::[0-9A-Fa-f]{2}){5})?(?:,ip=(?:dhcp|manual|(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])(?:\\.(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])){3}/(?:[0-9]|[12][0-9]|3[0-2])))?(?:,ip6=(?:auto|dhcp|manual))?(?:,link_down=[01])?(?:,rate=[0-9]+(?:\\.[0-9]+)?)?(?:,tag=(?:[1-9]|[1-9][0-9]{1,2}|[1-3][0-9]{3}|40[0-8][0-9]|409[0-4]))?(?:,type=veth)?$"
                 }
-              }
+              },
+              "anyOf": [
+                {
+                  "required": [],
+                  "properties": {
+                    "ostemplate": {
+                      "pattern": "^[A-Za-z][A-Za-z0-9._-]*:vztmpl/[A-Za-z0-9][A-Za-z0-9._-]*\\.tar\\.(?:zst|xz|gz)$"
+                    }
+                  },
+                  "not": {
+                    "anyOf": [
+                      {
+                        "required": [
+                          "restore"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "bwlimit"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "unique"
+                        ]
+                      }
+                    ]
+                  }
+                },
+                {
+                  "required": [
+                    "storage",
+                    "restore"
+                  ],
+                  "properties": {
+                    "ostemplate": {
+                      "pattern": "^[A-Za-z][A-Za-z0-9._-]*:backup/(?:vzdump-(?:lxc-[1-9][0-9]{2,8}-[0-9]{4}_[0-9]{2}_[0-9]{2}-[0-9]{2}_[0-9]{2}_[0-9]{2}\\.tar)(?:\\.(?:gz|lzo|zst))?|ct/[1-9][0-9]{2,8}/[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z)$"
+                    },
+                    "restore": {
+                      "const": true
+                    }
+                  }
+                }
+              ]
             }
           },
           "required": [
@@ -68529,7 +68608,7 @@
         "effect": "write",
         "transport": "json",
         "secrets": "input-refs",
-        "reason": "Confirmed guest creation with reviewed compute, managed storage, networking and onboarding; LXC is fixed unprivileged, and restore, overwrite and unreviewed host features remain refused.",
+        "reason": "Confirmed guest creation or fresh-ID restore from a reviewed backup to explicit managed storage; LXC stays unprivileged, and force, live restore, host paths and unreviewed host features remain refused.",
         "allowedInputs": [
           "node",
           "vmid",
@@ -68677,13 +68756,93 @@
           "scsihw",
           "ostype",
           "pool",
-          "start"
+          "start",
+          "archive",
+          "storage",
+          "bwlimit",
+          "unique"
+        ],
+        "inputCases": [
+          {
+            "forbiddenInputs": [
+              "archive",
+              "storage",
+              "bwlimit",
+              "unique"
+            ]
+          },
+          {
+            "requiredInputs": [
+              "archive",
+              "storage"
+            ],
+            "forbiddenInputs": [
+              "ide0",
+              "ide1",
+              "ide2",
+              "ide3",
+              "sata0",
+              "sata1",
+              "sata2",
+              "sata3",
+              "sata4",
+              "sata5",
+              "scsi0",
+              "scsi1",
+              "scsi2",
+              "scsi3",
+              "scsi4",
+              "scsi5",
+              "scsi6",
+              "scsi7",
+              "scsi8",
+              "scsi9",
+              "scsi10",
+              "scsi11",
+              "scsi12",
+              "scsi13",
+              "scsi14",
+              "scsi15",
+              "scsi16",
+              "scsi17",
+              "scsi18",
+              "scsi19",
+              "scsi20",
+              "scsi21",
+              "scsi22",
+              "scsi23",
+              "scsi24",
+              "scsi25",
+              "scsi26",
+              "scsi27",
+              "scsi28",
+              "scsi29",
+              "scsi30",
+              "virtio0",
+              "virtio1",
+              "virtio2",
+              "virtio3",
+              "virtio4",
+              "virtio5",
+              "virtio6",
+              "virtio7",
+              "virtio8",
+              "virtio9",
+              "virtio10",
+              "virtio11",
+              "virtio12",
+              "virtio13",
+              "virtio14",
+              "virtio15"
+            ]
+          }
         ],
         "inputPatterns": {
           "searchdomain": "^(?=.{1,255}$)[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?(?:\\.[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?)*(?: [A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?(?:\\.[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?)*)*$",
           "ciuser": "^[a-z_][a-z0-9_-]{0,31}$",
           "sshkeys": "^(?:ssh-ed25519|ssh-rsa|ecdsa-sha2-nistp256)%20(?=(?:(?:[A-Za-z0-9]|%2[BbFf])){32})(?:(?:[A-Za-z0-9]|%2[BbFf]){4})*(?:(?:[A-Za-z0-9]|%2[BbFf]){2}%3[Dd]%3[Dd]|(?:[A-Za-z0-9]|%2[BbFf]){3}%3[Dd])?(?:%20(?:[A-Za-z0-9._~-]|%20|%40|%2[Bb]|%3[Aa])+)?(?:%0[Aa](?:ssh-ed25519|ssh-rsa|ecdsa-sha2-nistp256)%20(?=(?:(?:[A-Za-z0-9]|%2[BbFf])){32})(?:(?:[A-Za-z0-9]|%2[BbFf]){4})*(?:(?:[A-Za-z0-9]|%2[BbFf]){2}%3[Dd]%3[Dd]|(?:[A-Za-z0-9]|%2[BbFf]){3}%3[Dd])?(?:%20(?:[A-Za-z0-9._~-]|%20|%40|%2[Bb]|%3[Aa])+)?)*(?:%0[Aa])?$",
-          "boot": "^order=(?:ide0|ide1|ide2|ide3|sata0|sata1|sata2|sata3|sata4|sata5|scsi0|scsi1|scsi2|scsi3|scsi4|scsi5|scsi6|scsi7|scsi8|scsi9|scsi10|scsi11|scsi12|scsi13|scsi14|scsi15|scsi16|scsi17|scsi18|scsi19|scsi20|scsi21|scsi22|scsi23|scsi24|scsi25|scsi26|scsi27|scsi28|scsi29|scsi30|virtio0|virtio1|virtio2|virtio3|virtio4|virtio5|virtio6|virtio7|virtio8|virtio9|virtio10|virtio11|virtio12|virtio13|virtio14|virtio15|net0|net1|net2|net3|net4|net5|net6|net7|net8|net9|net10|net11|net12|net13|net14|net15|net16|net17|net18|net19|net20|net21|net22|net23|net24|net25|net26|net27|net28|net29|net30|net31)(?:;(?:ide0|ide1|ide2|ide3|sata0|sata1|sata2|sata3|sata4|sata5|scsi0|scsi1|scsi2|scsi3|scsi4|scsi5|scsi6|scsi7|scsi8|scsi9|scsi10|scsi11|scsi12|scsi13|scsi14|scsi15|scsi16|scsi17|scsi18|scsi19|scsi20|scsi21|scsi22|scsi23|scsi24|scsi25|scsi26|scsi27|scsi28|scsi29|scsi30|virtio0|virtio1|virtio2|virtio3|virtio4|virtio5|virtio6|virtio7|virtio8|virtio9|virtio10|virtio11|virtio12|virtio13|virtio14|virtio15|net0|net1|net2|net3|net4|net5|net6|net7|net8|net9|net10|net11|net12|net13|net14|net15|net16|net17|net18|net19|net20|net21|net22|net23|net24|net25|net26|net27|net28|net29|net30|net31))*$"
+          "boot": "^order=(?:ide0|ide1|ide2|ide3|sata0|sata1|sata2|sata3|sata4|sata5|scsi0|scsi1|scsi2|scsi3|scsi4|scsi5|scsi6|scsi7|scsi8|scsi9|scsi10|scsi11|scsi12|scsi13|scsi14|scsi15|scsi16|scsi17|scsi18|scsi19|scsi20|scsi21|scsi22|scsi23|scsi24|scsi25|scsi26|scsi27|scsi28|scsi29|scsi30|virtio0|virtio1|virtio2|virtio3|virtio4|virtio5|virtio6|virtio7|virtio8|virtio9|virtio10|virtio11|virtio12|virtio13|virtio14|virtio15|net0|net1|net2|net3|net4|net5|net6|net7|net8|net9|net10|net11|net12|net13|net14|net15|net16|net17|net18|net19|net20|net21|net22|net23|net24|net25|net26|net27|net28|net29|net30|net31)(?:;(?:ide0|ide1|ide2|ide3|sata0|sata1|sata2|sata3|sata4|sata5|scsi0|scsi1|scsi2|scsi3|scsi4|scsi5|scsi6|scsi7|scsi8|scsi9|scsi10|scsi11|scsi12|scsi13|scsi14|scsi15|scsi16|scsi17|scsi18|scsi19|scsi20|scsi21|scsi22|scsi23|scsi24|scsi25|scsi26|scsi27|scsi28|scsi29|scsi30|virtio0|virtio1|virtio2|virtio3|virtio4|virtio5|virtio6|virtio7|virtio8|virtio9|virtio10|virtio11|virtio12|virtio13|virtio14|virtio15|net0|net1|net2|net3|net4|net5|net6|net7|net8|net9|net10|net11|net12|net13|net14|net15|net16|net17|net18|net19|net20|net21|net22|net23|net24|net25|net26|net27|net28|net29|net30|net31))*$",
+          "archive": "^[A-Za-z][A-Za-z0-9._-]*:backup/(?:vzdump-(?:qemu-[1-9][0-9]{2,8}-[0-9]{4}_[0-9]{2}_[0-9]{2}-[0-9]{2}_[0-9]{2}_[0-9]{2}\\.vma)(?:\\.(?:gz|lzo|zst))?|vm/[1-9][0-9]{2,8}/[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z)$"
         },
         "sensitiveInputs": [
           "cipassword"
@@ -68722,6 +68881,15 @@
                   "type": "string",
                   "pattern": "^(?:enabled=)?[01]$"
                 },
+                "archive": {
+                  "type": "string",
+                  "maxLength": 255,
+                  "allOf": [
+                    {
+                      "pattern": "^[A-Za-z][A-Za-z0-9._-]*:backup/(?:vzdump-(?:qemu-[1-9][0-9]{2,8}-[0-9]{4}_[0-9]{2}_[0-9]{2}-[0-9]{2}_[0-9]{2}_[0-9]{2}\\.vma)(?:\\.(?:gz|lzo|zst))?|vm/[1-9][0-9]{2,8}/[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z)$"
+                    }
+                  ]
+                },
                 "balloon": {
                   "type": "integer",
                   "minimum": 0
@@ -68741,6 +68909,10 @@
                       "pattern": "^order=(?:ide0|ide1|ide2|ide3|sata0|sata1|sata2|sata3|sata4|sata5|scsi0|scsi1|scsi2|scsi3|scsi4|scsi5|scsi6|scsi7|scsi8|scsi9|scsi10|scsi11|scsi12|scsi13|scsi14|scsi15|scsi16|scsi17|scsi18|scsi19|scsi20|scsi21|scsi22|scsi23|scsi24|scsi25|scsi26|scsi27|scsi28|scsi29|scsi30|virtio0|virtio1|virtio2|virtio3|virtio4|virtio5|virtio6|virtio7|virtio8|virtio9|virtio10|virtio11|virtio12|virtio13|virtio14|virtio15|net0|net1|net2|net3|net4|net5|net6|net7|net8|net9|net10|net11|net12|net13|net14|net15|net16|net17|net18|net19|net20|net21|net22|net23|net24|net25|net26|net27|net28|net29|net30|net31)(?:;(?:ide0|ide1|ide2|ide3|sata0|sata1|sata2|sata3|sata4|sata5|scsi0|scsi1|scsi2|scsi3|scsi4|scsi5|scsi6|scsi7|scsi8|scsi9|scsi10|scsi11|scsi12|scsi13|scsi14|scsi15|scsi16|scsi17|scsi18|scsi19|scsi20|scsi21|scsi22|scsi23|scsi24|scsi25|scsi26|scsi27|scsi28|scsi29|scsi30|virtio0|virtio1|virtio2|virtio3|virtio4|virtio5|virtio6|virtio7|virtio8|virtio9|virtio10|virtio11|virtio12|virtio13|virtio14|virtio15|net0|net1|net2|net3|net4|net5|net6|net7|net8|net9|net10|net11|net12|net13|net14|net15|net16|net17|net18|net19|net20|net21|net22|net23|net24|net25|net26|net27|net28|net29|net30|net31))*$"
                     }
                   ]
+                },
+                "bwlimit": {
+                  "type": "integer",
+                  "minimum": 0
                 },
                 "cipassword": {
                   "oneOf": [
@@ -68882,6 +69054,13 @@
                 "startup": {
                   "type": "string",
                   "pattern": "^(?:(?:order=)?[0-9]+(?:,up=[0-9]+)?(?:,down=[0-9]+)?|up=[0-9]+(?:,down=[0-9]+)?|down=[0-9]+)$"
+                },
+                "storage": {
+                  "type": "string",
+                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*$"
+                },
+                "unique": {
+                  "type": "boolean"
                 },
                 "vcpus": {
                   "type": "integer",
@@ -69261,7 +69440,11 @@
                 "node",
                 "vmid"
               ],
-              "dependencies": {},
+              "dependencies": {
+                "unique": [
+                  "archive"
+                ]
+              },
               "$defs": {
                 "ide": {
                   "type": "string",
@@ -69287,7 +69470,333 @@
                   "type": "string",
                   "pattern": "^(?:ip=dhcp(?:,ip6=(?:auto|dhcp))?|ip=(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])(?:\\.(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])){3}/(?:[0-9]|[12][0-9]|3[0-2])(?:,gw=(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])(?:\\.(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])){3})?(?:,ip6=(?:auto|dhcp))?|ip6=(?:auto|dhcp))$"
                 }
-              }
+              },
+              "anyOf": [
+                {
+                  "required": [],
+                  "properties": {},
+                  "not": {
+                    "anyOf": [
+                      {
+                        "required": [
+                          "archive"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "storage"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "bwlimit"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "unique"
+                        ]
+                      }
+                    ]
+                  }
+                },
+                {
+                  "required": [
+                    "archive",
+                    "storage"
+                  ],
+                  "properties": {},
+                  "not": {
+                    "anyOf": [
+                      {
+                        "required": [
+                          "ide0"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "ide1"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "ide2"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "ide3"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "sata0"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "sata1"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "sata2"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "sata3"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "sata4"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "sata5"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "scsi0"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "scsi1"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "scsi2"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "scsi3"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "scsi4"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "scsi5"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "scsi6"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "scsi7"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "scsi8"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "scsi9"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "scsi10"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "scsi11"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "scsi12"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "scsi13"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "scsi14"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "scsi15"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "scsi16"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "scsi17"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "scsi18"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "scsi19"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "scsi20"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "scsi21"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "scsi22"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "scsi23"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "scsi24"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "scsi25"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "scsi26"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "scsi27"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "scsi28"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "scsi29"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "scsi30"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "virtio0"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "virtio1"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "virtio2"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "virtio3"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "virtio4"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "virtio5"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "virtio6"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "virtio7"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "virtio8"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "virtio9"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "virtio10"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "virtio11"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "virtio12"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "virtio13"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "virtio14"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "virtio15"
+                        ]
+                      }
+                    ]
+                  }
+                }
+              ]
             }
           },
           "required": [
@@ -101953,12 +102462,15 @@
       "id": "OP-GET-c860b27298",
       "release": "legacy-8.2.7",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "read",
+        "transport": "json",
+        "secrets": "private-result",
+        "inputFormats": {
+          "volume": "pve-backup-volume"
+        },
+        "reason": "Configuration extracted from a reviewed guest backup can contain credentials and host-sensitive settings; the bounded text is delivered only through the inherited private result pipe."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "get",
         "/nodes/{node}/vzdump/extractconfig"
@@ -101980,7 +102492,8 @@
                   "pattern": "^[A-Za-z0-9][A-Za-z0-9.-]*$"
                 },
                 "volume": {
-                  "type": "string"
+                  "type": "string",
+                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*:backup/(?:vzdump-(?:qemu-[1-9][0-9]{2,8}-[0-9]{4}_[0-9]{2}_[0-9]{2}-[0-9]{2}_[0-9]{2}_[0-9]{2}\\.vma|lxc-[1-9][0-9]{2,8}-[0-9]{4}_[0-9]{2}_[0-9]{2}-[0-9]{2}_[0-9]{2}_[0-9]{2}\\.tar)(?:\\.(?:gz|lzo|zst))?|(?:vm|ct)/[1-9][0-9]{2,8}/[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z)$"
                 }
               },
               "required": [
@@ -169288,7 +169801,7 @@
         "effect": "write",
         "transport": "json",
         "secrets": "input-refs",
-        "reason": "Confirmed guest creation with reviewed compute, managed storage, networking and onboarding; LXC is fixed unprivileged, and restore, overwrite and unreviewed host features remain refused.",
+        "reason": "Confirmed guest creation or fresh-ID restore from a reviewed backup to explicit managed storage; LXC stays unprivileged, and force, live restore, host paths and unreviewed host features remain refused.",
         "allowedInputs": [
           "node",
           "vmid",
@@ -169598,17 +170111,43 @@
           "unprivileged",
           "ssh-public-keys",
           "pool",
-          "start"
+          "start",
+          "restore",
+          "bwlimit",
+          "unique"
+        ],
+        "inputCases": [
+          {
+            "forbiddenInputs": [
+              "restore",
+              "bwlimit",
+              "unique"
+            ],
+            "inputPatterns": {
+              "ostemplate": "^[A-Za-z][A-Za-z0-9._-]*:vztmpl/[A-Za-z0-9][A-Za-z0-9._-]*\\.tar\\.(?:zst|xz|gz)$"
+            }
+          },
+          {
+            "requiredInputs": [
+              "storage"
+            ],
+            "requiredValues": {
+              "restore": true
+            },
+            "inputPatterns": {
+              "ostemplate": "^[A-Za-z][A-Za-z0-9._-]*:backup/(?:vzdump-(?:lxc-[1-9][0-9]{2,8}-[0-9]{4}_[0-9]{2}_[0-9]{2}-[0-9]{2}_[0-9]{2}_[0-9]{2}\\.tar)(?:\\.(?:gz|lzo|zst))?|ct/[1-9][0-9]{2,8}/[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z)$"
+            }
+          }
         ],
         "fixedInputs": {
           "unprivileged": true
         },
         "inputFormats": {
-          "ssh-public-keys": "openssh-public-keys"
+          "ssh-public-keys": "openssh-public-keys",
+          "ostemplate": "pve-managed-volume"
         },
         "inputPatterns": {
-          "searchdomain": "^(?=.{1,255}$)[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?(?:\\.[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?)*(?: [A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?(?:\\.[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?)*)*$",
-          "ostemplate": "^[A-Za-z][A-Za-z0-9._-]*:vztmpl/[A-Za-z0-9][A-Za-z0-9._-]*\\.tar\\.(?:zst|xz|gz)$"
+          "searchdomain": "^(?=.{1,255}$)[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?(?:\\.[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?)*(?: [A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?(?:\\.[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?)*)*$"
         },
         "sensitiveInputs": [
           "password"
@@ -169643,6 +170182,10 @@
               "type": "object",
               "additionalProperties": false,
               "properties": {
+                "bwlimit": {
+                  "type": "number",
+                  "minimum": 0
+                },
                 "cores": {
                   "type": "integer",
                   "minimum": 1,
@@ -169685,11 +170228,7 @@
                 "ostemplate": {
                   "type": "string",
                   "maxLength": 255,
-                  "allOf": [
-                    {
-                      "pattern": "^[A-Za-z][A-Za-z0-9._-]*:vztmpl/[A-Za-z0-9][A-Za-z0-9._-]*\\.tar\\.(?:zst|xz|gz)$"
-                    }
-                  ]
+                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*:[A-Za-z0-9][A-Za-z0-9._:-]*(?:/[A-Za-z0-9][A-Za-z0-9._:-]*)*$"
                 },
                 "password": {
                   "oneOf": [
@@ -169726,6 +170265,9 @@
                   "type": "string",
                   "pattern": "^[A-Za-z][A-Za-z0-9._-]*$"
                 },
+                "restore": {
+                  "type": "boolean"
+                },
                 "rootfs": {
                   "type": "string",
                   "pattern": "^(?:volume=)?[A-Za-z][A-Za-z0-9._-]*:(?:(?:[1-9][0-9]*(?:\\.[0-9]+)?|0\\.[0-9]*[1-9][0-9]*)|(?:vm|subvol)-[1-9][0-9]*-disk-[0-9]+(?:\\.raw)?)(?:,acl=[01])?(?:,quota=[01])?(?:,ro=[01])?$"
@@ -169757,6 +170299,9 @@
                 "swap": {
                   "type": "integer",
                   "minimum": 0
+                },
+                "unique": {
+                  "type": "boolean"
                 },
                 "unprivileged": {
                   "type": "boolean",
@@ -170639,7 +171184,11 @@
                 "ostemplate",
                 "vmid"
               ],
-              "dependencies": {},
+              "dependencies": {
+                "unique": [
+                  "restore"
+                ]
+              },
               "$defs": {
                 "mp": {
                   "type": "string",
@@ -170649,7 +171198,50 @@
                   "type": "string",
                   "pattern": "^name=[A-Za-z][A-Za-z0-9_.-]{0,14}(?:,bridge=[A-Za-z][A-Za-z0-9_.-]{0,14})?(?:,firewall=[01])?(?:,gw=(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])(?:\\.(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])){3})?(?:,hwaddr=[0-9A-Fa-f][02468AaCcEe](?::[0-9A-Fa-f]{2}){5})?(?:,ip=(?:dhcp|manual|(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])(?:\\.(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])){3}/(?:[0-9]|[12][0-9]|3[0-2])))?(?:,ip6=(?:auto|dhcp|manual))?(?:,link_down=[01])?(?:,rate=[0-9]+(?:\\.[0-9]+)?)?(?:,tag=(?:[1-9]|[1-9][0-9]{1,2}|[1-3][0-9]{3}|40[0-8][0-9]|409[0-4]))?(?:,type=veth)?$"
                 }
-              }
+              },
+              "anyOf": [
+                {
+                  "required": [],
+                  "properties": {
+                    "ostemplate": {
+                      "pattern": "^[A-Za-z][A-Za-z0-9._-]*:vztmpl/[A-Za-z0-9][A-Za-z0-9._-]*\\.tar\\.(?:zst|xz|gz)$"
+                    }
+                  },
+                  "not": {
+                    "anyOf": [
+                      {
+                        "required": [
+                          "restore"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "bwlimit"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "unique"
+                        ]
+                      }
+                    ]
+                  }
+                },
+                {
+                  "required": [
+                    "storage",
+                    "restore"
+                  ],
+                  "properties": {
+                    "ostemplate": {
+                      "pattern": "^[A-Za-z][A-Za-z0-9._-]*:backup/(?:vzdump-(?:lxc-[1-9][0-9]{2,8}-[0-9]{4}_[0-9]{2}_[0-9]{2}-[0-9]{2}_[0-9]{2}_[0-9]{2}\\.tar)(?:\\.(?:gz|lzo|zst))?|ct/[1-9][0-9]{2,8}/[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z)$"
+                    },
+                    "restore": {
+                      "const": true
+                    }
+                  }
+                }
+              ]
             }
           },
           "required": [
@@ -189681,7 +190273,7 @@
         "effect": "write",
         "transport": "json",
         "secrets": "input-refs",
-        "reason": "Confirmed guest creation with reviewed compute, managed storage, networking and onboarding; LXC is fixed unprivileged, and restore, overwrite and unreviewed host features remain refused.",
+        "reason": "Confirmed guest creation or fresh-ID restore from a reviewed backup to explicit managed storage; LXC stays unprivileged, and force, live restore, host paths and unreviewed host features remain refused.",
         "allowedInputs": [
           "node",
           "vmid",
@@ -189829,13 +190421,93 @@
           "scsihw",
           "ostype",
           "pool",
-          "start"
+          "start",
+          "archive",
+          "storage",
+          "bwlimit",
+          "unique"
+        ],
+        "inputCases": [
+          {
+            "forbiddenInputs": [
+              "archive",
+              "storage",
+              "bwlimit",
+              "unique"
+            ]
+          },
+          {
+            "requiredInputs": [
+              "archive",
+              "storage"
+            ],
+            "forbiddenInputs": [
+              "ide0",
+              "ide1",
+              "ide2",
+              "ide3",
+              "sata0",
+              "sata1",
+              "sata2",
+              "sata3",
+              "sata4",
+              "sata5",
+              "scsi0",
+              "scsi1",
+              "scsi2",
+              "scsi3",
+              "scsi4",
+              "scsi5",
+              "scsi6",
+              "scsi7",
+              "scsi8",
+              "scsi9",
+              "scsi10",
+              "scsi11",
+              "scsi12",
+              "scsi13",
+              "scsi14",
+              "scsi15",
+              "scsi16",
+              "scsi17",
+              "scsi18",
+              "scsi19",
+              "scsi20",
+              "scsi21",
+              "scsi22",
+              "scsi23",
+              "scsi24",
+              "scsi25",
+              "scsi26",
+              "scsi27",
+              "scsi28",
+              "scsi29",
+              "scsi30",
+              "virtio0",
+              "virtio1",
+              "virtio2",
+              "virtio3",
+              "virtio4",
+              "virtio5",
+              "virtio6",
+              "virtio7",
+              "virtio8",
+              "virtio9",
+              "virtio10",
+              "virtio11",
+              "virtio12",
+              "virtio13",
+              "virtio14",
+              "virtio15"
+            ]
+          }
         ],
         "inputPatterns": {
           "searchdomain": "^(?=.{1,255}$)[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?(?:\\.[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?)*(?: [A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?(?:\\.[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?)*)*$",
           "ciuser": "^[a-z_][a-z0-9_-]{0,31}$",
           "sshkeys": "^(?:ssh-ed25519|ssh-rsa|ecdsa-sha2-nistp256)%20(?=(?:(?:[A-Za-z0-9]|%2[BbFf])){32})(?:(?:[A-Za-z0-9]|%2[BbFf]){4})*(?:(?:[A-Za-z0-9]|%2[BbFf]){2}%3[Dd]%3[Dd]|(?:[A-Za-z0-9]|%2[BbFf]){3}%3[Dd])?(?:%20(?:[A-Za-z0-9._~-]|%20|%40|%2[Bb]|%3[Aa])+)?(?:%0[Aa](?:ssh-ed25519|ssh-rsa|ecdsa-sha2-nistp256)%20(?=(?:(?:[A-Za-z0-9]|%2[BbFf])){32})(?:(?:[A-Za-z0-9]|%2[BbFf]){4})*(?:(?:[A-Za-z0-9]|%2[BbFf]){2}%3[Dd]%3[Dd]|(?:[A-Za-z0-9]|%2[BbFf]){3}%3[Dd])?(?:%20(?:[A-Za-z0-9._~-]|%20|%40|%2[Bb]|%3[Aa])+)?)*(?:%0[Aa])?$",
-          "boot": "^order=(?:ide0|ide1|ide2|ide3|sata0|sata1|sata2|sata3|sata4|sata5|scsi0|scsi1|scsi2|scsi3|scsi4|scsi5|scsi6|scsi7|scsi8|scsi9|scsi10|scsi11|scsi12|scsi13|scsi14|scsi15|scsi16|scsi17|scsi18|scsi19|scsi20|scsi21|scsi22|scsi23|scsi24|scsi25|scsi26|scsi27|scsi28|scsi29|scsi30|virtio0|virtio1|virtio2|virtio3|virtio4|virtio5|virtio6|virtio7|virtio8|virtio9|virtio10|virtio11|virtio12|virtio13|virtio14|virtio15|net0|net1|net2|net3|net4|net5|net6|net7|net8|net9|net10|net11|net12|net13|net14|net15|net16|net17|net18|net19|net20|net21|net22|net23|net24|net25|net26|net27|net28|net29|net30|net31)(?:;(?:ide0|ide1|ide2|ide3|sata0|sata1|sata2|sata3|sata4|sata5|scsi0|scsi1|scsi2|scsi3|scsi4|scsi5|scsi6|scsi7|scsi8|scsi9|scsi10|scsi11|scsi12|scsi13|scsi14|scsi15|scsi16|scsi17|scsi18|scsi19|scsi20|scsi21|scsi22|scsi23|scsi24|scsi25|scsi26|scsi27|scsi28|scsi29|scsi30|virtio0|virtio1|virtio2|virtio3|virtio4|virtio5|virtio6|virtio7|virtio8|virtio9|virtio10|virtio11|virtio12|virtio13|virtio14|virtio15|net0|net1|net2|net3|net4|net5|net6|net7|net8|net9|net10|net11|net12|net13|net14|net15|net16|net17|net18|net19|net20|net21|net22|net23|net24|net25|net26|net27|net28|net29|net30|net31))*$"
+          "boot": "^order=(?:ide0|ide1|ide2|ide3|sata0|sata1|sata2|sata3|sata4|sata5|scsi0|scsi1|scsi2|scsi3|scsi4|scsi5|scsi6|scsi7|scsi8|scsi9|scsi10|scsi11|scsi12|scsi13|scsi14|scsi15|scsi16|scsi17|scsi18|scsi19|scsi20|scsi21|scsi22|scsi23|scsi24|scsi25|scsi26|scsi27|scsi28|scsi29|scsi30|virtio0|virtio1|virtio2|virtio3|virtio4|virtio5|virtio6|virtio7|virtio8|virtio9|virtio10|virtio11|virtio12|virtio13|virtio14|virtio15|net0|net1|net2|net3|net4|net5|net6|net7|net8|net9|net10|net11|net12|net13|net14|net15|net16|net17|net18|net19|net20|net21|net22|net23|net24|net25|net26|net27|net28|net29|net30|net31)(?:;(?:ide0|ide1|ide2|ide3|sata0|sata1|sata2|sata3|sata4|sata5|scsi0|scsi1|scsi2|scsi3|scsi4|scsi5|scsi6|scsi7|scsi8|scsi9|scsi10|scsi11|scsi12|scsi13|scsi14|scsi15|scsi16|scsi17|scsi18|scsi19|scsi20|scsi21|scsi22|scsi23|scsi24|scsi25|scsi26|scsi27|scsi28|scsi29|scsi30|virtio0|virtio1|virtio2|virtio3|virtio4|virtio5|virtio6|virtio7|virtio8|virtio9|virtio10|virtio11|virtio12|virtio13|virtio14|virtio15|net0|net1|net2|net3|net4|net5|net6|net7|net8|net9|net10|net11|net12|net13|net14|net15|net16|net17|net18|net19|net20|net21|net22|net23|net24|net25|net26|net27|net28|net29|net30|net31))*$",
+          "archive": "^[A-Za-z][A-Za-z0-9._-]*:backup/(?:vzdump-(?:qemu-[1-9][0-9]{2,8}-[0-9]{4}_[0-9]{2}_[0-9]{2}-[0-9]{2}_[0-9]{2}_[0-9]{2}\\.vma)(?:\\.(?:gz|lzo|zst))?|vm/[1-9][0-9]{2,8}/[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z)$"
         },
         "sensitiveInputs": [
           "cipassword"
@@ -189874,6 +190546,15 @@
                   "type": "string",
                   "pattern": "^(?:enabled=)?[01]$"
                 },
+                "archive": {
+                  "type": "string",
+                  "maxLength": 255,
+                  "allOf": [
+                    {
+                      "pattern": "^[A-Za-z][A-Za-z0-9._-]*:backup/(?:vzdump-(?:qemu-[1-9][0-9]{2,8}-[0-9]{4}_[0-9]{2}_[0-9]{2}-[0-9]{2}_[0-9]{2}_[0-9]{2}\\.vma)(?:\\.(?:gz|lzo|zst))?|vm/[1-9][0-9]{2,8}/[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z)$"
+                    }
+                  ]
+                },
                 "balloon": {
                   "type": "integer",
                   "minimum": 0
@@ -189893,6 +190574,10 @@
                       "pattern": "^order=(?:ide0|ide1|ide2|ide3|sata0|sata1|sata2|sata3|sata4|sata5|scsi0|scsi1|scsi2|scsi3|scsi4|scsi5|scsi6|scsi7|scsi8|scsi9|scsi10|scsi11|scsi12|scsi13|scsi14|scsi15|scsi16|scsi17|scsi18|scsi19|scsi20|scsi21|scsi22|scsi23|scsi24|scsi25|scsi26|scsi27|scsi28|scsi29|scsi30|virtio0|virtio1|virtio2|virtio3|virtio4|virtio5|virtio6|virtio7|virtio8|virtio9|virtio10|virtio11|virtio12|virtio13|virtio14|virtio15|net0|net1|net2|net3|net4|net5|net6|net7|net8|net9|net10|net11|net12|net13|net14|net15|net16|net17|net18|net19|net20|net21|net22|net23|net24|net25|net26|net27|net28|net29|net30|net31)(?:;(?:ide0|ide1|ide2|ide3|sata0|sata1|sata2|sata3|sata4|sata5|scsi0|scsi1|scsi2|scsi3|scsi4|scsi5|scsi6|scsi7|scsi8|scsi9|scsi10|scsi11|scsi12|scsi13|scsi14|scsi15|scsi16|scsi17|scsi18|scsi19|scsi20|scsi21|scsi22|scsi23|scsi24|scsi25|scsi26|scsi27|scsi28|scsi29|scsi30|virtio0|virtio1|virtio2|virtio3|virtio4|virtio5|virtio6|virtio7|virtio8|virtio9|virtio10|virtio11|virtio12|virtio13|virtio14|virtio15|net0|net1|net2|net3|net4|net5|net6|net7|net8|net9|net10|net11|net12|net13|net14|net15|net16|net17|net18|net19|net20|net21|net22|net23|net24|net25|net26|net27|net28|net29|net30|net31))*$"
                     }
                   ]
+                },
+                "bwlimit": {
+                  "type": "integer",
+                  "minimum": 0
                 },
                 "cipassword": {
                   "oneOf": [
@@ -190034,6 +190719,13 @@
                 "startup": {
                   "type": "string",
                   "pattern": "^(?:(?:order=)?[0-9]+(?:,up=[0-9]+)?(?:,down=[0-9]+)?|up=[0-9]+(?:,down=[0-9]+)?|down=[0-9]+)$"
+                },
+                "storage": {
+                  "type": "string",
+                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*$"
+                },
+                "unique": {
+                  "type": "boolean"
                 },
                 "vcpus": {
                   "type": "integer",
@@ -190413,7 +191105,11 @@
                 "node",
                 "vmid"
               ],
-              "dependencies": {},
+              "dependencies": {
+                "unique": [
+                  "archive"
+                ]
+              },
               "$defs": {
                 "ide": {
                   "type": "string",
@@ -190439,7 +191135,333 @@
                   "type": "string",
                   "pattern": "^(?:ip=dhcp(?:,ip6=(?:auto|dhcp))?|ip=(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])(?:\\.(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])){3}/(?:[0-9]|[12][0-9]|3[0-2])(?:,gw=(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])(?:\\.(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])){3})?(?:,ip6=(?:auto|dhcp))?|ip6=(?:auto|dhcp))$"
                 }
-              }
+              },
+              "anyOf": [
+                {
+                  "required": [],
+                  "properties": {},
+                  "not": {
+                    "anyOf": [
+                      {
+                        "required": [
+                          "archive"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "storage"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "bwlimit"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "unique"
+                        ]
+                      }
+                    ]
+                  }
+                },
+                {
+                  "required": [
+                    "archive",
+                    "storage"
+                  ],
+                  "properties": {},
+                  "not": {
+                    "anyOf": [
+                      {
+                        "required": [
+                          "ide0"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "ide1"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "ide2"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "ide3"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "sata0"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "sata1"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "sata2"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "sata3"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "sata4"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "sata5"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "scsi0"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "scsi1"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "scsi2"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "scsi3"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "scsi4"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "scsi5"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "scsi6"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "scsi7"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "scsi8"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "scsi9"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "scsi10"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "scsi11"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "scsi12"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "scsi13"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "scsi14"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "scsi15"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "scsi16"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "scsi17"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "scsi18"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "scsi19"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "scsi20"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "scsi21"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "scsi22"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "scsi23"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "scsi24"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "scsi25"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "scsi26"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "scsi27"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "scsi28"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "scsi29"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "scsi30"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "virtio0"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "virtio1"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "virtio2"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "virtio3"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "virtio4"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "virtio5"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "virtio6"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "virtio7"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "virtio8"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "virtio9"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "virtio10"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "virtio11"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "virtio12"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "virtio13"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "virtio14"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "virtio15"
+                        ]
+                      }
+                    ]
+                  }
+                }
+              ]
             }
           },
           "required": [
@@ -225021,12 +226043,15 @@
       "id": "OP-GET-c860b27298",
       "release": "published-current",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "read",
+        "transport": "json",
+        "secrets": "private-result",
+        "inputFormats": {
+          "volume": "pve-backup-volume"
+        },
+        "reason": "Configuration extracted from a reviewed guest backup can contain credentials and host-sensitive settings; the bounded text is delivered only through the inherited private result pipe."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "get",
         "/nodes/{node}/vzdump/extractconfig"
@@ -225048,7 +226073,8 @@
                   "pattern": "^[A-Za-z0-9][A-Za-z0-9.-]*$"
                 },
                 "volume": {
-                  "type": "string"
+                  "type": "string",
+                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*:backup/(?:vzdump-(?:qemu-[1-9][0-9]{2,8}-[0-9]{4}_[0-9]{2}_[0-9]{2}-[0-9]{2}_[0-9]{2}_[0-9]{2}\\.vma|lxc-[1-9][0-9]{2,8}-[0-9]{4}_[0-9]{2}_[0-9]{2}-[0-9]{2}_[0-9]{2}_[0-9]{2}\\.tar)(?:\\.(?:gz|lzo|zst))?|(?:vm|ct)/[1-9][0-9]{2,8}/[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z)$"
                 }
               },
               "required": [

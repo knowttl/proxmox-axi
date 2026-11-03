@@ -856,6 +856,7 @@
         "preview": "boolean",
         "confirm": "value",
         "session": "value",
+        "api-bwlimit": "value",
         "api-cores": "value",
         "api-cpulimit": "value",
         "api-cpuunits": "value",
@@ -867,6 +868,7 @@
         "api-onboot": "value",
         "api-ostemplate": "value",
         "api-pool": "value",
+        "api-restore": "value",
         "api-rootfs": "value",
         "api-searchdomain": "value",
         "api-ssh-public-keys": "value",
@@ -874,6 +876,7 @@
         "api-startup": "value",
         "api-storage": "value",
         "api-swap": "value",
+        "api-unique": "value",
         "api-unprivileged": "value",
         "api-vmid": "value",
         "api-mp0": "value",
@@ -1421,9 +1424,11 @@
         "confirm": "value",
         "session": "value",
         "api-agent": "value",
+        "api-archive": "value",
         "api-balloon": "value",
         "api-bios": "value",
         "api-boot": "value",
+        "api-bwlimit": "value",
         "api-ciuser": "value",
         "api-cores": "value",
         "api-cpu": "value",
@@ -1443,6 +1448,8 @@
         "api-sshkeys": "value",
         "api-start": "value",
         "api-startup": "value",
+        "api-storage": "value",
+        "api-unique": "value",
         "api-vcpus": "value",
         "api-vmid": "value",
         "api-ide0": "value",
@@ -11053,6 +11060,29 @@
         "session": "value",
         "api-node": "value"
       },
+      "catalogues": [
+        "legacy-8.2.7",
+        "published-current"
+      ]
+    },
+    {
+      "command": "get /nodes/{node}/vzdump/extractconfig",
+      "operationId": "OP-GET-c860b27298",
+      "method": "GET",
+      "path": "/nodes/{node}/vzdump/extractconfig",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value",
+        "limit": "value",
+        "fields": "value",
+        "full": "boolean",
+        "session": "value",
+        "api-node": "value",
+        "api-volume": "value"
+      },
+      "privateResult": true,
       "catalogues": [
         "legacy-8.2.7",
         "published-current"

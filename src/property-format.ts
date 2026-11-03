@@ -12,7 +12,16 @@ function sshKeysPattern(encoded: boolean): string {
 }
 export const cloudInitSshKeysPattern = sshKeysPattern(true)
 
+export function backupVolumePattern(family?: 'qemu' | 'lxc'): string {
+  const vmid = '[1-9][0-9]{2,8}', date = '[0-9]{4}_[0-9]{2}_[0-9]{2}-[0-9]{2}_[0-9]{2}_[0-9]{2}'
+  const qemu = `qemu-${vmid}-${date}\\.vma`, lxc = `lxc-${vmid}-${date}\\.tar`
+  const archive = `vzdump-(?:${family === 'qemu' ? qemu : family === 'lxc' ? lxc : `${qemu}|${lxc}`})(?:\\.(?:gz|lzo|zst))?`
+  const pbs = `${family === 'qemu' ? 'vm' : family === 'lxc' ? 'ct' : '(?:vm|ct)'}/${vmid}/[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z`
+  return `^[A-Za-z][A-Za-z0-9._-]*:backup/(?:${archive}|${pbs})$`
+}
+
 export function namedFormatPattern(name: string): string | undefined {
+  if (name === 'pve-backup-volume') return backupVolumePattern()
   if (name === 'pve-backup-vmid-list') return '^[1-9][0-9]{2,8}(?:,[1-9][0-9]{2,8})*$'
   if (name === 'pve-managed-volume') return '^[A-Za-z][A-Za-z0-9._-]*:[A-Za-z0-9][A-Za-z0-9._:-]*(?:/[A-Za-z0-9][A-Za-z0-9._:-]*)*$'
   if (name === 'openssh-public-keys') return sshKeysPattern(false)
