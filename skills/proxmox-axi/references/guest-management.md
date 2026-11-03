@@ -275,8 +275,8 @@ proxmox-axi get '/nodes/{node}/qemu/{vmid}/agent/network-get-interfaces' --api-n
 
 Each private payload retains the provider's `result` wrapper.
 Inspect `info.result.supported_commands` and each command's enabled status before assuming support inside a particular image.
-Ping intentionally uses POST, as specified by the [provider implementation](https://github.com/proxmox/qemu-server/blob/master/src/PVE/API2/Qemu/Agent.pm).
-The [QEMU protocol](https://www.qemu.org/docs/master/interop/qemu-ga-ref.html#command-guest-ping) defines it as a responsiveness probe; this exact endpoint is a read effect and needs no mutation grant or preview/confirmation.
+Ping intentionally uses POST, as specified by the provider implementation.
+The QEMU protocol defines it as a responsiveness probe; this exact endpoint is a read effect and needs no mutation grant or preview/confirmation.
 Standalone readiness reads create no journal and remain available in read-only mode; confirmed batches still require the wrapper and each child's explicit policy grants.
 The current catalogue requires `VM.GuestAgent.Audit` or `VM.GuestAgent.Unrestricted`; the legacy catalogue requires `VM.Monitor`.
 Provider permissions remain authoritative.
