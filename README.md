@@ -200,6 +200,26 @@ For example, a protected config can keep two independent profiles with separate 
 Supply credentials through the referenced secret source and set file ownership and permissions as described under [Configuration](#configuration).
 These reads do not grant storage administration, node power control, or cluster membership changes.
 
+### Guest power control
+
+QEMU and LXC support guest `start`, `shutdown`, `stop`, `reboot`, `suspend` and `resume` through `create '/nodes/{node}/<qemu-or-lxc>/{vmid}/status/<action>'`.
+QEMU also supports `reset`; neither pinned LXC catalogue has a reset endpoint.
+Enable only the needed operation IDs in the selected profile and any independent host policy, then preview and confirm the exact guest request:
+
+```sh
+proxmox-axi create '/nodes/{node}/qemu/{vmid}/status/shutdown' --api-node '<node>' --api-vmid 100 --api-timeout 60 --api-forceStop 0 --profile '<profile>' --preview
+proxmox-axi create '/nodes/{node}/qemu/{vmid}/status/shutdown' --api-node '<node>' --api-vmid 100 --api-timeout 60 --api-forceStop 0 --profile '<profile>' --confirm '<confirmation>'
+proxmox-axi task wait --api-node '<node>' --api-upid '<UPID>' --journal '<intent-id>' --profile '<profile>'
+```
+
+`shutdown` requests graceful guest shutdown; `stop` abruptly powers off the guest and can lose unsaved data.
+QEMU `reset` is an abrupt guest reset; `reboot` requests shutdown followed by restart.
+`--api-forceStop 1` explicitly permits shutdown to force a stop after its timeout, and requires a fresh confirmation if changed.
+Suspend/resume depend on provider and guest support; QEMU `--api-todisk 1` suspends to disk and is resumed with guest `start`, rather than ordinary RAM `resume`.
+Guest actions do not power off or reboot the Proxmox node, and their operation grants do not authorize node shell access.
+An accepted UPID is pending: keep the profile, node and journal ID when waiting, inspect failed/running outcomes, and never automatically repeat a lost or uncertain mutation.
+See the [installed guest power guide](skills/proxmox-axi/references/guest-management.md#guest-power-control) for action choices and recovery guidance.
+
 ### Guest configuration and compute settings
 
 QEMU and LXC current status reads expose power state and resource metrics:
@@ -393,7 +413,7 @@ Only reviewed managed backup sources are admitted; force overwrite, raw host pat
   Managed transfers have separate administrator-controlled byte and elapsed limits.
 - Operations whose effects, transport or secret handling are not reviewed remain discoverable but uncallable.
   Unresolved policy fields deny invocation, and changing a capture never admits new operations automatically.
-- Writes cover [QEMU creation and cloning](#create-and-clone-qemu-guests), [LXC creation and cloning](#create-and-clone-lxc-guests), [backup restoration](#restore-guest-backups), [confirmed guest execution and status retrieval](#confirmed-guest-execution), guest power operations, guest destruction, [selected guest configuration settings](#guest-configuration-and-compute-settings), [managed disk attachments](#manage-disk-attachments), growth-only guest disk resize, pool management, task cancellation, node execute batches, [media uploads and catalogue installation](#discover-and-install-guest-media), [guest backups](#guest-backups) and the reviewed credential/session setup operations.
+- Writes cover [QEMU creation and cloning](#create-and-clone-qemu-guests), [LXC creation and cloning](#create-and-clone-lxc-guests), [backup restoration](#restore-guest-backups), [confirmed guest execution and status retrieval](#confirmed-guest-execution), [guest power operations](#guest-power-control), guest destruction, [selected guest configuration settings](#guest-configuration-and-compute-settings), [managed disk attachments](#manage-disk-attachments), growth-only guest disk resize, pool management, task cancellation, node execute batches, [media uploads and catalogue installation](#discover-and-install-guest-media), [guest backups](#guest-backups) and the reviewed credential/session setup operations.
   Effectful CIFS/PBS scans use the same preview and confirmation policy even though their vendor method is GET.
 - Inspect `schema get|create|set|delete <template>` and the generated `write-policy.json` before enabling an operation.
 - Enable an operation by adding its ID to the selected file profile: `writes: { "operations": ["<operation-id>"] }`.

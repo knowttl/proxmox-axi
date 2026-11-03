@@ -3,6 +3,50 @@
 Carry the selected profile, node and VMID through each request.
 Read `/nodes/{node}/qemu/{vmid}/status/current` or its LXC equivalent for ordinary resource metrics.
 
+## Guest power control
+
+Guest power actions use POST, exposed as `create '/nodes/{node}/qemu/{vmid}/status/<action>'` or the corresponding LXC template.
+Discover each operation's ID and inputs with `schema create '<template>'` before granting it in the selected profile and any independent host policy.
+Carry that profile, node and VMID through preview, confirmation and task observation.
+Guest power grants do not authorize node power-off/reboot or node shell access.
+
+| Action | QEMU | LXC | Meaning |
+| --- | --- | --- | --- |
+| `start` | Yes | Yes | Start the selected guest. |
+| `shutdown` | Yes | Yes | Request graceful shutdown; `forceStop=1` permits a forced stop after timeout. |
+| `stop` | Yes | Yes | Abruptly power off the guest, with possible loss of unsaved data. |
+| `reboot` | Yes | Yes | Request shutdown followed by restart. |
+| `reset` | Yes | No endpoint | Abrupt guest reset, with possible loss of unsaved data. |
+| `suspend` | Yes | Yes | Suspend using provider-supported guest state handling. |
+| `resume` | Yes | Yes | Resume a suspended guest; QEMU disk suspend uses `start` instead. |
+
+For graceful shutdown, preview this exact request and inspect its target and inputs:
+
+```sh
+proxmox-axi create '/nodes/{node}/qemu/{vmid}/status/shutdown' --api-node '<node>' --api-vmid 100 --api-timeout 60 --api-forceStop 0 --profile '<profile>' --preview
+```
+
+Repeat that command with `--confirm '<confirmation>'` in place of `--preview` only after authorization.
+Use `/lxc/` for a container, and select the exact action rather than treating stop, shutdown and reset as interchangeable.
+All actions require explicit confirmation; changing the action, guest, profile, timeout or force flag invalidates the preview.
+Optional fields vary by action and catalogue; use its schema instead of copying selectors between actions.
+Provider privilege checks and guest state/support remain authoritative.
+Leave lock-bypass selectors unset for ordinary power control; migration/start overrides remain refused.
+QEMU `suspend` with `--api-todisk 1` saves state to disk and resumes on guest `start`; it is separately bound to confirmation and does not admit a custom state-storage selector.
+Default QEMU suspend pauses in RAM; the pinned vendor contracts describe LXC suspend as experimental.
+
+Successful transmission returns `status: accepted`, a node UPID and an intent ID, not proof that the guest reached the requested state.
+
+```sh
+proxmox-axi task wait --api-node '<node>' --api-upid '<UPID>' --journal '<intent-id>' --profile '<profile>'
+proxmox-axi journal show '<intent-id>' --profile '<profile>'
+```
+
+Only task `status: success` establishes successful task completion; `data.processState: stopped` alone can also describe a failed task.
+A bounded wait can return `running`; inspect the task again explicitly before continuing onboarding.
+Read guest current status independently when the resulting power state matters, and use private guest-agent checks to establish application readiness.
+After provider errors, lost responses or uncertain delivery, retain the journal and inspect/reconcile before deciding on recovery; never automatically repeat a power action.
+
 ## Private configuration reads
 
 QEMU and LXC configuration, `/snapshot/{snapname}/config` and `/pending` GETs, including the `ls` aliases for pending-setting reads, QEMU `/cloudinit` GETs and backup `/vzdump/extractconfig` reads require a caller-owned inherited pipe or socket selected by `PROXMOX_AXI_RESULT_FD` (descriptor 3 or higher).
