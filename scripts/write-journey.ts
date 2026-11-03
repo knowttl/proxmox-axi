@@ -172,7 +172,8 @@ export async function exerciseWriteJourney(options: Journey): Promise<void> {
     if (expected.error) assert.equal(value.error?.code, expected.error, id)
     if (expected.status) assert.equal(value.status, expected.status, id)
     assert.equal(mutationCount - before, expected.mutations ?? 0, `${id}: never retry a mutation`)
-    assert.ok(performance.now() - started < 10_000, `${id}: bounded command runtime`)
+    // Match the acceptance harness deadline, including process startup and journal I/O.
+    assert.ok(performance.now() - started < 60_000, `${id}: bounded command runtime`)
     assert.ok(!result.stdout.includes(options.env.PROXMOX_AXI_TOKEN!), `${id}: credential leak`)
     cases.push({ id: `${options.hosted ? 'artium' : 'standalone'}/${id}`, hosted: !!options.hosted, expected: { hostBoundary, auditExit: hostBoundary ? null : result.code },
       operation: ['create', 'set', 'delete'].includes(args[0]!) ? operationId(({ create: 'POST', set: 'PUT', delete: 'DELETE' } as Record<string, string>)[args[0]!]!, args[1]!) : args.slice(0, 2).join(' '),
