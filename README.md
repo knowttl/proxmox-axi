@@ -302,10 +302,7 @@ proxmox-axi create '/nodes/{node}/lxc' --api-node '<node>' --api-vmid 202 --api-
 proxmox-axi create '/nodes/{node}/lxc/{vmid}/clone' --api-node '<source-node>' --api-vmid '<template-id>' --api-newid 203 --api-hostname cloned-container --api-full 1 --api-storage local-lvm --profile lab --preview
 ```
 
-Creation always sends unprivileged mode and refuses a privileged request.
-Clone inherits the source configuration, so inspect the template privately and select an unprivileged source before confirming.
-Creation accepts SecretRef-only passwords and raw LF-separated OpenSSH public keys in a protected body file.
-Follow the [LXC provisioning reference](skills/proxmox-axi/references/guest-management.md#lxc-creation-and-template-cloning) for supported settings, credential handling, task completion and remaining refusals.
+Follow the [LXC provisioning reference](skills/proxmox-axi/references/guest-management.md#lxc-creation-and-template-cloning) for unprivileged creation, source-template checks, supported settings, credential handling, task completion and remaining refusals.
 
 ## Safety
 
