@@ -22,7 +22,7 @@ async function readRules(credentials: Credentials, path: string, values: Record<
 
 // Positions are verified separately; a future provider digest is not predicted.
 function settings(rule: Rule): Rule {
-  return Object.fromEntries(Object.entries(rule).filter(([name]) => !['digest', 'pos'].includes(name)))
+  return Object.fromEntries(Object.entries(rule).filter(([name]) => !['digest', 'pos', 'errors'].includes(name)))
 }
 
 function canonical(value: unknown): string {

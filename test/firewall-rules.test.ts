@@ -32,7 +32,7 @@ test('ordered firewall changes stage disabled creation and guard later mutations
   let version = '8.2.7', mode = 'success', applied = false
   const state = new Map<string, Rule[]>(), requests: string[] = [], writes: { method: string, path: string, fields: Record<string, string> }[] = []
   const wire = (path: string) => `/api2/json${path.replace('{node}', 'node-a').replace('{vmid}', '100')}`
-  const digest = (rules: Rule[]) => createHash('sha1').update(JSON.stringify(rules)).digest('hex')
+  const digest = (rules: Rule[]) => createHash('sha1').update(JSON.stringify(rules.map(({ errors, ...settings }) => settings))).digest('hex')
   const server = createServer({ key: await readFile(new URL('../../test/fixtures/localhost-key.pem', import.meta.url)), cert: await readFile(caFile) }, async (request, response) => {
     const url = new URL(request.url!, 'https://fake.invalid'), path = url.pathname
     requests.push(`${request.method} ${path}`)
@@ -67,8 +67,12 @@ test('ordered firewall changes stage disabled creation and guard later mutations
       if (fields.enable !== undefined) rules[pos!]!.enable = Number(fields.enable)
     }
     for (const rule of rules) {
+      delete rule.errors
+      for (const field of ['source', 'dest']) {
+        if (rule[field] === 'missing-alias') rule.errors = { ...rule.errors as Record<string, string>, [field]: canary }
+      }
       const address = rule.source ?? rule.dest
-      if (address !== undefined) rule.ipversion = String(address).includes(':') ? 6 : 4
+      if (address !== undefined && address !== 'missing-alias') rule.ipversion = String(address).includes(':') ? 6 : 4
       else if (rule.proto === 'icmp' || rule.proto === 'icmpv6') rule.ipversion = rule.proto === 'icmp' ? 4 : 6
       else delete rule.ipversion
     }
@@ -153,6 +157,28 @@ test('ordered firewall changes stage disabled creation and guard later mutations
         assert.equal(observed.frame.payload.enable, 1)
         assert.equal(observed.frame.payload.dport, '2223')
       })
+      for (const field of ['source', 'dest']) await t.test(`${release.name} ${scope.name} repairing ${field} succeeds after provider diagnostics are recomputed`, async () => {
+        const errors = { [field]: canary }
+        state.set(wire(scope.path), [{ type: 'in', action: 'DROP', enable: 1, [field]: 'missing-alias', errors },
+          { type: 'out', action: 'DROP', enable: 1, source: 'missing-alias', errors: { source: canary } }, ...initial()])
+        const api = { ...scope.target, pos: 0, [field]: release.source }
+        const preview = await command('set', item, api, ['--preview'])
+        assert.equal(preview.code, 0)
+        assert.deepEqual(preview.frame.payload.before[0].errors, errors)
+        assert.equal(preview.frame.payload.after.some((rule: Rule) => Object.hasOwn(rule, 'errors')), false)
+        assert.equal(preview.frame.payload.after[0][field], release.source)
+        const before = writes.length
+        const result = await command('set', item, api, ['--confirm', preview.value.confirmation])
+        assert.equal(result.code, 0)
+        assert.equal(result.value.status, 'success')
+        assert.equal((await saved(preview.value.id)).status, 'success')
+        assert.equal(writes.length, before + 1)
+        const observed = await command('get', item, { ...scope.target, pos: 0 })
+        assert.equal(observed.frame.payload[field], release.source)
+        assert.equal(Object.hasOwn(observed.frame.payload, 'errors'), false)
+        const remaining = await command('get', item, { ...scope.target, pos: 1 })
+        assert.deepEqual(remaining.frame.payload.errors, { source: canary })
+      })
       await t.test(`${release.name} ${scope.name} reorder uses the provider original-position boundary`, async () => {
         state.set(wire(scope.path), [{ ...staged, enable: 1, dport: '2223' }, ...initial()])
         const api = { ...scope.target, pos: 0, moveto: 2 }, preview = await command('set', item, api, ['--preview'])
@@ -174,6 +200,21 @@ test('ordered firewall changes stage disabled creation and guard later mutations
       })
     }
     const scope = scopes[2]!, item = `${scope.path}/{pos}`, create = { ...scope.target, type: 'in', action: 'ACCEPT' }
+    for (const method of ['create', 'set', 'reorder', 'delete']) await t.test(`${release.name} diagnostic-only changes invalidate ${method} confirmation`, async () => {
+      state.set(wire(scope.path), [{ ...initial()[0], errors: { source: canary } }, initial()[1]!])
+      const path = method === 'create' ? scope.path : item, verb = method === 'reorder' ? 'set' : method
+      const api = method === 'create' ? create : { ...scope.target, pos: 0, ...(method === 'set' ? { enable: 0 } : method === 'reorder' ? { moveto: 2 } : {}) }
+      const preview = await command(verb, path, api, ['--preview'])
+      assert.equal(preview.code, 0)
+      assert.deepEqual(preview.frame.payload.before[0].errors, { source: canary })
+      assert.equal(preview.frame.payload.after.some((rule: Rule) => Object.hasOwn(rule, 'errors')), false)
+      const rules = state.get(wire(scope.path))!, before = writes.length, originalDigest = digest(rules)
+      rules[0]!.errors = { source: `${canary}-changed` }
+      assert.equal(digest(rules), originalDigest)
+      const result = await command(verb, path, api, ['--confirm', preview.value.confirmation])
+      assert.equal(result.value.error.code, 'CONFIRMATION_MISMATCH')
+      assert.equal(writes.length, before)
+    })
     await t.test(`${release.name} inherited unreviewed port selectors cannot be activated`, async () => {
       state.set(wire(scope.path), [{ type: 'in', action: 'ACCEPT', enable: 0, proto: 'tcp', dport: 'ssh' }])
       const before = writes.length
