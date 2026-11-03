@@ -64,7 +64,7 @@ export async function readOperation(credentials: Credentials, initial: Contract,
     const project = (value: unknown) => {
       const row = value as Record<string, unknown>
       const projected = Object.fromEntries(names.filter(name => Object.hasOwn(row, name)).map(name => [name, row[name]]))
-      // The appliance catalogue declares no row properties; reviewed identifiers are strings.
+      // Some vendor indexes declare no row properties; reviewed identifiers are strings.
       validateResponse(projected, { type: 'object', properties: Object.fromEntries(names.map(name =>
         [name, properties[name] ?? { type: 'string', optional: 1 }])) })
       return projected

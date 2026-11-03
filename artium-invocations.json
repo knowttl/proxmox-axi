@@ -580,6 +580,25 @@
       }
     },
     {
+      "command": "delete /nodes/{node}/lxc/{vmid}/snapshot/{snapname}",
+      "operationId": "OP-DELETE-3540081d0e",
+      "method": "DELETE",
+      "path": "/nodes/{node}/lxc/{vmid}/snapshot/{snapname}",
+      "sensitiveInputs": [],
+      "privateResult": false,
+      "effect": "write",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "preview": "boolean",
+        "confirm": "value",
+        "session": "value",
+        "api-node": "value",
+        "api-snapname": "value",
+        "api-vmid": "value"
+      }
+    },
+    {
       "command": "delete /nodes/{node}/qemu/{vmid}",
       "operationId": "OP-DELETE-5e826ea6b0",
       "method": "DELETE",
@@ -596,6 +615,25 @@
         "api-destroy-unreferenced-disks": "value",
         "api-node": "value",
         "api-purge": "value",
+        "api-vmid": "value"
+      }
+    },
+    {
+      "command": "delete /nodes/{node}/qemu/{vmid}/snapshot/{snapname}",
+      "operationId": "OP-DELETE-1389a0eedf",
+      "method": "DELETE",
+      "path": "/nodes/{node}/qemu/{vmid}/snapshot/{snapname}",
+      "sensitiveInputs": [],
+      "privateResult": false,
+      "effect": "write",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "preview": "boolean",
+        "confirm": "value",
+        "session": "value",
+        "api-node": "value",
+        "api-snapname": "value",
         "api-vmid": "value"
       }
     },
@@ -1156,6 +1194,46 @@
       }
     },
     {
+      "command": "create /nodes/{node}/lxc/{vmid}/snapshot",
+      "operationId": "OP-POST-3986818be5",
+      "method": "POST",
+      "path": "/nodes/{node}/lxc/{vmid}/snapshot",
+      "sensitiveInputs": [],
+      "privateResult": false,
+      "effect": "write",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "preview": "boolean",
+        "confirm": "value",
+        "session": "value",
+        "api-description": "value",
+        "api-node": "value",
+        "api-snapname": "value",
+        "api-vmid": "value"
+      }
+    },
+    {
+      "command": "create /nodes/{node}/lxc/{vmid}/snapshot/{snapname}/rollback",
+      "operationId": "OP-POST-6610c2e6d1",
+      "method": "POST",
+      "path": "/nodes/{node}/lxc/{vmid}/snapshot/{snapname}/rollback",
+      "sensitiveInputs": [],
+      "privateResult": false,
+      "effect": "write",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "preview": "boolean",
+        "confirm": "value",
+        "session": "value",
+        "api-node": "value",
+        "api-snapname": "value",
+        "api-start": "value",
+        "api-vmid": "value"
+      }
+    },
+    {
       "command": "create /nodes/{node}/lxc/{vmid}/status/reboot",
       "operationId": "OP-POST-2bc4d554ca",
       "method": "POST",
@@ -1515,6 +1593,47 @@
         "api-bridges": "value",
         "api-node": "value",
         "api-storages": "value",
+        "api-vmid": "value"
+      }
+    },
+    {
+      "command": "create /nodes/{node}/qemu/{vmid}/snapshot",
+      "operationId": "OP-POST-7544b32562",
+      "method": "POST",
+      "path": "/nodes/{node}/qemu/{vmid}/snapshot",
+      "sensitiveInputs": [],
+      "privateResult": false,
+      "effect": "write",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "preview": "boolean",
+        "confirm": "value",
+        "session": "value",
+        "api-description": "value",
+        "api-node": "value",
+        "api-snapname": "value",
+        "api-vmid": "value",
+        "api-vmstate": "value"
+      }
+    },
+    {
+      "command": "create /nodes/{node}/qemu/{vmid}/snapshot/{snapname}/rollback",
+      "operationId": "OP-POST-a056e1d1f4",
+      "method": "POST",
+      "path": "/nodes/{node}/qemu/{vmid}/snapshot/{snapname}/rollback",
+      "sensitiveInputs": [],
+      "privateResult": false,
+      "effect": "write",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "preview": "boolean",
+        "confirm": "value",
+        "session": "value",
+        "api-node": "value",
+        "api-snapname": "value",
+        "api-start": "value",
         "api-vmid": "value"
       }
     },
@@ -2524,6 +2643,35 @@
       }
     },
     {
+      "command": "ls /nodes/{node}/lxc/{vmid}/snapshot",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "session": "value",
+        "limit": "value",
+        "fields": "value",
+        "full": "boolean",
+        "api-node": "value",
+        "api-vmid": "value"
+      }
+    },
+    {
+      "command": "ls /nodes/{node}/lxc/{vmid}/snapshot/{snapname}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "session": "value",
+        "limit": "value",
+        "fields": "value",
+        "full": "boolean",
+        "api-node": "value",
+        "api-snapname": "value",
+        "api-vmid": "value"
+      }
+    },
+    {
       "command": "ls /nodes/{node}/qemu",
       "effect": "read",
       "flags": {
@@ -2564,6 +2712,35 @@
         "fields": "value",
         "full": "boolean",
         "api-node": "value",
+        "api-vmid": "value"
+      }
+    },
+    {
+      "command": "ls /nodes/{node}/qemu/{vmid}/snapshot",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "session": "value",
+        "limit": "value",
+        "fields": "value",
+        "full": "boolean",
+        "api-node": "value",
+        "api-vmid": "value"
+      }
+    },
+    {
+      "command": "ls /nodes/{node}/qemu/{vmid}/snapshot/{snapname}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "session": "value",
+        "limit": "value",
+        "fields": "value",
+        "full": "boolean",
+        "api-node": "value",
+        "api-snapname": "value",
         "api-vmid": "value"
       }
     },
@@ -10350,6 +10527,75 @@
       ]
     },
     {
+      "command": "get /nodes/{node}/lxc/{vmid}/snapshot",
+      "operationId": "OP-GET-3dd428bcd4",
+      "method": "GET",
+      "path": "/nodes/{node}/lxc/{vmid}/snapshot",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value",
+        "limit": "value",
+        "fields": "value",
+        "full": "boolean",
+        "session": "value",
+        "api-node": "value",
+        "api-vmid": "value"
+      },
+      "catalogues": [
+        "legacy-8.2.7",
+        "published-current"
+      ]
+    },
+    {
+      "command": "get /nodes/{node}/lxc/{vmid}/snapshot/{snapname}",
+      "operationId": "OP-GET-cad4dcb48f",
+      "method": "GET",
+      "path": "/nodes/{node}/lxc/{vmid}/snapshot/{snapname}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value",
+        "limit": "value",
+        "fields": "value",
+        "full": "boolean",
+        "session": "value",
+        "api-node": "value",
+        "api-snapname": "value",
+        "api-vmid": "value"
+      },
+      "catalogues": [
+        "legacy-8.2.7",
+        "published-current"
+      ]
+    },
+    {
+      "command": "get /nodes/{node}/lxc/{vmid}/snapshot/{snapname}/config",
+      "operationId": "OP-GET-f92e0d528d",
+      "method": "GET",
+      "path": "/nodes/{node}/lxc/{vmid}/snapshot/{snapname}/config",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value",
+        "limit": "value",
+        "fields": "value",
+        "full": "boolean",
+        "session": "value",
+        "api-node": "value",
+        "api-snapname": "value",
+        "api-vmid": "value"
+      },
+      "privateResult": true,
+      "catalogues": [
+        "legacy-8.2.7",
+        "published-current"
+      ]
+    },
+    {
       "command": "get /nodes/{node}/lxc/{vmid}/status/current",
       "operationId": "OP-GET-3e89cf9759",
       "method": "GET",
@@ -10456,6 +10702,75 @@
         "full": "boolean",
         "session": "value",
         "api-node": "value",
+        "api-vmid": "value"
+      },
+      "privateResult": true,
+      "catalogues": [
+        "legacy-8.2.7",
+        "published-current"
+      ]
+    },
+    {
+      "command": "get /nodes/{node}/qemu/{vmid}/snapshot",
+      "operationId": "OP-GET-21328c5bed",
+      "method": "GET",
+      "path": "/nodes/{node}/qemu/{vmid}/snapshot",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value",
+        "limit": "value",
+        "fields": "value",
+        "full": "boolean",
+        "session": "value",
+        "api-node": "value",
+        "api-vmid": "value"
+      },
+      "catalogues": [
+        "legacy-8.2.7",
+        "published-current"
+      ]
+    },
+    {
+      "command": "get /nodes/{node}/qemu/{vmid}/snapshot/{snapname}",
+      "operationId": "OP-GET-31cf78f27d",
+      "method": "GET",
+      "path": "/nodes/{node}/qemu/{vmid}/snapshot/{snapname}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value",
+        "limit": "value",
+        "fields": "value",
+        "full": "boolean",
+        "session": "value",
+        "api-node": "value",
+        "api-snapname": "value",
+        "api-vmid": "value"
+      },
+      "catalogues": [
+        "legacy-8.2.7",
+        "published-current"
+      ]
+    },
+    {
+      "command": "get /nodes/{node}/qemu/{vmid}/snapshot/{snapname}/config",
+      "operationId": "OP-GET-566eee8b61",
+      "method": "GET",
+      "path": "/nodes/{node}/qemu/{vmid}/snapshot/{snapname}/config",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value",
+        "limit": "value",
+        "fields": "value",
+        "full": "boolean",
+        "session": "value",
+        "api-node": "value",
+        "api-snapname": "value",
         "api-vmid": "value"
       },
       "privateResult": true,

@@ -318,6 +318,21 @@ proxmox-axi create '/nodes/{node}/lxc/{vmid}/clone' --api-node '<source-node>' -
 
 Follow the [LXC provisioning reference](skills/proxmox-axi/references/guest-management.md#lxc-creation-and-template-cloning) for unprivileged creation, source-template checks, supported settings, credential handling, task completion and remaining refusals.
 
+### Guest snapshots
+
+Inspect a QEMU or LXC snapshot tree, then preview an explicitly selected mutation:
+
+```sh
+proxmox-axi get '/nodes/{node}/qemu/{vmid}/snapshot' --api-node '<node>' --api-vmid 200 --profile lab
+proxmox-axi create '/nodes/{node}/qemu/{vmid}/snapshot' --api-node '<node>' --api-vmid 200 --api-snapname before-upgrade --profile lab --preview
+proxmox-axi create '/nodes/{node}/qemu/{vmid}/snapshot/{snapname}/rollback' --api-node '<node>' --api-vmid 200 --api-snapname before-upgrade --profile lab --preview
+proxmox-axi delete '/nodes/{node}/qemu/{vmid}/snapshot/{snapname}' --api-node '<node>' --api-vmid 200 --api-snapname before-upgrade --profile lab --preview
+```
+
+Use the equivalent LXC paths for containers.
+The [snapshot reference](skills/proxmox-axi/references/guest-management.md#guest-snapshots) covers protected configuration reads, confirmation, task completion, RAM-state rollback behavior and remaining refusals.
+Rollback and deletion each require their own exact confirmation; QEMU RAM-state rollback may start the VM even when `start=0`.
+
 ## Safety
 
 - Ordinary JSON reads use trusted HTTPS, a five-second total deadline and a 64 KiB response bound, and reject redirects.

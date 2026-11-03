@@ -182,3 +182,25 @@ File-byte completion and an accepted UPID do not prove installation success.
 Wait with the returned node, UPID, journal ID and profile, then list storage content to verify the installed volume before guest creation or attachment.
 Failed tasks remain failed; interrupted delivery retains uncertainty and must never trigger an automatic retry.
 Storage-content allocation/copy/attribute changes, arbitrary media deletion, remote URL download and registry operations remain refused by this admission.
+
+## Guest snapshots
+
+Use `get '/nodes/{node}/qemu/{vmid}/snapshot'` or the LXC equivalent with the selected node, VMID and profile to inspect the snapshot tree.
+Public rows expose name, parent, creation time and QEMU RAM-state metadata; descriptions and undeclared fields stay excluded even with `--full`.
+The `current` entry identifies the current guest state and cannot be created, deleted or rolled back as a saved snapshot.
+For saved-snapshot details, use `get .../snapshot/{snapname}/config` with `--api-snapname` and the inherited private result channel described above.
+Snapshot configuration can include credentials, descriptions and protected settings, so it never goes to ordinary output.
+The `get .../snapshot/{snapname}` command index exposes command names only; it does not grant permission to execute those commands.
+
+Inspect the selected schema and enable only each required write operation ID in the profile and any independent host policy.
+Preview `create .../snapshot` with `--api-snapname '<snapshot>'` and optional single-line description; QEMU also accepts `--api-vmstate 1` to include RAM.
+Snapshot names begin with an ASCII letter, contain only letters, digits, dots, underscores or hyphens, and are at most 40 characters.
+Provider storage and guest-state restrictions still apply; snapshots are not independent backups.
+Preview `create .../snapshot/{snapname}/rollback` to restore a saved state, with optional `--api-start 1` to request startup after success.
+Rollback discards changes after the selected snapshot and requires its own exact confirmation.
+A QEMU snapshot containing RAM can automatically start the VM during rollback even with `start=0`; inspect its RAM-state metadata and protected config before confirming.
+Preview `delete .../snapshot/{snapname}` to remove that saved snapshot and confirm only after checking its exact identity and tree position.
+Force removal, snapshot-description updates and unreviewed inputs remain refused.
+Every creation, rollback and deletion requires its own exact confirmation bound to profile, node, VMID, snapshot name and settings.
+A returned UPID means accepted, not completed; use `task wait` with the returned node/UPID, journal ID and profile.
+After success, inspect the tree and private configuration independently; after failure or uncertain delivery, retain the journal and never retry the mutation automatically.

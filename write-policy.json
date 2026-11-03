@@ -8037,44 +8037,137 @@
       "contract": "dist/contracts.json#/contracts/393"
     },
     {
-      "id": "OP-GET-3dd428bcd4",
-      "method": "GET",
-      "path": "/nodes/{node}/lxc/{vmid}/snapshot",
-      "release": "legacy-8.2.7",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/394"
-    },
-    {
       "id": "OP-POST-3986818be5",
       "method": "POST",
       "path": "/nodes/{node}/lxc/{vmid}/snapshot",
       "release": "legacy-8.2.7",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/395"
+      "admitted": true,
+      "contract": "dist/contracts.json#/contracts/395",
+      "policy": {
+        "effect": "write",
+        "transport": "json",
+        "secrets": "none",
+        "allowedInputs": [
+          "node",
+          "vmid",
+          "snapname",
+          "description"
+        ],
+        "inputPatterns": {
+          "snapname": "^(?!current$)[A-Za-z][A-Za-z0-9._-]*$"
+        },
+        "reason": "Confirmed snapshot creation, deletion or rollback with exact guest/snapshot binding; force removal and the current pseudo-snapshot remain refused.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Track the returned UPID and inspect the snapshot tree or protected configuration independently; never repeat uncertain snapshot mutations automatically."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/vms/{vmid}",
+            [
+              "VM.Snapshot"
+            ]
+          ]
+        },
+        "response": {
+          "description": "the task ID.",
+          "type": "string"
+        },
+        "source": "Pinned snapshot, delsnapshot and rollback schemas; existing effect, confirmation and task contracts."
+      },
+      "inputs": [
+        {
+          "name": "description",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "node",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "snapname",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "vmid",
+          "admitted": true,
+          "sensitive": false
+        }
+      ],
+      "results": {
+        "type": "string",
+        "handling": "public metadata; protected inputs excluded"
+      }
     },
     {
       "id": "OP-DELETE-3540081d0e",
       "method": "DELETE",
       "path": "/nodes/{node}/lxc/{vmid}/snapshot/{snapname}",
       "release": "legacy-8.2.7",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/396"
-    },
-    {
-      "id": "OP-GET-cad4dcb48f",
-      "method": "GET",
-      "path": "/nodes/{node}/lxc/{vmid}/snapshot/{snapname}",
-      "release": "legacy-8.2.7",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/397"
-    },
-    {
-      "id": "OP-GET-f92e0d528d",
-      "method": "GET",
-      "path": "/nodes/{node}/lxc/{vmid}/snapshot/{snapname}/config",
-      "release": "legacy-8.2.7",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/398"
+      "admitted": true,
+      "contract": "dist/contracts.json#/contracts/396",
+      "policy": {
+        "effect": "write",
+        "transport": "json",
+        "secrets": "none",
+        "allowedInputs": [
+          "node",
+          "vmid",
+          "snapname"
+        ],
+        "inputPatterns": {
+          "snapname": "^(?!current$)[A-Za-z][A-Za-z0-9._-]*$"
+        },
+        "reason": "Confirmed snapshot creation, deletion or rollback with exact guest/snapshot binding; force removal and the current pseudo-snapshot remain refused.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Track the returned UPID and inspect the snapshot tree or protected configuration independently; never repeat uncertain snapshot mutations automatically."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/vms/{vmid}",
+            [
+              "VM.Snapshot"
+            ]
+          ]
+        },
+        "response": {
+          "description": "the task ID.",
+          "type": "string"
+        },
+        "source": "Pinned snapshot, delsnapshot and rollback schemas; existing effect, confirmation and task contracts."
+      },
+      "inputs": [
+        {
+          "name": "force",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "node",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "snapname",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "vmid",
+          "admitted": true,
+          "sensitive": false
+        }
+      ],
+      "results": {
+        "type": "string",
+        "handling": "public metadata; protected inputs excluded"
+      }
     },
     {
       "id": "OP-PUT-307abec7c9",
@@ -8089,8 +8182,70 @@
       "method": "POST",
       "path": "/nodes/{node}/lxc/{vmid}/snapshot/{snapname}/rollback",
       "release": "legacy-8.2.7",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/400"
+      "admitted": true,
+      "contract": "dist/contracts.json#/contracts/400",
+      "policy": {
+        "effect": "write",
+        "transport": "json",
+        "secrets": "none",
+        "allowedInputs": [
+          "node",
+          "vmid",
+          "snapname",
+          "start"
+        ],
+        "inputPatterns": {
+          "snapname": "^(?!current$)[A-Za-z][A-Za-z0-9._-]*$"
+        },
+        "reason": "Confirmed snapshot creation, deletion or rollback with exact guest/snapshot binding; force removal and the current pseudo-snapshot remain refused.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Track the returned UPID and inspect the snapshot tree or protected configuration independently; never repeat uncertain snapshot mutations automatically."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/vms/{vmid}",
+            [
+              "VM.Snapshot",
+              "VM.Snapshot.Rollback"
+            ],
+            "any",
+            1
+          ]
+        },
+        "response": {
+          "description": "the task ID.",
+          "type": "string"
+        },
+        "source": "Pinned snapshot, delsnapshot and rollback schemas; existing effect, confirmation and task contracts."
+      },
+      "inputs": [
+        {
+          "name": "node",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "snapname",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "start",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "vmid",
+          "admitted": true,
+          "sensitive": false
+        }
+      ],
+      "results": {
+        "type": "string",
+        "handling": "public metadata; protected inputs excluded"
+      }
     },
     {
       "id": "OP-POST-9a334b54b5",
@@ -12172,44 +12327,143 @@
       "contract": "dist/contracts.json#/contracts/496"
     },
     {
-      "id": "OP-GET-21328c5bed",
-      "method": "GET",
-      "path": "/nodes/{node}/qemu/{vmid}/snapshot",
-      "release": "legacy-8.2.7",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/497"
-    },
-    {
       "id": "OP-POST-7544b32562",
       "method": "POST",
       "path": "/nodes/{node}/qemu/{vmid}/snapshot",
       "release": "legacy-8.2.7",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/498"
+      "admitted": true,
+      "contract": "dist/contracts.json#/contracts/498",
+      "policy": {
+        "effect": "write",
+        "transport": "json",
+        "secrets": "none",
+        "allowedInputs": [
+          "node",
+          "vmid",
+          "snapname",
+          "description",
+          "vmstate"
+        ],
+        "inputPatterns": {
+          "snapname": "^(?!current$)[A-Za-z][A-Za-z0-9._-]*$"
+        },
+        "reason": "Confirmed snapshot creation, deletion or rollback with exact guest/snapshot binding; force removal and the current pseudo-snapshot remain refused.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Track the returned UPID and inspect the snapshot tree or protected configuration independently; never repeat uncertain snapshot mutations automatically."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/vms/{vmid}",
+            [
+              "VM.Snapshot"
+            ]
+          ]
+        },
+        "response": {
+          "description": "the task ID.",
+          "type": "string"
+        },
+        "source": "Pinned snapshot, delsnapshot and rollback schemas; existing effect, confirmation and task contracts."
+      },
+      "inputs": [
+        {
+          "name": "description",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "node",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "snapname",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "vmid",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "vmstate",
+          "admitted": true,
+          "sensitive": false
+        }
+      ],
+      "results": {
+        "type": "string",
+        "handling": "public metadata; protected inputs excluded"
+      }
     },
     {
       "id": "OP-DELETE-1389a0eedf",
       "method": "DELETE",
       "path": "/nodes/{node}/qemu/{vmid}/snapshot/{snapname}",
       "release": "legacy-8.2.7",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/499"
-    },
-    {
-      "id": "OP-GET-31cf78f27d",
-      "method": "GET",
-      "path": "/nodes/{node}/qemu/{vmid}/snapshot/{snapname}",
-      "release": "legacy-8.2.7",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/500"
-    },
-    {
-      "id": "OP-GET-566eee8b61",
-      "method": "GET",
-      "path": "/nodes/{node}/qemu/{vmid}/snapshot/{snapname}/config",
-      "release": "legacy-8.2.7",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/501"
+      "admitted": true,
+      "contract": "dist/contracts.json#/contracts/499",
+      "policy": {
+        "effect": "write",
+        "transport": "json",
+        "secrets": "none",
+        "allowedInputs": [
+          "node",
+          "vmid",
+          "snapname"
+        ],
+        "inputPatterns": {
+          "snapname": "^(?!current$)[A-Za-z][A-Za-z0-9._-]*$"
+        },
+        "reason": "Confirmed snapshot creation, deletion or rollback with exact guest/snapshot binding; force removal and the current pseudo-snapshot remain refused.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Track the returned UPID and inspect the snapshot tree or protected configuration independently; never repeat uncertain snapshot mutations automatically."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/vms/{vmid}",
+            [
+              "VM.Snapshot"
+            ]
+          ]
+        },
+        "response": {
+          "description": "the task ID.",
+          "type": "string"
+        },
+        "source": "Pinned snapshot, delsnapshot and rollback schemas; existing effect, confirmation and task contracts."
+      },
+      "inputs": [
+        {
+          "name": "force",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "node",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "snapname",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "vmid",
+          "admitted": true,
+          "sensitive": false
+        }
+      ],
+      "results": {
+        "type": "string",
+        "handling": "public metadata; protected inputs excluded"
+      }
     },
     {
       "id": "OP-PUT-ac8e0d163e",
@@ -12224,8 +12478,70 @@
       "method": "POST",
       "path": "/nodes/{node}/qemu/{vmid}/snapshot/{snapname}/rollback",
       "release": "legacy-8.2.7",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/503"
+      "admitted": true,
+      "contract": "dist/contracts.json#/contracts/503",
+      "policy": {
+        "effect": "write",
+        "transport": "json",
+        "secrets": "none",
+        "allowedInputs": [
+          "node",
+          "vmid",
+          "snapname",
+          "start"
+        ],
+        "inputPatterns": {
+          "snapname": "^(?!current$)[A-Za-z][A-Za-z0-9._-]*$"
+        },
+        "reason": "Confirmed snapshot creation, deletion or rollback with exact guest/snapshot binding; force removal and the current pseudo-snapshot remain refused.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Track the returned UPID and inspect the snapshot tree or protected configuration independently; never repeat uncertain snapshot mutations automatically."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/vms/{vmid}",
+            [
+              "VM.Snapshot",
+              "VM.Snapshot.Rollback"
+            ],
+            "any",
+            1
+          ]
+        },
+        "response": {
+          "description": "the task ID.",
+          "type": "string"
+        },
+        "source": "Pinned snapshot, delsnapshot and rollback schemas; existing effect, confirmation and task contracts."
+      },
+      "inputs": [
+        {
+          "name": "node",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "snapname",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "start",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "vmid",
+          "admitted": true,
+          "sensitive": false
+        }
+      ],
+      "results": {
+        "type": "string",
+        "handling": "public metadata; protected inputs excluded"
+      }
     },
     {
       "id": "OP-POST-6807588e8e",
@@ -22759,44 +23075,137 @@
       "contract": "dist/contracts.json#/contracts/1062"
     },
     {
-      "id": "OP-GET-3dd428bcd4",
-      "method": "GET",
-      "path": "/nodes/{node}/lxc/{vmid}/snapshot",
-      "release": "published-current",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/1063"
-    },
-    {
       "id": "OP-POST-3986818be5",
       "method": "POST",
       "path": "/nodes/{node}/lxc/{vmid}/snapshot",
       "release": "published-current",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/1064"
+      "admitted": true,
+      "contract": "dist/contracts.json#/contracts/1064",
+      "policy": {
+        "effect": "write",
+        "transport": "json",
+        "secrets": "none",
+        "allowedInputs": [
+          "node",
+          "vmid",
+          "snapname",
+          "description"
+        ],
+        "inputPatterns": {
+          "snapname": "^(?!current$)[A-Za-z][A-Za-z0-9._-]*$"
+        },
+        "reason": "Confirmed snapshot creation, deletion or rollback with exact guest/snapshot binding; force removal and the current pseudo-snapshot remain refused.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Track the returned UPID and inspect the snapshot tree or protected configuration independently; never repeat uncertain snapshot mutations automatically."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/vms/{vmid}",
+            [
+              "VM.Snapshot"
+            ]
+          ]
+        },
+        "response": {
+          "description": "the task ID.",
+          "type": "string"
+        },
+        "source": "Pinned snapshot, delsnapshot and rollback schemas; existing effect, confirmation and task contracts."
+      },
+      "inputs": [
+        {
+          "name": "description",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "node",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "snapname",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "vmid",
+          "admitted": true,
+          "sensitive": false
+        }
+      ],
+      "results": {
+        "type": "string",
+        "handling": "public metadata; protected inputs excluded"
+      }
     },
     {
       "id": "OP-DELETE-3540081d0e",
       "method": "DELETE",
       "path": "/nodes/{node}/lxc/{vmid}/snapshot/{snapname}",
       "release": "published-current",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/1065"
-    },
-    {
-      "id": "OP-GET-cad4dcb48f",
-      "method": "GET",
-      "path": "/nodes/{node}/lxc/{vmid}/snapshot/{snapname}",
-      "release": "published-current",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/1066"
-    },
-    {
-      "id": "OP-GET-f92e0d528d",
-      "method": "GET",
-      "path": "/nodes/{node}/lxc/{vmid}/snapshot/{snapname}/config",
-      "release": "published-current",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/1067"
+      "admitted": true,
+      "contract": "dist/contracts.json#/contracts/1065",
+      "policy": {
+        "effect": "write",
+        "transport": "json",
+        "secrets": "none",
+        "allowedInputs": [
+          "node",
+          "vmid",
+          "snapname"
+        ],
+        "inputPatterns": {
+          "snapname": "^(?!current$)[A-Za-z][A-Za-z0-9._-]*$"
+        },
+        "reason": "Confirmed snapshot creation, deletion or rollback with exact guest/snapshot binding; force removal and the current pseudo-snapshot remain refused.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Track the returned UPID and inspect the snapshot tree or protected configuration independently; never repeat uncertain snapshot mutations automatically."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/vms/{vmid}",
+            [
+              "VM.Snapshot"
+            ]
+          ]
+        },
+        "response": {
+          "description": "the task ID.",
+          "type": "string"
+        },
+        "source": "Pinned snapshot, delsnapshot and rollback schemas; existing effect, confirmation and task contracts."
+      },
+      "inputs": [
+        {
+          "name": "force",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "node",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "snapname",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "vmid",
+          "admitted": true,
+          "sensitive": false
+        }
+      ],
+      "results": {
+        "type": "string",
+        "handling": "public metadata; protected inputs excluded"
+      }
     },
     {
       "id": "OP-PUT-307abec7c9",
@@ -22811,8 +23220,70 @@
       "method": "POST",
       "path": "/nodes/{node}/lxc/{vmid}/snapshot/{snapname}/rollback",
       "release": "published-current",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/1069"
+      "admitted": true,
+      "contract": "dist/contracts.json#/contracts/1069",
+      "policy": {
+        "effect": "write",
+        "transport": "json",
+        "secrets": "none",
+        "allowedInputs": [
+          "node",
+          "vmid",
+          "snapname",
+          "start"
+        ],
+        "inputPatterns": {
+          "snapname": "^(?!current$)[A-Za-z][A-Za-z0-9._-]*$"
+        },
+        "reason": "Confirmed snapshot creation, deletion or rollback with exact guest/snapshot binding; force removal and the current pseudo-snapshot remain refused.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Track the returned UPID and inspect the snapshot tree or protected configuration independently; never repeat uncertain snapshot mutations automatically."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/vms/{vmid}",
+            [
+              "VM.Snapshot",
+              "VM.Snapshot.Rollback"
+            ],
+            "any",
+            1
+          ]
+        },
+        "response": {
+          "description": "the task ID.",
+          "type": "string"
+        },
+        "source": "Pinned snapshot, delsnapshot and rollback schemas; existing effect, confirmation and task contracts."
+      },
+      "inputs": [
+        {
+          "name": "node",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "snapname",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "start",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "vmid",
+          "admitted": true,
+          "sensitive": false
+        }
+      ],
+      "results": {
+        "type": "string",
+        "handling": "public metadata; protected inputs excluded"
+      }
     },
     {
       "id": "OP-POST-9a334b54b5",
@@ -26932,44 +27403,143 @@
       "contract": "dist/contracts.json#/contracts/1166"
     },
     {
-      "id": "OP-GET-21328c5bed",
-      "method": "GET",
-      "path": "/nodes/{node}/qemu/{vmid}/snapshot",
-      "release": "published-current",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/1167"
-    },
-    {
       "id": "OP-POST-7544b32562",
       "method": "POST",
       "path": "/nodes/{node}/qemu/{vmid}/snapshot",
       "release": "published-current",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/1168"
+      "admitted": true,
+      "contract": "dist/contracts.json#/contracts/1168",
+      "policy": {
+        "effect": "write",
+        "transport": "json",
+        "secrets": "none",
+        "allowedInputs": [
+          "node",
+          "vmid",
+          "snapname",
+          "description",
+          "vmstate"
+        ],
+        "inputPatterns": {
+          "snapname": "^(?!current$)[A-Za-z][A-Za-z0-9._-]*$"
+        },
+        "reason": "Confirmed snapshot creation, deletion or rollback with exact guest/snapshot binding; force removal and the current pseudo-snapshot remain refused.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Track the returned UPID and inspect the snapshot tree or protected configuration independently; never repeat uncertain snapshot mutations automatically."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/vms/{vmid}",
+            [
+              "VM.Snapshot"
+            ]
+          ]
+        },
+        "response": {
+          "description": "the task ID.",
+          "type": "string"
+        },
+        "source": "Pinned snapshot, delsnapshot and rollback schemas; existing effect, confirmation and task contracts."
+      },
+      "inputs": [
+        {
+          "name": "description",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "node",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "snapname",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "vmid",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "vmstate",
+          "admitted": true,
+          "sensitive": false
+        }
+      ],
+      "results": {
+        "type": "string",
+        "handling": "public metadata; protected inputs excluded"
+      }
     },
     {
       "id": "OP-DELETE-1389a0eedf",
       "method": "DELETE",
       "path": "/nodes/{node}/qemu/{vmid}/snapshot/{snapname}",
       "release": "published-current",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/1169"
-    },
-    {
-      "id": "OP-GET-31cf78f27d",
-      "method": "GET",
-      "path": "/nodes/{node}/qemu/{vmid}/snapshot/{snapname}",
-      "release": "published-current",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/1170"
-    },
-    {
-      "id": "OP-GET-566eee8b61",
-      "method": "GET",
-      "path": "/nodes/{node}/qemu/{vmid}/snapshot/{snapname}/config",
-      "release": "published-current",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/1171"
+      "admitted": true,
+      "contract": "dist/contracts.json#/contracts/1169",
+      "policy": {
+        "effect": "write",
+        "transport": "json",
+        "secrets": "none",
+        "allowedInputs": [
+          "node",
+          "vmid",
+          "snapname"
+        ],
+        "inputPatterns": {
+          "snapname": "^(?!current$)[A-Za-z][A-Za-z0-9._-]*$"
+        },
+        "reason": "Confirmed snapshot creation, deletion or rollback with exact guest/snapshot binding; force removal and the current pseudo-snapshot remain refused.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Track the returned UPID and inspect the snapshot tree or protected configuration independently; never repeat uncertain snapshot mutations automatically."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/vms/{vmid}",
+            [
+              "VM.Snapshot"
+            ]
+          ]
+        },
+        "response": {
+          "description": "the task ID.",
+          "type": "string"
+        },
+        "source": "Pinned snapshot, delsnapshot and rollback schemas; existing effect, confirmation and task contracts."
+      },
+      "inputs": [
+        {
+          "name": "force",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "node",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "snapname",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "vmid",
+          "admitted": true,
+          "sensitive": false
+        }
+      ],
+      "results": {
+        "type": "string",
+        "handling": "public metadata; protected inputs excluded"
+      }
     },
     {
       "id": "OP-PUT-ac8e0d163e",
@@ -26984,8 +27554,70 @@
       "method": "POST",
       "path": "/nodes/{node}/qemu/{vmid}/snapshot/{snapname}/rollback",
       "release": "published-current",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/1173"
+      "admitted": true,
+      "contract": "dist/contracts.json#/contracts/1173",
+      "policy": {
+        "effect": "write",
+        "transport": "json",
+        "secrets": "none",
+        "allowedInputs": [
+          "node",
+          "vmid",
+          "snapname",
+          "start"
+        ],
+        "inputPatterns": {
+          "snapname": "^(?!current$)[A-Za-z][A-Za-z0-9._-]*$"
+        },
+        "reason": "Confirmed snapshot creation, deletion or rollback with exact guest/snapshot binding; force removal and the current pseudo-snapshot remain refused.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Track the returned UPID and inspect the snapshot tree or protected configuration independently; never repeat uncertain snapshot mutations automatically."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/vms/{vmid}",
+            [
+              "VM.Snapshot",
+              "VM.Snapshot.Rollback"
+            ],
+            "any",
+            1
+          ]
+        },
+        "response": {
+          "description": "the task ID.",
+          "type": "string"
+        },
+        "source": "Pinned snapshot, delsnapshot and rollback schemas; existing effect, confirmation and task contracts."
+      },
+      "inputs": [
+        {
+          "name": "node",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "snapname",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "start",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "vmid",
+          "admitted": true,
+          "sensitive": false
+        }
+      ],
+      "results": {
+        "type": "string",
+        "handling": "public metadata; protected inputs excluded"
+      }
     },
     {
       "id": "OP-POST-6807588e8e",

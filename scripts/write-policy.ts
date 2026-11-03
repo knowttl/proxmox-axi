@@ -17,6 +17,17 @@ const pool = new Set(['create_pool', 'update_pool', 'delete_pool'])
 export function reviewWrite(operation: Operation) {
   const { path, method } = operation
   const name = operation.vendorMetadata.name
+  const snapshot = /^\/nodes\/\{node\}\/(qemu|lxc)\/\{vmid\}\/snapshot$/.test(path) && method === 'POST' && name === 'snapshot'
+  const snapshotDelete = /^\/nodes\/\{node\}\/(qemu|lxc)\/\{vmid\}\/snapshot\/\{snapname\}$/.test(path) && method === 'DELETE' && name === 'delsnapshot'
+  const rollback = /^\/nodes\/\{node\}\/(qemu|lxc)\/\{vmid\}\/snapshot\/\{snapname\}\/rollback$/.test(path) && method === 'POST' && name === 'rollback'
+  if ((snapshot || snapshotDelete || rollback) && operation.allowtoken !== 0) {
+    return { effect: 'write', transport: 'json', secrets: 'none',
+      allowedInputs: ['node', 'vmid', 'snapname', ...(snapshot ? ['description', ...(path.includes('/qemu/') ? ['vmstate'] : [])] : rollback ? ['start'] : [])],
+      inputPatterns: { snapname: '^(?!current$)[A-Za-z][A-Za-z0-9._-]*$' },
+      reason: 'Confirmed snapshot creation, deletion or rollback with exact guest/snapshot binding; force removal and the current pseudo-snapshot remain refused.',
+      reconciliation: { kind: 'none', reason: 'Track the returned UPID and inspect the snapshot tree or protected configuration independently; never repeat uncertain snapshot mutations automatically.' },
+      privileges: operation.permissions, response: operation.returns, source: 'Pinned snapshot, delsnapshot and rollback schemas; existing effect, confirmation and task contracts.' }
+  }
   if (method === 'POST' && path === '/nodes/{node}/aplinfo' && name === 'apl_download' && operation.allowtoken !== 0) {
     return { effect: 'write', transport: 'json', secrets: 'none', allowedInputs: ['node', 'storage', 'template'],
       inputPatterns: { template: '^[A-Za-z0-9][A-Za-z0-9._-]*\\.tar\\.(?:zst|xz|gz)$' },
