@@ -209,8 +209,7 @@ proxmox-axi get '/nodes/{node}/qemu/{vmid}/status/current' --api-node '<node>' -
 proxmox-axi get '/nodes/{node}/lxc/{vmid}/status/current' --api-node '<node>' --api-vmid 101 --profile lab
 ```
 
-`get '/nodes/{node}/qemu/{vmid}/config'`, the LXC equivalent, and both guests' `/pending` reads require a caller-owned private result pipe because their payloads can contain credentials.
-Use the [private result contract](docs/s4-contract.md) for pipe setup, delivery metadata and payload handling.
+For protected guest reads, follow the [guest private-read guidance](skills/proxmox-axi/references/guest-management.md#private-configuration-reads) for covered operations, pipe setup, delivery metadata and payload handling.
 
 Confirmed `set .../config` supports the settings present in each guest's selected contract: names/description, cores, CPU limits/weights, memory, onboot and startup order; QEMU also supports sockets, vCPUs, balloon memory and a CPU model, while LXC supports swap.
 QEMU memory accepts `2048` or `current=2048` in MiB, with a minimum of 16; LXC memory and swap use integer MB values.

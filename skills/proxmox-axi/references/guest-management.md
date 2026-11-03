@@ -5,7 +5,8 @@ Read `/nodes/{node}/qemu/{vmid}/status/current` or its LXC equivalent for ordina
 
 ## Private configuration reads
 
-Configuration and `/pending` GETs require a caller-owned inherited pipe or socket selected by `PROXMOX_AXI_RESULT_FD` (descriptor 3 or higher).
+QEMU and LXC configuration and `/pending` GETs, including the `ls` aliases for pending-setting reads, and QEMU `/cloudinit` GETs require a caller-owned inherited pipe or socket selected by `PROXMOX_AXI_RESULT_FD` (descriptor 3 or higher).
+These payloads can contain credentials.
 Launch the CLI executable directly from the caller that owns that pipe.
 Terminals, regular files, stdout and stderr are refused, and a missing private pipe fails before provider access.
 Stdout contains `data: { "privateResult": true }`; the complete validated payload travels privately, is not trimmed by table display flags, and creates no journal.
@@ -87,7 +88,7 @@ LXC raw SSH-key/password provisioning is creation-only and remains for the LXC c
 
 After confirming configuration, preview and separately confirm `set '/nodes/{node}/qemu/{vmid}/cloudinit'` to regenerate managed media.
 It returns synchronous success with no UPID; after uncertain delivery, inspect independently rather than repeat automatically.
-`get` on that same route requires the private result pipe described above because current and pending values can contain credentials.
+For `get` on that same route, follow the [private-read guidance](#private-configuration-reads).
 Keep that payload private and inspect whether pending values have been applied.
 Cloud-init dumps remain refused, and regenerating media does not prove that the guest has booted or applied its configuration.
 

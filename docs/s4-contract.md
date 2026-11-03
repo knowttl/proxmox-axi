@@ -1,11 +1,6 @@
 # Protected results and memory authentication
 
-QEMU and LXC configuration and pending-setting GET operations (`/nodes/{node}/qemu/{vmid}/config`, `/nodes/{node}/qemu/{vmid}/pending` and their LXC equivalents) use this private result contract because their validated payloads can contain credentials.
-The `ls` aliases for pending-setting reads use the same contract.
-They require the inherited pipe before any provider request, return `data: { "privateResult": true }` on stdout, and deliver the complete payload in a private frame.
-Ordinary table display flags do not trim the private payload, and these reads do not create journal records.
-For standalone guest reads, the request binding is the SHA-256 fingerprint of `<selected catalogue> <encoded request path including query>`.
-Hosted reads use the authenticated request ID described below instead.
+For protected guest reads, follow the [guest private-read guidance](../skills/proxmox-axi/references/guest-management.md#private-configuration-reads) for covered operations, delivery metadata and request bindings.
 
 Executing a secret-producing operation requires a caller-owned inherited pipe before upstream transmission.
 Write previews may perform bounded version reads without a private sink and never request the protected result.
