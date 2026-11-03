@@ -65,7 +65,7 @@ Discover the exact operation ID and executable schema with `schema create|set|de
 Stateful rule changes inside execute batches remain refused; use a separate preview and confirmation per operation.
 
 Creation is a staged operation with a fixed integer `enable=0` that callers cannot override.
-The provider prepends the new disabled rule and ignores creation digests; create-position and digest inputs are refused by this admission.
+The [provider implementation](https://github.com/proxmox/pve-firewall/blob/82888bc0a16a989e2858f47dc56c73741fd36d5b/src/PVE/API2/Firewall/Rules.pm) prepends the new disabled rule and ignores creation digests; create-position and digest inputs are refused by this admission.
 This is NON-ATOMIC CREATE: the client rechecks the observed list before dispatch, but another writer can change it between that read and creation.
 The client compares the observed ordered result afterward and reports uncertainty on any unexpected result or unavailable verification.
 It never retries creation or automatically deletes an entry to recover.
@@ -77,9 +77,10 @@ proxmox-axi create '/nodes/{node}/qemu/{vmid}/firewall/rules' --api-node '<node>
 Inspect `warnings`, including the non-atomic creation limitation, and the private frame's complete `before` and predicted ordered `after` lists before repeating the exact request with its confirmation.
 The private preview also carries `nonAtomicCreate`; ordinary output carries `privatePlan: true`.
 Validate its request binding as SHA-256 of the fingerprint in that preview's confirmation, as for other private writes; hosted callers use the authenticated request ID.
-The complete observed list and exact inputs are HMAC-bound to confirmation and re-read before dispatch, so intervening observed changes require a fresh preview.
+The complete observed list, including provider `errors` diagnostics, and exact inputs are HMAC-bound to confirmation and re-read before dispatch, so intervening observed changes require a fresh preview even when only diagnostics change.
 Plan frames remain bounded to 65536 bytes; oversized plans fail rather than truncating or omitting rules.
-The predicted list omits future digest metadata but includes the resulting order and IP-family settings.
+The predicted list includes the resulting order and IP-family settings but omits future digest metadata and provider `errors` diagnostics, which are recomputed on reload rather than persisted as rule settings.
+Post-write comparison checks ordered persisted settings, excluding digests and diagnostics; inspect current diagnostics through a fresh private read.
 
 A separate fresh preview and confirmation enables the staged rule, using its current position:
 
@@ -91,7 +92,8 @@ Edits and deletion automatically carry the currently observed rules-list digest 
 A supplied stale digest is refused; there is no bypass for the native guard.
 Supported field changes use `type` in/out, action ACCEPT/DROP/REJECT, integer enable 0/1, literal IPv4 or pure IPv6 addresses with optional CIDR, tcp/udp/icmp/icmpv6, individual numeric ports 1-65535 and reviewed interface names.
 Ports require tcp/udp; guest interfaces are net0 through net31.
-Editing inherited aliases/IP sets, macros, ICMP subtype selectors, service/range port selectors or unreviewed protocols remains refused.
+Field edits are refused if the resulting rule retains aliases/IP sets, macros, ICMP subtype selectors, service/range port selectors or unreviewed protocols.
+An inherited unsupported address may be replaced with a reviewed literal address when the resulting rule meets these restrictions.
 Comments, port lists/ranges, service names, group/forward mutations and field-removal selectors are not admitted here.
 Every change requires exact confirmation; broad ACCEPT rules and deletion carry explicit warnings, including when enabling an existing staged rule.
 

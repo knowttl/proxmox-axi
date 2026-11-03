@@ -215,11 +215,7 @@ See the [installed firewall guide](skills/proxmox-axi/references/firewall-manage
 For provider filtering and backend behavior, see the [Proxmox firewall documentation](https://github.com/proxmox/pve-docs/blob/master/pve-firewall.adoc).
 
 Ordered rule reads and individually confirmed creation, editing, reorder and deletion are also admitted at cluster, node and QEMU/LXC scope.
-Prepare the inherited private result pipe for complete rule reads and ordered previews, as described in the [ordered-rule guide](skills/proxmox-axi/references/firewall-management.md#ordered-firewall-rules).
-Creation is fixed disabled staging: the [provider implementation](https://github.com/proxmox/pve-firewall/blob/82888bc0a16a989e2858f47dc56c73741fd36d5b/src/PVE/API2/Firewall/Rules.pm) prepends and ignores creation digests, so preview/help disclose the non-atomic limitation and post-write comparison retains uncertainty on unexpected state.
-Enabling the staged rule requires a separate fresh rules-digest-guarded preview and confirmation.
-Edits, separate-branch reorder and deletion use native digest guards, complete before/after private plans and exact state/input binding; no rule operation retries or automatically deletes after uncertainty.
-Stateful rule writes in execute batches, SDN-vnet and security-group rule namespaces remain refused.
+Follow the [ordered-rule guide](skills/proxmox-axi/references/firewall-management.md#ordered-firewall-rules) for private pipe setup, disabled staging, non-atomic creation limits, digest guards, supported inputs and uncertainty handling.
 
 ### Guest power control
 
@@ -434,7 +430,7 @@ Only reviewed managed backup sources are admitted; force overwrite, raw host pat
   Managed transfers have separate administrator-controlled byte and elapsed limits.
 - Operations whose effects, transport or secret handling are not reviewed remain discoverable but uncallable.
   Unresolved policy fields deny invocation, and changing a capture never admits new operations automatically.
-- Writes cover [QEMU creation and cloning](#create-and-clone-qemu-guests), [LXC creation and cloning](#create-and-clone-lxc-guests), [backup restoration](#restore-guest-backups), [confirmed guest execution and status retrieval](#confirmed-guest-execution), [guest power operations](#guest-power-control), guest destruction, [selected guest configuration settings](#guest-configuration-and-compute-settings), [managed disk attachments](#manage-disk-attachments), growth-only guest disk resize, [firewall options and default policies](skills/proxmox-axi/references/firewall-management.md), pool management, task cancellation, node execute batches, [media uploads and catalogue installation](#discover-and-install-guest-media), [guest backups](#guest-backups) and the reviewed credential/session setup operations.
+- Writes cover [QEMU creation and cloning](#create-and-clone-qemu-guests), [LXC creation and cloning](#create-and-clone-lxc-guests), [backup restoration](#restore-guest-backups), [confirmed guest execution and status retrieval](#confirmed-guest-execution), [guest power operations](#guest-power-control), guest destruction, [selected guest configuration settings](#guest-configuration-and-compute-settings), [managed disk attachments](#manage-disk-attachments), growth-only guest disk resize, [firewall options, default policies and ordered rules](skills/proxmox-axi/references/firewall-management.md), pool management, task cancellation, node execute batches, [media uploads and catalogue installation](#discover-and-install-guest-media), [guest backups](#guest-backups) and the reviewed credential/session setup operations.
   Effectful CIFS/PBS scans use the same preview and confirmation policy even though their vendor method is GET.
 - Inspect `schema get|create|set|delete <template>` and the generated `write-policy.json` before enabling an operation.
 - Enable an operation by adding its ID to the selected file profile: `writes: { "operations": ["<operation-id>"] }`.

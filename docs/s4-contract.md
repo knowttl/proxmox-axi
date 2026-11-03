@@ -3,7 +3,8 @@
 For protected guest reads, follow the [guest private-read guidance](../skills/proxmox-axi/references/guest-management.md#private-configuration-reads) for covered operations, delivery metadata and request bindings.
 
 Executing a secret-producing operation requires a caller-owned inherited pipe before upstream transmission.
-Write previews may perform bounded version reads without a private sink and never request the protected result.
+Write previews may perform bounded version reads without a private sink and never request the mutation's protected result.
+[Ordered firewall rule previews](../skills/proxmox-axi/references/firewall-management.md#ordered-firewall-rules) require a private sink for observed rules and the predicted plan before any provider access.
 `PROXMOX_AXI_RESULT_FD` selects its descriptor, which must be at least 3 and refer to a pipe or socket.
 Launch the CLI executable directly from the caller that owns that pipe.
 Terminals, regular files, stdout and stderr are refused.
