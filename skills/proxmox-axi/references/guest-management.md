@@ -5,7 +5,7 @@ Read `/nodes/{node}/qemu/{vmid}/status/current` or its LXC equivalent for ordina
 
 ## Private configuration reads
 
-QEMU and LXC configuration and `/pending` GETs, including the `ls` aliases for pending-setting reads, and QEMU `/cloudinit` GETs require a caller-owned inherited pipe or socket selected by `PROXMOX_AXI_RESULT_FD` (descriptor 3 or higher).
+QEMU and LXC configuration, `/snapshot/{snapname}/config` and `/pending` GETs, including the `ls` aliases for pending-setting reads, and QEMU `/cloudinit` GETs require a caller-owned inherited pipe or socket selected by `PROXMOX_AXI_RESULT_FD` (descriptor 3 or higher).
 These payloads can contain credentials.
 Launch the CLI executable directly from the caller that owns that pipe.
 Terminals, regular files, stdout and stderr are refused, and a missing private pipe fails before provider access.
