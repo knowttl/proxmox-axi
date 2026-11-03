@@ -3,11 +3,17 @@ const octet = '(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])'
 const ipv4 = `${octet}(?:\\.${octet}){3}`
 const dnsLabel = '[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?'
 const dnsName = `${dnsLabel}(?:\\.${dnsLabel})*`
-const encodedBase64 = '(?:[A-Za-z0-9]|%2[BbFf])'
-const encodedKey = `(?:ssh-ed25519|ssh-rsa|ecdsa-sha2-nistp256)%20(?=(?:${encodedBase64}){32})(?:${encodedBase64}{4})*(?:${encodedBase64}{2}%3[Dd]%3[Dd]|${encodedBase64}{3}%3[Dd])?(?:%20(?:[A-Za-z0-9._~-]|%20|%40|%2[Bb]|%3[Aa])+)?`
-export const cloudInitSshKeysPattern = `^${encodedKey}(?:%0[Aa]${encodedKey})*(?:%0[Aa])?$`
+function sshKeysPattern(encoded: boolean): string {
+  const base64 = encoded ? '(?:[A-Za-z0-9]|%2[BbFf])' : '[A-Za-z0-9+/]'
+  const space = encoded ? '%20' : ' ', padding = encoded ? '%3[Dd]' : '=', newline = encoded ? '%0[Aa]' : '\n'
+  const comment = encoded ? '(?:[A-Za-z0-9._~-]|%20|%40|%2[Bb]|%3[Aa])+' : '[A-Za-z0-9._~@:+ -]+'
+  const key = `(?:ssh-ed25519|ssh-rsa|ecdsa-sha2-nistp256)${space}(?=(?:${base64}){32})(?:${base64}{4})*(?:${base64}{2}${padding}${padding}|${base64}{3}${padding})?(?:${space}${comment})?`
+  return `^${key}(?:${newline}${key})*(?:${newline})?$`
+}
+export const cloudInitSshKeysPattern = sshKeysPattern(true)
 
 export function namedFormatPattern(name: string): string | undefined {
+  if (name === 'openssh-public-keys') return sshKeysPattern(false)
   if (name === 'dns-name') return `^(?=.{1,255}$)${dnsName}$`
   if (name === 'dns-name-list') return `^(?=.{1,255}$)${dnsName}(?: ${dnsName})*$`
   if (['address-list', 'lxc-ip-with-ll-iface-list'].includes(name)) return `^${ipv4}(?: ${ipv4})*$`
@@ -58,12 +64,13 @@ export function propertyFormatPattern(format: Record<string, Record<string, unkn
 }
 
 // Only explicitly admitted concrete names expand a vendor's numbered template.
-export function parameterProperties<T>(schema: { properties?: Record<string, T> }, allowedInputs?: string[]): Record<string, T> {
+export function parameterProperties<T extends { format?: unknown }>(schema: { properties?: Record<string, T> }, allowedInputs?: string[], inputFormats?: Record<string, string>): Record<string, T> {
   const properties = { ...schema.properties }
   for (const name of allowedInputs ?? []) {
     const prefix = /^([a-z]+)[0-9]+$/.exec(name)?.[1]
     const template = prefix ? properties[`${prefix}[n]`] : undefined
     if (template !== undefined && !Object.hasOwn(properties, name)) properties[name] = template
   }
+  for (const [name, format] of Object.entries(inputFormats ?? {})) if (properties[name]) properties[name] = { ...properties[name], format }
   return properties
 }

@@ -42,11 +42,11 @@ export function reviewWrite(operation: Operation) {
   const guest = /^\/nodes\/\{node\}\/(qemu|lxc)\/\{vmid\}$/.test(path)
   const lifecyclePath = /^\/nodes\/\{node\}\/(qemu|lxc)\/\{vmid\}\/status\/(start|stop|shutdown|reboot|reset|resume|suspend)$/.test(path)
   const config = /^\/nodes\/\{node\}\/(qemu|lxc)\/\{vmid\}\/config$/.test(path)
-  const create = method === 'POST' && path === '/nodes/{node}/qemu' && name === 'create_vm'
+  const create = method === 'POST' && /^\/nodes\/\{node\}\/(qemu|lxc)$/.test(path) && name === 'create_vm'
   const qemu = path === '/nodes/{node}/qemu' || path.includes('/qemu/')
-  if (method === 'POST' && path === '/nodes/{node}/qemu/{vmid}/clone' && name === 'clone_vm' && operation.allowtoken !== 0) {
+  if (method === 'POST' && /^\/nodes\/\{node\}\/(qemu|lxc)\/\{vmid\}\/clone$/.test(path) && name === 'clone_vm' && operation.allowtoken !== 0) {
     return { effect: 'write', transport: 'json', secrets: 'none',
-      allowedInputs: ['node', 'vmid', 'newid', 'name', 'description', 'full', 'storage', 'format', 'target', 'pool', 'bwlimit'],
+      allowedInputs: ['node', 'vmid', 'newid', 'description', 'full', 'storage', 'target', 'pool', 'bwlimit', ...(qemu ? ['name', 'format'] : ['hostname'])],
       reason: 'Confirmed guest clone with reviewed destination and storage settings; snapshot-source variants remain refused.',
       reconciliation: { kind: 'none', reason: 'Track the source-node UPID, then inspect the destination guest independently; never clone again after uncertain delivery.' },
       privileges: operation.permissions, response: operation.returns, source: 'Pinned clone_vm schemas; existing effect and task contracts.' }
@@ -90,15 +90,19 @@ export function reviewWrite(operation: Operation) {
   return { effect: batch ? 'batch' : 'write', transport: 'json', secrets: settings ? 'input-refs' : 'none',
     reason: batch ? 'Vendor execute resolves each ordered node-relative child and reports per-child status; no atomicity.' :
       cancel ? 'Stop an existing UPID; cancellation is a separately confirmed mutation.' :
-      create ? 'Confirmed blank QEMU creation with reviewed compute, managed disks, NICs, boot and onboarding inputs; restore, overwrite and unreviewed hardware remain refused.' :
+      create ? 'Confirmed guest creation with reviewed compute, managed storage, networking and onboarding; LXC is fixed unprivileged, and restore, overwrite and unreviewed host features remain refused.' :
       config ? 'Reviewed compute, managed disks, guest networking, boot/agent and cloud-init onboarding; numbered slots/removal selectors are explicit, host passthrough remains refused, and credentials require SecretRefs.' :
       lifecyclePath ? 'Guest power-state operation, asynchronous UPID acceptance does not prove completion.' :
       guest ? 'Destroy guest; absence or filtered inventory cannot prove the outcome.' : 'Pool configuration and membership mutation; no automatic retry.',
-    allowedInputs: config ? [...settingInputs, 'delete'] : create ? [...settingInputs.filter(name => !['hostname', 'swap', 'digest', 'password'].includes(name)), 'bios', 'scsihw', 'ostype', 'pool', 'start'] : allowedInputs,
+    allowedInputs: config ? [...settingInputs, 'delete'] : create ? qemu ?
+      [...settingInputs.filter(name => !['hostname', 'swap', 'digest', 'password'].includes(name)), 'bios', 'scsihw', 'ostype', 'pool', 'start'] :
+      [...settingInputs.filter(name => !['name', 'sockets', 'vcpus', 'balloon', 'cpu', 'cipassword', 'digest'].includes(name)), 'ostemplate', 'storage', 'unprivileged', 'ssh-public-keys', 'pool', 'start'] : allowedInputs,
+    ...(create && !qemu ? { fixedInputs: { unprivileged: true }, inputFormats: { 'ssh-public-keys': 'openssh-public-keys' } } : {}),
     ...(settings ? { inputPatterns: { ...(config ? { delete: `^(?:${removableSlots.join('|')})(?:,(?:${removableSlots.join('|')}))*$` } : {}),
       searchdomain: namedFormatPattern('dns-name-list')!, ...(qemu ? { ciuser: '^[a-z_][a-z0-9_-]{0,31}$', sshkeys: cloudInitSshKeysPattern,
-        boot: `^order=(?:${removableSlots.join('|')})(?:;(?:${removableSlots.join('|')}))*$` } : {}) } } : {}),
-    sensitiveInputs: create ? ['cipassword'] : config ? ['cipassword', 'password'] : [],
+        boot: `^order=(?:${removableSlots.join('|')})(?:;(?:${removableSlots.join('|')}))*$` } :
+        create ? { ostemplate: '^[A-Za-z][A-Za-z0-9._-]*:vztmpl/[A-Za-z0-9][A-Za-z0-9._-]*\\.tar\\.(?:zst|xz|gz)$' } : {}) } } : {}),
+    sensitiveInputs: create ? [qemu ? 'cipassword' : 'password'] : config ? ['cipassword', 'password'] : [],
     reconciliation: config ? { kind: 'read', path, reason: 'Direct configuration observation may confirm supplied fields; missing fields never prove failure.' } :
       lifecyclePath ? { kind: 'read', path: path.replace(/\/status\/[^/]+$/, '/status/current'), reason: 'Direct guest status observation; only requested stable start/stop states can be confirmed.' } :
         { kind: 'none', reason: 'No safe automated business-outcome proof is admitted for this variant. Use the retained UPID when available; otherwise retain uncertainty and inspect independently.' },

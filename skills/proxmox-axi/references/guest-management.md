@@ -84,7 +84,7 @@ Cloud-init IP settings use canonical order: `ip=<IPv4/CIDR>` followed by optiona
 A gateway requires static IPv4; static IPv6/gw6 and manual QEMU IP modes remain refused.
 For QEMU or LXC, `nameserver` is a single-space-separated list of IPv4 addresses and `searchdomain` is a single-space-separated DNS-name list up to 255 characters.
 IPv6/scoped DNS servers and custom cloud-init snippets remain refused.
-LXC raw SSH-key/password provisioning is creation-only and remains for the LXC creation slice; this update does not add unsupported LXC config fields.
+LXC raw SSH-key/password provisioning is creation-only; see [LXC creation and cloning](#lxc-creation-and-template-cloning).
 
 After confirming configuration, preview and separately confirm `set '/nodes/{node}/qemu/{vmid}/cloudinit'` to regenerate managed media.
 It returns synchronous success with no UPID; after uncertain delivery, inspect independently rather than repeat automatically.
@@ -130,3 +130,24 @@ Failed tasks remain failed in the journal; do not treat acceptance or an absent/
 After successful creation, inspect the new VMID on its actual destination node through the private configuration read.
 Apply the reviewed cloud-init/onboarding settings and regenerate media if needed before first boot, then use the existing confirmed start, shutdown, reboot, stop or delete commands and task tracking.
 If provisioning delivery is uncertain, inspect the journal and retained task rather than submit another create/clone automatically.
+
+## LXC creation and template cloning
+
+Inspect `schema create '/nodes/{node}/lxc'` or `schema create '/nodes/{node}/lxc/{vmid}/clone'` and enable only the selected operation ID in the profile and any independent host policy.
+Create with required node, VMID and `ostemplate` using an existing managed template volume such as `local:vztmpl/base.tar.zst`.
+Template filenames may end in `.tar.zst`, `.tar.xz` or `.tar.gz`; backup archives and host paths remain refused.
+Creation always sends `unprivileged=1`, including when omitted; explicitly requesting a privileged container is refused before provider access.
+Reviewed options include hostname, description, cores, CPU limits/weights, integer memory/swap, managed rootfs/mount points, NICs, DNS, onboot/startup, storage, pool and optional start.
+Leave `start` unset or `0` to finish onboarding before first boot.
+Use a protected body file with SecretRef-only `password`, for example `{"password":{"env":"INITIAL_PASSWORD"}}`, alongside required creation settings.
+`ssh-public-keys` accepts raw OpenSSH public-key lines, separated by LF, with an optional final LF; do not percent-encode these keys as required for QEMU `sshkeys`.
+The reviewed key algorithms and simple comment restrictions are the same as for QEMU keys; authorized-key options, private keys and control characters remain refused.
+Host bind mounts, devices, hooks, custom features, restore/overwrite and privilege-changing inputs remain refused.
+
+Before cloning, read the source template's configuration privately, check its template flag and select an unprivileged template after reviewing its inherited settings and features.
+Clone inherits the source configuration, including privilege settings; this command does not rewrite those settings.
+Preview `create '/nodes/{node}/lxc/{vmid}/clone'` with the source node/VMID and required `newid`; reviewed options are hostname, description, full, storage, target, pool and `bwlimit`.
+Use `--api-full 1` for a full copy; linked clones and cross-node targets follow the provider's source/storage rules.
+Snapshot-source cloning remains refused.
+Use the same exact confirmation, source-node task wait, destination private-config inspection, VMID collision handling and uncertain-delivery rules described for QEMU provisioning above.
+After task success, verify the resulting privilege and onboarding settings privately before requesting a confirmed start.

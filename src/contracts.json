@@ -48523,12 +48523,348 @@
       "id": "OP-POST-0b2e040aa1",
       "release": "legacy-8.2.7",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "write",
+        "transport": "json",
+        "secrets": "input-refs",
+        "reason": "Confirmed guest creation with reviewed compute, managed storage, networking and onboarding; LXC is fixed unprivileged, and restore, overwrite and unreviewed host features remain refused.",
+        "allowedInputs": [
+          "node",
+          "vmid",
+          "description",
+          "hostname",
+          "memory",
+          "cores",
+          "swap",
+          "cpulimit",
+          "cpuunits",
+          "onboot",
+          "startup",
+          "password",
+          "mp0",
+          "mp1",
+          "mp2",
+          "mp3",
+          "mp4",
+          "mp5",
+          "mp6",
+          "mp7",
+          "mp8",
+          "mp9",
+          "mp10",
+          "mp11",
+          "mp12",
+          "mp13",
+          "mp14",
+          "mp15",
+          "mp16",
+          "mp17",
+          "mp18",
+          "mp19",
+          "mp20",
+          "mp21",
+          "mp22",
+          "mp23",
+          "mp24",
+          "mp25",
+          "mp26",
+          "mp27",
+          "mp28",
+          "mp29",
+          "mp30",
+          "mp31",
+          "mp32",
+          "mp33",
+          "mp34",
+          "mp35",
+          "mp36",
+          "mp37",
+          "mp38",
+          "mp39",
+          "mp40",
+          "mp41",
+          "mp42",
+          "mp43",
+          "mp44",
+          "mp45",
+          "mp46",
+          "mp47",
+          "mp48",
+          "mp49",
+          "mp50",
+          "mp51",
+          "mp52",
+          "mp53",
+          "mp54",
+          "mp55",
+          "mp56",
+          "mp57",
+          "mp58",
+          "mp59",
+          "mp60",
+          "mp61",
+          "mp62",
+          "mp63",
+          "mp64",
+          "mp65",
+          "mp66",
+          "mp67",
+          "mp68",
+          "mp69",
+          "mp70",
+          "mp71",
+          "mp72",
+          "mp73",
+          "mp74",
+          "mp75",
+          "mp76",
+          "mp77",
+          "mp78",
+          "mp79",
+          "mp80",
+          "mp81",
+          "mp82",
+          "mp83",
+          "mp84",
+          "mp85",
+          "mp86",
+          "mp87",
+          "mp88",
+          "mp89",
+          "mp90",
+          "mp91",
+          "mp92",
+          "mp93",
+          "mp94",
+          "mp95",
+          "mp96",
+          "mp97",
+          "mp98",
+          "mp99",
+          "mp100",
+          "mp101",
+          "mp102",
+          "mp103",
+          "mp104",
+          "mp105",
+          "mp106",
+          "mp107",
+          "mp108",
+          "mp109",
+          "mp110",
+          "mp111",
+          "mp112",
+          "mp113",
+          "mp114",
+          "mp115",
+          "mp116",
+          "mp117",
+          "mp118",
+          "mp119",
+          "mp120",
+          "mp121",
+          "mp122",
+          "mp123",
+          "mp124",
+          "mp125",
+          "mp126",
+          "mp127",
+          "mp128",
+          "mp129",
+          "mp130",
+          "mp131",
+          "mp132",
+          "mp133",
+          "mp134",
+          "mp135",
+          "mp136",
+          "mp137",
+          "mp138",
+          "mp139",
+          "mp140",
+          "mp141",
+          "mp142",
+          "mp143",
+          "mp144",
+          "mp145",
+          "mp146",
+          "mp147",
+          "mp148",
+          "mp149",
+          "mp150",
+          "mp151",
+          "mp152",
+          "mp153",
+          "mp154",
+          "mp155",
+          "mp156",
+          "mp157",
+          "mp158",
+          "mp159",
+          "mp160",
+          "mp161",
+          "mp162",
+          "mp163",
+          "mp164",
+          "mp165",
+          "mp166",
+          "mp167",
+          "mp168",
+          "mp169",
+          "mp170",
+          "mp171",
+          "mp172",
+          "mp173",
+          "mp174",
+          "mp175",
+          "mp176",
+          "mp177",
+          "mp178",
+          "mp179",
+          "mp180",
+          "mp181",
+          "mp182",
+          "mp183",
+          "mp184",
+          "mp185",
+          "mp186",
+          "mp187",
+          "mp188",
+          "mp189",
+          "mp190",
+          "mp191",
+          "mp192",
+          "mp193",
+          "mp194",
+          "mp195",
+          "mp196",
+          "mp197",
+          "mp198",
+          "mp199",
+          "mp200",
+          "mp201",
+          "mp202",
+          "mp203",
+          "mp204",
+          "mp205",
+          "mp206",
+          "mp207",
+          "mp208",
+          "mp209",
+          "mp210",
+          "mp211",
+          "mp212",
+          "mp213",
+          "mp214",
+          "mp215",
+          "mp216",
+          "mp217",
+          "mp218",
+          "mp219",
+          "mp220",
+          "mp221",
+          "mp222",
+          "mp223",
+          "mp224",
+          "mp225",
+          "mp226",
+          "mp227",
+          "mp228",
+          "mp229",
+          "mp230",
+          "mp231",
+          "mp232",
+          "mp233",
+          "mp234",
+          "mp235",
+          "mp236",
+          "mp237",
+          "mp238",
+          "mp239",
+          "mp240",
+          "mp241",
+          "mp242",
+          "mp243",
+          "mp244",
+          "mp245",
+          "mp246",
+          "mp247",
+          "mp248",
+          "mp249",
+          "mp250",
+          "mp251",
+          "mp252",
+          "mp253",
+          "mp254",
+          "mp255",
+          "net0",
+          "net1",
+          "net2",
+          "net3",
+          "net4",
+          "net5",
+          "net6",
+          "net7",
+          "net8",
+          "net9",
+          "net10",
+          "net11",
+          "net12",
+          "net13",
+          "net14",
+          "net15",
+          "net16",
+          "net17",
+          "net18",
+          "net19",
+          "net20",
+          "net21",
+          "net22",
+          "net23",
+          "net24",
+          "net25",
+          "net26",
+          "net27",
+          "net28",
+          "net29",
+          "net30",
+          "net31",
+          "nameserver",
+          "searchdomain",
+          "rootfs",
+          "ostemplate",
+          "storage",
+          "unprivileged",
+          "ssh-public-keys",
+          "pool",
+          "start"
+        ],
+        "fixedInputs": {
+          "unprivileged": true
+        },
+        "inputFormats": {
+          "ssh-public-keys": "openssh-public-keys"
+        },
+        "inputPatterns": {
+          "searchdomain": "^(?=.{1,255}$)[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?(?:\\.[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?)*(?: [A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?(?:\\.[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?)*)*$",
+          "ostemplate": "^[A-Za-z][A-Za-z0-9._-]*:vztmpl/[A-Za-z0-9][A-Za-z0-9._-]*\\.tar\\.(?:zst|xz|gz)$"
+        },
+        "sensitiveInputs": [
+          "password"
+        ],
+        "reconciliation": {
+          "kind": "none",
+          "reason": "No safe automated business-outcome proof is admitted for this variant. Use the retained UPID when available; otherwise retain uncertainty and inspect independently."
+        },
+        "privileges": {
+          "description": "You need 'VM.Allocate' permission on /vms/{vmid} or on the VM pool /pool/{pool}. For restore, it is enough if the user has 'VM.Backup' permission and the VM already exists. You also need 'Datastore.AllocateSpace' permissions on the storage.",
+          "user": "all"
+        },
+        "response": {
+          "type": "string"
+        },
+        "source": "Retained versioned API schema; design.md S3 write/outcome contract; pve-node-batch-source.txt for execute."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "post",
         "/nodes/{node}/lxc"
@@ -48545,32 +48881,6 @@
               "type": "object",
               "additionalProperties": false,
               "properties": {
-                "arch": {
-                  "enum": [
-                    "amd64",
-                    "i386",
-                    "arm64",
-                    "armhf",
-                    "riscv32",
-                    "riscv64"
-                  ],
-                  "type": "string"
-                },
-                "bwlimit": {
-                  "type": "number",
-                  "minimum": 0
-                },
-                "cmode": {
-                  "enum": [
-                    "shell",
-                    "console",
-                    "tty"
-                  ],
-                  "type": "string"
-                },
-                "console": {
-                  "type": "boolean"
-                },
                 "cores": {
                   "type": "integer",
                   "minimum": 1,
@@ -48586,68 +48896,22 @@
                   "minimum": 0,
                   "maximum": 500000
                 },
-                "debug": {
-                  "type": "boolean"
-                },
                 "description": {
                   "type": "string",
                   "maxLength": 8192
-                },
-                "dev[n]": {
-                  "not": {},
-                  "x-untranslated": "numbered vendor parameter"
-                },
-                "features": {
-                  "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
-                },
-                "force": {
-                  "type": "boolean"
-                },
-                "hookscript": {
-                  "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
                 },
                 "hostname": {
                   "type": "string",
                   "maxLength": 255,
                   "pattern": "^(?=.{1,255}$)[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?(?:\\.[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?)*$"
                 },
-                "ignore-unpack-errors": {
-                  "type": "boolean"
-                },
-                "lock": {
-                  "enum": [
-                    "backup",
-                    "create",
-                    "destroyed",
-                    "disk",
-                    "fstrim",
-                    "migrate",
-                    "mounted",
-                    "rollback",
-                    "snapshot",
-                    "snapshot-delete"
-                  ],
-                  "type": "string"
-                },
                 "memory": {
                   "type": "integer",
                   "minimum": 16
                 },
-                "mp[n]": {
-                  "not": {},
-                  "x-untranslated": "numbered vendor parameter"
-                },
                 "nameserver": {
                   "type": "string",
                   "pattern": "^(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])(?:\\.(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])){3}(?: (?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])(?:\\.(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])){3})*$"
-                },
-                "net[n]": {
-                  "not": {},
-                  "x-untranslated": "numbered vendor parameter"
                 },
                 "node": {
                   "type": "string",
@@ -48658,37 +48922,47 @@
                 },
                 "ostemplate": {
                   "type": "string",
-                  "maxLength": 255
-                },
-                "ostype": {
-                  "enum": [
-                    "debian",
-                    "devuan",
-                    "ubuntu",
-                    "centos",
-                    "fedora",
-                    "opensuse",
-                    "archlinux",
-                    "alpine",
-                    "gentoo",
-                    "nixos",
-                    "unmanaged"
-                  ],
-                  "type": "string"
+                  "maxLength": 255,
+                  "allOf": [
+                    {
+                      "pattern": "^[A-Za-z][A-Za-z0-9._-]*:vztmpl/[A-Za-z0-9][A-Za-z0-9._-]*\\.tar\\.(?:zst|xz|gz)$"
+                    }
+                  ]
                 },
                 "password": {
-                  "type": "string",
-                  "minLength": 5
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "env"
+                      ],
+                      "properties": {
+                        "env": {
+                          "type": "string",
+                          "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "file"
+                      ],
+                      "properties": {
+                        "file": {
+                          "type": "string",
+                          "minLength": 1
+                        }
+                      }
+                    }
+                  ],
+                  "x-secret": true
                 },
                 "pool": {
                   "type": "string",
                   "pattern": "^[A-Za-z][A-Za-z0-9._-]*$"
-                },
-                "protection": {
-                  "type": "boolean"
-                },
-                "restore": {
-                  "type": "boolean"
                 },
                 "rootfs": {
                   "type": "string",
@@ -48696,10 +48970,16 @@
                 },
                 "searchdomain": {
                   "type": "string",
-                  "pattern": "^(?=.{1,255}$)[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?(?:\\.[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?)*(?: [A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?(?:\\.[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?)*)*$"
+                  "pattern": "^(?=.{1,255}$)[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?(?:\\.[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?)*(?: [A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?(?:\\.[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?)*)*$",
+                  "allOf": [
+                    {
+                      "pattern": "^(?=.{1,255}$)[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?(?:\\.[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?)*(?: [A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?(?:\\.[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?)*)*$"
+                    }
+                  ]
                 },
                 "ssh-public-keys": {
-                  "type": "string"
+                  "type": "string",
+                  "pattern": "^(?:ssh-ed25519|ssh-rsa|ecdsa-sha2-nistp256) (?=(?:[A-Za-z0-9+/]){32})(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?(?: [A-Za-z0-9._~@:+ -]+)?(?:\n(?:ssh-ed25519|ssh-rsa|ecdsa-sha2-nistp256) (?=(?:[A-Za-z0-9+/]){32})(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?(?: [A-Za-z0-9._~@:+ -]+)?)*(?:\n)?$"
                 },
                 "start": {
                   "type": "boolean"
@@ -48716,39 +48996,880 @@
                   "type": "integer",
                   "minimum": 0
                 },
-                "tags": {
-                  "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
-                },
-                "template": {
-                  "type": "boolean"
-                },
-                "timezone": {
-                  "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
-                },
-                "tty": {
-                  "type": "integer",
-                  "minimum": 0,
-                  "maximum": 6
-                },
-                "unique": {
-                  "type": "boolean"
-                },
                 "unprivileged": {
-                  "type": "boolean"
-                },
-                "unused[n]": {
-                  "not": {},
-                  "x-untranslated": "numbered vendor parameter"
+                  "type": "boolean",
+                  "const": true,
+                  "default": true
                 },
                 "vmid": {
                   "type": "integer",
                   "minimum": 100,
                   "maximum": 999999999,
                   "pattern": "^[1-9][0-9]*$"
+                },
+                "mp0": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp1": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp2": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp3": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp4": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp5": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp6": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp7": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp8": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp9": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp10": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp11": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp12": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp13": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp14": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp15": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp16": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp17": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp18": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp19": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp20": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp21": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp22": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp23": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp24": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp25": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp26": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp27": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp28": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp29": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp30": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp31": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp32": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp33": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp34": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp35": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp36": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp37": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp38": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp39": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp40": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp41": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp42": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp43": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp44": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp45": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp46": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp47": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp48": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp49": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp50": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp51": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp52": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp53": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp54": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp55": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp56": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp57": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp58": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp59": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp60": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp61": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp62": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp63": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp64": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp65": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp66": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp67": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp68": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp69": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp70": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp71": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp72": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp73": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp74": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp75": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp76": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp77": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp78": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp79": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp80": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp81": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp82": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp83": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp84": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp85": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp86": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp87": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp88": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp89": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp90": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp91": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp92": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp93": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp94": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp95": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp96": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp97": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp98": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp99": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp100": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp101": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp102": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp103": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp104": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp105": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp106": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp107": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp108": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp109": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp110": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp111": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp112": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp113": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp114": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp115": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp116": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp117": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp118": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp119": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp120": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp121": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp122": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp123": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp124": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp125": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp126": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp127": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp128": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp129": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp130": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp131": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp132": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp133": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp134": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp135": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp136": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp137": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp138": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp139": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp140": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp141": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp142": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp143": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp144": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp145": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp146": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp147": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp148": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp149": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp150": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp151": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp152": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp153": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp154": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp155": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp156": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp157": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp158": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp159": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp160": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp161": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp162": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp163": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp164": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp165": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp166": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp167": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp168": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp169": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp170": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp171": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp172": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp173": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp174": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp175": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp176": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp177": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp178": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp179": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp180": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp181": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp182": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp183": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp184": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp185": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp186": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp187": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp188": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp189": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp190": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp191": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp192": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp193": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp194": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp195": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp196": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp197": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp198": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp199": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp200": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp201": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp202": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp203": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp204": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp205": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp206": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp207": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp208": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp209": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp210": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp211": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp212": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp213": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp214": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp215": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp216": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp217": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp218": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp219": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp220": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp221": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp222": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp223": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp224": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp225": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp226": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp227": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp228": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp229": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp230": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp231": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp232": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp233": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp234": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp235": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp236": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp237": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp238": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp239": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp240": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp241": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp242": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp243": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp244": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp245": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp246": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp247": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp248": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp249": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp250": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp251": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp252": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp253": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp254": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp255": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "net0": {
+                  "$ref": "#/properties/api/$defs/net"
+                },
+                "net1": {
+                  "$ref": "#/properties/api/$defs/net"
+                },
+                "net2": {
+                  "$ref": "#/properties/api/$defs/net"
+                },
+                "net3": {
+                  "$ref": "#/properties/api/$defs/net"
+                },
+                "net4": {
+                  "$ref": "#/properties/api/$defs/net"
+                },
+                "net5": {
+                  "$ref": "#/properties/api/$defs/net"
+                },
+                "net6": {
+                  "$ref": "#/properties/api/$defs/net"
+                },
+                "net7": {
+                  "$ref": "#/properties/api/$defs/net"
+                },
+                "net8": {
+                  "$ref": "#/properties/api/$defs/net"
+                },
+                "net9": {
+                  "$ref": "#/properties/api/$defs/net"
+                },
+                "net10": {
+                  "$ref": "#/properties/api/$defs/net"
+                },
+                "net11": {
+                  "$ref": "#/properties/api/$defs/net"
+                },
+                "net12": {
+                  "$ref": "#/properties/api/$defs/net"
+                },
+                "net13": {
+                  "$ref": "#/properties/api/$defs/net"
+                },
+                "net14": {
+                  "$ref": "#/properties/api/$defs/net"
+                },
+                "net15": {
+                  "$ref": "#/properties/api/$defs/net"
+                },
+                "net16": {
+                  "$ref": "#/properties/api/$defs/net"
+                },
+                "net17": {
+                  "$ref": "#/properties/api/$defs/net"
+                },
+                "net18": {
+                  "$ref": "#/properties/api/$defs/net"
+                },
+                "net19": {
+                  "$ref": "#/properties/api/$defs/net"
+                },
+                "net20": {
+                  "$ref": "#/properties/api/$defs/net"
+                },
+                "net21": {
+                  "$ref": "#/properties/api/$defs/net"
+                },
+                "net22": {
+                  "$ref": "#/properties/api/$defs/net"
+                },
+                "net23": {
+                  "$ref": "#/properties/api/$defs/net"
+                },
+                "net24": {
+                  "$ref": "#/properties/api/$defs/net"
+                },
+                "net25": {
+                  "$ref": "#/properties/api/$defs/net"
+                },
+                "net26": {
+                  "$ref": "#/properties/api/$defs/net"
+                },
+                "net27": {
+                  "$ref": "#/properties/api/$defs/net"
+                },
+                "net28": {
+                  "$ref": "#/properties/api/$defs/net"
+                },
+                "net29": {
+                  "$ref": "#/properties/api/$defs/net"
+                },
+                "net30": {
+                  "$ref": "#/properties/api/$defs/net"
+                },
+                "net31": {
+                  "$ref": "#/properties/api/$defs/net"
                 }
               },
               "required": [
@@ -48756,10 +49877,16 @@
                 "ostemplate",
                 "vmid"
               ],
-              "dependencies": {
-                "unique": [
-                  "restore"
-                ]
+              "dependencies": {},
+              "$defs": {
+                "mp": {
+                  "type": "string",
+                  "pattern": "^(?:volume=)?[A-Za-z][A-Za-z0-9._-]*:(?:(?:[1-9][0-9]*(?:\\.[0-9]+)?|0\\.[0-9]*[1-9][0-9]*)|(?:vm|subvol)-[1-9][0-9]*-disk-[0-9]+(?:\\.raw)?),mp=(?:/(?!\\.{1,2}(?:/|,|$))[A-Za-z0-9._-]+)+(?:,acl=[01])?(?:,backup=[01])?(?:,quota=[01])?(?:,ro=[01])?$"
+                },
+                "net": {
+                  "type": "string",
+                  "pattern": "^name=[A-Za-z][A-Za-z0-9_.-]{0,14}(?:,bridge=[A-Za-z][A-Za-z0-9_.-]{0,14})?(?:,firewall=[01])?(?:,gw=(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])(?:\\.(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])){3})?(?:,hwaddr=[0-9A-Fa-f][02468AaCcEe](?::[0-9A-Fa-f]{2}){5})?(?:,ip=(?:dhcp|manual|(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])(?:\\.(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])){3}/(?:[0-9]|[12][0-9]|3[0-2])))?(?:,ip6=(?:auto|dhcp|manual))?(?:,link_down=[01])?(?:,rate=[0-9]+(?:\\.[0-9]+)?)?(?:,tag=(?:[1-9]|[1-9][0-9]{1,2}|[1-3][0-9]{3}|40[0-8][0-9]|409[0-4]))?(?:,type=veth)?$"
+                }
               }
             }
           },
@@ -49164,12 +50291,64 @@
       "id": "OP-POST-64ef428bce",
       "release": "legacy-8.2.7",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "write",
+        "transport": "json",
+        "secrets": "none",
+        "allowedInputs": [
+          "node",
+          "vmid",
+          "newid",
+          "description",
+          "full",
+          "storage",
+          "target",
+          "pool",
+          "bwlimit",
+          "hostname"
+        ],
+        "reason": "Confirmed guest clone with reviewed destination and storage settings; snapshot-source variants remain refused.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Track the source-node UPID, then inspect the destination guest independently; never clone again after uncertain delivery."
+        },
+        "privileges": {
+          "check": [
+            "and",
+            [
+              "perm",
+              "/vms/{vmid}",
+              [
+                "VM.Clone"
+              ]
+            ],
+            [
+              "or",
+              [
+                "perm",
+                "/vms/{newid}",
+                [
+                  "VM.Allocate"
+                ]
+              ],
+              [
+                "perm",
+                "/pool/{pool}",
+                [
+                  "VM.Allocate"
+                ],
+                "require_param",
+                "pool"
+              ]
+            ]
+          ],
+          "description": "You need 'VM.Clone' permissions on /vms/{vmid}, and 'VM.Allocate' permissions on /vms/{newid} (or on the VM pool /pool/{pool}). You also need 'Datastore.AllocateSpace' on any used storage, and 'SDN.Use' on any bridge."
+        },
+        "response": {
+          "type": "string"
+        },
+        "source": "Pinned clone_vm schemas; existing effect and task contracts."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "post",
         "/nodes/{node}/lxc/{vmid}/clone"
@@ -49212,11 +50391,6 @@
                 },
                 "pool": {
                   "type": "string",
-                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*$"
-                },
-                "snapname": {
-                  "type": "string",
-                  "maxLength": 40,
                   "pattern": "^[A-Za-z][A-Za-z0-9._-]*$"
                 },
                 "storage": {
@@ -67213,7 +68387,7 @@
         "effect": "write",
         "transport": "json",
         "secrets": "input-refs",
-        "reason": "Confirmed blank QEMU creation with reviewed compute, managed disks, NICs, boot and onboarding inputs; restore, overwrite and unreviewed hardware remain refused.",
+        "reason": "Confirmed guest creation with reviewed compute, managed storage, networking and onboarding; LXC is fixed unprivileged, and restore, overwrite and unreviewed host features remain refused.",
         "allowedInputs": [
           "node",
           "vmid",
@@ -71277,14 +72451,14 @@
           "node",
           "vmid",
           "newid",
-          "name",
           "description",
           "full",
           "storage",
-          "format",
           "target",
           "pool",
-          "bwlimit"
+          "bwlimit",
+          "name",
+          "format"
         ],
         "reason": "Confirmed guest clone with reviewed destination and storage settings; snapshot-source variants remain refused.",
         "reconciliation": {
@@ -167864,12 +169038,348 @@
       "id": "OP-POST-0b2e040aa1",
       "release": "published-current",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "write",
+        "transport": "json",
+        "secrets": "input-refs",
+        "reason": "Confirmed guest creation with reviewed compute, managed storage, networking and onboarding; LXC is fixed unprivileged, and restore, overwrite and unreviewed host features remain refused.",
+        "allowedInputs": [
+          "node",
+          "vmid",
+          "description",
+          "hostname",
+          "memory",
+          "cores",
+          "swap",
+          "cpulimit",
+          "cpuunits",
+          "onboot",
+          "startup",
+          "password",
+          "mp0",
+          "mp1",
+          "mp2",
+          "mp3",
+          "mp4",
+          "mp5",
+          "mp6",
+          "mp7",
+          "mp8",
+          "mp9",
+          "mp10",
+          "mp11",
+          "mp12",
+          "mp13",
+          "mp14",
+          "mp15",
+          "mp16",
+          "mp17",
+          "mp18",
+          "mp19",
+          "mp20",
+          "mp21",
+          "mp22",
+          "mp23",
+          "mp24",
+          "mp25",
+          "mp26",
+          "mp27",
+          "mp28",
+          "mp29",
+          "mp30",
+          "mp31",
+          "mp32",
+          "mp33",
+          "mp34",
+          "mp35",
+          "mp36",
+          "mp37",
+          "mp38",
+          "mp39",
+          "mp40",
+          "mp41",
+          "mp42",
+          "mp43",
+          "mp44",
+          "mp45",
+          "mp46",
+          "mp47",
+          "mp48",
+          "mp49",
+          "mp50",
+          "mp51",
+          "mp52",
+          "mp53",
+          "mp54",
+          "mp55",
+          "mp56",
+          "mp57",
+          "mp58",
+          "mp59",
+          "mp60",
+          "mp61",
+          "mp62",
+          "mp63",
+          "mp64",
+          "mp65",
+          "mp66",
+          "mp67",
+          "mp68",
+          "mp69",
+          "mp70",
+          "mp71",
+          "mp72",
+          "mp73",
+          "mp74",
+          "mp75",
+          "mp76",
+          "mp77",
+          "mp78",
+          "mp79",
+          "mp80",
+          "mp81",
+          "mp82",
+          "mp83",
+          "mp84",
+          "mp85",
+          "mp86",
+          "mp87",
+          "mp88",
+          "mp89",
+          "mp90",
+          "mp91",
+          "mp92",
+          "mp93",
+          "mp94",
+          "mp95",
+          "mp96",
+          "mp97",
+          "mp98",
+          "mp99",
+          "mp100",
+          "mp101",
+          "mp102",
+          "mp103",
+          "mp104",
+          "mp105",
+          "mp106",
+          "mp107",
+          "mp108",
+          "mp109",
+          "mp110",
+          "mp111",
+          "mp112",
+          "mp113",
+          "mp114",
+          "mp115",
+          "mp116",
+          "mp117",
+          "mp118",
+          "mp119",
+          "mp120",
+          "mp121",
+          "mp122",
+          "mp123",
+          "mp124",
+          "mp125",
+          "mp126",
+          "mp127",
+          "mp128",
+          "mp129",
+          "mp130",
+          "mp131",
+          "mp132",
+          "mp133",
+          "mp134",
+          "mp135",
+          "mp136",
+          "mp137",
+          "mp138",
+          "mp139",
+          "mp140",
+          "mp141",
+          "mp142",
+          "mp143",
+          "mp144",
+          "mp145",
+          "mp146",
+          "mp147",
+          "mp148",
+          "mp149",
+          "mp150",
+          "mp151",
+          "mp152",
+          "mp153",
+          "mp154",
+          "mp155",
+          "mp156",
+          "mp157",
+          "mp158",
+          "mp159",
+          "mp160",
+          "mp161",
+          "mp162",
+          "mp163",
+          "mp164",
+          "mp165",
+          "mp166",
+          "mp167",
+          "mp168",
+          "mp169",
+          "mp170",
+          "mp171",
+          "mp172",
+          "mp173",
+          "mp174",
+          "mp175",
+          "mp176",
+          "mp177",
+          "mp178",
+          "mp179",
+          "mp180",
+          "mp181",
+          "mp182",
+          "mp183",
+          "mp184",
+          "mp185",
+          "mp186",
+          "mp187",
+          "mp188",
+          "mp189",
+          "mp190",
+          "mp191",
+          "mp192",
+          "mp193",
+          "mp194",
+          "mp195",
+          "mp196",
+          "mp197",
+          "mp198",
+          "mp199",
+          "mp200",
+          "mp201",
+          "mp202",
+          "mp203",
+          "mp204",
+          "mp205",
+          "mp206",
+          "mp207",
+          "mp208",
+          "mp209",
+          "mp210",
+          "mp211",
+          "mp212",
+          "mp213",
+          "mp214",
+          "mp215",
+          "mp216",
+          "mp217",
+          "mp218",
+          "mp219",
+          "mp220",
+          "mp221",
+          "mp222",
+          "mp223",
+          "mp224",
+          "mp225",
+          "mp226",
+          "mp227",
+          "mp228",
+          "mp229",
+          "mp230",
+          "mp231",
+          "mp232",
+          "mp233",
+          "mp234",
+          "mp235",
+          "mp236",
+          "mp237",
+          "mp238",
+          "mp239",
+          "mp240",
+          "mp241",
+          "mp242",
+          "mp243",
+          "mp244",
+          "mp245",
+          "mp246",
+          "mp247",
+          "mp248",
+          "mp249",
+          "mp250",
+          "mp251",
+          "mp252",
+          "mp253",
+          "mp254",
+          "mp255",
+          "net0",
+          "net1",
+          "net2",
+          "net3",
+          "net4",
+          "net5",
+          "net6",
+          "net7",
+          "net8",
+          "net9",
+          "net10",
+          "net11",
+          "net12",
+          "net13",
+          "net14",
+          "net15",
+          "net16",
+          "net17",
+          "net18",
+          "net19",
+          "net20",
+          "net21",
+          "net22",
+          "net23",
+          "net24",
+          "net25",
+          "net26",
+          "net27",
+          "net28",
+          "net29",
+          "net30",
+          "net31",
+          "nameserver",
+          "searchdomain",
+          "rootfs",
+          "ostemplate",
+          "storage",
+          "unprivileged",
+          "ssh-public-keys",
+          "pool",
+          "start"
+        ],
+        "fixedInputs": {
+          "unprivileged": true
+        },
+        "inputFormats": {
+          "ssh-public-keys": "openssh-public-keys"
+        },
+        "inputPatterns": {
+          "searchdomain": "^(?=.{1,255}$)[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?(?:\\.[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?)*(?: [A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?(?:\\.[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?)*)*$",
+          "ostemplate": "^[A-Za-z][A-Za-z0-9._-]*:vztmpl/[A-Za-z0-9][A-Za-z0-9._-]*\\.tar\\.(?:zst|xz|gz)$"
+        },
+        "sensitiveInputs": [
+          "password"
+        ],
+        "reconciliation": {
+          "kind": "none",
+          "reason": "No safe automated business-outcome proof is admitted for this variant. Use the retained UPID when available; otherwise retain uncertainty and inspect independently."
+        },
+        "privileges": {
+          "description": "You need 'VM.Allocate' permission on /vms/{vmid} or on the VM pool /pool/{pool}. For restore, it is enough if the user has 'VM.Backup' permission and the VM already exists. You also need 'Datastore.AllocateSpace' permissions on the storage. For privileged containers, 'Sys.Modify' permissions on '/' are required.",
+          "user": "all"
+        },
+        "response": {
+          "type": "string"
+        },
+        "source": "Retained versioned API schema; design.md S3 write/outcome contract; pve-node-batch-source.txt for execute."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "post",
         "/nodes/{node}/lxc"
@@ -167886,32 +169396,6 @@
               "type": "object",
               "additionalProperties": false,
               "properties": {
-                "arch": {
-                  "enum": [
-                    "amd64",
-                    "i386",
-                    "arm64",
-                    "armhf",
-                    "riscv32",
-                    "riscv64"
-                  ],
-                  "type": "string"
-                },
-                "bwlimit": {
-                  "type": "number",
-                  "minimum": 0
-                },
-                "cmode": {
-                  "enum": [
-                    "shell",
-                    "console",
-                    "tty"
-                  ],
-                  "type": "string"
-                },
-                "console": {
-                  "type": "boolean"
-                },
                 "cores": {
                   "type": "integer",
                   "minimum": 1,
@@ -167927,81 +169411,22 @@
                   "minimum": 0,
                   "maximum": 500000
                 },
-                "debug": {
-                  "type": "boolean"
-                },
                 "description": {
                   "type": "string",
                   "maxLength": 8192
-                },
-                "dev[n]": {
-                  "not": {},
-                  "x-untranslated": "numbered vendor parameter"
-                },
-                "entrypoint": {
-                  "type": "string",
-                  "not": {},
-                  "x-untranslated": "Perl pattern"
-                },
-                "env": {
-                  "type": "string",
-                  "not": {},
-                  "x-untranslated": "Perl pattern"
-                },
-                "features": {
-                  "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
-                },
-                "force": {
-                  "type": "boolean"
-                },
-                "ha-managed": {
-                  "type": "boolean"
-                },
-                "hookscript": {
-                  "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
                 },
                 "hostname": {
                   "type": "string",
                   "maxLength": 255,
                   "pattern": "^(?=.{1,255}$)[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?(?:\\.[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?)*$"
                 },
-                "ignore-unpack-errors": {
-                  "type": "boolean"
-                },
-                "lock": {
-                  "enum": [
-                    "backup",
-                    "create",
-                    "destroyed",
-                    "disk",
-                    "fstrim",
-                    "migrate",
-                    "mounted",
-                    "rollback",
-                    "snapshot",
-                    "snapshot-delete"
-                  ],
-                  "type": "string"
-                },
                 "memory": {
                   "type": "integer",
                   "minimum": 16
                 },
-                "mp[n]": {
-                  "not": {},
-                  "x-untranslated": "numbered vendor parameter"
-                },
                 "nameserver": {
                   "type": "string",
                   "pattern": "^(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])(?:\\.(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])){3}(?: (?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])(?:\\.(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])){3})*$"
-                },
-                "net[n]": {
-                  "not": {},
-                  "x-untranslated": "numbered vendor parameter"
                 },
                 "node": {
                   "type": "string",
@@ -168012,37 +169437,47 @@
                 },
                 "ostemplate": {
                   "type": "string",
-                  "maxLength": 255
-                },
-                "ostype": {
-                  "enum": [
-                    "debian",
-                    "devuan",
-                    "ubuntu",
-                    "centos",
-                    "fedora",
-                    "opensuse",
-                    "archlinux",
-                    "alpine",
-                    "gentoo",
-                    "nixos",
-                    "unmanaged"
-                  ],
-                  "type": "string"
+                  "maxLength": 255,
+                  "allOf": [
+                    {
+                      "pattern": "^[A-Za-z][A-Za-z0-9._-]*:vztmpl/[A-Za-z0-9][A-Za-z0-9._-]*\\.tar\\.(?:zst|xz|gz)$"
+                    }
+                  ]
                 },
                 "password": {
-                  "type": "string",
-                  "minLength": 5
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "env"
+                      ],
+                      "properties": {
+                        "env": {
+                          "type": "string",
+                          "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "file"
+                      ],
+                      "properties": {
+                        "file": {
+                          "type": "string",
+                          "minLength": 1
+                        }
+                      }
+                    }
+                  ],
+                  "x-secret": true
                 },
                 "pool": {
                   "type": "string",
                   "pattern": "^[A-Za-z][A-Za-z0-9._-]*$"
-                },
-                "protection": {
-                  "type": "boolean"
-                },
-                "restore": {
-                  "type": "boolean"
                 },
                 "rootfs": {
                   "type": "string",
@@ -168050,10 +169485,16 @@
                 },
                 "searchdomain": {
                   "type": "string",
-                  "pattern": "^(?=.{1,255}$)[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?(?:\\.[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?)*(?: [A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?(?:\\.[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?)*)*$"
+                  "pattern": "^(?=.{1,255}$)[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?(?:\\.[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?)*(?: [A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?(?:\\.[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?)*)*$",
+                  "allOf": [
+                    {
+                      "pattern": "^(?=.{1,255}$)[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?(?:\\.[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?)*(?: [A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?(?:\\.[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?)*)*$"
+                    }
+                  ]
                 },
                 "ssh-public-keys": {
-                  "type": "string"
+                  "type": "string",
+                  "pattern": "^(?:ssh-ed25519|ssh-rsa|ecdsa-sha2-nistp256) (?=(?:[A-Za-z0-9+/]){32})(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?(?: [A-Za-z0-9._~@:+ -]+)?(?:\n(?:ssh-ed25519|ssh-rsa|ecdsa-sha2-nistp256) (?=(?:[A-Za-z0-9+/]){32})(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?(?: [A-Za-z0-9._~@:+ -]+)?)*(?:\n)?$"
                 },
                 "start": {
                   "type": "boolean"
@@ -168070,39 +169511,880 @@
                   "type": "integer",
                   "minimum": 0
                 },
-                "tags": {
-                  "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
-                },
-                "template": {
-                  "type": "boolean"
-                },
-                "timezone": {
-                  "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
-                },
-                "tty": {
-                  "type": "integer",
-                  "minimum": 0,
-                  "maximum": 6
-                },
-                "unique": {
-                  "type": "boolean"
-                },
                 "unprivileged": {
-                  "type": "boolean"
-                },
-                "unused[n]": {
-                  "not": {},
-                  "x-untranslated": "numbered vendor parameter"
+                  "type": "boolean",
+                  "const": true,
+                  "default": true
                 },
                 "vmid": {
                   "type": "integer",
                   "minimum": 100,
                   "maximum": 999999999,
                   "pattern": "^[1-9][0-9]*$"
+                },
+                "mp0": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp1": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp2": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp3": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp4": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp5": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp6": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp7": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp8": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp9": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp10": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp11": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp12": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp13": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp14": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp15": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp16": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp17": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp18": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp19": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp20": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp21": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp22": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp23": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp24": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp25": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp26": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp27": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp28": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp29": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp30": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp31": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp32": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp33": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp34": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp35": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp36": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp37": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp38": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp39": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp40": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp41": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp42": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp43": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp44": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp45": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp46": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp47": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp48": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp49": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp50": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp51": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp52": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp53": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp54": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp55": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp56": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp57": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp58": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp59": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp60": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp61": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp62": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp63": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp64": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp65": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp66": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp67": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp68": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp69": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp70": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp71": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp72": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp73": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp74": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp75": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp76": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp77": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp78": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp79": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp80": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp81": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp82": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp83": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp84": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp85": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp86": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp87": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp88": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp89": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp90": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp91": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp92": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp93": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp94": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp95": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp96": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp97": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp98": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp99": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp100": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp101": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp102": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp103": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp104": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp105": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp106": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp107": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp108": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp109": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp110": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp111": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp112": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp113": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp114": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp115": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp116": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp117": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp118": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp119": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp120": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp121": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp122": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp123": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp124": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp125": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp126": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp127": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp128": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp129": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp130": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp131": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp132": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp133": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp134": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp135": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp136": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp137": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp138": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp139": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp140": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp141": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp142": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp143": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp144": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp145": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp146": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp147": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp148": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp149": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp150": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp151": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp152": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp153": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp154": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp155": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp156": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp157": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp158": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp159": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp160": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp161": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp162": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp163": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp164": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp165": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp166": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp167": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp168": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp169": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp170": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp171": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp172": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp173": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp174": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp175": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp176": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp177": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp178": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp179": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp180": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp181": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp182": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp183": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp184": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp185": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp186": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp187": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp188": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp189": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp190": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp191": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp192": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp193": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp194": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp195": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp196": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp197": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp198": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp199": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp200": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp201": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp202": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp203": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp204": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp205": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp206": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp207": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp208": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp209": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp210": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp211": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp212": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp213": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp214": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp215": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp216": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp217": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp218": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp219": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp220": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp221": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp222": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp223": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp224": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp225": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp226": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp227": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp228": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp229": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp230": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp231": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp232": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp233": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp234": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp235": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp236": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp237": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp238": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp239": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp240": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp241": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp242": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp243": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp244": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp245": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp246": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp247": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp248": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp249": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp250": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp251": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp252": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp253": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp254": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "mp255": {
+                  "$ref": "#/properties/api/$defs/mp"
+                },
+                "net0": {
+                  "$ref": "#/properties/api/$defs/net"
+                },
+                "net1": {
+                  "$ref": "#/properties/api/$defs/net"
+                },
+                "net2": {
+                  "$ref": "#/properties/api/$defs/net"
+                },
+                "net3": {
+                  "$ref": "#/properties/api/$defs/net"
+                },
+                "net4": {
+                  "$ref": "#/properties/api/$defs/net"
+                },
+                "net5": {
+                  "$ref": "#/properties/api/$defs/net"
+                },
+                "net6": {
+                  "$ref": "#/properties/api/$defs/net"
+                },
+                "net7": {
+                  "$ref": "#/properties/api/$defs/net"
+                },
+                "net8": {
+                  "$ref": "#/properties/api/$defs/net"
+                },
+                "net9": {
+                  "$ref": "#/properties/api/$defs/net"
+                },
+                "net10": {
+                  "$ref": "#/properties/api/$defs/net"
+                },
+                "net11": {
+                  "$ref": "#/properties/api/$defs/net"
+                },
+                "net12": {
+                  "$ref": "#/properties/api/$defs/net"
+                },
+                "net13": {
+                  "$ref": "#/properties/api/$defs/net"
+                },
+                "net14": {
+                  "$ref": "#/properties/api/$defs/net"
+                },
+                "net15": {
+                  "$ref": "#/properties/api/$defs/net"
+                },
+                "net16": {
+                  "$ref": "#/properties/api/$defs/net"
+                },
+                "net17": {
+                  "$ref": "#/properties/api/$defs/net"
+                },
+                "net18": {
+                  "$ref": "#/properties/api/$defs/net"
+                },
+                "net19": {
+                  "$ref": "#/properties/api/$defs/net"
+                },
+                "net20": {
+                  "$ref": "#/properties/api/$defs/net"
+                },
+                "net21": {
+                  "$ref": "#/properties/api/$defs/net"
+                },
+                "net22": {
+                  "$ref": "#/properties/api/$defs/net"
+                },
+                "net23": {
+                  "$ref": "#/properties/api/$defs/net"
+                },
+                "net24": {
+                  "$ref": "#/properties/api/$defs/net"
+                },
+                "net25": {
+                  "$ref": "#/properties/api/$defs/net"
+                },
+                "net26": {
+                  "$ref": "#/properties/api/$defs/net"
+                },
+                "net27": {
+                  "$ref": "#/properties/api/$defs/net"
+                },
+                "net28": {
+                  "$ref": "#/properties/api/$defs/net"
+                },
+                "net29": {
+                  "$ref": "#/properties/api/$defs/net"
+                },
+                "net30": {
+                  "$ref": "#/properties/api/$defs/net"
+                },
+                "net31": {
+                  "$ref": "#/properties/api/$defs/net"
                 }
               },
               "required": [
@@ -168110,10 +170392,16 @@
                 "ostemplate",
                 "vmid"
               ],
-              "dependencies": {
-                "unique": [
-                  "restore"
-                ]
+              "dependencies": {},
+              "$defs": {
+                "mp": {
+                  "type": "string",
+                  "pattern": "^(?:volume=)?[A-Za-z][A-Za-z0-9._-]*:(?:(?:[1-9][0-9]*(?:\\.[0-9]+)?|0\\.[0-9]*[1-9][0-9]*)|(?:vm|subvol)-[1-9][0-9]*-disk-[0-9]+(?:\\.raw)?),mp=(?:/(?!\\.{1,2}(?:/|,|$))[A-Za-z0-9._-]+)+(?:,acl=[01])?(?:,backup=[01])?(?:,quota=[01])?(?:,ro=[01])?$"
+                },
+                "net": {
+                  "type": "string",
+                  "pattern": "^name=[A-Za-z][A-Za-z0-9_.-]{0,14}(?:,bridge=[A-Za-z][A-Za-z0-9_.-]{0,14})?(?:,firewall=[01])?(?:,gw=(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])(?:\\.(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])){3})?(?:,hwaddr=[0-9A-Fa-f][02468AaCcEe](?::[0-9A-Fa-f]{2}){5})?(?:,ip=(?:dhcp|manual|(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])(?:\\.(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])){3}/(?:[0-9]|[12][0-9]|3[0-2])))?(?:,ip6=(?:auto|dhcp|manual))?(?:,link_down=[01])?(?:,rate=[0-9]+(?:\\.[0-9]+)?)?(?:,tag=(?:[1-9]|[1-9][0-9]{1,2}|[1-3][0-9]{3}|40[0-8][0-9]|409[0-4]))?(?:,type=veth)?$"
+                }
               }
             }
           },
@@ -168518,12 +170806,64 @@
       "id": "OP-POST-64ef428bce",
       "release": "published-current",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "write",
+        "transport": "json",
+        "secrets": "none",
+        "allowedInputs": [
+          "node",
+          "vmid",
+          "newid",
+          "description",
+          "full",
+          "storage",
+          "target",
+          "pool",
+          "bwlimit",
+          "hostname"
+        ],
+        "reason": "Confirmed guest clone with reviewed destination and storage settings; snapshot-source variants remain refused.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Track the source-node UPID, then inspect the destination guest independently; never clone again after uncertain delivery."
+        },
+        "privileges": {
+          "check": [
+            "and",
+            [
+              "perm",
+              "/vms/{vmid}",
+              [
+                "VM.Clone"
+              ]
+            ],
+            [
+              "or",
+              [
+                "perm",
+                "/vms/{newid}",
+                [
+                  "VM.Allocate"
+                ]
+              ],
+              [
+                "perm",
+                "/pool/{pool}",
+                [
+                  "VM.Allocate"
+                ],
+                "require_param",
+                "pool"
+              ]
+            ]
+          ],
+          "description": "You need 'VM.Clone' permissions on /vms/{vmid}, and 'VM.Allocate' permissions on /vms/{newid} (or on the VM pool /pool/{pool}). You also need 'Datastore.AllocateSpace' on any used storage, and 'SDN.Use' on any bridge."
+        },
+        "response": {
+          "type": "string"
+        },
+        "source": "Pinned clone_vm schemas; existing effect and task contracts."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "post",
         "/nodes/{node}/lxc/{vmid}/clone"
@@ -168566,11 +170906,6 @@
                 },
                 "pool": {
                   "type": "string",
-                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*$"
-                },
-                "snapname": {
-                  "type": "string",
-                  "maxLength": 40,
                   "pattern": "^[A-Za-z][A-Za-z0-9._-]*$"
                 },
                 "storage": {
@@ -186996,7 +189331,7 @@
         "effect": "write",
         "transport": "json",
         "secrets": "input-refs",
-        "reason": "Confirmed blank QEMU creation with reviewed compute, managed disks, NICs, boot and onboarding inputs; restore, overwrite and unreviewed hardware remain refused.",
+        "reason": "Confirmed guest creation with reviewed compute, managed storage, networking and onboarding; LXC is fixed unprivileged, and restore, overwrite and unreviewed host features remain refused.",
         "allowedInputs": [
           "node",
           "vmid",
@@ -191168,14 +193503,14 @@
           "node",
           "vmid",
           "newid",
-          "name",
           "description",
           "full",
           "storage",
-          "format",
           "target",
           "pool",
-          "bwlimit"
+          "bwlimit",
+          "name",
+          "format"
         ],
         "reason": "Confirmed guest clone with reviewed destination and storage settings; snapshot-source variants remain refused.",
         "reconciliation": {

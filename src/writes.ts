@@ -34,7 +34,10 @@ async function invocation(credentials: Credentials, contract: Contract, input: R
   checkPolicy(credentials, contract)
   if (depth > 0 && contract.policy.transport !== 'json') throw new Failure('INVALID_INPUT', 'Batch children cannot open byte transports.', 'Execute each transfer separately through its managed channel.', 2)
   if (++budget.count > 64 || depth > 4) throw new Failure('INVALID_INPUT', 'Batch exceeds 64 total operations or four nesting levels.', 'Use a smaller reviewed batch.', 2)
-  const values = { ...input }
+  const values = { ...contract.policy.fixedInputs, ...input }
+  for (const [name, value] of Object.entries(contract.policy.fixedInputs ?? {})) {
+    if (values[name] !== value) throw new Failure('INVALID_INPUT', 'Input conflicts with a fixed reviewed setting.', 'Inspect the operation policy and use its fixed settings.', 2)
+  }
   const revisions: unknown[] = []
   for (const [name, value] of Object.entries(values)) {
     if (contract.policy.allowedInputs && !contract.policy.allowedInputs.includes(name)) throw new Failure('CONTRACT_UNRESOLVED', 'Supplied parameter branch has not been admitted.', 'Inspect the operation policy and use reviewed branches only.')
