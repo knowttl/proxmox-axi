@@ -171,7 +171,7 @@ export async function main(args: string[]): Promise<void> {
         ['doctor', 'auth status'].includes(key) ? ['--config', '--profile', '--session'] : ['--config']),
         ...(key === 'inventory' ? ['--limit', '--full'] : key === 'schema' ? ['--view', '--offset'] : [])]
       if (Object.keys(options).some(option => option !== 'help' && !names.includes(option))) throw usage(`Valid flags: ${names.join(', ')}.`)
-      output({ purpose: key === 'doctor' ? 'Check private-file protection and perform one bounded version read.' : `Inspect ${key}.`,
+      output({ purpose: key === 'doctor' ? 'Check private-file protection, versions, permissions, inventory and task status in at most nine bounded reads.' : `Inspect ${key}.`,
         usage: `proxmox-axi ${usages[key]}`, examples: key === 'schema' ? ['proxmox-axi schema get /version', 'proxmox-axi schema get /nodes --catalogue published-current'] :
           [`proxmox-axi ${key}`, `proxmox-axi ${key} --format json`], flags: [...help.flags,
           ...(key === 'schema' ? ['--view invocation|vendor (default invocation)', '--offset <nonnegative integer> (vendor schema page)'] : [])]
