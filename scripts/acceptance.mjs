@@ -106,6 +106,12 @@ function selection(args) {
   return values
 }
 
+function includesRoutes(values) {
+  return values['--task'] === 'S2.1' || values['--task'] === 'S6.2' || values['--all-route-variants'] ||
+    values['--repeat-through'] === 'S2' ||
+    (/^S[3456]\./.test(values['--task']) && ['S3', 'S4', 'S5', 'S6'].includes(values['--repeat-through']))
+}
+
 async function preparePackage(values, out, scratch) {
   const pkg = await json(join(root, 'package.json'))
   const archive = join(out, `knowttl-proxmox-axi-${pkg.version}.tgz`)
@@ -470,7 +476,7 @@ async function verify(values, prepared, scratch) {
       }
       return coverage
     }
-    if (values['--task'] === 'S2.1' || values['--task'] === 'S6.2' || values['--all-route-variants'] || (/^S[3456]\./.test(values['--task']) && ['S3', 'S4', 'S5', 'S6'].includes(values['--repeat-through']))) {
+    if (includesRoutes(values)) {
       verifyDiscovery(inventory, catalogues, (await json(join(installed, 'dist/contracts.json'))).contracts, operationPolicy)
       const bodyRoute = [...routeCases(catalogues, operationPolicy)].find(route => route.callable && route.operation.path === '/nodes/{node}/tasks')
       const bodyFile = join(scratch, 'parameters.json')
@@ -548,7 +554,7 @@ async function verify(values, prepared, scratch) {
         { exitCode: 1, requests: 1, error: 'AUTH_REQUIRED', identity: 'hosted-canary' }, denied, client)
       await runCase('AC-HOST/invalid-shape', ['proxmox-axi', 'get', '/version', '--format', 'json'], clientEnvironment,
         { exitCode: 1, requests: 1, error: 'INVALID_RESPONSE', identity: 'hosted-canary' }, { httpStatus: 200, body: { data: null } }, client)
-      if (values['--task'] === 'S2.1' || values['--task'] === 'S6.2' || values['--all-route-variants'] || (/^S[3456]\./.test(values['--task']) && ['S3', 'S4', 'S5', 'S6'].includes(values['--repeat-through']))) result.host.routeCoverage = await exerciseRoutes(clientEnvironment, client)
+      if (includesRoutes(values)) result.host.routeCoverage = await exerciseRoutes(clientEnvironment, client)
       if (['S2.2', 'S2.3'].includes(values['--task']) || /^S[3456]\./.test(values['--task'])) await readJourney(clientEnvironment, client)
       if (/^S[3456]\./.test(values['--task'])) {
         await exerciseWriteJourney({ scratch, out, executable: client, caFile, env: { ...clientEnvironment, PROXMOX_AXI_TOKEN: hostedToken },
@@ -614,13 +620,22 @@ async function verify(values, prepared, scratch) {
     }
     if (values['--task'].startsWith('S6.')) {
       result.native = { linux: 'pass', windows: 'pending', reason: 'Native Windows machine unavailable; Linux is not a substitute.' }
+      const transportEvidence = {
+        'AC-TRANSFER': row => row.invocation.args.includes('transfer'),
+        'AC-TRANSPORT': row => row.invocation.args.includes('transfer') || row.invocation.args.includes('duplex'),
+        'AC-SPECIAL-BATCH-POLICY': row => row.id === 'S5.2/batch-cannot-open-byte-channel',
+        'AC-SPECIAL-GUEST-FILE': row => row.id.startsWith('S5.2/guest-'),
+        'AC-STREAM': row => row.invocation.args.includes('duplex'),
+      }
+      const evidenceFor = id => result.cases.filter(row => row.id.split('/').includes(id) ||
+        row.id.startsWith('S5.2/') && transportEvidence[id]?.(row)).map(row => row.id)
       result.caseCoverage = Array.from({ length: 21 }, (_, index) => `CRED-${String(index + 1).padStart(2, '0')}`).map(id => {
-        const evidence = result.cases.filter(row => row.id.includes(`${id}/`)).map(row => row.id)
+        const evidence = evidenceFor(id)
         return { id, status: evidence.length ? 'pass' : 'pending', evidence,
           ...(evidence.length ? {} : { reason: id === 'CRED-07' ? 'Actual native Windows machine required.' : 'No selected runtime evidence for this ID.' }) }
       })
       result.versionCoverage = Array.from({ length: 8 }, (_, index) => `VP-${String(index + 1).padStart(2, '0')}`).map(id => {
-        const evidence = result.cases.filter(row => row.id.includes(`${id}/`)).map(row => row.id)
+        const evidence = evidenceFor(id)
         return { id, status: evidence.length ? 'pass' : 'pending', evidence,
           ...(evidence.length ? {} : { reason: 'No individually labelled runtime evidence for this ID; release completeness remains pending.' }) }
       })
@@ -628,7 +643,7 @@ async function verify(values, prepared, scratch) {
         'AC-READ', 'AC-PERMISSIONS', 'AC-VERSIONS', 'AC-WRITES', 'AC-WRITE', 'AC-SPECIAL-BATCH-POLICY', 'AC-ASYNC',
         'AC-SPECIAL-BATCH-RESULTS', 'AC-SECRETS', 'AC-SPECIAL-SECRET-INPUTS', 'AC-AUTH', 'AC-TRANSFER', 'AC-TRANSPORT',
         'AC-SPECIAL-GUEST-FILE', 'AC-STREAM', 'AC-PLATFORM'].map(id => {
-        const evidence = result.cases.filter(row => row.id.includes(`${id}/`)).map(row => row.id)
+        const evidence = evidenceFor(id)
         const releasePending = ['AC-FULL', 'AC-COVERAGE', 'AC-PLATFORM'].includes(id)
         return { id, status: !releasePending && evidence.length ? 'pass' : 'pending', evidence,
           ...(!releasePending && evidence.length ? {} : { reason: 'Full release evidence remains pending; native Windows, Artium admission and unreviewed routes are not certified by this slice.' }) }
@@ -674,7 +689,7 @@ try {
       fileURLToPath(import.meta.url), ...process.argv.slice(2)],
     // Full S3.2 replays have run close to the former aggregate 30-minute cap.
     { timeoutMs: /^S[456]\./.test(values['--task']) ? 3_600_000 : values['--task'] === 'S3.2' && values['--repeat-through'] === 'S3' ? 2_700_000 :
-      values['--task'] === 'S2.1' || values['--repeat-through'] === 'S3' ? 1_800_000 : 300_000,
+      includesRoutes(values) || values['--repeat-through'] === 'S3' ? 1_800_000 : 300_000,
       env: { ...process.env, PROXMOX_AXI_ACCEPTANCE_NETNS: parentNamespace, PROXMOX_AXI_ACCEPTANCE_SCRATCH: scratch } })
     process.stdout.write(isolated.stdout)
     process.stderr.write(isolated.stderr)

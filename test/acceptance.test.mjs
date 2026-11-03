@@ -13,6 +13,7 @@ for (const scenario of [
   { name: 'packaged console and migration messages satisfy S5.2 with outbound networking denied', task: 'S5.2', through: 'standalone', exitCode: 0, status: 'pass', host: 'pending' },
   { name: 'installed tarball satisfies canonical credentials with external egress denied', task: 'S1.2', through: 'standalone', exitCode: 0, status: 'pass', host: 'pending' },
   { name: 'generated route cases satisfy the checked catalogue and admission policy', task: 'S2.1', through: 'standalone', exitCode: 0, status: 'pass', host: 'pending' },
+  { name: '#12 S2 repeat records every release route during read acceptance', task: 'S2.3', repeat: 'S2', through: 'standalone', exitCode: 0, status: 'pass', host: 'pending' },
   { name: 'retained reads preserve permission visibility and bounded output', task: 'S2.2', through: 'standalone', exitCode: 0, status: 'pass', host: 'pending' },
   { name: 'mixed node capabilities and bounded doctor use selected contracts', task: 'S2.3', through: 'standalone', exitCode: 0, status: 'pass', host: 'pending' },
   { name: 'packaged writes preserve confirmations and durable outcomes with outbound networking denied', task: 'S3.2', through: 'standalone', exitCode: 0, status: 'pass', host: 'pending' },
@@ -31,7 +32,8 @@ for (const scenario of [
   const out = join(temporary, 'S1.1')
   try {
     const child = spawn(process.execPath, [join(root, 'scripts/acceptance.mjs'), '--task', scenario.task ?? 'S1.1',
-      '--pack', join(root, 'evidence'), '--out', out, '--network', 'fake-only', '--through', scenario.through],
+      '--pack', join(root, 'evidence'), '--out', out, '--network', 'fake-only', '--through', scenario.through,
+      ...(scenario.repeat ? ['--repeat-through', scenario.repeat] : [])],
     { stdio: ['ignore', 'pipe', 'pipe'], env: { ...process.env,
       ...(scenario.missingHost ? { PROXMOX_AXI_ARTIUM_FIXTURE: '', PROXMOX_AXI_ARTIUM_MANIFEST: '' } : {}) } })
     const output = []
@@ -44,6 +46,14 @@ for (const scenario of [
     assert.equal(result.failure, scenario.failure)
     assert.equal(result.host.status, scenario.host)
     assert.equal(result.cases.every(entry => entry.status === 'pass'), true, result.failure)
+    if (scenario.repeat === 'S2') {
+      assert.equal(result.routeCoverage.union, 681)
+      assert.equal(result.routeCoverage.variants, 1285)
+      for (const [release, count] of [['legacy-8.2.7', 605], ['published-current', 680]]) {
+        assert.equal(result.cases.filter(row => row.id.startsWith(`standalone/contract/${release}/`) && row.id.endsWith('/required/valid')).length, count)
+        assert.equal(result.cases.filter(row => row.id.startsWith(`standalone/contract/${release}/`) && row.id.endsWith('/required/invalid')).length, count)
+      }
+    }
     if (scenario.task?.startsWith('S6.')) {
       assert.deepEqual(result.native, { linux: 'pass', windows: 'pending', reason: 'Native Windows machine unavailable; Linux is not a substitute.' })
       assert.equal(result.admission.status, 'pass')
@@ -55,6 +65,23 @@ for (const scenario of [
       assert.ok(result.admission.completeness.unresolved > 0)
       assert.equal(result.caseCoverage.find(row => row.id === 'CRED-08').status, 'pass')
       assert.equal(result.caseCoverage.find(row => row.id === 'CRED-07').status, 'pending')
+      for (const id of ['CRED-01', 'CRED-02', 'CRED-03', 'CRED-12']) {
+        const coverage = result.caseCoverage.find(row => row.id === id)
+        assert.equal(coverage.status, 'pass', `#31 executed exact ID ${id}`)
+        assert.ok(coverage.evidence.includes(id))
+      }
+      for (const [id, evidence] of [
+        ['AC-TRANSFER', 'S5.2/upload-confirm'],
+        ['AC-TRANSPORT', 'S5.2/upload-confirm'],
+        ['AC-SPECIAL-GUEST-FILE', 'S5.2/guest-16777216-bytes'],
+        ['AC-STREAM', 'S5.2/qemu/{vmid}/vncproxy-frames'],
+        ['AC-SPECIAL-BATCH-POLICY', 'S5.2/batch-cannot-open-byte-channel'],
+      ]) {
+        const coverage = result.outcomeCoverage.find(row => row.id === id)
+        assert.equal(coverage.status, 'pass', `#31 mapped transport outcome ${id}`)
+        assert.ok(coverage.evidence.includes(evidence))
+      }
+      for (const id of ['AC-HOST', 'AC-FULL', 'AC-COVERAGE', 'AC-PLATFORM']) assert.equal(result.outcomeCoverage.find(row => row.id === id).status, 'pending')
     }
     if (scenario.task === 'S3.2' && scenario.through === 'both') {
       assert.deepEqual(result.outcomes.filter(row => row.journey === 'artium' && [
