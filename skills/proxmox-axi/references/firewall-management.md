@@ -36,6 +36,7 @@ Review existing management allowances and recovery access before confirming.
 The provider can update filtering automatically after configuration changes; there is no automatic rollback or separate network-apply step in these commands.
 Cluster enablement, node/guest options, guest NIC firewall flags and the active firewall backend/service determine effective coverage.
 Forward-policy behavior depends on backend support; this admission does not switch backends.
+See the [Proxmox firewall documentation](https://github.com/proxmox/pve-docs/blob/master/pve-firewall.adoc) for provider filtering and backend behavior.
 For a guest NIC's reviewed `firewall=1` setting, use the [guest NIC guidance](guest-management.md#guest-networking-and-boot).
 
 The option PUT returns a synchronous null result, so API `status: success` means the configuration request completed, not that filtering is effective or management connectivity is verified.

@@ -202,10 +202,7 @@ These reads do not grant storage administration, node power control, or cluster 
 
 ### Firewall options and default policies
 
-Read `/cluster/firewall/options`, `/nodes/{node}/firewall/options` or `/nodes/{node}/qemu/{vmid}/firewall/options` and its LXC equivalent with the selected profile and path parameters.
-These reads expose configured enable/default-policy settings and a provider digest when available; unrelated and undeclared fields remain excluded even with `--full`.
-Confirmed `set` supports enable at all four scopes, in/out default policies at cluster and guest scope, and forward default policy at cluster scope.
-Node schemas have no default-policy inputs; cluster enable is narrowed to integer 0/1.
+Read firewall options and preview enable/default-policy updates for the selected cluster, node or guest:
 
 ```sh
 proxmox-axi get '/nodes/{node}/qemu/{vmid}/firewall/options' --api-node '<node>' --api-vmid 100 --profile '<profile>'
@@ -213,14 +210,8 @@ proxmox-axi set '/nodes/{node}/qemu/{vmid}/firewall/options' --api-node '<node>'
 ```
 
 Enable the exact mutation ID in the selected profile and any independent host policy, inspect the target/settings and preview `warnings`, then repeat the exact request with `--confirm '<confirmation>'`.
-Disabling protection and ACCEPT defaults receive explicit warnings, including inside confirmed batches; ACCEPT is the action for unmatched traffic in its direction, not removal of explicit rules.
-Changed scope, enable/policy inputs or supplied digest invalidate confirmation, and the provider can reject an intervening digest conflict.
 Firewall changes can cut off management access; review management allowances and recovery access before confirming.
-The provider can update filtering automatically, and guest coverage also requires the NIC firewall flag; forward behavior depends on the active backend, as described in the [Proxmox firewall documentation](https://github.com/proxmox/pve-docs/blob/master/pve-firewall.adoc).
-The synchronous null result confirms the configuration request, not effective filtering or connectivity, and supplies no UPID for task waiting.
-Read options again, retain failed/uncertain journal outcomes and never automatically retry or disable protection after lost access.
-See the [installed firewall guide](skills/proxmox-axi/references/firewall-management.md) for scope, digest and recovery details.
-Other firewall option selectors and SDN-vnet firewall options remain refused in this slice.
+See the [installed firewall guide](skills/proxmox-axi/references/firewall-management.md) for supported scopes and inputs, read projection, warning meanings, digest handling, filtering prerequisites, verification and recovery.
 
 ### Guest power control
 
@@ -435,7 +426,7 @@ Only reviewed managed backup sources are admitted; force overwrite, raw host pat
   Managed transfers have separate administrator-controlled byte and elapsed limits.
 - Operations whose effects, transport or secret handling are not reviewed remain discoverable but uncallable.
   Unresolved policy fields deny invocation, and changing a capture never admits new operations automatically.
-- Writes cover [QEMU creation and cloning](#create-and-clone-qemu-guests), [LXC creation and cloning](#create-and-clone-lxc-guests), [backup restoration](#restore-guest-backups), [confirmed guest execution and status retrieval](#confirmed-guest-execution), [guest power operations](#guest-power-control), guest destruction, [selected guest configuration settings](#guest-configuration-and-compute-settings), [managed disk attachments](#manage-disk-attachments), growth-only guest disk resize, pool management, task cancellation, node execute batches, [media uploads and catalogue installation](#discover-and-install-guest-media), [guest backups](#guest-backups) and the reviewed credential/session setup operations.
+- Writes cover [QEMU creation and cloning](#create-and-clone-qemu-guests), [LXC creation and cloning](#create-and-clone-lxc-guests), [backup restoration](#restore-guest-backups), [confirmed guest execution and status retrieval](#confirmed-guest-execution), [guest power operations](#guest-power-control), guest destruction, [selected guest configuration settings](#guest-configuration-and-compute-settings), [managed disk attachments](#manage-disk-attachments), growth-only guest disk resize, [firewall options and default policies](skills/proxmox-axi/references/firewall-management.md), pool management, task cancellation, node execute batches, [media uploads and catalogue installation](#discover-and-install-guest-media), [guest backups](#guest-backups) and the reviewed credential/session setup operations.
   Effectful CIFS/PBS scans use the same preview and confirmation policy even though their vendor method is GET.
 - Inspect `schema get|create|set|delete <template>` and the generated `write-policy.json` before enabling an operation.
 - Enable an operation by adding its ID to the selected file profile: `writes: { "operations": ["<operation-id>"] }`.
