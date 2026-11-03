@@ -575,23 +575,95 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "private-result",
+            "stateBinding": {
+              "kind": "firewall-rules",
+              "path": "/cluster/firewall/rules"
+            },
+            "allowedInputs": [
+              "pos",
+              "digest"
+            ],
+            "requiredInputs": [
+              "pos"
+            ],
+            "confirmationWarnings": [
+              {
+                "message": "Firewall rule changes can cut off management access or change protection. Inspect the complete private ordered plan before confirming."
+              },
+              {
+                "message": "RULE DELETION: explicitly review the selected position and resulting ordered rules before confirming."
+              }
+            ],
+            "reason": "Private state-bound ordered rule change with automatic provider digest guard; reorder is separate from field edits. No automatic retry or deletion after uncertainty.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Inspect complete current rules privately; a matching later list cannot establish attribution. Never retry or automatically delete after uncertainty."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/",
+                [
+                  "Sys.Modify"
+                ]
+              ]
+            },
+            "response": {
+              "type": "null"
+            },
+            "source": "Pinned rule schemas and reviewed provider Rules.pm creation, digest-guarded updates/deletes and reorder semantics."
           },
           "contract": "dist/contracts.json#/contracts/113"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "private-result",
+            "stateBinding": {
+              "kind": "firewall-rules",
+              "path": "/cluster/firewall/rules"
+            },
+            "allowedInputs": [
+              "pos",
+              "digest"
+            ],
+            "requiredInputs": [
+              "pos"
+            ],
+            "confirmationWarnings": [
+              {
+                "message": "Firewall rule changes can cut off management access or change protection. Inspect the complete private ordered plan before confirming."
+              },
+              {
+                "message": "RULE DELETION: explicitly review the selected position and resulting ordered rules before confirming."
+              }
+            ],
+            "reason": "Private state-bound ordered rule change with automatic provider digest guard; reorder is separate from field edits. No automatic retry or deletion after uncertainty.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Inspect complete current rules privately; a matching later list cannot establish attribution. Never retry or automatically delete after uncertainty."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/",
+                [
+                  "Sys.Modify"
+                ]
+              ]
+            },
+            "response": {
+              "type": "null"
+            },
+            "source": "Pinned rule schemas and reviewed provider Rules.pm creation, digest-guarded updates/deletes and reorder semantics."
           },
           "contract": "dist/contracts.json#/contracts/728"
         }
@@ -1862,23 +1934,97 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "private-result",
+            "stateBinding": {
+              "kind": "firewall-rules",
+              "path": "/nodes/{node}/firewall/rules"
+            },
+            "allowedInputs": [
+              "node",
+              "pos",
+              "digest"
+            ],
+            "requiredInputs": [
+              "pos"
+            ],
+            "confirmationWarnings": [
+              {
+                "message": "Firewall rule changes can cut off management access or change protection. Inspect the complete private ordered plan before confirming."
+              },
+              {
+                "message": "RULE DELETION: explicitly review the selected position and resulting ordered rules before confirming."
+              }
+            ],
+            "reason": "Private state-bound ordered rule change with automatic provider digest guard; reorder is separate from field edits. No automatic retry or deletion after uncertainty.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Inspect complete current rules privately; a matching later list cannot establish attribution. Never retry or automatically delete after uncertainty."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/nodes/{node}",
+                [
+                  "Sys.Modify"
+                ]
+              ]
+            },
+            "response": {
+              "type": "null"
+            },
+            "source": "Pinned rule schemas and reviewed provider Rules.pm creation, digest-guarded updates/deletes and reorder semantics."
           },
           "contract": "dist/contracts.json#/contracts/342"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "private-result",
+            "stateBinding": {
+              "kind": "firewall-rules",
+              "path": "/nodes/{node}/firewall/rules"
+            },
+            "allowedInputs": [
+              "node",
+              "pos",
+              "digest"
+            ],
+            "requiredInputs": [
+              "pos"
+            ],
+            "confirmationWarnings": [
+              {
+                "message": "Firewall rule changes can cut off management access or change protection. Inspect the complete private ordered plan before confirming."
+              },
+              {
+                "message": "RULE DELETION: explicitly review the selected position and resulting ordered rules before confirming."
+              }
+            ],
+            "reason": "Private state-bound ordered rule change with automatic provider digest guard; reorder is separate from field edits. No automatic retry or deletion after uncertainty.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Inspect complete current rules privately; a matching later list cannot establish attribution. Never retry or automatically delete after uncertainty."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/nodes/{node}",
+                [
+                  "Sys.Modify"
+                ]
+              ]
+            },
+            "response": {
+              "type": "null"
+            },
+            "source": "Pinned rule schemas and reviewed provider Rules.pm creation, digest-guarded updates/deletes and reorder semantics."
           },
           "contract": "dist/contracts.json#/contracts/1010"
         }
@@ -2077,23 +2223,99 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "private-result",
+            "stateBinding": {
+              "kind": "firewall-rules",
+              "path": "/nodes/{node}/lxc/{vmid}/firewall/rules"
+            },
+            "allowedInputs": [
+              "node",
+              "vmid",
+              "pos",
+              "digest"
+            ],
+            "requiredInputs": [
+              "pos"
+            ],
+            "confirmationWarnings": [
+              {
+                "message": "Firewall rule changes can cut off management access or change protection. Inspect the complete private ordered plan before confirming."
+              },
+              {
+                "message": "RULE DELETION: explicitly review the selected position and resulting ordered rules before confirming."
+              }
+            ],
+            "reason": "Private state-bound ordered rule change with automatic provider digest guard; reorder is separate from field edits. No automatic retry or deletion after uncertainty.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Inspect complete current rules privately; a matching later list cannot establish attribution. Never retry or automatically delete after uncertainty."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/vms/{vmid}",
+                [
+                  "VM.Config.Network"
+                ]
+              ]
+            },
+            "response": {
+              "type": "null"
+            },
+            "source": "Pinned rule schemas and reviewed provider Rules.pm creation, digest-guarded updates/deletes and reorder semantics."
           },
           "contract": "dist/contracts.json#/contracts/381"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "private-result",
+            "stateBinding": {
+              "kind": "firewall-rules",
+              "path": "/nodes/{node}/lxc/{vmid}/firewall/rules"
+            },
+            "allowedInputs": [
+              "node",
+              "vmid",
+              "pos",
+              "digest"
+            ],
+            "requiredInputs": [
+              "pos"
+            ],
+            "confirmationWarnings": [
+              {
+                "message": "Firewall rule changes can cut off management access or change protection. Inspect the complete private ordered plan before confirming."
+              },
+              {
+                "message": "RULE DELETION: explicitly review the selected position and resulting ordered rules before confirming."
+              }
+            ],
+            "reason": "Private state-bound ordered rule change with automatic provider digest guard; reorder is separate from field edits. No automatic retry or deletion after uncertainty.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Inspect complete current rules privately; a matching later list cannot establish attribution. Never retry or automatically delete after uncertainty."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/vms/{vmid}",
+                [
+                  "VM.Config.Network"
+                ]
+              ]
+            },
+            "response": {
+              "type": "null"
+            },
+            "source": "Pinned rule schemas and reviewed provider Rules.pm creation, digest-guarded updates/deletes and reorder semantics."
           },
           "contract": "dist/contracts.json#/contracts/1049"
         }
@@ -2443,23 +2665,99 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "private-result",
+            "stateBinding": {
+              "kind": "firewall-rules",
+              "path": "/nodes/{node}/qemu/{vmid}/firewall/rules"
+            },
+            "allowedInputs": [
+              "node",
+              "vmid",
+              "pos",
+              "digest"
+            ],
+            "requiredInputs": [
+              "pos"
+            ],
+            "confirmationWarnings": [
+              {
+                "message": "Firewall rule changes can cut off management access or change protection. Inspect the complete private ordered plan before confirming."
+              },
+              {
+                "message": "RULE DELETION: explicitly review the selected position and resulting ordered rules before confirming."
+              }
+            ],
+            "reason": "Private state-bound ordered rule change with automatic provider digest guard; reorder is separate from field edits. No automatic retry or deletion after uncertainty.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Inspect complete current rules privately; a matching later list cannot establish attribution. Never retry or automatically delete after uncertainty."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/vms/{vmid}",
+                [
+                  "VM.Config.Network"
+                ]
+              ]
+            },
+            "response": {
+              "type": "null"
+            },
+            "source": "Pinned rule schemas and reviewed provider Rules.pm creation, digest-guarded updates/deletes and reorder semantics."
           },
           "contract": "dist/contracts.json#/contracts/482"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "private-result",
+            "stateBinding": {
+              "kind": "firewall-rules",
+              "path": "/nodes/{node}/qemu/{vmid}/firewall/rules"
+            },
+            "allowedInputs": [
+              "node",
+              "vmid",
+              "pos",
+              "digest"
+            ],
+            "requiredInputs": [
+              "pos"
+            ],
+            "confirmationWarnings": [
+              {
+                "message": "Firewall rule changes can cut off management access or change protection. Inspect the complete private ordered plan before confirming."
+              },
+              {
+                "message": "RULE DELETION: explicitly review the selected position and resulting ordered rules before confirming."
+              }
+            ],
+            "reason": "Private state-bound ordered rule change with automatic provider digest guard; reorder is separate from field edits. No automatic retry or deletion after uncertainty.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Inspect complete current rules privately; a matching later list cannot establish attribution. Never retry or automatically delete after uncertainty."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/vms/{vmid}",
+                [
+                  "VM.Config.Network"
+                ]
+              ]
+            },
+            "response": {
+              "type": "null"
+            },
+            "source": "Pinned rule schemas and reviewed provider Rules.pm creation, digest-guarded updates/deletes and reorder semantics."
           },
           "contract": "dist/contracts.json#/contracts/1152"
         }
@@ -4875,23 +5173,23 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "read",
+            "transport": "json",
+            "secrets": "private-result",
+            "reason": "Complete ordered firewall rules, including provider digests and potentially sensitive comments, use the bounded private result channel."
           },
           "contract": "dist/contracts.json#/contracts/111"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "read",
+            "transport": "json",
+            "secrets": "private-result",
+            "reason": "Complete ordered firewall rules, including provider digests and potentially sensitive comments, use the bounded private result channel."
           },
           "contract": "dist/contracts.json#/contracts/726"
         }
@@ -4908,23 +5206,23 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "read",
+            "transport": "json",
+            "secrets": "private-result",
+            "reason": "One firewall rule and its rules-list digest use the private result channel; position does not establish a stable rule identity."
           },
           "contract": "dist/contracts.json#/contracts/114"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "read",
+            "transport": "json",
+            "secrets": "private-result",
+            "reason": "One firewall rule and its rules-list digest use the private result channel; position does not establish a stable rule identity."
           },
           "contract": "dist/contracts.json#/contracts/729"
         }
@@ -9246,23 +9544,23 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "read",
+            "transport": "json",
+            "secrets": "private-result",
+            "reason": "Complete ordered firewall rules and potentially sensitive comments require bounded private results."
           },
           "contract": "dist/contracts.json#/contracts/340"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "read",
+            "transport": "json",
+            "secrets": "private-result",
+            "reason": "Complete ordered firewall rules and potentially sensitive comments require bounded private results."
           },
           "contract": "dist/contracts.json#/contracts/1008"
         }
@@ -9279,23 +9577,23 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "read",
+            "transport": "json",
+            "secrets": "private-result",
+            "reason": "One firewall rule and its rules-list digest require private results."
           },
           "contract": "dist/contracts.json#/contracts/343"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "read",
+            "transport": "json",
+            "secrets": "private-result",
+            "reason": "One firewall rule and its rules-list digest require private results."
           },
           "contract": "dist/contracts.json#/contracts/1011"
         }
@@ -10024,23 +10322,23 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "read",
+            "transport": "json",
+            "secrets": "private-result",
+            "reason": "Complete ordered guest firewall rules and potentially sensitive comments require bounded private results."
           },
           "contract": "dist/contracts.json#/contracts/379"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "read",
+            "transport": "json",
+            "secrets": "private-result",
+            "reason": "Complete ordered guest firewall rules and potentially sensitive comments require bounded private results."
           },
           "contract": "dist/contracts.json#/contracts/1047"
         }
@@ -10057,23 +10355,23 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "read",
+            "transport": "json",
+            "secrets": "private-result",
+            "reason": "One guest firewall rule and its rules-list digest require private results."
           },
           "contract": "dist/contracts.json#/contracts/382"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "read",
+            "transport": "json",
+            "secrets": "private-result",
+            "reason": "One guest firewall rule and its rules-list digest require private results."
           },
           "contract": "dist/contracts.json#/contracts/1050"
         }
@@ -11780,23 +12078,23 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "read",
+            "transport": "json",
+            "secrets": "private-result",
+            "reason": "Complete ordered guest firewall rules and potentially sensitive comments require bounded private results."
           },
           "contract": "dist/contracts.json#/contracts/480"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "read",
+            "transport": "json",
+            "secrets": "private-result",
+            "reason": "Complete ordered guest firewall rules and potentially sensitive comments require bounded private results."
           },
           "contract": "dist/contracts.json#/contracts/1150"
         }
@@ -11813,23 +12111,23 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "read",
+            "transport": "json",
+            "secrets": "private-result",
+            "reason": "One guest firewall rule and its rules-list digest require private results."
           },
           "contract": "dist/contracts.json#/contracts/483"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "read",
+            "transport": "json",
+            "secrets": "private-result",
+            "reason": "One guest firewall rule and its rules-list digest require private results."
           },
           "contract": "dist/contracts.json#/contracts/1153"
         }
@@ -15531,23 +15829,135 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "private-result",
+            "stateBinding": {
+              "kind": "firewall-rules",
+              "path": "/cluster/firewall/rules"
+            },
+            "allowedInputs": [
+              "type",
+              "action",
+              "enable",
+              "source",
+              "dest",
+              "proto",
+              "sport",
+              "dport",
+              "iface"
+            ],
+            "requiredInputs": [],
+            "fixedInputs": {
+              "enable": 0
+            },
+            "inputPatterns": {
+              "type": "^(?:in|out)$",
+              "action": "^(?:ACCEPT|DROP|REJECT)$"
+            },
+            "inputFormats": {
+              "source": "pve-firewall-address",
+              "dest": "pve-firewall-address",
+              "proto": "pve-firewall-protocol",
+              "sport": "pve-firewall-port",
+              "dport": "pve-firewall-port",
+              "iface": "pve-firewall-interface"
+            },
+            "confirmationWarnings": [
+              {
+                "message": "Firewall rule changes can cut off management access or change protection. Inspect the complete private ordered plan before confirming."
+              },
+              {
+                "message": "NON-ATOMIC CREATE: the provider ignores creation digests and prepends this fixed disabled rule. Unexpected observed order remains uncertain; enabling requires a separate fresh digest-guarded confirmation."
+              }
+            ],
+            "reason": "Non-atomic creation of a fixed disabled rule only: provider POST ignores digest and prepends; private before/after plan, state recheck and post-write comparison apply. Enable separately with a fresh digest-guarded confirmation.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Inspect complete current rules privately; a matching later list cannot establish attribution. Never retry or automatically delete after uncertainty."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/",
+                [
+                  "Sys.Modify"
+                ]
+              ]
+            },
+            "response": {
+              "type": "null"
+            },
+            "source": "Pinned rule schemas and reviewed provider Rules.pm creation, digest-guarded updates/deletes and reorder semantics."
           },
           "contract": "dist/contracts.json#/contracts/112"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "private-result",
+            "stateBinding": {
+              "kind": "firewall-rules",
+              "path": "/cluster/firewall/rules"
+            },
+            "allowedInputs": [
+              "type",
+              "action",
+              "enable",
+              "source",
+              "dest",
+              "proto",
+              "sport",
+              "dport",
+              "iface"
+            ],
+            "requiredInputs": [],
+            "fixedInputs": {
+              "enable": 0
+            },
+            "inputPatterns": {
+              "type": "^(?:in|out)$",
+              "action": "^(?:ACCEPT|DROP|REJECT)$"
+            },
+            "inputFormats": {
+              "source": "pve-firewall-address",
+              "dest": "pve-firewall-address",
+              "proto": "pve-firewall-protocol",
+              "sport": "pve-firewall-port",
+              "dport": "pve-firewall-port",
+              "iface": "pve-firewall-interface"
+            },
+            "confirmationWarnings": [
+              {
+                "message": "Firewall rule changes can cut off management access or change protection. Inspect the complete private ordered plan before confirming."
+              },
+              {
+                "message": "NON-ATOMIC CREATE: the provider ignores creation digests and prepends this fixed disabled rule. Unexpected observed order remains uncertain; enabling requires a separate fresh digest-guarded confirmation."
+              }
+            ],
+            "reason": "Non-atomic creation of a fixed disabled rule only: provider POST ignores digest and prepends; private before/after plan, state recheck and post-write comparison apply. Enable separately with a fresh digest-guarded confirmation.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Inspect complete current rules privately; a matching later list cannot establish attribution. Never retry or automatically delete after uncertainty."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/",
+                [
+                  "Sys.Modify"
+                ]
+              ]
+            },
+            "response": {
+              "type": "null"
+            },
+            "source": "Pinned rule schemas and reviewed provider Rules.pm creation, digest-guarded updates/deletes and reorder semantics."
           },
           "contract": "dist/contracts.json#/contracts/727"
         }
@@ -17648,23 +18058,137 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "private-result",
+            "stateBinding": {
+              "kind": "firewall-rules",
+              "path": "/nodes/{node}/firewall/rules"
+            },
+            "allowedInputs": [
+              "node",
+              "type",
+              "action",
+              "enable",
+              "source",
+              "dest",
+              "proto",
+              "sport",
+              "dport",
+              "iface"
+            ],
+            "requiredInputs": [],
+            "fixedInputs": {
+              "enable": 0
+            },
+            "inputPatterns": {
+              "type": "^(?:in|out)$",
+              "action": "^(?:ACCEPT|DROP|REJECT)$"
+            },
+            "inputFormats": {
+              "source": "pve-firewall-address",
+              "dest": "pve-firewall-address",
+              "proto": "pve-firewall-protocol",
+              "sport": "pve-firewall-port",
+              "dport": "pve-firewall-port",
+              "iface": "pve-firewall-interface"
+            },
+            "confirmationWarnings": [
+              {
+                "message": "Firewall rule changes can cut off management access or change protection. Inspect the complete private ordered plan before confirming."
+              },
+              {
+                "message": "NON-ATOMIC CREATE: the provider ignores creation digests and prepends this fixed disabled rule. Unexpected observed order remains uncertain; enabling requires a separate fresh digest-guarded confirmation."
+              }
+            ],
+            "reason": "Non-atomic creation of a fixed disabled rule only: provider POST ignores digest and prepends; private before/after plan, state recheck and post-write comparison apply. Enable separately with a fresh digest-guarded confirmation.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Inspect complete current rules privately; a matching later list cannot establish attribution. Never retry or automatically delete after uncertainty."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/nodes/{node}",
+                [
+                  "Sys.Modify"
+                ]
+              ]
+            },
+            "response": {
+              "type": "null"
+            },
+            "source": "Pinned rule schemas and reviewed provider Rules.pm creation, digest-guarded updates/deletes and reorder semantics."
           },
           "contract": "dist/contracts.json#/contracts/341"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "private-result",
+            "stateBinding": {
+              "kind": "firewall-rules",
+              "path": "/nodes/{node}/firewall/rules"
+            },
+            "allowedInputs": [
+              "node",
+              "type",
+              "action",
+              "enable",
+              "source",
+              "dest",
+              "proto",
+              "sport",
+              "dport",
+              "iface"
+            ],
+            "requiredInputs": [],
+            "fixedInputs": {
+              "enable": 0
+            },
+            "inputPatterns": {
+              "type": "^(?:in|out)$",
+              "action": "^(?:ACCEPT|DROP|REJECT)$"
+            },
+            "inputFormats": {
+              "source": "pve-firewall-address",
+              "dest": "pve-firewall-address",
+              "proto": "pve-firewall-protocol",
+              "sport": "pve-firewall-port",
+              "dport": "pve-firewall-port",
+              "iface": "pve-firewall-interface"
+            },
+            "confirmationWarnings": [
+              {
+                "message": "Firewall rule changes can cut off management access or change protection. Inspect the complete private ordered plan before confirming."
+              },
+              {
+                "message": "NON-ATOMIC CREATE: the provider ignores creation digests and prepends this fixed disabled rule. Unexpected observed order remains uncertain; enabling requires a separate fresh digest-guarded confirmation."
+              }
+            ],
+            "reason": "Non-atomic creation of a fixed disabled rule only: provider POST ignores digest and prepends; private before/after plan, state recheck and post-write comparison apply. Enable separately with a fresh digest-guarded confirmation.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Inspect complete current rules privately; a matching later list cannot establish attribution. Never retry or automatically delete after uncertainty."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/nodes/{node}",
+                [
+                  "Sys.Modify"
+                ]
+              ]
+            },
+            "response": {
+              "type": "null"
+            },
+            "source": "Pinned rule schemas and reviewed provider Rules.pm creation, digest-guarded updates/deletes and reorder semantics."
           },
           "contract": "dist/contracts.json#/contracts/1009"
         }
@@ -18707,23 +19231,141 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "private-result",
+            "stateBinding": {
+              "kind": "firewall-rules",
+              "path": "/nodes/{node}/lxc/{vmid}/firewall/rules"
+            },
+            "allowedInputs": [
+              "node",
+              "vmid",
+              "type",
+              "action",
+              "enable",
+              "source",
+              "dest",
+              "proto",
+              "sport",
+              "dport",
+              "iface"
+            ],
+            "requiredInputs": [],
+            "fixedInputs": {
+              "enable": 0
+            },
+            "inputPatterns": {
+              "type": "^(?:in|out)$",
+              "action": "^(?:ACCEPT|DROP|REJECT)$",
+              "iface": "^net(?:[0-9]|[12][0-9]|3[01])$"
+            },
+            "inputFormats": {
+              "source": "pve-firewall-address",
+              "dest": "pve-firewall-address",
+              "proto": "pve-firewall-protocol",
+              "sport": "pve-firewall-port",
+              "dport": "pve-firewall-port",
+              "iface": "pve-firewall-interface"
+            },
+            "confirmationWarnings": [
+              {
+                "message": "Firewall rule changes can cut off management access or change protection. Inspect the complete private ordered plan before confirming."
+              },
+              {
+                "message": "NON-ATOMIC CREATE: the provider ignores creation digests and prepends this fixed disabled rule. Unexpected observed order remains uncertain; enabling requires a separate fresh digest-guarded confirmation."
+              }
+            ],
+            "reason": "Non-atomic creation of a fixed disabled rule only: provider POST ignores digest and prepends; private before/after plan, state recheck and post-write comparison apply. Enable separately with a fresh digest-guarded confirmation.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Inspect complete current rules privately; a matching later list cannot establish attribution. Never retry or automatically delete after uncertainty."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/vms/{vmid}",
+                [
+                  "VM.Config.Network"
+                ]
+              ]
+            },
+            "response": {
+              "type": "null"
+            },
+            "source": "Pinned rule schemas and reviewed provider Rules.pm creation, digest-guarded updates/deletes and reorder semantics."
           },
           "contract": "dist/contracts.json#/contracts/380"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "private-result",
+            "stateBinding": {
+              "kind": "firewall-rules",
+              "path": "/nodes/{node}/lxc/{vmid}/firewall/rules"
+            },
+            "allowedInputs": [
+              "node",
+              "vmid",
+              "type",
+              "action",
+              "enable",
+              "source",
+              "dest",
+              "proto",
+              "sport",
+              "dport",
+              "iface"
+            ],
+            "requiredInputs": [],
+            "fixedInputs": {
+              "enable": 0
+            },
+            "inputPatterns": {
+              "type": "^(?:in|out)$",
+              "action": "^(?:ACCEPT|DROP|REJECT)$",
+              "iface": "^net(?:[0-9]|[12][0-9]|3[01])$"
+            },
+            "inputFormats": {
+              "source": "pve-firewall-address",
+              "dest": "pve-firewall-address",
+              "proto": "pve-firewall-protocol",
+              "sport": "pve-firewall-port",
+              "dport": "pve-firewall-port",
+              "iface": "pve-firewall-interface"
+            },
+            "confirmationWarnings": [
+              {
+                "message": "Firewall rule changes can cut off management access or change protection. Inspect the complete private ordered plan before confirming."
+              },
+              {
+                "message": "NON-ATOMIC CREATE: the provider ignores creation digests and prepends this fixed disabled rule. Unexpected observed order remains uncertain; enabling requires a separate fresh digest-guarded confirmation."
+              }
+            ],
+            "reason": "Non-atomic creation of a fixed disabled rule only: provider POST ignores digest and prepends; private before/after plan, state recheck and post-write comparison apply. Enable separately with a fresh digest-guarded confirmation.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Inspect complete current rules privately; a matching later list cannot establish attribution. Never retry or automatically delete after uncertainty."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/vms/{vmid}",
+                [
+                  "VM.Config.Network"
+                ]
+              ]
+            },
+            "response": {
+              "type": "null"
+            },
+            "source": "Pinned rule schemas and reviewed provider Rules.pm creation, digest-guarded updates/deletes and reorder semantics."
           },
           "contract": "dist/contracts.json#/contracts/1048"
         }
@@ -21396,23 +22038,141 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "private-result",
+            "stateBinding": {
+              "kind": "firewall-rules",
+              "path": "/nodes/{node}/qemu/{vmid}/firewall/rules"
+            },
+            "allowedInputs": [
+              "node",
+              "vmid",
+              "type",
+              "action",
+              "enable",
+              "source",
+              "dest",
+              "proto",
+              "sport",
+              "dport",
+              "iface"
+            ],
+            "requiredInputs": [],
+            "fixedInputs": {
+              "enable": 0
+            },
+            "inputPatterns": {
+              "type": "^(?:in|out)$",
+              "action": "^(?:ACCEPT|DROP|REJECT)$",
+              "iface": "^net(?:[0-9]|[12][0-9]|3[01])$"
+            },
+            "inputFormats": {
+              "source": "pve-firewall-address",
+              "dest": "pve-firewall-address",
+              "proto": "pve-firewall-protocol",
+              "sport": "pve-firewall-port",
+              "dport": "pve-firewall-port",
+              "iface": "pve-firewall-interface"
+            },
+            "confirmationWarnings": [
+              {
+                "message": "Firewall rule changes can cut off management access or change protection. Inspect the complete private ordered plan before confirming."
+              },
+              {
+                "message": "NON-ATOMIC CREATE: the provider ignores creation digests and prepends this fixed disabled rule. Unexpected observed order remains uncertain; enabling requires a separate fresh digest-guarded confirmation."
+              }
+            ],
+            "reason": "Non-atomic creation of a fixed disabled rule only: provider POST ignores digest and prepends; private before/after plan, state recheck and post-write comparison apply. Enable separately with a fresh digest-guarded confirmation.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Inspect complete current rules privately; a matching later list cannot establish attribution. Never retry or automatically delete after uncertainty."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/vms/{vmid}",
+                [
+                  "VM.Config.Network"
+                ]
+              ]
+            },
+            "response": {
+              "type": "null"
+            },
+            "source": "Pinned rule schemas and reviewed provider Rules.pm creation, digest-guarded updates/deletes and reorder semantics."
           },
           "contract": "dist/contracts.json#/contracts/481"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "private-result",
+            "stateBinding": {
+              "kind": "firewall-rules",
+              "path": "/nodes/{node}/qemu/{vmid}/firewall/rules"
+            },
+            "allowedInputs": [
+              "node",
+              "vmid",
+              "type",
+              "action",
+              "enable",
+              "source",
+              "dest",
+              "proto",
+              "sport",
+              "dport",
+              "iface"
+            ],
+            "requiredInputs": [],
+            "fixedInputs": {
+              "enable": 0
+            },
+            "inputPatterns": {
+              "type": "^(?:in|out)$",
+              "action": "^(?:ACCEPT|DROP|REJECT)$",
+              "iface": "^net(?:[0-9]|[12][0-9]|3[01])$"
+            },
+            "inputFormats": {
+              "source": "pve-firewall-address",
+              "dest": "pve-firewall-address",
+              "proto": "pve-firewall-protocol",
+              "sport": "pve-firewall-port",
+              "dport": "pve-firewall-port",
+              "iface": "pve-firewall-interface"
+            },
+            "confirmationWarnings": [
+              {
+                "message": "Firewall rule changes can cut off management access or change protection. Inspect the complete private ordered plan before confirming."
+              },
+              {
+                "message": "NON-ATOMIC CREATE: the provider ignores creation digests and prepends this fixed disabled rule. Unexpected observed order remains uncertain; enabling requires a separate fresh digest-guarded confirmation."
+              }
+            ],
+            "reason": "Non-atomic creation of a fixed disabled rule only: provider POST ignores digest and prepends; private before/after plan, state recheck and post-write comparison apply. Enable separately with a fresh digest-guarded confirmation.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Inspect complete current rules privately; a matching later list cannot establish attribution. Never retry or automatically delete after uncertainty."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/vms/{vmid}",
+                [
+                  "VM.Config.Network"
+                ]
+              ]
+            },
+            "response": {
+              "type": "null"
+            },
+            "source": "Pinned rule schemas and reviewed provider Rules.pm creation, digest-guarded updates/deletes and reorder semantics."
           },
           "contract": "dist/contracts.json#/contracts/1151"
         }
@@ -24931,23 +25691,213 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "private-result",
+            "stateBinding": {
+              "kind": "firewall-rules",
+              "path": "/cluster/firewall/rules"
+            },
+            "allowedInputs": [
+              "pos",
+              "digest",
+              "type",
+              "action",
+              "enable",
+              "source",
+              "dest",
+              "proto",
+              "sport",
+              "dport",
+              "iface",
+              "moveto"
+            ],
+            "requiredInputs": [
+              "pos"
+            ],
+            "inputCases": [
+              {
+                "requiredInputs": [
+                  "moveto"
+                ],
+                "forbiddenInputs": [
+                  "type",
+                  "action",
+                  "enable",
+                  "source",
+                  "dest",
+                  "proto",
+                  "sport",
+                  "dport",
+                  "iface"
+                ]
+              },
+              {
+                "forbiddenInputs": [
+                  "moveto",
+                  "enable"
+                ]
+              },
+              {
+                "forbiddenInputs": [
+                  "moveto"
+                ],
+                "requiredValues": {
+                  "enable": 0
+                }
+              },
+              {
+                "forbiddenInputs": [
+                  "moveto"
+                ],
+                "requiredValues": {
+                  "enable": 1
+                }
+              }
+            ],
+            "inputPatterns": {
+              "type": "^(?:in|out)$",
+              "action": "^(?:ACCEPT|DROP|REJECT)$"
+            },
+            "inputFormats": {
+              "source": "pve-firewall-address",
+              "dest": "pve-firewall-address",
+              "proto": "pve-firewall-protocol",
+              "sport": "pve-firewall-port",
+              "dport": "pve-firewall-port",
+              "iface": "pve-firewall-interface"
+            },
+            "confirmationWarnings": [
+              {
+                "message": "Firewall rule changes can cut off management access or change protection. Inspect the complete private ordered plan before confirming."
+              }
+            ],
+            "reason": "Private state-bound ordered rule change with automatic provider digest guard; reorder is separate from field edits. No automatic retry or deletion after uncertainty.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Inspect complete current rules privately; a matching later list cannot establish attribution. Never retry or automatically delete after uncertainty."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/",
+                [
+                  "Sys.Modify"
+                ]
+              ]
+            },
+            "response": {
+              "type": "null"
+            },
+            "source": "Pinned rule schemas and reviewed provider Rules.pm creation, digest-guarded updates/deletes and reorder semantics."
           },
           "contract": "dist/contracts.json#/contracts/115"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "private-result",
+            "stateBinding": {
+              "kind": "firewall-rules",
+              "path": "/cluster/firewall/rules"
+            },
+            "allowedInputs": [
+              "pos",
+              "digest",
+              "type",
+              "action",
+              "enable",
+              "source",
+              "dest",
+              "proto",
+              "sport",
+              "dport",
+              "iface",
+              "moveto"
+            ],
+            "requiredInputs": [
+              "pos"
+            ],
+            "inputCases": [
+              {
+                "requiredInputs": [
+                  "moveto"
+                ],
+                "forbiddenInputs": [
+                  "type",
+                  "action",
+                  "enable",
+                  "source",
+                  "dest",
+                  "proto",
+                  "sport",
+                  "dport",
+                  "iface"
+                ]
+              },
+              {
+                "forbiddenInputs": [
+                  "moveto",
+                  "enable"
+                ]
+              },
+              {
+                "forbiddenInputs": [
+                  "moveto"
+                ],
+                "requiredValues": {
+                  "enable": 0
+                }
+              },
+              {
+                "forbiddenInputs": [
+                  "moveto"
+                ],
+                "requiredValues": {
+                  "enable": 1
+                }
+              }
+            ],
+            "inputPatterns": {
+              "type": "^(?:in|out)$",
+              "action": "^(?:ACCEPT|DROP|REJECT)$"
+            },
+            "inputFormats": {
+              "source": "pve-firewall-address",
+              "dest": "pve-firewall-address",
+              "proto": "pve-firewall-protocol",
+              "sport": "pve-firewall-port",
+              "dport": "pve-firewall-port",
+              "iface": "pve-firewall-interface"
+            },
+            "confirmationWarnings": [
+              {
+                "message": "Firewall rule changes can cut off management access or change protection. Inspect the complete private ordered plan before confirming."
+              }
+            ],
+            "reason": "Private state-bound ordered rule change with automatic provider digest guard; reorder is separate from field edits. No automatic retry or deletion after uncertainty.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Inspect complete current rules privately; a matching later list cannot establish attribution. Never retry or automatically delete after uncertainty."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/",
+                [
+                  "Sys.Modify"
+                ]
+              ]
+            },
+            "response": {
+              "type": "null"
+            },
+            "source": "Pinned rule schemas and reviewed provider Rules.pm creation, digest-guarded updates/deletes and reorder semantics."
           },
           "contract": "dist/contracts.json#/contracts/730"
         }
@@ -26271,23 +27221,215 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "private-result",
+            "stateBinding": {
+              "kind": "firewall-rules",
+              "path": "/nodes/{node}/firewall/rules"
+            },
+            "allowedInputs": [
+              "node",
+              "pos",
+              "digest",
+              "type",
+              "action",
+              "enable",
+              "source",
+              "dest",
+              "proto",
+              "sport",
+              "dport",
+              "iface",
+              "moveto"
+            ],
+            "requiredInputs": [
+              "pos"
+            ],
+            "inputCases": [
+              {
+                "requiredInputs": [
+                  "moveto"
+                ],
+                "forbiddenInputs": [
+                  "type",
+                  "action",
+                  "enable",
+                  "source",
+                  "dest",
+                  "proto",
+                  "sport",
+                  "dport",
+                  "iface"
+                ]
+              },
+              {
+                "forbiddenInputs": [
+                  "moveto",
+                  "enable"
+                ]
+              },
+              {
+                "forbiddenInputs": [
+                  "moveto"
+                ],
+                "requiredValues": {
+                  "enable": 0
+                }
+              },
+              {
+                "forbiddenInputs": [
+                  "moveto"
+                ],
+                "requiredValues": {
+                  "enable": 1
+                }
+              }
+            ],
+            "inputPatterns": {
+              "type": "^(?:in|out)$",
+              "action": "^(?:ACCEPT|DROP|REJECT)$"
+            },
+            "inputFormats": {
+              "source": "pve-firewall-address",
+              "dest": "pve-firewall-address",
+              "proto": "pve-firewall-protocol",
+              "sport": "pve-firewall-port",
+              "dport": "pve-firewall-port",
+              "iface": "pve-firewall-interface"
+            },
+            "confirmationWarnings": [
+              {
+                "message": "Firewall rule changes can cut off management access or change protection. Inspect the complete private ordered plan before confirming."
+              }
+            ],
+            "reason": "Private state-bound ordered rule change with automatic provider digest guard; reorder is separate from field edits. No automatic retry or deletion after uncertainty.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Inspect complete current rules privately; a matching later list cannot establish attribution. Never retry or automatically delete after uncertainty."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/nodes/{node}",
+                [
+                  "Sys.Modify"
+                ]
+              ]
+            },
+            "response": {
+              "type": "null"
+            },
+            "source": "Pinned rule schemas and reviewed provider Rules.pm creation, digest-guarded updates/deletes and reorder semantics."
           },
           "contract": "dist/contracts.json#/contracts/344"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "private-result",
+            "stateBinding": {
+              "kind": "firewall-rules",
+              "path": "/nodes/{node}/firewall/rules"
+            },
+            "allowedInputs": [
+              "node",
+              "pos",
+              "digest",
+              "type",
+              "action",
+              "enable",
+              "source",
+              "dest",
+              "proto",
+              "sport",
+              "dport",
+              "iface",
+              "moveto"
+            ],
+            "requiredInputs": [
+              "pos"
+            ],
+            "inputCases": [
+              {
+                "requiredInputs": [
+                  "moveto"
+                ],
+                "forbiddenInputs": [
+                  "type",
+                  "action",
+                  "enable",
+                  "source",
+                  "dest",
+                  "proto",
+                  "sport",
+                  "dport",
+                  "iface"
+                ]
+              },
+              {
+                "forbiddenInputs": [
+                  "moveto",
+                  "enable"
+                ]
+              },
+              {
+                "forbiddenInputs": [
+                  "moveto"
+                ],
+                "requiredValues": {
+                  "enable": 0
+                }
+              },
+              {
+                "forbiddenInputs": [
+                  "moveto"
+                ],
+                "requiredValues": {
+                  "enable": 1
+                }
+              }
+            ],
+            "inputPatterns": {
+              "type": "^(?:in|out)$",
+              "action": "^(?:ACCEPT|DROP|REJECT)$"
+            },
+            "inputFormats": {
+              "source": "pve-firewall-address",
+              "dest": "pve-firewall-address",
+              "proto": "pve-firewall-protocol",
+              "sport": "pve-firewall-port",
+              "dport": "pve-firewall-port",
+              "iface": "pve-firewall-interface"
+            },
+            "confirmationWarnings": [
+              {
+                "message": "Firewall rule changes can cut off management access or change protection. Inspect the complete private ordered plan before confirming."
+              }
+            ],
+            "reason": "Private state-bound ordered rule change with automatic provider digest guard; reorder is separate from field edits. No automatic retry or deletion after uncertainty.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Inspect complete current rules privately; a matching later list cannot establish attribution. Never retry or automatically delete after uncertainty."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/nodes/{node}",
+                [
+                  "Sys.Modify"
+                ]
+              ]
+            },
+            "response": {
+              "type": "null"
+            },
+            "source": "Pinned rule schemas and reviewed provider Rules.pm creation, digest-guarded updates/deletes and reorder semantics."
           },
           "contract": "dist/contracts.json#/contracts/1012"
         }
@@ -27264,23 +28406,219 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "private-result",
+            "stateBinding": {
+              "kind": "firewall-rules",
+              "path": "/nodes/{node}/lxc/{vmid}/firewall/rules"
+            },
+            "allowedInputs": [
+              "node",
+              "vmid",
+              "pos",
+              "digest",
+              "type",
+              "action",
+              "enable",
+              "source",
+              "dest",
+              "proto",
+              "sport",
+              "dport",
+              "iface",
+              "moveto"
+            ],
+            "requiredInputs": [
+              "pos"
+            ],
+            "inputCases": [
+              {
+                "requiredInputs": [
+                  "moveto"
+                ],
+                "forbiddenInputs": [
+                  "type",
+                  "action",
+                  "enable",
+                  "source",
+                  "dest",
+                  "proto",
+                  "sport",
+                  "dport",
+                  "iface"
+                ]
+              },
+              {
+                "forbiddenInputs": [
+                  "moveto",
+                  "enable"
+                ]
+              },
+              {
+                "forbiddenInputs": [
+                  "moveto"
+                ],
+                "requiredValues": {
+                  "enable": 0
+                }
+              },
+              {
+                "forbiddenInputs": [
+                  "moveto"
+                ],
+                "requiredValues": {
+                  "enable": 1
+                }
+              }
+            ],
+            "inputPatterns": {
+              "type": "^(?:in|out)$",
+              "action": "^(?:ACCEPT|DROP|REJECT)$",
+              "iface": "^net(?:[0-9]|[12][0-9]|3[01])$"
+            },
+            "inputFormats": {
+              "source": "pve-firewall-address",
+              "dest": "pve-firewall-address",
+              "proto": "pve-firewall-protocol",
+              "sport": "pve-firewall-port",
+              "dport": "pve-firewall-port",
+              "iface": "pve-firewall-interface"
+            },
+            "confirmationWarnings": [
+              {
+                "message": "Firewall rule changes can cut off management access or change protection. Inspect the complete private ordered plan before confirming."
+              }
+            ],
+            "reason": "Private state-bound ordered rule change with automatic provider digest guard; reorder is separate from field edits. No automatic retry or deletion after uncertainty.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Inspect complete current rules privately; a matching later list cannot establish attribution. Never retry or automatically delete after uncertainty."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/vms/{vmid}",
+                [
+                  "VM.Config.Network"
+                ]
+              ]
+            },
+            "response": {
+              "type": "null"
+            },
+            "source": "Pinned rule schemas and reviewed provider Rules.pm creation, digest-guarded updates/deletes and reorder semantics."
           },
           "contract": "dist/contracts.json#/contracts/383"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "private-result",
+            "stateBinding": {
+              "kind": "firewall-rules",
+              "path": "/nodes/{node}/lxc/{vmid}/firewall/rules"
+            },
+            "allowedInputs": [
+              "node",
+              "vmid",
+              "pos",
+              "digest",
+              "type",
+              "action",
+              "enable",
+              "source",
+              "dest",
+              "proto",
+              "sport",
+              "dport",
+              "iface",
+              "moveto"
+            ],
+            "requiredInputs": [
+              "pos"
+            ],
+            "inputCases": [
+              {
+                "requiredInputs": [
+                  "moveto"
+                ],
+                "forbiddenInputs": [
+                  "type",
+                  "action",
+                  "enable",
+                  "source",
+                  "dest",
+                  "proto",
+                  "sport",
+                  "dport",
+                  "iface"
+                ]
+              },
+              {
+                "forbiddenInputs": [
+                  "moveto",
+                  "enable"
+                ]
+              },
+              {
+                "forbiddenInputs": [
+                  "moveto"
+                ],
+                "requiredValues": {
+                  "enable": 0
+                }
+              },
+              {
+                "forbiddenInputs": [
+                  "moveto"
+                ],
+                "requiredValues": {
+                  "enable": 1
+                }
+              }
+            ],
+            "inputPatterns": {
+              "type": "^(?:in|out)$",
+              "action": "^(?:ACCEPT|DROP|REJECT)$",
+              "iface": "^net(?:[0-9]|[12][0-9]|3[01])$"
+            },
+            "inputFormats": {
+              "source": "pve-firewall-address",
+              "dest": "pve-firewall-address",
+              "proto": "pve-firewall-protocol",
+              "sport": "pve-firewall-port",
+              "dport": "pve-firewall-port",
+              "iface": "pve-firewall-interface"
+            },
+            "confirmationWarnings": [
+              {
+                "message": "Firewall rule changes can cut off management access or change protection. Inspect the complete private ordered plan before confirming."
+              }
+            ],
+            "reason": "Private state-bound ordered rule change with automatic provider digest guard; reorder is separate from field edits. No automatic retry or deletion after uncertainty.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Inspect complete current rules privately; a matching later list cannot establish attribution. Never retry or automatically delete after uncertainty."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/vms/{vmid}",
+                [
+                  "VM.Config.Network"
+                ]
+              ]
+            },
+            "response": {
+              "type": "null"
+            },
+            "source": "Pinned rule schemas and reviewed provider Rules.pm creation, digest-guarded updates/deletes and reorder semantics."
           },
           "contract": "dist/contracts.json#/contracts/1051"
         }
@@ -28206,23 +29544,219 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "private-result",
+            "stateBinding": {
+              "kind": "firewall-rules",
+              "path": "/nodes/{node}/qemu/{vmid}/firewall/rules"
+            },
+            "allowedInputs": [
+              "node",
+              "vmid",
+              "pos",
+              "digest",
+              "type",
+              "action",
+              "enable",
+              "source",
+              "dest",
+              "proto",
+              "sport",
+              "dport",
+              "iface",
+              "moveto"
+            ],
+            "requiredInputs": [
+              "pos"
+            ],
+            "inputCases": [
+              {
+                "requiredInputs": [
+                  "moveto"
+                ],
+                "forbiddenInputs": [
+                  "type",
+                  "action",
+                  "enable",
+                  "source",
+                  "dest",
+                  "proto",
+                  "sport",
+                  "dport",
+                  "iface"
+                ]
+              },
+              {
+                "forbiddenInputs": [
+                  "moveto",
+                  "enable"
+                ]
+              },
+              {
+                "forbiddenInputs": [
+                  "moveto"
+                ],
+                "requiredValues": {
+                  "enable": 0
+                }
+              },
+              {
+                "forbiddenInputs": [
+                  "moveto"
+                ],
+                "requiredValues": {
+                  "enable": 1
+                }
+              }
+            ],
+            "inputPatterns": {
+              "type": "^(?:in|out)$",
+              "action": "^(?:ACCEPT|DROP|REJECT)$",
+              "iface": "^net(?:[0-9]|[12][0-9]|3[01])$"
+            },
+            "inputFormats": {
+              "source": "pve-firewall-address",
+              "dest": "pve-firewall-address",
+              "proto": "pve-firewall-protocol",
+              "sport": "pve-firewall-port",
+              "dport": "pve-firewall-port",
+              "iface": "pve-firewall-interface"
+            },
+            "confirmationWarnings": [
+              {
+                "message": "Firewall rule changes can cut off management access or change protection. Inspect the complete private ordered plan before confirming."
+              }
+            ],
+            "reason": "Private state-bound ordered rule change with automatic provider digest guard; reorder is separate from field edits. No automatic retry or deletion after uncertainty.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Inspect complete current rules privately; a matching later list cannot establish attribution. Never retry or automatically delete after uncertainty."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/vms/{vmid}",
+                [
+                  "VM.Config.Network"
+                ]
+              ]
+            },
+            "response": {
+              "type": "null"
+            },
+            "source": "Pinned rule schemas and reviewed provider Rules.pm creation, digest-guarded updates/deletes and reorder semantics."
           },
           "contract": "dist/contracts.json#/contracts/484"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "private-result",
+            "stateBinding": {
+              "kind": "firewall-rules",
+              "path": "/nodes/{node}/qemu/{vmid}/firewall/rules"
+            },
+            "allowedInputs": [
+              "node",
+              "vmid",
+              "pos",
+              "digest",
+              "type",
+              "action",
+              "enable",
+              "source",
+              "dest",
+              "proto",
+              "sport",
+              "dport",
+              "iface",
+              "moveto"
+            ],
+            "requiredInputs": [
+              "pos"
+            ],
+            "inputCases": [
+              {
+                "requiredInputs": [
+                  "moveto"
+                ],
+                "forbiddenInputs": [
+                  "type",
+                  "action",
+                  "enable",
+                  "source",
+                  "dest",
+                  "proto",
+                  "sport",
+                  "dport",
+                  "iface"
+                ]
+              },
+              {
+                "forbiddenInputs": [
+                  "moveto",
+                  "enable"
+                ]
+              },
+              {
+                "forbiddenInputs": [
+                  "moveto"
+                ],
+                "requiredValues": {
+                  "enable": 0
+                }
+              },
+              {
+                "forbiddenInputs": [
+                  "moveto"
+                ],
+                "requiredValues": {
+                  "enable": 1
+                }
+              }
+            ],
+            "inputPatterns": {
+              "type": "^(?:in|out)$",
+              "action": "^(?:ACCEPT|DROP|REJECT)$",
+              "iface": "^net(?:[0-9]|[12][0-9]|3[01])$"
+            },
+            "inputFormats": {
+              "source": "pve-firewall-address",
+              "dest": "pve-firewall-address",
+              "proto": "pve-firewall-protocol",
+              "sport": "pve-firewall-port",
+              "dport": "pve-firewall-port",
+              "iface": "pve-firewall-interface"
+            },
+            "confirmationWarnings": [
+              {
+                "message": "Firewall rule changes can cut off management access or change protection. Inspect the complete private ordered plan before confirming."
+              }
+            ],
+            "reason": "Private state-bound ordered rule change with automatic provider digest guard; reorder is separate from field edits. No automatic retry or deletion after uncertainty.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Inspect complete current rules privately; a matching later list cannot establish attribution. Never retry or automatically delete after uncertainty."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/vms/{vmid}",
+                [
+                  "VM.Config.Network"
+                ]
+              ]
+            },
+            "response": {
+              "type": "null"
+            },
+            "source": "Pinned rule schemas and reviewed provider Rules.pm creation, digest-guarded updates/deletes and reorder semantics."
           },
           "contract": "dist/contracts.json#/contracts/1154"
         }

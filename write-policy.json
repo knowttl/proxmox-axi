@@ -1481,44 +1481,421 @@
       "contract": "dist/contracts.json#/contracts/110"
     },
     {
-      "id": "OP-GET-462c883778",
-      "method": "GET",
-      "path": "/cluster/firewall/rules",
-      "release": "legacy-8.2.7",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/111"
-    },
-    {
       "id": "OP-POST-bbc1f06212",
       "method": "POST",
       "path": "/cluster/firewall/rules",
       "release": "legacy-8.2.7",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/112"
+      "admitted": true,
+      "contract": "dist/contracts.json#/contracts/112",
+      "policy": {
+        "effect": "write",
+        "transport": "json",
+        "secrets": "private-result",
+        "stateBinding": {
+          "kind": "firewall-rules",
+          "path": "/cluster/firewall/rules"
+        },
+        "allowedInputs": [
+          "type",
+          "action",
+          "enable",
+          "source",
+          "dest",
+          "proto",
+          "sport",
+          "dport",
+          "iface"
+        ],
+        "requiredInputs": [],
+        "fixedInputs": {
+          "enable": 0
+        },
+        "inputPatterns": {
+          "type": "^(?:in|out)$",
+          "action": "^(?:ACCEPT|DROP|REJECT)$"
+        },
+        "inputFormats": {
+          "source": "pve-firewall-address",
+          "dest": "pve-firewall-address",
+          "proto": "pve-firewall-protocol",
+          "sport": "pve-firewall-port",
+          "dport": "pve-firewall-port",
+          "iface": "pve-firewall-interface"
+        },
+        "confirmationWarnings": [
+          {
+            "message": "Firewall rule changes can cut off management access or change protection. Inspect the complete private ordered plan before confirming."
+          },
+          {
+            "message": "NON-ATOMIC CREATE: the provider ignores creation digests and prepends this fixed disabled rule. Unexpected observed order remains uncertain; enabling requires a separate fresh digest-guarded confirmation."
+          }
+        ],
+        "reason": "Non-atomic creation of a fixed disabled rule only: provider POST ignores digest and prepends; private before/after plan, state recheck and post-write comparison apply. Enable separately with a fresh digest-guarded confirmation.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Inspect complete current rules privately; a matching later list cannot establish attribution. Never retry or automatically delete after uncertainty."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/",
+            [
+              "Sys.Modify"
+            ]
+          ]
+        },
+        "response": {
+          "type": "null"
+        },
+        "source": "Pinned rule schemas and reviewed provider Rules.pm creation, digest-guarded updates/deletes and reorder semantics."
+      },
+      "inputs": [
+        {
+          "name": "action",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "comment",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "dest",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "digest",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "dport",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "enable",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "icmp-type",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "iface",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "log",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "macro",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "pos",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "proto",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "source",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "sport",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "type",
+          "admitted": true,
+          "sensitive": false
+        }
+      ],
+      "results": {
+        "type": "null",
+        "handling": "versioned inherited private pipe; public metadata only"
+      }
     },
     {
       "id": "OP-DELETE-1a7ddd36fa",
       "method": "DELETE",
       "path": "/cluster/firewall/rules/{pos}",
       "release": "legacy-8.2.7",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/113"
-    },
-    {
-      "id": "OP-GET-f410c3ab76",
-      "method": "GET",
-      "path": "/cluster/firewall/rules/{pos}",
-      "release": "legacy-8.2.7",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/114"
+      "admitted": true,
+      "contract": "dist/contracts.json#/contracts/113",
+      "policy": {
+        "effect": "write",
+        "transport": "json",
+        "secrets": "private-result",
+        "stateBinding": {
+          "kind": "firewall-rules",
+          "path": "/cluster/firewall/rules"
+        },
+        "allowedInputs": [
+          "pos",
+          "digest"
+        ],
+        "requiredInputs": [
+          "pos"
+        ],
+        "confirmationWarnings": [
+          {
+            "message": "Firewall rule changes can cut off management access or change protection. Inspect the complete private ordered plan before confirming."
+          },
+          {
+            "message": "RULE DELETION: explicitly review the selected position and resulting ordered rules before confirming."
+          }
+        ],
+        "reason": "Private state-bound ordered rule change with automatic provider digest guard; reorder is separate from field edits. No automatic retry or deletion after uncertainty.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Inspect complete current rules privately; a matching later list cannot establish attribution. Never retry or automatically delete after uncertainty."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/",
+            [
+              "Sys.Modify"
+            ]
+          ]
+        },
+        "response": {
+          "type": "null"
+        },
+        "source": "Pinned rule schemas and reviewed provider Rules.pm creation, digest-guarded updates/deletes and reorder semantics."
+      },
+      "inputs": [
+        {
+          "name": "digest",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "pos",
+          "admitted": true,
+          "sensitive": false
+        }
+      ],
+      "results": {
+        "type": "null",
+        "handling": "versioned inherited private pipe; public metadata only"
+      }
     },
     {
       "id": "OP-PUT-92784ada32",
       "method": "PUT",
       "path": "/cluster/firewall/rules/{pos}",
       "release": "legacy-8.2.7",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/115"
+      "admitted": true,
+      "contract": "dist/contracts.json#/contracts/115",
+      "policy": {
+        "effect": "write",
+        "transport": "json",
+        "secrets": "private-result",
+        "stateBinding": {
+          "kind": "firewall-rules",
+          "path": "/cluster/firewall/rules"
+        },
+        "allowedInputs": [
+          "pos",
+          "digest",
+          "type",
+          "action",
+          "enable",
+          "source",
+          "dest",
+          "proto",
+          "sport",
+          "dport",
+          "iface",
+          "moveto"
+        ],
+        "requiredInputs": [
+          "pos"
+        ],
+        "inputCases": [
+          {
+            "requiredInputs": [
+              "moveto"
+            ],
+            "forbiddenInputs": [
+              "type",
+              "action",
+              "enable",
+              "source",
+              "dest",
+              "proto",
+              "sport",
+              "dport",
+              "iface"
+            ]
+          },
+          {
+            "forbiddenInputs": [
+              "moveto",
+              "enable"
+            ]
+          },
+          {
+            "forbiddenInputs": [
+              "moveto"
+            ],
+            "requiredValues": {
+              "enable": 0
+            }
+          },
+          {
+            "forbiddenInputs": [
+              "moveto"
+            ],
+            "requiredValues": {
+              "enable": 1
+            }
+          }
+        ],
+        "inputPatterns": {
+          "type": "^(?:in|out)$",
+          "action": "^(?:ACCEPT|DROP|REJECT)$"
+        },
+        "inputFormats": {
+          "source": "pve-firewall-address",
+          "dest": "pve-firewall-address",
+          "proto": "pve-firewall-protocol",
+          "sport": "pve-firewall-port",
+          "dport": "pve-firewall-port",
+          "iface": "pve-firewall-interface"
+        },
+        "confirmationWarnings": [
+          {
+            "message": "Firewall rule changes can cut off management access or change protection. Inspect the complete private ordered plan before confirming."
+          }
+        ],
+        "reason": "Private state-bound ordered rule change with automatic provider digest guard; reorder is separate from field edits. No automatic retry or deletion after uncertainty.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Inspect complete current rules privately; a matching later list cannot establish attribution. Never retry or automatically delete after uncertainty."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/",
+            [
+              "Sys.Modify"
+            ]
+          ]
+        },
+        "response": {
+          "type": "null"
+        },
+        "source": "Pinned rule schemas and reviewed provider Rules.pm creation, digest-guarded updates/deletes and reorder semantics."
+      },
+      "inputs": [
+        {
+          "name": "action",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "comment",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "delete",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "dest",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "digest",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "dport",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "enable",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "icmp-type",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "iface",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "log",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "macro",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "moveto",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "pos",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "proto",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "source",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "sport",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "type",
+          "admitted": true,
+          "sensitive": false
+        }
+      ],
+      "results": {
+        "type": "null",
+        "handling": "versioned inherited private pipe; public metadata only"
+      }
     },
     {
       "id": "OP-GET-137e00f77d",
@@ -3656,44 +4033,439 @@
       }
     },
     {
-      "id": "OP-GET-affa73c601",
-      "method": "GET",
-      "path": "/nodes/{node}/firewall/rules",
-      "release": "legacy-8.2.7",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/340"
-    },
-    {
       "id": "OP-POST-7c51a40f15",
       "method": "POST",
       "path": "/nodes/{node}/firewall/rules",
       "release": "legacy-8.2.7",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/341"
+      "admitted": true,
+      "contract": "dist/contracts.json#/contracts/341",
+      "policy": {
+        "effect": "write",
+        "transport": "json",
+        "secrets": "private-result",
+        "stateBinding": {
+          "kind": "firewall-rules",
+          "path": "/nodes/{node}/firewall/rules"
+        },
+        "allowedInputs": [
+          "node",
+          "type",
+          "action",
+          "enable",
+          "source",
+          "dest",
+          "proto",
+          "sport",
+          "dport",
+          "iface"
+        ],
+        "requiredInputs": [],
+        "fixedInputs": {
+          "enable": 0
+        },
+        "inputPatterns": {
+          "type": "^(?:in|out)$",
+          "action": "^(?:ACCEPT|DROP|REJECT)$"
+        },
+        "inputFormats": {
+          "source": "pve-firewall-address",
+          "dest": "pve-firewall-address",
+          "proto": "pve-firewall-protocol",
+          "sport": "pve-firewall-port",
+          "dport": "pve-firewall-port",
+          "iface": "pve-firewall-interface"
+        },
+        "confirmationWarnings": [
+          {
+            "message": "Firewall rule changes can cut off management access or change protection. Inspect the complete private ordered plan before confirming."
+          },
+          {
+            "message": "NON-ATOMIC CREATE: the provider ignores creation digests and prepends this fixed disabled rule. Unexpected observed order remains uncertain; enabling requires a separate fresh digest-guarded confirmation."
+          }
+        ],
+        "reason": "Non-atomic creation of a fixed disabled rule only: provider POST ignores digest and prepends; private before/after plan, state recheck and post-write comparison apply. Enable separately with a fresh digest-guarded confirmation.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Inspect complete current rules privately; a matching later list cannot establish attribution. Never retry or automatically delete after uncertainty."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/nodes/{node}",
+            [
+              "Sys.Modify"
+            ]
+          ]
+        },
+        "response": {
+          "type": "null"
+        },
+        "source": "Pinned rule schemas and reviewed provider Rules.pm creation, digest-guarded updates/deletes and reorder semantics."
+      },
+      "inputs": [
+        {
+          "name": "action",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "comment",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "dest",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "digest",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "dport",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "enable",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "icmp-type",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "iface",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "log",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "macro",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "node",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "pos",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "proto",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "source",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "sport",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "type",
+          "admitted": true,
+          "sensitive": false
+        }
+      ],
+      "results": {
+        "type": "null",
+        "handling": "versioned inherited private pipe; public metadata only"
+      }
     },
     {
       "id": "OP-DELETE-1f2b438113",
       "method": "DELETE",
       "path": "/nodes/{node}/firewall/rules/{pos}",
       "release": "legacy-8.2.7",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/342"
-    },
-    {
-      "id": "OP-GET-6810f4dcf6",
-      "method": "GET",
-      "path": "/nodes/{node}/firewall/rules/{pos}",
-      "release": "legacy-8.2.7",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/343"
+      "admitted": true,
+      "contract": "dist/contracts.json#/contracts/342",
+      "policy": {
+        "effect": "write",
+        "transport": "json",
+        "secrets": "private-result",
+        "stateBinding": {
+          "kind": "firewall-rules",
+          "path": "/nodes/{node}/firewall/rules"
+        },
+        "allowedInputs": [
+          "node",
+          "pos",
+          "digest"
+        ],
+        "requiredInputs": [
+          "pos"
+        ],
+        "confirmationWarnings": [
+          {
+            "message": "Firewall rule changes can cut off management access or change protection. Inspect the complete private ordered plan before confirming."
+          },
+          {
+            "message": "RULE DELETION: explicitly review the selected position and resulting ordered rules before confirming."
+          }
+        ],
+        "reason": "Private state-bound ordered rule change with automatic provider digest guard; reorder is separate from field edits. No automatic retry or deletion after uncertainty.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Inspect complete current rules privately; a matching later list cannot establish attribution. Never retry or automatically delete after uncertainty."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/nodes/{node}",
+            [
+              "Sys.Modify"
+            ]
+          ]
+        },
+        "response": {
+          "type": "null"
+        },
+        "source": "Pinned rule schemas and reviewed provider Rules.pm creation, digest-guarded updates/deletes and reorder semantics."
+      },
+      "inputs": [
+        {
+          "name": "digest",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "node",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "pos",
+          "admitted": true,
+          "sensitive": false
+        }
+      ],
+      "results": {
+        "type": "null",
+        "handling": "versioned inherited private pipe; public metadata only"
+      }
     },
     {
       "id": "OP-PUT-5b4be3785f",
       "method": "PUT",
       "path": "/nodes/{node}/firewall/rules/{pos}",
       "release": "legacy-8.2.7",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/344"
+      "admitted": true,
+      "contract": "dist/contracts.json#/contracts/344",
+      "policy": {
+        "effect": "write",
+        "transport": "json",
+        "secrets": "private-result",
+        "stateBinding": {
+          "kind": "firewall-rules",
+          "path": "/nodes/{node}/firewall/rules"
+        },
+        "allowedInputs": [
+          "node",
+          "pos",
+          "digest",
+          "type",
+          "action",
+          "enable",
+          "source",
+          "dest",
+          "proto",
+          "sport",
+          "dport",
+          "iface",
+          "moveto"
+        ],
+        "requiredInputs": [
+          "pos"
+        ],
+        "inputCases": [
+          {
+            "requiredInputs": [
+              "moveto"
+            ],
+            "forbiddenInputs": [
+              "type",
+              "action",
+              "enable",
+              "source",
+              "dest",
+              "proto",
+              "sport",
+              "dport",
+              "iface"
+            ]
+          },
+          {
+            "forbiddenInputs": [
+              "moveto",
+              "enable"
+            ]
+          },
+          {
+            "forbiddenInputs": [
+              "moveto"
+            ],
+            "requiredValues": {
+              "enable": 0
+            }
+          },
+          {
+            "forbiddenInputs": [
+              "moveto"
+            ],
+            "requiredValues": {
+              "enable": 1
+            }
+          }
+        ],
+        "inputPatterns": {
+          "type": "^(?:in|out)$",
+          "action": "^(?:ACCEPT|DROP|REJECT)$"
+        },
+        "inputFormats": {
+          "source": "pve-firewall-address",
+          "dest": "pve-firewall-address",
+          "proto": "pve-firewall-protocol",
+          "sport": "pve-firewall-port",
+          "dport": "pve-firewall-port",
+          "iface": "pve-firewall-interface"
+        },
+        "confirmationWarnings": [
+          {
+            "message": "Firewall rule changes can cut off management access or change protection. Inspect the complete private ordered plan before confirming."
+          }
+        ],
+        "reason": "Private state-bound ordered rule change with automatic provider digest guard; reorder is separate from field edits. No automatic retry or deletion after uncertainty.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Inspect complete current rules privately; a matching later list cannot establish attribution. Never retry or automatically delete after uncertainty."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/nodes/{node}",
+            [
+              "Sys.Modify"
+            ]
+          ]
+        },
+        "response": {
+          "type": "null"
+        },
+        "source": "Pinned rule schemas and reviewed provider Rules.pm creation, digest-guarded updates/deletes and reorder semantics."
+      },
+      "inputs": [
+        {
+          "name": "action",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "comment",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "delete",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "dest",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "digest",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "dport",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "enable",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "icmp-type",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "iface",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "log",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "macro",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "moveto",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "node",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "pos",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "proto",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "source",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "sport",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "type",
+          "admitted": true,
+          "sensitive": false
+        }
+      ],
+      "results": {
+        "type": "null",
+        "handling": "versioned inherited private pipe; public metadata only"
+      }
     },
     {
       "id": "OP-GET-bb7bcdf364",
@@ -8269,44 +9041,459 @@
       "contract": "dist/contracts.json#/contracts/378"
     },
     {
-      "id": "OP-GET-7c6d3585f6",
-      "method": "GET",
-      "path": "/nodes/{node}/lxc/{vmid}/firewall/rules",
-      "release": "legacy-8.2.7",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/379"
-    },
-    {
       "id": "OP-POST-8d36152b44",
       "method": "POST",
       "path": "/nodes/{node}/lxc/{vmid}/firewall/rules",
       "release": "legacy-8.2.7",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/380"
+      "admitted": true,
+      "contract": "dist/contracts.json#/contracts/380",
+      "policy": {
+        "effect": "write",
+        "transport": "json",
+        "secrets": "private-result",
+        "stateBinding": {
+          "kind": "firewall-rules",
+          "path": "/nodes/{node}/lxc/{vmid}/firewall/rules"
+        },
+        "allowedInputs": [
+          "node",
+          "vmid",
+          "type",
+          "action",
+          "enable",
+          "source",
+          "dest",
+          "proto",
+          "sport",
+          "dport",
+          "iface"
+        ],
+        "requiredInputs": [],
+        "fixedInputs": {
+          "enable": 0
+        },
+        "inputPatterns": {
+          "type": "^(?:in|out)$",
+          "action": "^(?:ACCEPT|DROP|REJECT)$",
+          "iface": "^net(?:[0-9]|[12][0-9]|3[01])$"
+        },
+        "inputFormats": {
+          "source": "pve-firewall-address",
+          "dest": "pve-firewall-address",
+          "proto": "pve-firewall-protocol",
+          "sport": "pve-firewall-port",
+          "dport": "pve-firewall-port",
+          "iface": "pve-firewall-interface"
+        },
+        "confirmationWarnings": [
+          {
+            "message": "Firewall rule changes can cut off management access or change protection. Inspect the complete private ordered plan before confirming."
+          },
+          {
+            "message": "NON-ATOMIC CREATE: the provider ignores creation digests and prepends this fixed disabled rule. Unexpected observed order remains uncertain; enabling requires a separate fresh digest-guarded confirmation."
+          }
+        ],
+        "reason": "Non-atomic creation of a fixed disabled rule only: provider POST ignores digest and prepends; private before/after plan, state recheck and post-write comparison apply. Enable separately with a fresh digest-guarded confirmation.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Inspect complete current rules privately; a matching later list cannot establish attribution. Never retry or automatically delete after uncertainty."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/vms/{vmid}",
+            [
+              "VM.Config.Network"
+            ]
+          ]
+        },
+        "response": {
+          "type": "null"
+        },
+        "source": "Pinned rule schemas and reviewed provider Rules.pm creation, digest-guarded updates/deletes and reorder semantics."
+      },
+      "inputs": [
+        {
+          "name": "action",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "comment",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "dest",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "digest",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "dport",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "enable",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "icmp-type",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "iface",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "log",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "macro",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "node",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "pos",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "proto",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "source",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "sport",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "type",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "vmid",
+          "admitted": true,
+          "sensitive": false
+        }
+      ],
+      "results": {
+        "type": "null",
+        "handling": "versioned inherited private pipe; public metadata only"
+      }
     },
     {
       "id": "OP-DELETE-0ed1346d15",
       "method": "DELETE",
       "path": "/nodes/{node}/lxc/{vmid}/firewall/rules/{pos}",
       "release": "legacy-8.2.7",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/381"
-    },
-    {
-      "id": "OP-GET-25ff71872c",
-      "method": "GET",
-      "path": "/nodes/{node}/lxc/{vmid}/firewall/rules/{pos}",
-      "release": "legacy-8.2.7",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/382"
+      "admitted": true,
+      "contract": "dist/contracts.json#/contracts/381",
+      "policy": {
+        "effect": "write",
+        "transport": "json",
+        "secrets": "private-result",
+        "stateBinding": {
+          "kind": "firewall-rules",
+          "path": "/nodes/{node}/lxc/{vmid}/firewall/rules"
+        },
+        "allowedInputs": [
+          "node",
+          "vmid",
+          "pos",
+          "digest"
+        ],
+        "requiredInputs": [
+          "pos"
+        ],
+        "confirmationWarnings": [
+          {
+            "message": "Firewall rule changes can cut off management access or change protection. Inspect the complete private ordered plan before confirming."
+          },
+          {
+            "message": "RULE DELETION: explicitly review the selected position and resulting ordered rules before confirming."
+          }
+        ],
+        "reason": "Private state-bound ordered rule change with automatic provider digest guard; reorder is separate from field edits. No automatic retry or deletion after uncertainty.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Inspect complete current rules privately; a matching later list cannot establish attribution. Never retry or automatically delete after uncertainty."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/vms/{vmid}",
+            [
+              "VM.Config.Network"
+            ]
+          ]
+        },
+        "response": {
+          "type": "null"
+        },
+        "source": "Pinned rule schemas and reviewed provider Rules.pm creation, digest-guarded updates/deletes and reorder semantics."
+      },
+      "inputs": [
+        {
+          "name": "digest",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "node",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "pos",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "vmid",
+          "admitted": true,
+          "sensitive": false
+        }
+      ],
+      "results": {
+        "type": "null",
+        "handling": "versioned inherited private pipe; public metadata only"
+      }
     },
     {
       "id": "OP-PUT-25c1e29637",
       "method": "PUT",
       "path": "/nodes/{node}/lxc/{vmid}/firewall/rules/{pos}",
       "release": "legacy-8.2.7",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/383"
+      "admitted": true,
+      "contract": "dist/contracts.json#/contracts/383",
+      "policy": {
+        "effect": "write",
+        "transport": "json",
+        "secrets": "private-result",
+        "stateBinding": {
+          "kind": "firewall-rules",
+          "path": "/nodes/{node}/lxc/{vmid}/firewall/rules"
+        },
+        "allowedInputs": [
+          "node",
+          "vmid",
+          "pos",
+          "digest",
+          "type",
+          "action",
+          "enable",
+          "source",
+          "dest",
+          "proto",
+          "sport",
+          "dport",
+          "iface",
+          "moveto"
+        ],
+        "requiredInputs": [
+          "pos"
+        ],
+        "inputCases": [
+          {
+            "requiredInputs": [
+              "moveto"
+            ],
+            "forbiddenInputs": [
+              "type",
+              "action",
+              "enable",
+              "source",
+              "dest",
+              "proto",
+              "sport",
+              "dport",
+              "iface"
+            ]
+          },
+          {
+            "forbiddenInputs": [
+              "moveto",
+              "enable"
+            ]
+          },
+          {
+            "forbiddenInputs": [
+              "moveto"
+            ],
+            "requiredValues": {
+              "enable": 0
+            }
+          },
+          {
+            "forbiddenInputs": [
+              "moveto"
+            ],
+            "requiredValues": {
+              "enable": 1
+            }
+          }
+        ],
+        "inputPatterns": {
+          "type": "^(?:in|out)$",
+          "action": "^(?:ACCEPT|DROP|REJECT)$",
+          "iface": "^net(?:[0-9]|[12][0-9]|3[01])$"
+        },
+        "inputFormats": {
+          "source": "pve-firewall-address",
+          "dest": "pve-firewall-address",
+          "proto": "pve-firewall-protocol",
+          "sport": "pve-firewall-port",
+          "dport": "pve-firewall-port",
+          "iface": "pve-firewall-interface"
+        },
+        "confirmationWarnings": [
+          {
+            "message": "Firewall rule changes can cut off management access or change protection. Inspect the complete private ordered plan before confirming."
+          }
+        ],
+        "reason": "Private state-bound ordered rule change with automatic provider digest guard; reorder is separate from field edits. No automatic retry or deletion after uncertainty.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Inspect complete current rules privately; a matching later list cannot establish attribution. Never retry or automatically delete after uncertainty."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/vms/{vmid}",
+            [
+              "VM.Config.Network"
+            ]
+          ]
+        },
+        "response": {
+          "type": "null"
+        },
+        "source": "Pinned rule schemas and reviewed provider Rules.pm creation, digest-guarded updates/deletes and reorder semantics."
+      },
+      "inputs": [
+        {
+          "name": "action",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "comment",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "delete",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "dest",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "digest",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "dport",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "enable",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "icmp-type",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "iface",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "log",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "macro",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "moveto",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "node",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "pos",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "proto",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "source",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "sport",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "type",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "vmid",
+          "admitted": true,
+          "sensitive": false
+        }
+      ],
+      "results": {
+        "type": "null",
+        "handling": "versioned inherited private pipe; public metadata only"
+      }
     },
     {
       "id": "OP-GET-3b936b7171",
@@ -12872,44 +14059,459 @@
       "contract": "dist/contracts.json#/contracts/479"
     },
     {
-      "id": "OP-GET-61f449d5f3",
-      "method": "GET",
-      "path": "/nodes/{node}/qemu/{vmid}/firewall/rules",
-      "release": "legacy-8.2.7",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/480"
-    },
-    {
       "id": "OP-POST-6f3a5021ce",
       "method": "POST",
       "path": "/nodes/{node}/qemu/{vmid}/firewall/rules",
       "release": "legacy-8.2.7",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/481"
+      "admitted": true,
+      "contract": "dist/contracts.json#/contracts/481",
+      "policy": {
+        "effect": "write",
+        "transport": "json",
+        "secrets": "private-result",
+        "stateBinding": {
+          "kind": "firewall-rules",
+          "path": "/nodes/{node}/qemu/{vmid}/firewall/rules"
+        },
+        "allowedInputs": [
+          "node",
+          "vmid",
+          "type",
+          "action",
+          "enable",
+          "source",
+          "dest",
+          "proto",
+          "sport",
+          "dport",
+          "iface"
+        ],
+        "requiredInputs": [],
+        "fixedInputs": {
+          "enable": 0
+        },
+        "inputPatterns": {
+          "type": "^(?:in|out)$",
+          "action": "^(?:ACCEPT|DROP|REJECT)$",
+          "iface": "^net(?:[0-9]|[12][0-9]|3[01])$"
+        },
+        "inputFormats": {
+          "source": "pve-firewall-address",
+          "dest": "pve-firewall-address",
+          "proto": "pve-firewall-protocol",
+          "sport": "pve-firewall-port",
+          "dport": "pve-firewall-port",
+          "iface": "pve-firewall-interface"
+        },
+        "confirmationWarnings": [
+          {
+            "message": "Firewall rule changes can cut off management access or change protection. Inspect the complete private ordered plan before confirming."
+          },
+          {
+            "message": "NON-ATOMIC CREATE: the provider ignores creation digests and prepends this fixed disabled rule. Unexpected observed order remains uncertain; enabling requires a separate fresh digest-guarded confirmation."
+          }
+        ],
+        "reason": "Non-atomic creation of a fixed disabled rule only: provider POST ignores digest and prepends; private before/after plan, state recheck and post-write comparison apply. Enable separately with a fresh digest-guarded confirmation.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Inspect complete current rules privately; a matching later list cannot establish attribution. Never retry or automatically delete after uncertainty."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/vms/{vmid}",
+            [
+              "VM.Config.Network"
+            ]
+          ]
+        },
+        "response": {
+          "type": "null"
+        },
+        "source": "Pinned rule schemas and reviewed provider Rules.pm creation, digest-guarded updates/deletes and reorder semantics."
+      },
+      "inputs": [
+        {
+          "name": "action",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "comment",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "dest",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "digest",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "dport",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "enable",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "icmp-type",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "iface",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "log",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "macro",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "node",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "pos",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "proto",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "source",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "sport",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "type",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "vmid",
+          "admitted": true,
+          "sensitive": false
+        }
+      ],
+      "results": {
+        "type": "null",
+        "handling": "versioned inherited private pipe; public metadata only"
+      }
     },
     {
       "id": "OP-DELETE-1a226b99be",
       "method": "DELETE",
       "path": "/nodes/{node}/qemu/{vmid}/firewall/rules/{pos}",
       "release": "legacy-8.2.7",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/482"
-    },
-    {
-      "id": "OP-GET-1f1e7e144a",
-      "method": "GET",
-      "path": "/nodes/{node}/qemu/{vmid}/firewall/rules/{pos}",
-      "release": "legacy-8.2.7",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/483"
+      "admitted": true,
+      "contract": "dist/contracts.json#/contracts/482",
+      "policy": {
+        "effect": "write",
+        "transport": "json",
+        "secrets": "private-result",
+        "stateBinding": {
+          "kind": "firewall-rules",
+          "path": "/nodes/{node}/qemu/{vmid}/firewall/rules"
+        },
+        "allowedInputs": [
+          "node",
+          "vmid",
+          "pos",
+          "digest"
+        ],
+        "requiredInputs": [
+          "pos"
+        ],
+        "confirmationWarnings": [
+          {
+            "message": "Firewall rule changes can cut off management access or change protection. Inspect the complete private ordered plan before confirming."
+          },
+          {
+            "message": "RULE DELETION: explicitly review the selected position and resulting ordered rules before confirming."
+          }
+        ],
+        "reason": "Private state-bound ordered rule change with automatic provider digest guard; reorder is separate from field edits. No automatic retry or deletion after uncertainty.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Inspect complete current rules privately; a matching later list cannot establish attribution. Never retry or automatically delete after uncertainty."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/vms/{vmid}",
+            [
+              "VM.Config.Network"
+            ]
+          ]
+        },
+        "response": {
+          "type": "null"
+        },
+        "source": "Pinned rule schemas and reviewed provider Rules.pm creation, digest-guarded updates/deletes and reorder semantics."
+      },
+      "inputs": [
+        {
+          "name": "digest",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "node",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "pos",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "vmid",
+          "admitted": true,
+          "sensitive": false
+        }
+      ],
+      "results": {
+        "type": "null",
+        "handling": "versioned inherited private pipe; public metadata only"
+      }
     },
     {
       "id": "OP-PUT-54cc519df3",
       "method": "PUT",
       "path": "/nodes/{node}/qemu/{vmid}/firewall/rules/{pos}",
       "release": "legacy-8.2.7",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/484"
+      "admitted": true,
+      "contract": "dist/contracts.json#/contracts/484",
+      "policy": {
+        "effect": "write",
+        "transport": "json",
+        "secrets": "private-result",
+        "stateBinding": {
+          "kind": "firewall-rules",
+          "path": "/nodes/{node}/qemu/{vmid}/firewall/rules"
+        },
+        "allowedInputs": [
+          "node",
+          "vmid",
+          "pos",
+          "digest",
+          "type",
+          "action",
+          "enable",
+          "source",
+          "dest",
+          "proto",
+          "sport",
+          "dport",
+          "iface",
+          "moveto"
+        ],
+        "requiredInputs": [
+          "pos"
+        ],
+        "inputCases": [
+          {
+            "requiredInputs": [
+              "moveto"
+            ],
+            "forbiddenInputs": [
+              "type",
+              "action",
+              "enable",
+              "source",
+              "dest",
+              "proto",
+              "sport",
+              "dport",
+              "iface"
+            ]
+          },
+          {
+            "forbiddenInputs": [
+              "moveto",
+              "enable"
+            ]
+          },
+          {
+            "forbiddenInputs": [
+              "moveto"
+            ],
+            "requiredValues": {
+              "enable": 0
+            }
+          },
+          {
+            "forbiddenInputs": [
+              "moveto"
+            ],
+            "requiredValues": {
+              "enable": 1
+            }
+          }
+        ],
+        "inputPatterns": {
+          "type": "^(?:in|out)$",
+          "action": "^(?:ACCEPT|DROP|REJECT)$",
+          "iface": "^net(?:[0-9]|[12][0-9]|3[01])$"
+        },
+        "inputFormats": {
+          "source": "pve-firewall-address",
+          "dest": "pve-firewall-address",
+          "proto": "pve-firewall-protocol",
+          "sport": "pve-firewall-port",
+          "dport": "pve-firewall-port",
+          "iface": "pve-firewall-interface"
+        },
+        "confirmationWarnings": [
+          {
+            "message": "Firewall rule changes can cut off management access or change protection. Inspect the complete private ordered plan before confirming."
+          }
+        ],
+        "reason": "Private state-bound ordered rule change with automatic provider digest guard; reorder is separate from field edits. No automatic retry or deletion after uncertainty.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Inspect complete current rules privately; a matching later list cannot establish attribution. Never retry or automatically delete after uncertainty."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/vms/{vmid}",
+            [
+              "VM.Config.Network"
+            ]
+          ]
+        },
+        "response": {
+          "type": "null"
+        },
+        "source": "Pinned rule schemas and reviewed provider Rules.pm creation, digest-guarded updates/deletes and reorder semantics."
+      },
+      "inputs": [
+        {
+          "name": "action",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "comment",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "delete",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "dest",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "digest",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "dport",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "enable",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "icmp-type",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "iface",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "log",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "macro",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "moveto",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "node",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "pos",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "proto",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "source",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "sport",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "type",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "vmid",
+          "admitted": true,
+          "sensitive": false
+        }
+      ],
+      "results": {
+        "type": "null",
+        "handling": "versioned inherited private pipe; public metadata only"
+      }
     },
     {
       "id": "OP-GET-29926ddd4d",
@@ -17148,44 +18750,421 @@
       "contract": "dist/contracts.json#/contracts/725"
     },
     {
-      "id": "OP-GET-462c883778",
-      "method": "GET",
-      "path": "/cluster/firewall/rules",
-      "release": "published-current",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/726"
-    },
-    {
       "id": "OP-POST-bbc1f06212",
       "method": "POST",
       "path": "/cluster/firewall/rules",
       "release": "published-current",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/727"
+      "admitted": true,
+      "contract": "dist/contracts.json#/contracts/727",
+      "policy": {
+        "effect": "write",
+        "transport": "json",
+        "secrets": "private-result",
+        "stateBinding": {
+          "kind": "firewall-rules",
+          "path": "/cluster/firewall/rules"
+        },
+        "allowedInputs": [
+          "type",
+          "action",
+          "enable",
+          "source",
+          "dest",
+          "proto",
+          "sport",
+          "dport",
+          "iface"
+        ],
+        "requiredInputs": [],
+        "fixedInputs": {
+          "enable": 0
+        },
+        "inputPatterns": {
+          "type": "^(?:in|out)$",
+          "action": "^(?:ACCEPT|DROP|REJECT)$"
+        },
+        "inputFormats": {
+          "source": "pve-firewall-address",
+          "dest": "pve-firewall-address",
+          "proto": "pve-firewall-protocol",
+          "sport": "pve-firewall-port",
+          "dport": "pve-firewall-port",
+          "iface": "pve-firewall-interface"
+        },
+        "confirmationWarnings": [
+          {
+            "message": "Firewall rule changes can cut off management access or change protection. Inspect the complete private ordered plan before confirming."
+          },
+          {
+            "message": "NON-ATOMIC CREATE: the provider ignores creation digests and prepends this fixed disabled rule. Unexpected observed order remains uncertain; enabling requires a separate fresh digest-guarded confirmation."
+          }
+        ],
+        "reason": "Non-atomic creation of a fixed disabled rule only: provider POST ignores digest and prepends; private before/after plan, state recheck and post-write comparison apply. Enable separately with a fresh digest-guarded confirmation.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Inspect complete current rules privately; a matching later list cannot establish attribution. Never retry or automatically delete after uncertainty."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/",
+            [
+              "Sys.Modify"
+            ]
+          ]
+        },
+        "response": {
+          "type": "null"
+        },
+        "source": "Pinned rule schemas and reviewed provider Rules.pm creation, digest-guarded updates/deletes and reorder semantics."
+      },
+      "inputs": [
+        {
+          "name": "action",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "comment",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "dest",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "digest",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "dport",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "enable",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "icmp-type",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "iface",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "log",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "macro",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "pos",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "proto",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "source",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "sport",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "type",
+          "admitted": true,
+          "sensitive": false
+        }
+      ],
+      "results": {
+        "type": "null",
+        "handling": "versioned inherited private pipe; public metadata only"
+      }
     },
     {
       "id": "OP-DELETE-1a7ddd36fa",
       "method": "DELETE",
       "path": "/cluster/firewall/rules/{pos}",
       "release": "published-current",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/728"
-    },
-    {
-      "id": "OP-GET-f410c3ab76",
-      "method": "GET",
-      "path": "/cluster/firewall/rules/{pos}",
-      "release": "published-current",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/729"
+      "admitted": true,
+      "contract": "dist/contracts.json#/contracts/728",
+      "policy": {
+        "effect": "write",
+        "transport": "json",
+        "secrets": "private-result",
+        "stateBinding": {
+          "kind": "firewall-rules",
+          "path": "/cluster/firewall/rules"
+        },
+        "allowedInputs": [
+          "pos",
+          "digest"
+        ],
+        "requiredInputs": [
+          "pos"
+        ],
+        "confirmationWarnings": [
+          {
+            "message": "Firewall rule changes can cut off management access or change protection. Inspect the complete private ordered plan before confirming."
+          },
+          {
+            "message": "RULE DELETION: explicitly review the selected position and resulting ordered rules before confirming."
+          }
+        ],
+        "reason": "Private state-bound ordered rule change with automatic provider digest guard; reorder is separate from field edits. No automatic retry or deletion after uncertainty.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Inspect complete current rules privately; a matching later list cannot establish attribution. Never retry or automatically delete after uncertainty."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/",
+            [
+              "Sys.Modify"
+            ]
+          ]
+        },
+        "response": {
+          "type": "null"
+        },
+        "source": "Pinned rule schemas and reviewed provider Rules.pm creation, digest-guarded updates/deletes and reorder semantics."
+      },
+      "inputs": [
+        {
+          "name": "digest",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "pos",
+          "admitted": true,
+          "sensitive": false
+        }
+      ],
+      "results": {
+        "type": "null",
+        "handling": "versioned inherited private pipe; public metadata only"
+      }
     },
     {
       "id": "OP-PUT-92784ada32",
       "method": "PUT",
       "path": "/cluster/firewall/rules/{pos}",
       "release": "published-current",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/730"
+      "admitted": true,
+      "contract": "dist/contracts.json#/contracts/730",
+      "policy": {
+        "effect": "write",
+        "transport": "json",
+        "secrets": "private-result",
+        "stateBinding": {
+          "kind": "firewall-rules",
+          "path": "/cluster/firewall/rules"
+        },
+        "allowedInputs": [
+          "pos",
+          "digest",
+          "type",
+          "action",
+          "enable",
+          "source",
+          "dest",
+          "proto",
+          "sport",
+          "dport",
+          "iface",
+          "moveto"
+        ],
+        "requiredInputs": [
+          "pos"
+        ],
+        "inputCases": [
+          {
+            "requiredInputs": [
+              "moveto"
+            ],
+            "forbiddenInputs": [
+              "type",
+              "action",
+              "enable",
+              "source",
+              "dest",
+              "proto",
+              "sport",
+              "dport",
+              "iface"
+            ]
+          },
+          {
+            "forbiddenInputs": [
+              "moveto",
+              "enable"
+            ]
+          },
+          {
+            "forbiddenInputs": [
+              "moveto"
+            ],
+            "requiredValues": {
+              "enable": 0
+            }
+          },
+          {
+            "forbiddenInputs": [
+              "moveto"
+            ],
+            "requiredValues": {
+              "enable": 1
+            }
+          }
+        ],
+        "inputPatterns": {
+          "type": "^(?:in|out)$",
+          "action": "^(?:ACCEPT|DROP|REJECT)$"
+        },
+        "inputFormats": {
+          "source": "pve-firewall-address",
+          "dest": "pve-firewall-address",
+          "proto": "pve-firewall-protocol",
+          "sport": "pve-firewall-port",
+          "dport": "pve-firewall-port",
+          "iface": "pve-firewall-interface"
+        },
+        "confirmationWarnings": [
+          {
+            "message": "Firewall rule changes can cut off management access or change protection. Inspect the complete private ordered plan before confirming."
+          }
+        ],
+        "reason": "Private state-bound ordered rule change with automatic provider digest guard; reorder is separate from field edits. No automatic retry or deletion after uncertainty.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Inspect complete current rules privately; a matching later list cannot establish attribution. Never retry or automatically delete after uncertainty."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/",
+            [
+              "Sys.Modify"
+            ]
+          ]
+        },
+        "response": {
+          "type": "null"
+        },
+        "source": "Pinned rule schemas and reviewed provider Rules.pm creation, digest-guarded updates/deletes and reorder semantics."
+      },
+      "inputs": [
+        {
+          "name": "action",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "comment",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "delete",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "dest",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "digest",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "dport",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "enable",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "icmp-type",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "iface",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "log",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "macro",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "moveto",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "pos",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "proto",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "source",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "sport",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "type",
+          "admitted": true,
+          "sensitive": false
+        }
+      ],
+      "results": {
+        "type": "null",
+        "handling": "versioned inherited private pipe; public metadata only"
+      }
     },
     {
       "id": "OP-GET-137e00f77d",
@@ -19747,44 +21726,439 @@
       }
     },
     {
-      "id": "OP-GET-affa73c601",
-      "method": "GET",
-      "path": "/nodes/{node}/firewall/rules",
-      "release": "published-current",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/1008"
-    },
-    {
       "id": "OP-POST-7c51a40f15",
       "method": "POST",
       "path": "/nodes/{node}/firewall/rules",
       "release": "published-current",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/1009"
+      "admitted": true,
+      "contract": "dist/contracts.json#/contracts/1009",
+      "policy": {
+        "effect": "write",
+        "transport": "json",
+        "secrets": "private-result",
+        "stateBinding": {
+          "kind": "firewall-rules",
+          "path": "/nodes/{node}/firewall/rules"
+        },
+        "allowedInputs": [
+          "node",
+          "type",
+          "action",
+          "enable",
+          "source",
+          "dest",
+          "proto",
+          "sport",
+          "dport",
+          "iface"
+        ],
+        "requiredInputs": [],
+        "fixedInputs": {
+          "enable": 0
+        },
+        "inputPatterns": {
+          "type": "^(?:in|out)$",
+          "action": "^(?:ACCEPT|DROP|REJECT)$"
+        },
+        "inputFormats": {
+          "source": "pve-firewall-address",
+          "dest": "pve-firewall-address",
+          "proto": "pve-firewall-protocol",
+          "sport": "pve-firewall-port",
+          "dport": "pve-firewall-port",
+          "iface": "pve-firewall-interface"
+        },
+        "confirmationWarnings": [
+          {
+            "message": "Firewall rule changes can cut off management access or change protection. Inspect the complete private ordered plan before confirming."
+          },
+          {
+            "message": "NON-ATOMIC CREATE: the provider ignores creation digests and prepends this fixed disabled rule. Unexpected observed order remains uncertain; enabling requires a separate fresh digest-guarded confirmation."
+          }
+        ],
+        "reason": "Non-atomic creation of a fixed disabled rule only: provider POST ignores digest and prepends; private before/after plan, state recheck and post-write comparison apply. Enable separately with a fresh digest-guarded confirmation.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Inspect complete current rules privately; a matching later list cannot establish attribution. Never retry or automatically delete after uncertainty."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/nodes/{node}",
+            [
+              "Sys.Modify"
+            ]
+          ]
+        },
+        "response": {
+          "type": "null"
+        },
+        "source": "Pinned rule schemas and reviewed provider Rules.pm creation, digest-guarded updates/deletes and reorder semantics."
+      },
+      "inputs": [
+        {
+          "name": "action",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "comment",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "dest",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "digest",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "dport",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "enable",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "icmp-type",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "iface",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "log",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "macro",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "node",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "pos",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "proto",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "source",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "sport",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "type",
+          "admitted": true,
+          "sensitive": false
+        }
+      ],
+      "results": {
+        "type": "null",
+        "handling": "versioned inherited private pipe; public metadata only"
+      }
     },
     {
       "id": "OP-DELETE-1f2b438113",
       "method": "DELETE",
       "path": "/nodes/{node}/firewall/rules/{pos}",
       "release": "published-current",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/1010"
-    },
-    {
-      "id": "OP-GET-6810f4dcf6",
-      "method": "GET",
-      "path": "/nodes/{node}/firewall/rules/{pos}",
-      "release": "published-current",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/1011"
+      "admitted": true,
+      "contract": "dist/contracts.json#/contracts/1010",
+      "policy": {
+        "effect": "write",
+        "transport": "json",
+        "secrets": "private-result",
+        "stateBinding": {
+          "kind": "firewall-rules",
+          "path": "/nodes/{node}/firewall/rules"
+        },
+        "allowedInputs": [
+          "node",
+          "pos",
+          "digest"
+        ],
+        "requiredInputs": [
+          "pos"
+        ],
+        "confirmationWarnings": [
+          {
+            "message": "Firewall rule changes can cut off management access or change protection. Inspect the complete private ordered plan before confirming."
+          },
+          {
+            "message": "RULE DELETION: explicitly review the selected position and resulting ordered rules before confirming."
+          }
+        ],
+        "reason": "Private state-bound ordered rule change with automatic provider digest guard; reorder is separate from field edits. No automatic retry or deletion after uncertainty.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Inspect complete current rules privately; a matching later list cannot establish attribution. Never retry or automatically delete after uncertainty."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/nodes/{node}",
+            [
+              "Sys.Modify"
+            ]
+          ]
+        },
+        "response": {
+          "type": "null"
+        },
+        "source": "Pinned rule schemas and reviewed provider Rules.pm creation, digest-guarded updates/deletes and reorder semantics."
+      },
+      "inputs": [
+        {
+          "name": "digest",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "node",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "pos",
+          "admitted": true,
+          "sensitive": false
+        }
+      ],
+      "results": {
+        "type": "null",
+        "handling": "versioned inherited private pipe; public metadata only"
+      }
     },
     {
       "id": "OP-PUT-5b4be3785f",
       "method": "PUT",
       "path": "/nodes/{node}/firewall/rules/{pos}",
       "release": "published-current",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/1012"
+      "admitted": true,
+      "contract": "dist/contracts.json#/contracts/1012",
+      "policy": {
+        "effect": "write",
+        "transport": "json",
+        "secrets": "private-result",
+        "stateBinding": {
+          "kind": "firewall-rules",
+          "path": "/nodes/{node}/firewall/rules"
+        },
+        "allowedInputs": [
+          "node",
+          "pos",
+          "digest",
+          "type",
+          "action",
+          "enable",
+          "source",
+          "dest",
+          "proto",
+          "sport",
+          "dport",
+          "iface",
+          "moveto"
+        ],
+        "requiredInputs": [
+          "pos"
+        ],
+        "inputCases": [
+          {
+            "requiredInputs": [
+              "moveto"
+            ],
+            "forbiddenInputs": [
+              "type",
+              "action",
+              "enable",
+              "source",
+              "dest",
+              "proto",
+              "sport",
+              "dport",
+              "iface"
+            ]
+          },
+          {
+            "forbiddenInputs": [
+              "moveto",
+              "enable"
+            ]
+          },
+          {
+            "forbiddenInputs": [
+              "moveto"
+            ],
+            "requiredValues": {
+              "enable": 0
+            }
+          },
+          {
+            "forbiddenInputs": [
+              "moveto"
+            ],
+            "requiredValues": {
+              "enable": 1
+            }
+          }
+        ],
+        "inputPatterns": {
+          "type": "^(?:in|out)$",
+          "action": "^(?:ACCEPT|DROP|REJECT)$"
+        },
+        "inputFormats": {
+          "source": "pve-firewall-address",
+          "dest": "pve-firewall-address",
+          "proto": "pve-firewall-protocol",
+          "sport": "pve-firewall-port",
+          "dport": "pve-firewall-port",
+          "iface": "pve-firewall-interface"
+        },
+        "confirmationWarnings": [
+          {
+            "message": "Firewall rule changes can cut off management access or change protection. Inspect the complete private ordered plan before confirming."
+          }
+        ],
+        "reason": "Private state-bound ordered rule change with automatic provider digest guard; reorder is separate from field edits. No automatic retry or deletion after uncertainty.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Inspect complete current rules privately; a matching later list cannot establish attribution. Never retry or automatically delete after uncertainty."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/nodes/{node}",
+            [
+              "Sys.Modify"
+            ]
+          ]
+        },
+        "response": {
+          "type": "null"
+        },
+        "source": "Pinned rule schemas and reviewed provider Rules.pm creation, digest-guarded updates/deletes and reorder semantics."
+      },
+      "inputs": [
+        {
+          "name": "action",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "comment",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "delete",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "dest",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "digest",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "dport",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "enable",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "icmp-type",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "iface",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "log",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "macro",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "moveto",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "node",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "pos",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "proto",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "source",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "sport",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "type",
+          "admitted": true,
+          "sensitive": false
+        }
+      ],
+      "results": {
+        "type": "null",
+        "handling": "versioned inherited private pipe; public metadata only"
+      }
     },
     {
       "id": "OP-GET-bb7bcdf364",
@@ -24385,44 +26759,459 @@
       "contract": "dist/contracts.json#/contracts/1046"
     },
     {
-      "id": "OP-GET-7c6d3585f6",
-      "method": "GET",
-      "path": "/nodes/{node}/lxc/{vmid}/firewall/rules",
-      "release": "published-current",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/1047"
-    },
-    {
       "id": "OP-POST-8d36152b44",
       "method": "POST",
       "path": "/nodes/{node}/lxc/{vmid}/firewall/rules",
       "release": "published-current",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/1048"
+      "admitted": true,
+      "contract": "dist/contracts.json#/contracts/1048",
+      "policy": {
+        "effect": "write",
+        "transport": "json",
+        "secrets": "private-result",
+        "stateBinding": {
+          "kind": "firewall-rules",
+          "path": "/nodes/{node}/lxc/{vmid}/firewall/rules"
+        },
+        "allowedInputs": [
+          "node",
+          "vmid",
+          "type",
+          "action",
+          "enable",
+          "source",
+          "dest",
+          "proto",
+          "sport",
+          "dport",
+          "iface"
+        ],
+        "requiredInputs": [],
+        "fixedInputs": {
+          "enable": 0
+        },
+        "inputPatterns": {
+          "type": "^(?:in|out)$",
+          "action": "^(?:ACCEPT|DROP|REJECT)$",
+          "iface": "^net(?:[0-9]|[12][0-9]|3[01])$"
+        },
+        "inputFormats": {
+          "source": "pve-firewall-address",
+          "dest": "pve-firewall-address",
+          "proto": "pve-firewall-protocol",
+          "sport": "pve-firewall-port",
+          "dport": "pve-firewall-port",
+          "iface": "pve-firewall-interface"
+        },
+        "confirmationWarnings": [
+          {
+            "message": "Firewall rule changes can cut off management access or change protection. Inspect the complete private ordered plan before confirming."
+          },
+          {
+            "message": "NON-ATOMIC CREATE: the provider ignores creation digests and prepends this fixed disabled rule. Unexpected observed order remains uncertain; enabling requires a separate fresh digest-guarded confirmation."
+          }
+        ],
+        "reason": "Non-atomic creation of a fixed disabled rule only: provider POST ignores digest and prepends; private before/after plan, state recheck and post-write comparison apply. Enable separately with a fresh digest-guarded confirmation.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Inspect complete current rules privately; a matching later list cannot establish attribution. Never retry or automatically delete after uncertainty."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/vms/{vmid}",
+            [
+              "VM.Config.Network"
+            ]
+          ]
+        },
+        "response": {
+          "type": "null"
+        },
+        "source": "Pinned rule schemas and reviewed provider Rules.pm creation, digest-guarded updates/deletes and reorder semantics."
+      },
+      "inputs": [
+        {
+          "name": "action",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "comment",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "dest",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "digest",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "dport",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "enable",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "icmp-type",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "iface",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "log",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "macro",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "node",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "pos",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "proto",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "source",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "sport",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "type",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "vmid",
+          "admitted": true,
+          "sensitive": false
+        }
+      ],
+      "results": {
+        "type": "null",
+        "handling": "versioned inherited private pipe; public metadata only"
+      }
     },
     {
       "id": "OP-DELETE-0ed1346d15",
       "method": "DELETE",
       "path": "/nodes/{node}/lxc/{vmid}/firewall/rules/{pos}",
       "release": "published-current",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/1049"
-    },
-    {
-      "id": "OP-GET-25ff71872c",
-      "method": "GET",
-      "path": "/nodes/{node}/lxc/{vmid}/firewall/rules/{pos}",
-      "release": "published-current",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/1050"
+      "admitted": true,
+      "contract": "dist/contracts.json#/contracts/1049",
+      "policy": {
+        "effect": "write",
+        "transport": "json",
+        "secrets": "private-result",
+        "stateBinding": {
+          "kind": "firewall-rules",
+          "path": "/nodes/{node}/lxc/{vmid}/firewall/rules"
+        },
+        "allowedInputs": [
+          "node",
+          "vmid",
+          "pos",
+          "digest"
+        ],
+        "requiredInputs": [
+          "pos"
+        ],
+        "confirmationWarnings": [
+          {
+            "message": "Firewall rule changes can cut off management access or change protection. Inspect the complete private ordered plan before confirming."
+          },
+          {
+            "message": "RULE DELETION: explicitly review the selected position and resulting ordered rules before confirming."
+          }
+        ],
+        "reason": "Private state-bound ordered rule change with automatic provider digest guard; reorder is separate from field edits. No automatic retry or deletion after uncertainty.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Inspect complete current rules privately; a matching later list cannot establish attribution. Never retry or automatically delete after uncertainty."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/vms/{vmid}",
+            [
+              "VM.Config.Network"
+            ]
+          ]
+        },
+        "response": {
+          "type": "null"
+        },
+        "source": "Pinned rule schemas and reviewed provider Rules.pm creation, digest-guarded updates/deletes and reorder semantics."
+      },
+      "inputs": [
+        {
+          "name": "digest",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "node",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "pos",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "vmid",
+          "admitted": true,
+          "sensitive": false
+        }
+      ],
+      "results": {
+        "type": "null",
+        "handling": "versioned inherited private pipe; public metadata only"
+      }
     },
     {
       "id": "OP-PUT-25c1e29637",
       "method": "PUT",
       "path": "/nodes/{node}/lxc/{vmid}/firewall/rules/{pos}",
       "release": "published-current",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/1051"
+      "admitted": true,
+      "contract": "dist/contracts.json#/contracts/1051",
+      "policy": {
+        "effect": "write",
+        "transport": "json",
+        "secrets": "private-result",
+        "stateBinding": {
+          "kind": "firewall-rules",
+          "path": "/nodes/{node}/lxc/{vmid}/firewall/rules"
+        },
+        "allowedInputs": [
+          "node",
+          "vmid",
+          "pos",
+          "digest",
+          "type",
+          "action",
+          "enable",
+          "source",
+          "dest",
+          "proto",
+          "sport",
+          "dport",
+          "iface",
+          "moveto"
+        ],
+        "requiredInputs": [
+          "pos"
+        ],
+        "inputCases": [
+          {
+            "requiredInputs": [
+              "moveto"
+            ],
+            "forbiddenInputs": [
+              "type",
+              "action",
+              "enable",
+              "source",
+              "dest",
+              "proto",
+              "sport",
+              "dport",
+              "iface"
+            ]
+          },
+          {
+            "forbiddenInputs": [
+              "moveto",
+              "enable"
+            ]
+          },
+          {
+            "forbiddenInputs": [
+              "moveto"
+            ],
+            "requiredValues": {
+              "enable": 0
+            }
+          },
+          {
+            "forbiddenInputs": [
+              "moveto"
+            ],
+            "requiredValues": {
+              "enable": 1
+            }
+          }
+        ],
+        "inputPatterns": {
+          "type": "^(?:in|out)$",
+          "action": "^(?:ACCEPT|DROP|REJECT)$",
+          "iface": "^net(?:[0-9]|[12][0-9]|3[01])$"
+        },
+        "inputFormats": {
+          "source": "pve-firewall-address",
+          "dest": "pve-firewall-address",
+          "proto": "pve-firewall-protocol",
+          "sport": "pve-firewall-port",
+          "dport": "pve-firewall-port",
+          "iface": "pve-firewall-interface"
+        },
+        "confirmationWarnings": [
+          {
+            "message": "Firewall rule changes can cut off management access or change protection. Inspect the complete private ordered plan before confirming."
+          }
+        ],
+        "reason": "Private state-bound ordered rule change with automatic provider digest guard; reorder is separate from field edits. No automatic retry or deletion after uncertainty.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Inspect complete current rules privately; a matching later list cannot establish attribution. Never retry or automatically delete after uncertainty."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/vms/{vmid}",
+            [
+              "VM.Config.Network"
+            ]
+          ]
+        },
+        "response": {
+          "type": "null"
+        },
+        "source": "Pinned rule schemas and reviewed provider Rules.pm creation, digest-guarded updates/deletes and reorder semantics."
+      },
+      "inputs": [
+        {
+          "name": "action",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "comment",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "delete",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "dest",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "digest",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "dport",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "enable",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "icmp-type",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "iface",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "log",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "macro",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "moveto",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "node",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "pos",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "proto",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "source",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "sport",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "type",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "vmid",
+          "admitted": true,
+          "sensitive": false
+        }
+      ],
+      "results": {
+        "type": "null",
+        "handling": "versioned inherited private pipe; public metadata only"
+      }
     },
     {
       "id": "OP-GET-3b936b7171",
@@ -29034,44 +31823,459 @@
       "contract": "dist/contracts.json#/contracts/1149"
     },
     {
-      "id": "OP-GET-61f449d5f3",
-      "method": "GET",
-      "path": "/nodes/{node}/qemu/{vmid}/firewall/rules",
-      "release": "published-current",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/1150"
-    },
-    {
       "id": "OP-POST-6f3a5021ce",
       "method": "POST",
       "path": "/nodes/{node}/qemu/{vmid}/firewall/rules",
       "release": "published-current",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/1151"
+      "admitted": true,
+      "contract": "dist/contracts.json#/contracts/1151",
+      "policy": {
+        "effect": "write",
+        "transport": "json",
+        "secrets": "private-result",
+        "stateBinding": {
+          "kind": "firewall-rules",
+          "path": "/nodes/{node}/qemu/{vmid}/firewall/rules"
+        },
+        "allowedInputs": [
+          "node",
+          "vmid",
+          "type",
+          "action",
+          "enable",
+          "source",
+          "dest",
+          "proto",
+          "sport",
+          "dport",
+          "iface"
+        ],
+        "requiredInputs": [],
+        "fixedInputs": {
+          "enable": 0
+        },
+        "inputPatterns": {
+          "type": "^(?:in|out)$",
+          "action": "^(?:ACCEPT|DROP|REJECT)$",
+          "iface": "^net(?:[0-9]|[12][0-9]|3[01])$"
+        },
+        "inputFormats": {
+          "source": "pve-firewall-address",
+          "dest": "pve-firewall-address",
+          "proto": "pve-firewall-protocol",
+          "sport": "pve-firewall-port",
+          "dport": "pve-firewall-port",
+          "iface": "pve-firewall-interface"
+        },
+        "confirmationWarnings": [
+          {
+            "message": "Firewall rule changes can cut off management access or change protection. Inspect the complete private ordered plan before confirming."
+          },
+          {
+            "message": "NON-ATOMIC CREATE: the provider ignores creation digests and prepends this fixed disabled rule. Unexpected observed order remains uncertain; enabling requires a separate fresh digest-guarded confirmation."
+          }
+        ],
+        "reason": "Non-atomic creation of a fixed disabled rule only: provider POST ignores digest and prepends; private before/after plan, state recheck and post-write comparison apply. Enable separately with a fresh digest-guarded confirmation.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Inspect complete current rules privately; a matching later list cannot establish attribution. Never retry or automatically delete after uncertainty."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/vms/{vmid}",
+            [
+              "VM.Config.Network"
+            ]
+          ]
+        },
+        "response": {
+          "type": "null"
+        },
+        "source": "Pinned rule schemas and reviewed provider Rules.pm creation, digest-guarded updates/deletes and reorder semantics."
+      },
+      "inputs": [
+        {
+          "name": "action",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "comment",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "dest",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "digest",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "dport",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "enable",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "icmp-type",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "iface",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "log",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "macro",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "node",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "pos",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "proto",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "source",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "sport",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "type",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "vmid",
+          "admitted": true,
+          "sensitive": false
+        }
+      ],
+      "results": {
+        "type": "null",
+        "handling": "versioned inherited private pipe; public metadata only"
+      }
     },
     {
       "id": "OP-DELETE-1a226b99be",
       "method": "DELETE",
       "path": "/nodes/{node}/qemu/{vmid}/firewall/rules/{pos}",
       "release": "published-current",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/1152"
-    },
-    {
-      "id": "OP-GET-1f1e7e144a",
-      "method": "GET",
-      "path": "/nodes/{node}/qemu/{vmid}/firewall/rules/{pos}",
-      "release": "published-current",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/1153"
+      "admitted": true,
+      "contract": "dist/contracts.json#/contracts/1152",
+      "policy": {
+        "effect": "write",
+        "transport": "json",
+        "secrets": "private-result",
+        "stateBinding": {
+          "kind": "firewall-rules",
+          "path": "/nodes/{node}/qemu/{vmid}/firewall/rules"
+        },
+        "allowedInputs": [
+          "node",
+          "vmid",
+          "pos",
+          "digest"
+        ],
+        "requiredInputs": [
+          "pos"
+        ],
+        "confirmationWarnings": [
+          {
+            "message": "Firewall rule changes can cut off management access or change protection. Inspect the complete private ordered plan before confirming."
+          },
+          {
+            "message": "RULE DELETION: explicitly review the selected position and resulting ordered rules before confirming."
+          }
+        ],
+        "reason": "Private state-bound ordered rule change with automatic provider digest guard; reorder is separate from field edits. No automatic retry or deletion after uncertainty.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Inspect complete current rules privately; a matching later list cannot establish attribution. Never retry or automatically delete after uncertainty."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/vms/{vmid}",
+            [
+              "VM.Config.Network"
+            ]
+          ]
+        },
+        "response": {
+          "type": "null"
+        },
+        "source": "Pinned rule schemas and reviewed provider Rules.pm creation, digest-guarded updates/deletes and reorder semantics."
+      },
+      "inputs": [
+        {
+          "name": "digest",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "node",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "pos",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "vmid",
+          "admitted": true,
+          "sensitive": false
+        }
+      ],
+      "results": {
+        "type": "null",
+        "handling": "versioned inherited private pipe; public metadata only"
+      }
     },
     {
       "id": "OP-PUT-54cc519df3",
       "method": "PUT",
       "path": "/nodes/{node}/qemu/{vmid}/firewall/rules/{pos}",
       "release": "published-current",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/1154"
+      "admitted": true,
+      "contract": "dist/contracts.json#/contracts/1154",
+      "policy": {
+        "effect": "write",
+        "transport": "json",
+        "secrets": "private-result",
+        "stateBinding": {
+          "kind": "firewall-rules",
+          "path": "/nodes/{node}/qemu/{vmid}/firewall/rules"
+        },
+        "allowedInputs": [
+          "node",
+          "vmid",
+          "pos",
+          "digest",
+          "type",
+          "action",
+          "enable",
+          "source",
+          "dest",
+          "proto",
+          "sport",
+          "dport",
+          "iface",
+          "moveto"
+        ],
+        "requiredInputs": [
+          "pos"
+        ],
+        "inputCases": [
+          {
+            "requiredInputs": [
+              "moveto"
+            ],
+            "forbiddenInputs": [
+              "type",
+              "action",
+              "enable",
+              "source",
+              "dest",
+              "proto",
+              "sport",
+              "dport",
+              "iface"
+            ]
+          },
+          {
+            "forbiddenInputs": [
+              "moveto",
+              "enable"
+            ]
+          },
+          {
+            "forbiddenInputs": [
+              "moveto"
+            ],
+            "requiredValues": {
+              "enable": 0
+            }
+          },
+          {
+            "forbiddenInputs": [
+              "moveto"
+            ],
+            "requiredValues": {
+              "enable": 1
+            }
+          }
+        ],
+        "inputPatterns": {
+          "type": "^(?:in|out)$",
+          "action": "^(?:ACCEPT|DROP|REJECT)$",
+          "iface": "^net(?:[0-9]|[12][0-9]|3[01])$"
+        },
+        "inputFormats": {
+          "source": "pve-firewall-address",
+          "dest": "pve-firewall-address",
+          "proto": "pve-firewall-protocol",
+          "sport": "pve-firewall-port",
+          "dport": "pve-firewall-port",
+          "iface": "pve-firewall-interface"
+        },
+        "confirmationWarnings": [
+          {
+            "message": "Firewall rule changes can cut off management access or change protection. Inspect the complete private ordered plan before confirming."
+          }
+        ],
+        "reason": "Private state-bound ordered rule change with automatic provider digest guard; reorder is separate from field edits. No automatic retry or deletion after uncertainty.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Inspect complete current rules privately; a matching later list cannot establish attribution. Never retry or automatically delete after uncertainty."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/vms/{vmid}",
+            [
+              "VM.Config.Network"
+            ]
+          ]
+        },
+        "response": {
+          "type": "null"
+        },
+        "source": "Pinned rule schemas and reviewed provider Rules.pm creation, digest-guarded updates/deletes and reorder semantics."
+      },
+      "inputs": [
+        {
+          "name": "action",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "comment",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "delete",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "dest",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "digest",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "dport",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "enable",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "icmp-type",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "iface",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "log",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "macro",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "moveto",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "node",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "pos",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "proto",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "source",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "sport",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "type",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "vmid",
+          "admitted": true,
+          "sensitive": false
+        }
+      ],
+      "results": {
+        "type": "null",
+        "handling": "versioned inherited private pipe; public metadata only"
+      }
     },
     {
       "id": "OP-GET-29926ddd4d",
