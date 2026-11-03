@@ -212,6 +212,7 @@ proxmox-axi set '/nodes/{node}/qemu/{vmid}/firewall/options' --api-node '<node>'
 Enable the exact mutation ID in the selected profile and any independent host policy, inspect the target/settings and preview `warnings`, then repeat the exact request with `--confirm '<confirmation>'`.
 Firewall changes can cut off management access; review management allowances and recovery access before confirming.
 See the [installed firewall guide](skills/proxmox-axi/references/firewall-management.md) for supported scopes and inputs, read projection, warning meanings, digest handling, filtering prerequisites, verification and recovery.
+For provider filtering and backend behavior, see the [Proxmox firewall documentation](https://github.com/proxmox/pve-docs/blob/master/pve-firewall.adoc).
 
 ### Guest power control
 
