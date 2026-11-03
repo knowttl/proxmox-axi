@@ -32,7 +32,8 @@ export interface Contract {
   parameters: VendorSchema
   returns: VendorSchema
   policy: { effect: string, transport: string, secrets: string, reason: string,
-    allowedInputs?: string[], sensitiveInputs?: string[], inputPatterns?: Record<string, string>, reconciliation?: { kind: string, path?: string, reason: string } }
+    allowedInputs?: string[], sensitiveInputs?: string[], inputPatterns?: Record<string, string>, inputFormats?: Record<string, string>,
+    fixedInputs?: Record<string, string | number | boolean>, reconciliation?: { kind: string, path?: string, reason: string } }
   invocation: unknown
 }
 export const contracts: Contract[] = JSON.parse(readFileSync(new URL('./contracts.json', import.meta.url), 'utf8')).contracts
@@ -66,7 +67,7 @@ export function validateValue(value: unknown, schema: VendorSchema): void {
   if (typeof value === 'number' && ((schema.minimum !== undefined && value < schema.minimum) || (schema.maximum !== undefined && value > schema.maximum))) throw invalid()
   if (schema.type === 'string') {
     const pem = schema.format === 'pem-string' || schema.format === 'pem-certificate-chain'
-    if (typeof value !== 'string' || (pem ? /[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]/ : /[\x00-\x1f\x7f]/).test(value)) throw invalid()
+    if (typeof value !== 'string' || (pem || schema.format === 'openssh-public-keys' ? /[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]/ : /[\x00-\x1f\x7f]/).test(value)) throw invalid()
     if ((schema.minLength !== undefined && value.length < schema.minLength) || (schema.maxLength !== undefined && value.length > schema.maxLength)) throw invalid()
     if (schema.pattern) {
       // Perl syntax requires a reviewed translation when ECMAScript cannot represent it directly.
@@ -132,7 +133,7 @@ export function validateParameters(values: Record<string, unknown>, schema: Vend
 }
 
 export function buildPath(contract: Contract, values: Record<string, unknown>): string {
-  validateParameters(values, { ...contract.parameters, properties: parameterProperties(contract.parameters, contract.policy.allowedInputs) })
+  validateParameters(values, { ...contract.parameters, properties: parameterProperties(contract.parameters, contract.policy.allowedInputs, contract.policy.inputFormats) })
   const used = new Set<string>()
   const path = contract.path.replace(/\{([^}]+)\}/g, (_, name: string) => {
     used.add(name)

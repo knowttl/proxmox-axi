@@ -293,13 +293,27 @@ proxmox-axi create '/nodes/{node}/qemu/{vmid}/clone' --api-node '<source-node>' 
 
 Follow the [QEMU provisioning reference](skills/proxmox-axi/references/guest-management.md#qemu-creation-and-template-cloning) for operation permissions, supported inputs, confirmation, task completion, cross-node clones, onboarding and remaining refusals.
 
+### Create and clone LXC guests
+
+Create from an existing managed container template or clone a reviewed unprivileged template:
+
+```sh
+proxmox-axi create '/nodes/{node}/lxc' --api-node '<node>' --api-vmid 202 --api-ostemplate 'local:vztmpl/base.tar.zst' --api-hostname new-container --api-memory 2048 --api-rootfs local-lvm:8 --profile lab --preview
+proxmox-axi create '/nodes/{node}/lxc/{vmid}/clone' --api-node '<source-node>' --api-vmid '<template-id>' --api-newid 203 --api-hostname cloned-container --api-full 1 --api-storage local-lvm --profile lab --preview
+```
+
+Creation always sends unprivileged mode and refuses a privileged request.
+Clone inherits the source configuration, so inspect the template privately and select an unprivileged source before confirming.
+Creation accepts SecretRef-only passwords and raw LF-separated OpenSSH public keys in a protected body file.
+Follow the [LXC provisioning reference](skills/proxmox-axi/references/guest-management.md#lxc-creation-and-template-cloning) for supported settings, credential handling, task completion and remaining refusals.
+
 ## Safety
 
 - Ordinary JSON reads use trusted HTTPS, a five-second total deadline and a 64 KiB response bound, and reject redirects.
   Managed transfers have separate administrator-controlled byte and elapsed limits.
 - Operations whose effects, transport or secret handling are not reviewed remain discoverable but uncallable.
   Unresolved policy fields deny invocation, and changing a capture never admits new operations automatically.
-- Writes cover [QEMU creation and cloning](#create-and-clone-qemu-guests), guest power operations, guest destruction, [selected guest configuration settings](#guest-configuration-and-compute-settings), [managed disk attachments](#manage-disk-attachments), growth-only guest disk resize, pool management, task cancellation, node execute batches, storage uploads and the reviewed credential/session setup operations.
+- Writes cover [QEMU creation and cloning](#create-and-clone-qemu-guests), [LXC creation and cloning](#create-and-clone-lxc-guests), guest power operations, guest destruction, [selected guest configuration settings](#guest-configuration-and-compute-settings), [managed disk attachments](#manage-disk-attachments), growth-only guest disk resize, pool management, task cancellation, node execute batches, storage uploads and the reviewed credential/session setup operations.
   Effectful CIFS/PBS scans use the same preview and confirmation policy even though their vendor method is GET.
 - Inspect `schema create|set|delete <template>` and the generated `write-policy.json` before enabling an operation.
 - Enable an operation by adding its ID to the selected file profile: `writes: { "operations": ["<operation-id>"] }`.

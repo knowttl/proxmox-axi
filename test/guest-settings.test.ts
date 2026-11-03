@@ -18,7 +18,7 @@ const hash = (value: string) => createHash('sha256').update(value).digest('hex')
 const configPath = (family: string) => `/nodes/{node}/${family}/{vmid}/config`
 const canary = 'CANARY-private-guest-credential'
 const cloudPassword = 'CANARY-cloud-init+password/with space'
-const publicKey = `ssh-ed25519 ${Buffer.from('0000000b7373682d6564323535313900000020d75a980182b10ab7d54bfed3c964073a0ee172f3daa62325af021a68f707511a', 'hex').toString('base64')} fixture`
+const publicKey = (await readFile(new URL('../../test/fixtures/ssh-public-key.pub', import.meta.url), 'utf8')).trimEnd()
 const digest = '0123456789012345678901234567890123456789'
 const releases = [{ release: 'legacy-8.2.7', version: '8.2.7' }, { release: 'published-current', version: '9.2.1' }]
 const guests = [

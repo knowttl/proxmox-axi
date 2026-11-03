@@ -273,7 +273,7 @@ export async function main(args: string[]): Promise<void> {
     }
     for (const [flag, value] of Object.entries(options)) if (flag.startsWith('--api-')) {
       const name = flag.slice(6)
-      const properties = contract ? parameterProperties(contract.parameters, contract.policy.allowedInputs) : {}
+      const properties = contract ? parameterProperties(contract.parameters, contract.policy.allowedInputs, contract.policy.inputFormats) : {}
       const schema = Object.hasOwn(properties, name) ? properties[name] : undefined
       if (!schema || Object.hasOwn(values, name)) throw usage('Unknown or duplicate API parameter.')
       values[name] = parseParameter(value, schema)

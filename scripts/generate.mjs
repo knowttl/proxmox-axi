@@ -55,9 +55,13 @@ const contracts = catalogues.flatMap(catalogue => catalogue.operations.map(opera
   const callable = policy.captureBindings[catalogue.release] === catalogue.captureSha256 && ['read', 'write', 'batch'].includes(review.effect) && ['json', 'managed'].includes(review.transport) && ['none', 'input-refs', 'private-result'].includes(review.secrets)
   const id = operations.find(item => routeKey(item) === routeKey(operation))?.id ?? `OP-${operation.method}-${createHash('sha256').update(routeKey(operation)).digest('hex').slice(0, 10)}`
   const api = parameterSchema({ ...operation.parameters,
-    properties: Object.fromEntries(Object.entries(parameterProperties(operation.parameters, review.allowedInputs)).filter(([name]) =>
+    properties: Object.fromEntries(Object.entries(parameterProperties(operation.parameters, review.allowedInputs, review.inputFormats)).filter(([name]) =>
       !review.allowedInputs || review.allowedInputs.includes(name))),
   })
+  for (const [name, value] of Object.entries(review.fixedInputs ?? {})) {
+    if (!api.properties?.[name]) throw new Error('Fixed setting names an unknown input')
+    Object.assign(api.properties[name], { const: value, default: value })
+  }
   for (const name of review.allowedInputs ?? []) {
     const template = name.replace(/[0-9]+$/, '[n]')
     if (template === name || !Object.hasOwn(operation.parameters.properties ?? {}, template) || Object.hasOwn(operation.parameters.properties, name)) continue
