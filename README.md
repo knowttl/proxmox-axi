@@ -439,7 +439,7 @@ Only reviewed managed backup sources are admitted; force overwrite, raw host pat
 - Hosted use needs the host's independent `hostWrites` policy with `allowWrites: true` and the exact operation IDs.
   Host policy never replaces the profile's own permissions.
   The host supplies its authenticated caller and credential revision, and callers cannot override those bindings or the persistent journal path.
-- `--preview` may perform bounded version reads but sends no business mutation.
+- `--preview` may perform bounded version reads and [ordered-rule state reads](skills/proxmox-axi/references/firewall-management.md#ordered-firewall-rules) but sends no business mutation.
 - A confirmation expires after five minutes and binds origin, identity, caller, selected contract, policy, target, complete ordered inputs, trust and secret-source revisions.
 - Sensitive operation inputs require env/file SecretRefs in a body file, and literal secret arguments are refused.
 

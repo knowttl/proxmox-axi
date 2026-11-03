@@ -92,6 +92,7 @@ Edits and deletion automatically carry the currently observed rules-list digest 
 A supplied stale digest is refused; there is no bypass for the native guard.
 Supported field changes use `type` in/out, action ACCEPT/DROP/REJECT, integer enable 0/1, literal IPv4 or pure IPv6 addresses with optional CIDR, tcp/udp/icmp/icmpv6, individual numeric ports 1-65535 and reviewed interface names.
 Ports require tcp/udp; guest interfaces are net0 through net31.
+Source and destination addresses must use the same IP family, consistent with icmp (IPv4) or icmpv6 (IPv6) when selected.
 Field edits are refused if the resulting rule retains aliases/IP sets, macros, ICMP subtype selectors, service/range port selectors or unreviewed protocols.
 An inherited unsupported address may be replaced with a reviewed literal address when the resulting rule meets these restrictions.
 Comments, port lists/ranges, service names, group/forward mutations and field-removal selectors are not admitted here.
