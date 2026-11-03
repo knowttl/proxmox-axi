@@ -42,6 +42,15 @@ export function reviewWrite(operation: Operation) {
   const guest = /^\/nodes\/\{node\}\/(qemu|lxc)\/\{vmid\}$/.test(path)
   const lifecyclePath = /^\/nodes\/\{node\}\/(qemu|lxc)\/\{vmid\}\/status\/(start|stop|shutdown|reboot|reset|resume|suspend)$/.test(path)
   const config = /^\/nodes\/\{node\}\/(qemu|lxc)\/\{vmid\}\/config$/.test(path)
+  const create = method === 'POST' && path === '/nodes/{node}/qemu' && name === 'create_vm'
+  const qemu = path === '/nodes/{node}/qemu' || path.includes('/qemu/')
+  if (method === 'POST' && path === '/nodes/{node}/qemu/{vmid}/clone' && name === 'clone_vm' && operation.allowtoken !== 0) {
+    return { effect: 'write', transport: 'json', secrets: 'none',
+      allowedInputs: ['node', 'vmid', 'newid', 'name', 'description', 'full', 'storage', 'format', 'target', 'pool', 'bwlimit'],
+      reason: 'Confirmed guest clone with reviewed destination and storage settings; snapshot-source variants remain refused.',
+      reconciliation: { kind: 'none', reason: 'Track the source-node UPID, then inspect the destination guest independently; never clone again after uncertain delivery.' },
+      privileges: operation.permissions, response: operation.returns, source: 'Pinned clone_vm schemas; existing effect and task contracts.' }
+  }
   if (method === 'PUT' && path === '/nodes/{node}/qemu/{vmid}/cloudinit' && name === 'cloudinit_update' && operation.allowtoken !== 0) {
     return { effect: 'write', transport: 'json', secrets: 'none', allowedInputs: ['node', 'vmid'],
       reason: 'Confirmed regeneration of managed cloud-init media after reviewed configuration changes.',
@@ -63,29 +72,33 @@ export function reviewWrite(operation: Operation) {
     (method === 'DELETE' && guest && ['destroy_vm', 'destroy'].includes(name ?? '')) ||
     (method === 'PUT' && config && name === 'update_vm') ||
     (['/pools', '/pools/{poolid}'].includes(path) && pool.has(name ?? '') && ['POST', 'PUT', 'DELETE'].includes(method)) ||
-    batch || cancel)
+    create || batch || cancel)
   if (!admitted) return undefined
   // Configuration has credentials, hardware passthrough and executable hooks.
   // Compute settings admit scalar values and narrowly reviewed property strings only.
-  const disks = path.includes('/qemu/') ? [['ide', 4], ['sata', 6], ['scsi', 31], ['virtio', 16]] as const : [['mp', 256]] as const
+  const disks = qemu ? [['ide', 4], ['sata', 6], ['scsi', 31], ['virtio', 16]] as const : [['mp', 256]] as const
   const slots = disks.flatMap(([prefix, count]) => Array.from({ length: count }, (_, index) => `${prefix}${index}`))
   const networkSlots = Array.from({ length: 32 }, (_, index) => `net${index}`)
   const ipconfigSlots = Array.from({ length: 32 }, (_, index) => `ipconfig${index}`)
   const removableSlots = [...slots, ...networkSlots]
-  const allowedInputs = config ? ['node', 'vmid', 'description', 'name', 'hostname', 'memory', 'cores', 'sockets', 'vcpus', 'balloon', 'swap', 'cpu', 'cpulimit', 'cpuunits', 'onboot', 'startup', 'digest', 'cipassword', 'password'] :
+  const settings = config || create
+  const allowedInputs = settings ? ['node', 'vmid', 'description', 'name', 'hostname', 'memory', 'cores', 'sockets', 'vcpus', 'balloon', 'swap', 'cpu', 'cpulimit', 'cpuunits', 'onboot', 'startup', 'digest', 'cipassword', 'password'] :
     lifecyclePath ? ['node', 'vmid', 'timeout', 'forceStop', 'keepActive', 'skiplock', 'todisk'] :
     guest ? ['node', 'vmid', 'purge', 'destroy-unreferenced-disks', 'force'] : undefined
-  return { effect: batch ? 'batch' : 'write', transport: 'json', secrets: config ? 'input-refs' : 'none',
+  const settingInputs = settings ? [...allowedInputs!, ...slots, ...networkSlots, 'nameserver', 'searchdomain',
+    ...(qemu ? ['boot', 'agent', 'ciuser', 'sshkeys', ...ipconfigSlots] : ['rootfs'])] : []
+  return { effect: batch ? 'batch' : 'write', transport: 'json', secrets: settings ? 'input-refs' : 'none',
     reason: batch ? 'Vendor execute resolves each ordered node-relative child and reports per-child status; no atomicity.' :
       cancel ? 'Stop an existing UPID; cancellation is a separately confirmed mutation.' :
+      create ? 'Confirmed blank QEMU creation with reviewed compute, managed disks, NICs, boot and onboarding inputs; restore, overwrite and unreviewed hardware remain refused.' :
       config ? 'Reviewed compute, managed disks, guest networking, boot/agent and cloud-init onboarding; numbered slots/removal selectors are explicit, host passthrough remains refused, and credentials require SecretRefs.' :
       lifecyclePath ? 'Guest power-state operation, asynchronous UPID acceptance does not prove completion.' :
       guest ? 'Destroy guest; absence or filtered inventory cannot prove the outcome.' : 'Pool configuration and membership mutation; no automatic retry.',
-    allowedInputs: config ? [...allowedInputs!, ...slots, ...networkSlots, 'nameserver', 'searchdomain', ...(path.includes('/lxc/') ? ['rootfs'] : ['boot', 'agent', 'ciuser', 'sshkeys', ...ipconfigSlots]), 'delete'] : allowedInputs,
-    ...(config ? { inputPatterns: { delete: `^(?:${removableSlots.join('|')})(?:,(?:${removableSlots.join('|')}))*$`,
-      searchdomain: namedFormatPattern('dns-name-list')!, ...(path.includes('/qemu/') ? { ciuser: '^[a-z_][a-z0-9_-]{0,31}$', sshkeys: cloudInitSshKeysPattern,
+    allowedInputs: config ? [...settingInputs, 'delete'] : create ? [...settingInputs.filter(name => !['hostname', 'swap', 'digest', 'password'].includes(name)), 'bios', 'scsihw', 'ostype', 'pool', 'start'] : allowedInputs,
+    ...(settings ? { inputPatterns: { ...(config ? { delete: `^(?:${removableSlots.join('|')})(?:,(?:${removableSlots.join('|')}))*$` } : {}),
+      searchdomain: namedFormatPattern('dns-name-list')!, ...(qemu ? { ciuser: '^[a-z_][a-z0-9_-]{0,31}$', sshkeys: cloudInitSshKeysPattern,
         boot: `^order=(?:${removableSlots.join('|')})(?:;(?:${removableSlots.join('|')}))*$` } : {}) } } : {}),
-    sensitiveInputs: config ? ['cipassword', 'password'] : [],
+    sensitiveInputs: create ? ['cipassword'] : config ? ['cipassword', 'password'] : [],
     reconciliation: config ? { kind: 'read', path, reason: 'Direct configuration observation may confirm supplied fields; missing fields never prove failure.' } :
       lifecyclePath ? { kind: 'read', path: path.replace(/\/status\/[^/]+$/, '/status/current'), reason: 'Direct guest status observation; only requested stable start/stop states can be confirmed.' } :
         { kind: 'none', reason: 'No safe automated business-outcome proof is admitted for this variant. Use the retained UPID when available; otherwise retain uncertainty and inspect independently.' },

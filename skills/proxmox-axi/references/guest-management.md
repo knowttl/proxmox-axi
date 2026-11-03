@@ -106,3 +106,27 @@ For configuration removal, use `--api-delete scsi0` or a comma-separated list of
 NIC selectors can also be removed alone; LXC rootfs, unused volumes and arbitrary settings cannot be selected.
 This does not admit arbitrary storage-volume deletion or force options.
 Use a private configuration digest for concurrent-change protection and inspect the exact guest and disk before confirming replacement/removal.
+
+## QEMU creation and template cloning
+
+Inspect `schema create '/nodes/{node}/qemu'` or `schema create '/nodes/{node}/qemu/{vmid}/clone'` for the selected operation and enable only its operation ID in the selected profile and any independent host policy.
+Choose a VMID using the cluster's nextid read or explicit inventory; a free-ID read is an observation, never a reservation.
+Create with required node/VMID and the reviewed compute, managed disk, NIC, boot, agent and cloud-init settings described above.
+Basic create-only inputs include `bios`, `scsihw`, `ostype`, `pool` and optional `start` from the selected vendor schema.
+Leave `start` unset or set it to `0` when onboarding must finish before first boot; `start=1` requests startup as part of creation.
+Passwords still require SecretRefs in a protected body file and SSH public keys retain the cloud-init encoding rules.
+For a blank installation, allocate a managed disk, attach an existing ISO, choose an ordinary boot order and preview the complete request.
+Restore/archive/force, delete/digest selectors, custom arguments, the template flag and unreviewed hardware/machine/EFI/TPM properties remain refused on creation.
+BIOS selection does not admit EFI/TPM variable-disk configuration; use an appropriately configured template when those properties are needed.
+
+Select an existing template by reading its configuration privately and checking its template flag.
+Preview `create '/nodes/{node}/qemu/{vmid}/clone'` with the source node/VMID and required `newid`; reviewed options are name, description, full, storage, format, target, pool and `bwlimit`.
+For a full copy, use `--api-full 1` and select supported destination storage/format; linked clones use the provider's template/storage rules.
+Cross-node `target` also follows provider shared-storage rules, and snapshot-source clones remain refused.
+
+Repeat each exact request with its confirmation only after inspecting the source, destination, VMID, storage and settings.
+A returned UPID means accepted, not completed; use `task wait` with the returned/source node, UPID, journal ID and profile.
+Failed tasks remain failed in the journal; do not treat acceptance or an absent/hidden inventory row as success or failure proof.
+After successful creation, inspect the new VMID on its actual destination node through the private configuration read.
+Apply the reviewed cloud-init/onboarding settings and regenerate media if needed before first boot, then use the existing confirmed start, shutdown, reboot, stop or delete commands and task tracking.
+If provisioning delivery is uncertain, inspect the journal and retained task rather than submit another create/clone automatically.

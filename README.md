@@ -282,13 +282,24 @@ Confirm each exact preview separately; regeneration returns synchronous success 
 `get .../cloudinit` exposes protected current/pending values only through the inherited private result pipe, including before regeneration.
 Cloud-init dumps, custom snippets and unreviewed input branches remain refused.
 
+### Create and clone QEMU guests
+
+Create a blank QEMU guest or clone an existing template with a preview:
+
+```sh
+proxmox-axi create '/nodes/{node}/qemu' --api-node '<node>' --api-vmid 200 --api-name new-guest --api-memory 2048 --api-cores 2 --api-scsihw virtio-scsi-single --api-scsi0 'local-lvm:8' --api-ide2 'local:iso/installer.iso,media=cdrom' --api-net0 'virtio,bridge=vmbr0' --api-boot 'order=ide2;scsi0' --api-ostype l26 --profile lab --preview
+proxmox-axi create '/nodes/{node}/qemu/{vmid}/clone' --api-node '<source-node>' --api-vmid '<template-id>' --api-newid 201 --api-name cloned-guest --api-full 1 --api-storage local-lvm --profile lab --preview
+```
+
+Follow the [QEMU provisioning reference](skills/proxmox-axi/references/guest-management.md#qemu-creation-and-template-cloning) for operation permissions, supported inputs, confirmation, task completion, cross-node clones, onboarding and remaining refusals.
+
 ## Safety
 
 - Ordinary JSON reads use trusted HTTPS, a five-second total deadline and a 64 KiB response bound, and reject redirects.
   Managed transfers have separate administrator-controlled byte and elapsed limits.
 - Operations whose effects, transport or secret handling are not reviewed remain discoverable but uncallable.
   Unresolved policy fields deny invocation, and changing a capture never admits new operations automatically.
-- Writes cover guest power operations, guest destruction, [selected guest configuration settings](#guest-configuration-and-compute-settings), [managed disk attachments](#manage-disk-attachments), growth-only guest disk resize, pool management, task cancellation, node execute batches, storage uploads and the reviewed credential/session setup operations.
+- Writes cover [QEMU creation and cloning](#create-and-clone-qemu-guests), guest power operations, guest destruction, [selected guest configuration settings](#guest-configuration-and-compute-settings), [managed disk attachments](#manage-disk-attachments), growth-only guest disk resize, pool management, task cancellation, node execute batches, storage uploads and the reviewed credential/session setup operations.
   Effectful CIFS/PBS scans use the same preview and confirmation policy even though their vendor method is GET.
 - Inspect `schema create|set|delete <template>` and the generated `write-policy.json` before enabling an operation.
 - Enable an operation by adding its ID to the selected file profile: `writes: { "operations": ["<operation-id>"] }`.
