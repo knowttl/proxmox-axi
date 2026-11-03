@@ -5,7 +5,7 @@ Read `/nodes/{node}/qemu/{vmid}/status/current` or its LXC equivalent for ordina
 
 ## Private configuration reads
 
-QEMU and LXC configuration, `/snapshot/{snapname}/config` and `/pending` GETs, including the `ls` aliases for pending-setting reads, and QEMU `/cloudinit` GETs require a caller-owned inherited pipe or socket selected by `PROXMOX_AXI_RESULT_FD` (descriptor 3 or higher).
+QEMU and LXC configuration, `/snapshot/{snapname}/config` and `/pending` GETs, including the `ls` aliases for pending-setting reads, QEMU `/cloudinit` GETs and backup `/vzdump/extractconfig` reads require a caller-owned inherited pipe or socket selected by `PROXMOX_AXI_RESULT_FD` (descriptor 3 or higher).
 These payloads can contain credentials.
 Launch the CLI executable directly from the caller that owns that pipe.
 Terminals, regular files, stdout and stderr are refused, and a missing private pipe fails before provider access.
@@ -116,7 +116,7 @@ Basic create-only inputs include `bios`, `scsihw`, `ostype`, `pool` and optional
 Leave `start` unset or set it to `0` when onboarding must finish before first boot; `start=1` requests startup as part of creation.
 Passwords still require SecretRefs in a protected body file and SSH public keys retain the cloud-init encoding rules.
 For a blank installation, allocate a managed disk, attach an existing ISO, choose an ordinary boot order and preview the complete request.
-Restore/archive/force, delete/digest selectors, custom arguments, the template flag and unreviewed hardware/machine/EFI/TPM properties remain refused on creation.
+Force overwrite, delete/digest selectors, custom arguments, the template flag and unreviewed hardware/machine/EFI/TPM input properties remain refused; [backup restoration](#restore-guest-backups) has its own reviewed source and destination constraints.
 BIOS selection does not admit EFI/TPM variable-disk configuration; use an appropriately configured template when those properties are needed.
 
 Select an existing template by reading its configuration privately and checking its template flag.
@@ -142,7 +142,7 @@ Leave `start` unset or `0` to finish onboarding before first boot.
 Use a protected body file with SecretRef-only `password`, for example `{"password":{"env":"INITIAL_PASSWORD"}}`, alongside required creation settings.
 `ssh-public-keys` accepts raw OpenSSH public-key lines, separated by LF, with an optional final LF; do not percent-encode these keys as required for QEMU `sshkeys`.
 The reviewed key algorithms and simple comment restrictions are the same as for QEMU keys; authorized-key options, private keys and control characters remain refused.
-Host bind mounts, devices, hooks, custom features, restore/overwrite and privilege-changing inputs remain refused.
+Host bind mounts, devices, hooks, custom features, overwrite and privilege-changing inputs remain refused; use the [restore workflow](#restore-guest-backups) for managed backups.
 
 Before cloning, read the source template's configuration privately, check its template flag and select an unprivileged template after reviewing its inherited settings and features.
 Clone inherits the source configuration, including privilege settings; this command does not rewrite those settings.
@@ -218,7 +218,7 @@ Existing provider configuration, permissions and storage support still apply.
 Wait for the returned node/UPID with the journal ID and selected profile before treating a backup as complete.
 List results through `get '/nodes/{node}/storage/{storage}/content' --api-content backup`, using reviewed volume/protection metadata and the selected storage.
 Permission-filtered inventory and an absent row never prove success or reserve a backup name.
-Backup restoration remains refused by this admission.
+Use the [restore workflow](#restore-guest-backups) for separately confirmed restoration to a new guest ID.
 
 Preview `delete '/nodes/{node}/storage/{storage}/content/{volume}'` with explicit node, storage and the raw complete backup volume ID, then confirm the exact request.
 Deletion admits only conventional `storage:backup/vzdump-qemu-<id>-YYYY_MM_DD-HH_MM_SS.vma` or LXC `.tar` archives, optionally suffixed `.gz`, `.lzo` or `.zst`, and PBS `storage:backup/vm/<id>/YYYY-MM-DDTHH:MM:SSZ` or `ct` IDs.
@@ -229,3 +229,27 @@ The provider checks storage/volume consistency, permissions and backup protectio
 Delayed/null-result deletion variants remain refused so successful transmission returns a task UPID.
 Deletion is destructive and requires its own exact confirmation; a confirmation for one backup cannot authorize another volume or destination.
 After task success, inspect inventory independently; failed tasks and provider protection refusals stay failed in the journal, while uncertain delivery must never trigger an automatic retry.
+
+## Restore guest backups
+
+Choose a trusted QEMU or LXC dump archive or PBS guest backup from reviewed storage-content listing.
+Inspect its complete configuration privately with `get '/nodes/{node}/vzdump/extractconfig' --api-node '<node>' --api-volume '<backup-volume-id>'` and the inherited private result channel described above.
+The extracted text can contain passwords, host-sensitive settings and descriptions; do not print or journal it.
+Restore inherits configuration from the backup, including settings not overridden by supplied reviewed inputs.
+Review host-device mappings, mounts, hooks and network identities before confirming; provider restore permissions remain authoritative.
+Guest-setting inputs outside the existing reviewed creation allowlist remain refused, including custom arguments, hooks and host passthrough selectors.
+
+Preview QEMU `create '/nodes/{node}/qemu'` with a new VMID, `--api-archive '<qemu-backup-volume-id>'` and explicit destination `--api-storage '<storage>'`.
+For LXC, use `create '/nodes/{node}/lxc'` with a new VMID, `--api-ostemplate '<lxc-backup-volume-id>'`, explicit `--api-restore 1` and destination storage.
+Sources must use the reviewed dump-archive or PBS volume-ID forms described above and match the guest family; stdin, raw host paths, unqualified filenames and other content remain refused.
+LXC templates require creation mode without a restore flag; a backup requires restore mode, and destination storage is mandatory for either family's restore.
+Already reviewed guest settings can override restored settings; optional `bwlimit` and `unique` are restore-only inputs.
+Use `--api-unique 1` to request fresh Ethernet identities when the original guest may still exist, and leave start unset or `0` until onboarding is checked.
+Live/background startup during import remains refused; optional `start=1` is a separately bound request to start after completion.
+All LXC requests retain the fixed unprivileged setting, including restore; inspect the source privilege/mount configuration and select a compatible backup.
+
+Inspect the source, unused destination VMID, storage and settings before repeating the exact request with its confirmation.
+Both provider creation routes refuse existing destination IDs without force; force/overwrite stays refused by this client even with confirmation.
+A changed backup source or destination setting invalidates the original confirmation.
+Wait on the returned node/UPID with the journal ID and profile, then inspect the destination configuration privately.
+Failed tasks can leave partial destination state; inspect it and the journal before manual recovery, without automatically retrying or deleting anything.

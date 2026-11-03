@@ -33,6 +33,7 @@ export interface Contract {
   returns: VendorSchema
   policy: { effect: string, transport: string, secrets: string, reason: string,
     allowedInputs?: string[], requiredInputs?: string[], sensitiveInputs?: string[], outputFields?: string[], inputPatterns?: Record<string, string>, inputFormats?: Record<string, string>,
+    inputCases?: { requiredInputs?: string[], forbiddenInputs?: string[], requiredValues?: Record<string, string | number | boolean>, inputPatterns?: Record<string, string> }[],
     fixedInputs?: Record<string, string | number | boolean>, reconciliation?: { kind: string, path?: string, reason: string } }
   invocation: unknown
 }
@@ -135,6 +136,11 @@ export function validateParameters(values: Record<string, unknown>, schema: Vend
 export function buildPath(contract: Contract, values: Record<string, unknown>): string {
   const properties = parameterProperties(contract.parameters, contract.policy.allowedInputs, contract.policy.inputFormats)
   validateParameters(values, { ...contract.parameters, properties })
+  if (contract.policy.inputCases && !contract.policy.inputCases.some(branch =>
+    (branch.requiredInputs ?? []).every(name => Object.hasOwn(values, name)) &&
+    (branch.forbiddenInputs ?? []).every(name => !Object.hasOwn(values, name)) &&
+    Object.entries(branch.requiredValues ?? {}).every(([name, value]) => values[name] === value) &&
+    Object.entries(branch.inputPatterns ?? {}).every(([name, pattern]) => !Object.hasOwn(values, name) || typeof values[name] === 'string' && new RegExp(pattern).test(values[name])))) throw invalid()
   const used = new Set<string>()
   const path = contract.path.replace(/\{([^}]+)\}/g, (_, name: string) => {
     used.add(name)

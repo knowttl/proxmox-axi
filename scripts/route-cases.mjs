@@ -27,6 +27,7 @@ export function* routeCases(catalogues, policy) {
       if (name === 'node') values[name] = 'pve-test'
       else if (name === 'upid') values[name] = 'UPID:pve-test:00000001:00000002:00000003:vzdump:100:synthetic@pve:'
       else if (review.inputFormats?.[name] === 'pve-managed-volume') values[name] = 'local:iso/installer.iso'
+      else if (review.inputFormats?.[name] === 'pve-backup-volume') values[name] = 'local:backup/vzdump-qemu-100-2026_11_03-06_00_00.vma.zst'
       else if (schema.enum) values[name] = schema.enum[0]
       else if (schema.type === 'integer' || schema.type === 'number') values[name] = schema.minimum ?? 1
       else if (schema.type === 'boolean') values[name] = false

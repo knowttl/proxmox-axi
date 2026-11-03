@@ -3455,7 +3455,7 @@
         "effect": "write",
         "transport": "json",
         "secrets": "input-refs",
-        "reason": "Confirmed guest creation with reviewed compute, managed storage, networking and onboarding; LXC is fixed unprivileged, and restore, overwrite and unreviewed host features remain refused.",
+        "reason": "Confirmed guest creation or fresh-ID restore from a reviewed backup to explicit managed storage; LXC stays unprivileged, and force, live restore, host paths and unreviewed host features remain refused.",
         "allowedInputs": [
           "node",
           "vmid",
@@ -3765,17 +3765,43 @@
           "unprivileged",
           "ssh-public-keys",
           "pool",
-          "start"
+          "start",
+          "restore",
+          "bwlimit",
+          "unique"
+        ],
+        "inputCases": [
+          {
+            "forbiddenInputs": [
+              "restore",
+              "bwlimit",
+              "unique"
+            ],
+            "inputPatterns": {
+              "ostemplate": "^[A-Za-z][A-Za-z0-9._-]*:vztmpl/[A-Za-z0-9][A-Za-z0-9._-]*\\.tar\\.(?:zst|xz|gz)$"
+            }
+          },
+          {
+            "requiredInputs": [
+              "storage"
+            ],
+            "requiredValues": {
+              "restore": true
+            },
+            "inputPatterns": {
+              "ostemplate": "^[A-Za-z][A-Za-z0-9._-]*:backup/(?:vzdump-(?:lxc-[1-9][0-9]{2,8}-[0-9]{4}_[0-9]{2}_[0-9]{2}-[0-9]{2}_[0-9]{2}_[0-9]{2}\\.tar)(?:\\.(?:gz|lzo|zst))?|ct/[1-9][0-9]{2,8}/[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z)$"
+            }
+          }
         ],
         "fixedInputs": {
           "unprivileged": true
         },
         "inputFormats": {
-          "ssh-public-keys": "openssh-public-keys"
+          "ssh-public-keys": "openssh-public-keys",
+          "ostemplate": "pve-managed-volume"
         },
         "inputPatterns": {
-          "searchdomain": "^(?=.{1,255}$)[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?(?:\\.[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?)*(?: [A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?(?:\\.[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?)*)*$",
-          "ostemplate": "^[A-Za-z][A-Za-z0-9._-]*:vztmpl/[A-Za-z0-9][A-Za-z0-9._-]*\\.tar\\.(?:zst|xz|gz)$"
+          "searchdomain": "^(?=.{1,255}$)[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?(?:\\.[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?)*(?: [A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?(?:\\.[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?)*)*$"
         },
         "sensitiveInputs": [
           "password"
@@ -3801,7 +3827,7 @@
         },
         {
           "name": "bwlimit",
-          "admitted": false,
+          "admitted": true,
           "sensitive": false
         },
         {
@@ -3931,7 +3957,7 @@
         },
         {
           "name": "restore",
-          "admitted": false,
+          "admitted": true,
           "sensitive": false
         },
         {
@@ -3991,7 +4017,7 @@
         },
         {
           "name": "unique",
-          "admitted": false,
+          "admitted": true,
           "sensitive": false
         },
         {
@@ -8949,7 +8975,7 @@
         "effect": "write",
         "transport": "json",
         "secrets": "input-refs",
-        "reason": "Confirmed guest creation with reviewed compute, managed storage, networking and onboarding; LXC is fixed unprivileged, and restore, overwrite and unreviewed host features remain refused.",
+        "reason": "Confirmed guest creation or fresh-ID restore from a reviewed backup to explicit managed storage; LXC stays unprivileged, and force, live restore, host paths and unreviewed host features remain refused.",
         "allowedInputs": [
           "node",
           "vmid",
@@ -9097,13 +9123,34 @@
           "scsihw",
           "ostype",
           "pool",
-          "start"
+          "start",
+          "archive",
+          "storage",
+          "bwlimit",
+          "unique"
+        ],
+        "inputCases": [
+          {
+            "forbiddenInputs": [
+              "archive",
+              "storage",
+              "bwlimit",
+              "unique"
+            ]
+          },
+          {
+            "requiredInputs": [
+              "archive",
+              "storage"
+            ]
+          }
         ],
         "inputPatterns": {
           "searchdomain": "^(?=.{1,255}$)[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?(?:\\.[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?)*(?: [A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?(?:\\.[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?)*)*$",
           "ciuser": "^[a-z_][a-z0-9_-]{0,31}$",
           "sshkeys": "^(?:ssh-ed25519|ssh-rsa|ecdsa-sha2-nistp256)%20(?=(?:(?:[A-Za-z0-9]|%2[BbFf])){32})(?:(?:[A-Za-z0-9]|%2[BbFf]){4})*(?:(?:[A-Za-z0-9]|%2[BbFf]){2}%3[Dd]%3[Dd]|(?:[A-Za-z0-9]|%2[BbFf]){3}%3[Dd])?(?:%20(?:[A-Za-z0-9._~-]|%20|%40|%2[Bb]|%3[Aa])+)?(?:%0[Aa](?:ssh-ed25519|ssh-rsa|ecdsa-sha2-nistp256)%20(?=(?:(?:[A-Za-z0-9]|%2[BbFf])){32})(?:(?:[A-Za-z0-9]|%2[BbFf]){4})*(?:(?:[A-Za-z0-9]|%2[BbFf]){2}%3[Dd]%3[Dd]|(?:[A-Za-z0-9]|%2[BbFf]){3}%3[Dd])?(?:%20(?:[A-Za-z0-9._~-]|%20|%40|%2[Bb]|%3[Aa])+)?)*(?:%0[Aa])?$",
-          "boot": "^order=(?:ide0|ide1|ide2|ide3|sata0|sata1|sata2|sata3|sata4|sata5|scsi0|scsi1|scsi2|scsi3|scsi4|scsi5|scsi6|scsi7|scsi8|scsi9|scsi10|scsi11|scsi12|scsi13|scsi14|scsi15|scsi16|scsi17|scsi18|scsi19|scsi20|scsi21|scsi22|scsi23|scsi24|scsi25|scsi26|scsi27|scsi28|scsi29|scsi30|virtio0|virtio1|virtio2|virtio3|virtio4|virtio5|virtio6|virtio7|virtio8|virtio9|virtio10|virtio11|virtio12|virtio13|virtio14|virtio15|net0|net1|net2|net3|net4|net5|net6|net7|net8|net9|net10|net11|net12|net13|net14|net15|net16|net17|net18|net19|net20|net21|net22|net23|net24|net25|net26|net27|net28|net29|net30|net31)(?:;(?:ide0|ide1|ide2|ide3|sata0|sata1|sata2|sata3|sata4|sata5|scsi0|scsi1|scsi2|scsi3|scsi4|scsi5|scsi6|scsi7|scsi8|scsi9|scsi10|scsi11|scsi12|scsi13|scsi14|scsi15|scsi16|scsi17|scsi18|scsi19|scsi20|scsi21|scsi22|scsi23|scsi24|scsi25|scsi26|scsi27|scsi28|scsi29|scsi30|virtio0|virtio1|virtio2|virtio3|virtio4|virtio5|virtio6|virtio7|virtio8|virtio9|virtio10|virtio11|virtio12|virtio13|virtio14|virtio15|net0|net1|net2|net3|net4|net5|net6|net7|net8|net9|net10|net11|net12|net13|net14|net15|net16|net17|net18|net19|net20|net21|net22|net23|net24|net25|net26|net27|net28|net29|net30|net31))*$"
+          "boot": "^order=(?:ide0|ide1|ide2|ide3|sata0|sata1|sata2|sata3|sata4|sata5|scsi0|scsi1|scsi2|scsi3|scsi4|scsi5|scsi6|scsi7|scsi8|scsi9|scsi10|scsi11|scsi12|scsi13|scsi14|scsi15|scsi16|scsi17|scsi18|scsi19|scsi20|scsi21|scsi22|scsi23|scsi24|scsi25|scsi26|scsi27|scsi28|scsi29|scsi30|virtio0|virtio1|virtio2|virtio3|virtio4|virtio5|virtio6|virtio7|virtio8|virtio9|virtio10|virtio11|virtio12|virtio13|virtio14|virtio15|net0|net1|net2|net3|net4|net5|net6|net7|net8|net9|net10|net11|net12|net13|net14|net15|net16|net17|net18|net19|net20|net21|net22|net23|net24|net25|net26|net27|net28|net29|net30|net31)(?:;(?:ide0|ide1|ide2|ide3|sata0|sata1|sata2|sata3|sata4|sata5|scsi0|scsi1|scsi2|scsi3|scsi4|scsi5|scsi6|scsi7|scsi8|scsi9|scsi10|scsi11|scsi12|scsi13|scsi14|scsi15|scsi16|scsi17|scsi18|scsi19|scsi20|scsi21|scsi22|scsi23|scsi24|scsi25|scsi26|scsi27|scsi28|scsi29|scsi30|virtio0|virtio1|virtio2|virtio3|virtio4|virtio5|virtio6|virtio7|virtio8|virtio9|virtio10|virtio11|virtio12|virtio13|virtio14|virtio15|net0|net1|net2|net3|net4|net5|net6|net7|net8|net9|net10|net11|net12|net13|net14|net15|net16|net17|net18|net19|net20|net21|net22|net23|net24|net25|net26|net27|net28|net29|net30|net31))*$",
+          "archive": "^[A-Za-z][A-Za-z0-9._-]*:backup/(?:vzdump-(?:qemu-[1-9][0-9]{2,8}-[0-9]{4}_[0-9]{2}_[0-9]{2}-[0-9]{2}_[0-9]{2}_[0-9]{2}\\.vma)(?:\\.(?:gz|lzo|zst))?|vm/[1-9][0-9]{2,8}/[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z)$"
         },
         "sensitiveInputs": [
           "cipassword"
@@ -9149,7 +9196,7 @@
         },
         {
           "name": "archive",
-          "admitted": false,
+          "admitted": true,
           "sensitive": false
         },
         {
@@ -9189,7 +9236,7 @@
         },
         {
           "name": "bwlimit",
-          "admitted": false,
+          "admitted": true,
           "sensitive": false
         },
         {
@@ -9489,7 +9536,7 @@
         },
         {
           "name": "storage",
-          "admitted": false,
+          "admitted": true,
           "sensitive": false
         },
         {
@@ -9519,7 +9566,7 @@
         },
         {
           "name": "unique",
-          "admitted": false,
+          "admitted": true,
           "sensitive": false
         },
         {
@@ -14549,14 +14596,6 @@
       "contract": "dist/contracts.json#/contracts/589"
     },
     {
-      "id": "OP-GET-c860b27298",
-      "method": "GET",
-      "path": "/nodes/{node}/vzdump/extractconfig",
-      "release": "legacy-8.2.7",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/590"
-    },
-    {
       "id": "OP-POST-8ca2321e12",
       "method": "POST",
       "path": "/nodes/{node}/wakeonlan",
@@ -18746,7 +18785,7 @@
         "effect": "write",
         "transport": "json",
         "secrets": "input-refs",
-        "reason": "Confirmed guest creation with reviewed compute, managed storage, networking and onboarding; LXC is fixed unprivileged, and restore, overwrite and unreviewed host features remain refused.",
+        "reason": "Confirmed guest creation or fresh-ID restore from a reviewed backup to explicit managed storage; LXC stays unprivileged, and force, live restore, host paths and unreviewed host features remain refused.",
         "allowedInputs": [
           "node",
           "vmid",
@@ -19056,17 +19095,43 @@
           "unprivileged",
           "ssh-public-keys",
           "pool",
-          "start"
+          "start",
+          "restore",
+          "bwlimit",
+          "unique"
+        ],
+        "inputCases": [
+          {
+            "forbiddenInputs": [
+              "restore",
+              "bwlimit",
+              "unique"
+            ],
+            "inputPatterns": {
+              "ostemplate": "^[A-Za-z][A-Za-z0-9._-]*:vztmpl/[A-Za-z0-9][A-Za-z0-9._-]*\\.tar\\.(?:zst|xz|gz)$"
+            }
+          },
+          {
+            "requiredInputs": [
+              "storage"
+            ],
+            "requiredValues": {
+              "restore": true
+            },
+            "inputPatterns": {
+              "ostemplate": "^[A-Za-z][A-Za-z0-9._-]*:backup/(?:vzdump-(?:lxc-[1-9][0-9]{2,8}-[0-9]{4}_[0-9]{2}_[0-9]{2}-[0-9]{2}_[0-9]{2}_[0-9]{2}\\.tar)(?:\\.(?:gz|lzo|zst))?|ct/[1-9][0-9]{2,8}/[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z)$"
+            }
+          }
         ],
         "fixedInputs": {
           "unprivileged": true
         },
         "inputFormats": {
-          "ssh-public-keys": "openssh-public-keys"
+          "ssh-public-keys": "openssh-public-keys",
+          "ostemplate": "pve-managed-volume"
         },
         "inputPatterns": {
-          "searchdomain": "^(?=.{1,255}$)[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?(?:\\.[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?)*(?: [A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?(?:\\.[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?)*)*$",
-          "ostemplate": "^[A-Za-z][A-Za-z0-9._-]*:vztmpl/[A-Za-z0-9][A-Za-z0-9._-]*\\.tar\\.(?:zst|xz|gz)$"
+          "searchdomain": "^(?=.{1,255}$)[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?(?:\\.[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?)*(?: [A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?(?:\\.[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?)*)*$"
         },
         "sensitiveInputs": [
           "password"
@@ -19092,7 +19157,7 @@
         },
         {
           "name": "bwlimit",
-          "admitted": false,
+          "admitted": true,
           "sensitive": false
         },
         {
@@ -19237,7 +19302,7 @@
         },
         {
           "name": "restore",
-          "admitted": false,
+          "admitted": true,
           "sensitive": false
         },
         {
@@ -19297,7 +19362,7 @@
         },
         {
           "name": "unique",
-          "admitted": false,
+          "admitted": true,
           "sensitive": false
         },
         {
@@ -24278,7 +24343,7 @@
         "effect": "write",
         "transport": "json",
         "secrets": "input-refs",
-        "reason": "Confirmed guest creation with reviewed compute, managed storage, networking and onboarding; LXC is fixed unprivileged, and restore, overwrite and unreviewed host features remain refused.",
+        "reason": "Confirmed guest creation or fresh-ID restore from a reviewed backup to explicit managed storage; LXC stays unprivileged, and force, live restore, host paths and unreviewed host features remain refused.",
         "allowedInputs": [
           "node",
           "vmid",
@@ -24426,13 +24491,34 @@
           "scsihw",
           "ostype",
           "pool",
-          "start"
+          "start",
+          "archive",
+          "storage",
+          "bwlimit",
+          "unique"
+        ],
+        "inputCases": [
+          {
+            "forbiddenInputs": [
+              "archive",
+              "storage",
+              "bwlimit",
+              "unique"
+            ]
+          },
+          {
+            "requiredInputs": [
+              "archive",
+              "storage"
+            ]
+          }
         ],
         "inputPatterns": {
           "searchdomain": "^(?=.{1,255}$)[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?(?:\\.[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?)*(?: [A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?(?:\\.[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?)*)*$",
           "ciuser": "^[a-z_][a-z0-9_-]{0,31}$",
           "sshkeys": "^(?:ssh-ed25519|ssh-rsa|ecdsa-sha2-nistp256)%20(?=(?:(?:[A-Za-z0-9]|%2[BbFf])){32})(?:(?:[A-Za-z0-9]|%2[BbFf]){4})*(?:(?:[A-Za-z0-9]|%2[BbFf]){2}%3[Dd]%3[Dd]|(?:[A-Za-z0-9]|%2[BbFf]){3}%3[Dd])?(?:%20(?:[A-Za-z0-9._~-]|%20|%40|%2[Bb]|%3[Aa])+)?(?:%0[Aa](?:ssh-ed25519|ssh-rsa|ecdsa-sha2-nistp256)%20(?=(?:(?:[A-Za-z0-9]|%2[BbFf])){32})(?:(?:[A-Za-z0-9]|%2[BbFf]){4})*(?:(?:[A-Za-z0-9]|%2[BbFf]){2}%3[Dd]%3[Dd]|(?:[A-Za-z0-9]|%2[BbFf]){3}%3[Dd])?(?:%20(?:[A-Za-z0-9._~-]|%20|%40|%2[Bb]|%3[Aa])+)?)*(?:%0[Aa])?$",
-          "boot": "^order=(?:ide0|ide1|ide2|ide3|sata0|sata1|sata2|sata3|sata4|sata5|scsi0|scsi1|scsi2|scsi3|scsi4|scsi5|scsi6|scsi7|scsi8|scsi9|scsi10|scsi11|scsi12|scsi13|scsi14|scsi15|scsi16|scsi17|scsi18|scsi19|scsi20|scsi21|scsi22|scsi23|scsi24|scsi25|scsi26|scsi27|scsi28|scsi29|scsi30|virtio0|virtio1|virtio2|virtio3|virtio4|virtio5|virtio6|virtio7|virtio8|virtio9|virtio10|virtio11|virtio12|virtio13|virtio14|virtio15|net0|net1|net2|net3|net4|net5|net6|net7|net8|net9|net10|net11|net12|net13|net14|net15|net16|net17|net18|net19|net20|net21|net22|net23|net24|net25|net26|net27|net28|net29|net30|net31)(?:;(?:ide0|ide1|ide2|ide3|sata0|sata1|sata2|sata3|sata4|sata5|scsi0|scsi1|scsi2|scsi3|scsi4|scsi5|scsi6|scsi7|scsi8|scsi9|scsi10|scsi11|scsi12|scsi13|scsi14|scsi15|scsi16|scsi17|scsi18|scsi19|scsi20|scsi21|scsi22|scsi23|scsi24|scsi25|scsi26|scsi27|scsi28|scsi29|scsi30|virtio0|virtio1|virtio2|virtio3|virtio4|virtio5|virtio6|virtio7|virtio8|virtio9|virtio10|virtio11|virtio12|virtio13|virtio14|virtio15|net0|net1|net2|net3|net4|net5|net6|net7|net8|net9|net10|net11|net12|net13|net14|net15|net16|net17|net18|net19|net20|net21|net22|net23|net24|net25|net26|net27|net28|net29|net30|net31))*$"
+          "boot": "^order=(?:ide0|ide1|ide2|ide3|sata0|sata1|sata2|sata3|sata4|sata5|scsi0|scsi1|scsi2|scsi3|scsi4|scsi5|scsi6|scsi7|scsi8|scsi9|scsi10|scsi11|scsi12|scsi13|scsi14|scsi15|scsi16|scsi17|scsi18|scsi19|scsi20|scsi21|scsi22|scsi23|scsi24|scsi25|scsi26|scsi27|scsi28|scsi29|scsi30|virtio0|virtio1|virtio2|virtio3|virtio4|virtio5|virtio6|virtio7|virtio8|virtio9|virtio10|virtio11|virtio12|virtio13|virtio14|virtio15|net0|net1|net2|net3|net4|net5|net6|net7|net8|net9|net10|net11|net12|net13|net14|net15|net16|net17|net18|net19|net20|net21|net22|net23|net24|net25|net26|net27|net28|net29|net30|net31)(?:;(?:ide0|ide1|ide2|ide3|sata0|sata1|sata2|sata3|sata4|sata5|scsi0|scsi1|scsi2|scsi3|scsi4|scsi5|scsi6|scsi7|scsi8|scsi9|scsi10|scsi11|scsi12|scsi13|scsi14|scsi15|scsi16|scsi17|scsi18|scsi19|scsi20|scsi21|scsi22|scsi23|scsi24|scsi25|scsi26|scsi27|scsi28|scsi29|scsi30|virtio0|virtio1|virtio2|virtio3|virtio4|virtio5|virtio6|virtio7|virtio8|virtio9|virtio10|virtio11|virtio12|virtio13|virtio14|virtio15|net0|net1|net2|net3|net4|net5|net6|net7|net8|net9|net10|net11|net12|net13|net14|net15|net16|net17|net18|net19|net20|net21|net22|net23|net24|net25|net26|net27|net28|net29|net30|net31))*$",
+          "archive": "^[A-Za-z][A-Za-z0-9._-]*:backup/(?:vzdump-(?:qemu-[1-9][0-9]{2,8}-[0-9]{4}_[0-9]{2}_[0-9]{2}-[0-9]{2}_[0-9]{2}_[0-9]{2}\\.vma)(?:\\.(?:gz|lzo|zst))?|vm/[1-9][0-9]{2,8}/[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z)$"
         },
         "sensitiveInputs": [
           "cipassword"
@@ -24483,7 +24569,7 @@
         },
         {
           "name": "archive",
-          "admitted": false,
+          "admitted": true,
           "sensitive": false
         },
         {
@@ -24523,7 +24609,7 @@
         },
         {
           "name": "bwlimit",
-          "admitted": false,
+          "admitted": true,
           "sensitive": false
         },
         {
@@ -24833,7 +24919,7 @@
         },
         {
           "name": "storage",
-          "admitted": false,
+          "admitted": true,
           "sensitive": false
         },
         {
@@ -24863,7 +24949,7 @@
         },
         {
           "name": "unique",
-          "admitted": false,
+          "admitted": true,
           "sensitive": false
         },
         {
@@ -29993,14 +30079,6 @@
       "release": "published-current",
       "admitted": false,
       "contract": "dist/contracts.json#/contracts/1269"
-    },
-    {
-      "id": "OP-GET-c860b27298",
-      "method": "GET",
-      "path": "/nodes/{node}/vzdump/extractconfig",
-      "release": "published-current",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/1270"
     },
     {
       "id": "OP-POST-8ca2321e12",

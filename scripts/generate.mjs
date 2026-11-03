@@ -81,6 +81,16 @@ const contracts = catalogues.flatMap(catalogue => catalogue.operations.map(opera
   for (const name of review.sensitiveInputs ?? []) if (api.properties?.[name]) api.properties[name] = {
     ...JSON.parse(read('src/profile-schema.json')).$defs.secretRef, 'x-secret': true,
   }
+  if (review.inputCases) api.anyOf = review.inputCases.map(branch => {
+    const names = [...new Set([...Object.keys(branch.inputPatterns ?? {}), ...Object.keys(branch.requiredValues ?? {})])]
+    return { required: [...(branch.requiredInputs ?? []), ...Object.keys(branch.requiredValues ?? {})],
+      properties: Object.fromEntries(names.map(name => [name, {
+        ...(branch.inputPatterns?.[name] ? { pattern: branch.inputPatterns[name] } : {}),
+        ...(Object.hasOwn(branch.requiredValues ?? {}, name) ? { const: branch.requiredValues[name] } : {}),
+      }])),
+      ...(branch.forbiddenInputs?.length ? { not: { anyOf: branch.forbiddenInputs.map(name => ({ required: [name] })) } } : {}),
+    }
+  })
   return { ...operation, id, release: catalogue.release, policy: review, callable,
     command: [operation.method.toLowerCase(), operation.path],
     invocation: { method: operation.method, path: operation.path, catalogue: catalogue.release,

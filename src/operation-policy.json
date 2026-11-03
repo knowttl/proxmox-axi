@@ -11,6 +11,7 @@
     "reason": "Requires operation-specific effect, transport and secret review before admission."
   },
   "reviewed": {
+    "GET /nodes/{node}/vzdump/extractconfig": { "effect": "read", "transport": "json", "secrets": "private-result", "inputFormats": { "volume": "pve-backup-volume" }, "reason": "Configuration extracted from a reviewed guest backup can contain credentials and host-sensitive settings; the bounded text is delivered only through the inherited private result pipe." },
     "GET /nodes/{node}/qemu/{vmid}/snapshot": { "effect": "read", "transport": "json", "secrets": "none", "outputFields": ["name", "parent", "snaptime", "vmstate"], "reason": "Snapshot tree identifiers, timestamps and RAM-state metadata only; descriptions and undeclared fields are excluded even with full output." },
     "GET /nodes/{node}/lxc/{vmid}/snapshot": { "effect": "read", "transport": "json", "secrets": "none", "outputFields": ["name", "parent", "snaptime"], "reason": "Snapshot tree identifiers and timestamps only; descriptions and undeclared fields are excluded even with full output." },
     "GET /nodes/{node}/qemu/{vmid}/snapshot/{snapname}": { "effect": "read", "transport": "json", "secrets": "none", "outputFields": ["cmd"], "reason": "Snapshot command index only; command names do not admit their operations." },
