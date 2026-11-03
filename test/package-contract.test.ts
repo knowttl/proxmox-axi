@@ -1,6 +1,8 @@
 import assert from 'node:assert/strict'
 import { execFile } from 'node:child_process'
+import { createHash } from 'node:crypto'
 import { cp, mkdtemp, readFile, readdir, realpath, rm, unlink, writeFile } from 'node:fs/promises'
+import { createServer } from 'node:https'
 import { tmpdir } from 'node:os'
 import { dirname, isAbsolute, join, resolve, sep } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -19,7 +21,7 @@ const data = ['artium-invocations.json', 'write-policy.json', 'axi-credential.sc
   'dist/contracts.json', 'dist/operation-policy.json', 'dist/operations.json',
   'dist/profile-schema.json', 'dist/vendor-constraints.json']
 
-test('packed package installs offline and exposes the CLI and admission contracts', { timeout: 60000 }, async () => {
+test('packed package installs offline and exposes the CLI and admission contracts', { timeout: 120000 }, async t => {
   const scratch = await mkdtemp(join(tmpdir(), 'proxmox-package-'))
   const manifest = JSON.parse(await readFile(join(root, 'package.json'), 'utf8')) as {
     name: string, version: string, bin: Record<string, string>, pnpm: { overrides: Record<string, string> }
@@ -112,6 +114,130 @@ test('packed package installs offline and exposes the CLI and admission contract
         } })
       assert.equal(cases.filter(row => row.restart === 'success').length, 3)
     }
+    const caFile = join(scratch, 'power-ca.pem'), config = join(scratch, 'power-config.json'), journal = join(scratch, 'power.log')
+    await writeFile(caFile, await readFile(join(root, 'test/fixtures/localhost-cert.pem')), { mode: 0o600 })
+    const families = [
+      { name: 'qemu', actions: ['start', 'shutdown', 'stop', 'reboot', 'reset', 'suspend', 'resume'] },
+      { name: 'lxc', actions: ['start', 'shutdown', 'stop', 'reboot', 'suspend', 'resume'] },
+    ]
+    const route = (family: string, action: string) => `/nodes/{node}/${family}/{vmid}/status/${action}`
+    const operations = families.flatMap(family => family.actions.map(action =>
+      `OP-POST-${createHash('sha256').update(`POST ${route(family.name, action)}`).digest('hex').slice(0, 10)}`))
+    let serverVersion = '8.2.7', sequence = 0, mode = 'success'
+    const mutations: { path: string, body: string }[] = [], requests: string[] = []
+    const tasks = new Map<string, { reads: number, failed: boolean }>()
+    const server = createServer({ key: await readFile(join(root, 'test/fixtures/localhost-key.pem')), cert: await readFile(caFile) }, async (request, response) => {
+      const path = new URL(request.url!, 'https://fake.invalid').pathname
+      requests.push(`${request.method} ${path}`)
+      if (path.endsWith('/version')) { response.end(JSON.stringify({ data: { version: serverVersion, release: 'synthetic', repoid: 'synthetic' } })); return }
+      const task = /\/tasks\/([^/]+)\/status$/.exec(path)
+      if (request.method === 'GET' && task) {
+        const upid = decodeURIComponent(task[1]!), state = tasks.get(upid)!
+        const running = state.reads++ === 0
+        response.end(JSON.stringify({ data: { node: 'node-a', upid, id: '100', pid: sequence, pstart: 1, starttime: 1,
+          type: 'power', user: 'synthetic@pve', status: running ? 'running' : 'stopped',
+          ...(!running ? { exitstatus: state.failed ? 'ERROR: guest action failed' : 'OK' } : {}) } })); return
+      }
+      assert.equal(request.method, 'POST')
+      assert.match(path, /^\/api2\/json\/nodes\/node-a\/(qemu|lxc)\/100\/status\/(start|shutdown|stop|reboot|reset|suspend|resume)$/)
+      const chunks: Buffer[] = []
+      for await (const chunk of request) chunks.push(Buffer.from(chunk))
+      mutations.push({ path, body: Buffer.concat(chunks).toString() })
+      if (mode === 'uncertain') { response.writeHead(500).end(JSON.stringify({ message: 'delivery uncertain' })); return }
+      const upid = `UPID:node-a:${(++sequence).toString(16).padStart(8, '0')}:00000001:00000001:power:100:synthetic@pve:`
+      tasks.set(upid, { reads: 0, failed: mode === 'failed' })
+      response.end(JSON.stringify({ data: upid }))
+    })
+    await new Promise<void>(resolve => server.listen(0, '127.0.0.1', resolve))
+    const address = server.address()
+    assert.ok(address && typeof address === 'object')
+    const profile = { auth: 'api-token', origin: `https://127.0.0.1:${address.port}`, caBundle: caFile,
+      tokenId: 'synthetic@pve!power', token: { env: 'POWER_TOKEN' }, writes: { operations } }
+    await writeFile(config, JSON.stringify({ version: 1, defaultProfile: 'lab', profiles: { lab: profile, other: profile } }), { mode: 0o600 })
+    const invoke = async (args: string[], extraEnv: Record<string, string> = {}) => {
+      const result = await execute(bin, [...args, '--config', config, '--format', 'json'], {
+        cwd: scratch, env: { ...env, POWER_TOKEN: 'synthetic-token', PROXMOX_AXI_WRITE_LOG: journal, ...extraEnv }, timeout: 15000,
+      }).catch((error: { code: number, stdout: string, stderr: string }) => error)
+      assert.equal(result.stderr, '')
+      return { code: 'code' in result ? result.code : 0, value: JSON.parse(result.stdout) }
+    }
+    const args = (family: string, action: string) => ['create', route(family, action), '--api-node', 'node-a', '--api-vmid', '100']
+    const wait = (accepted: { upid: string, id: string }) => invoke(['task', 'wait', '--api-node', 'node-a', '--api-upid', accepted.upid, '--journal', accepted.id])
+    try {
+      for (const release of ['8.2.7', '9.2.1']) {
+        serverVersion = release
+        for (const family of families) for (const action of family.actions) {
+          await t.test(`${release} installed ${family.name} ${action} confirms and waits for the guest task`, async () => {
+            const before = mutations.length, command = args(family.name, action)
+            const preview = await invoke([...command, '--preview'])
+            assert.equal(preview.code, 0)
+            assert.equal(preview.value.status, 'preview')
+            assert.equal(mutations.length, before)
+            const accepted = await invoke([...command, '--confirm', preview.value.confirmation])
+            assert.equal(accepted.code, 0)
+            assert.equal(accepted.value.status, 'accepted')
+            assert.deepEqual(mutations.slice(before), [{ path: `/api2/json/nodes/node-a/${family.name}/100/status/${action}`, body: '' }])
+            const done = await wait(accepted.value)
+            assert.equal(done.code, 0)
+            assert.equal(done.value.status, 'success')
+            assert.equal(done.value.data.processState, 'stopped')
+            const retained = await invoke(['journal', 'show', preview.value.id])
+            assert.equal(retained.value.journal.status, 'success')
+          })
+        }
+        await t.test(`${release} installed power confirmation binds guest, action, profile and force flag`, async () => {
+          const command = [...args('qemu', 'shutdown'), '--api-forceStop', '0'], before = mutations.length
+          const unconfirmed = await invoke(command)
+          assert.equal(unconfirmed.value.error.code, 'CONFIRMATION_REQUIRED')
+          const preview = await invoke([...command, '--preview'])
+          for (const changed of [
+            [...args('qemu', 'shutdown').slice(0, -1), '101', '--api-forceStop', '0'],
+            args('qemu', 'stop'), [...command, '--profile', 'other'], [...args('qemu', 'shutdown'), '--api-forceStop', '1'],
+          ]) {
+            const refused = await invoke([...changed, '--confirm', preview.value.confirmation])
+            assert.equal(refused.value.error.code, 'CONFIRMATION_MISMATCH')
+          }
+          assert.equal(mutations.length, before)
+        })
+        for (const failure of ['failed', 'uncertain']) await t.test(`${release} installed guest power retains ${failure} without repeating it`, async () => {
+          const command = args('lxc', 'stop'), before = mutations.length
+          const preview = await invoke([...command, '--preview'])
+          mode = failure
+          const accepted = await invoke([...command, '--confirm', preview.value.confirmation])
+          mode = 'success'
+          if (failure === 'failed') {
+            const done = await wait(accepted.value)
+            assert.equal(done.code, 1)
+            assert.equal(done.value.status, 'failed')
+          } else assert.equal(accepted.value.error.code, 'WRITE_UNCERTAIN')
+          const retained = await invoke(['journal', 'show', preview.value.id])
+          assert.equal(retained.value.journal.status, failure)
+          const replay = await invoke([...command, '--confirm', preview.value.confirmation])
+          assert.equal(replay.value.error.code, 'CONFIRMATION_USED')
+          assert.equal(mutations.length, before + 1)
+        })
+        await t.test(`${release} installed guest grants do not permit host control or unreviewed selectors`, async () => {
+          for (const [command, code] of [
+            [['create', '/nodes/{node}/status', '--api-node', 'node-a', '--api-command', 'shutdown'], 'CONTRACT_UNRESOLVED'],
+            [['create', '/nodes/{node}/status', '--api-node', 'node-a', '--api-command', 'reboot'], 'CONTRACT_UNRESOLVED'],
+            [['create', '/nodes/{node}/termproxy', '--api-node', 'node-a'], 'WRITE_DISABLED'],
+            [args('lxc', 'reset'), 'INVALID_INPUT'],
+            [[...args('qemu', 'start'), '--api-migratedfrom', 'other-node'], 'CONTRACT_UNRESOLVED'],
+          ] as const) {
+            const before = mutations.length
+            const refused = await invoke([...command, '--preview'])
+            assert.equal(refused.value.error.code, code)
+            assert.equal(mutations.length, before)
+          }
+          for (const extraEnv of [{ PROXMOX_AXI_READ_ONLY: '1' }, { PROXMOX_AXI_ACTOR: 'fixture', PROXMOX_AXI_HOST_OPERATIONS: '[]' }]) {
+            const before = requests.length
+            const refused = await invoke([...args('qemu', 'stop'), '--preview'], extraEnv)
+            assert.equal(refused.value.error.code, 'WRITE_DISABLED')
+            assert.equal(requests.length, before)
+          }
+        })
+      }
+    } finally { await new Promise<void>(resolve => server.close(() => resolve())) }
     // pnpm may hardlink package files to its shared store; break that link first.
     await unlink(join(installed, 'dist/cli.js'))
     await writeFile(join(installed, 'dist/cli.js'), 'throw new Error("altered executable")\n')
