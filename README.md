@@ -280,6 +280,22 @@ proxmox-axi post '/nodes/{node}/qemu/{vmid}/agent/ping' --api-node '<node>' --ap
 Ping uses the provider's POST method but is a reviewed read, without mutation permission, confirmation or a standalone journal.
 Follow the readiness reference above for prerequisites, interpretation of results and failures, and private first-boot marker checks.
 
+### Confirmed guest execution
+
+QEMU `create .../agent/exec` starts an explicitly approved program and arguments inside the guest.
+Its `command` input must be an env/file SecretRef containing a JSON array; literal argv and stdin submission remain refused.
+Both the returned guest PID and `get .../agent/exec-status` output require the inherited private result pipe.
+Status retrieval requires its own operation grant and exact preview/confirmation because completed queries reap process metadata, despite using GET.
+
+```sh
+proxmox-axi create '/nodes/{node}/qemu/{vmid}/agent/exec' --body-file '<absolute-protected-request-file>' --profile lab --preview
+proxmox-axi get '/nodes/{node}/qemu/{vmid}/agent/exec-status' --api-node '<node>' --api-vmid 100 --api-pid '<private-pid>' --profile lab --preview
+```
+
+Confirm each exact preview separately, after privately reviewing the argv source and target.
+Launch success does not establish that the guest process completed successfully, and a guest PID is not a node-task UPID.
+Follow the [execution and onboarding reference](skills/proxmox-axi/references/guest-management.md#confirmed-guest-execution) for private body files, result interpretation, one-time status consumption and recovery limits.
+
 ### Cloud-init onboarding
 
 Confirmed QEMU configuration updates now support `ciuser`, SecretRef-only `cipassword`, percent-encoded SSH public keys, `ipconfig0` through `ipconfig31`, DNS settings and ordinary `storage:cloudinit` media.
@@ -377,7 +393,7 @@ Only reviewed managed backup sources are admitted; force overwrite, raw host pat
   Managed transfers have separate administrator-controlled byte and elapsed limits.
 - Operations whose effects, transport or secret handling are not reviewed remain discoverable but uncallable.
   Unresolved policy fields deny invocation, and changing a capture never admits new operations automatically.
-- Writes cover [QEMU creation and cloning](#create-and-clone-qemu-guests), [LXC creation and cloning](#create-and-clone-lxc-guests), [backup restoration](#restore-guest-backups), guest power operations, guest destruction, [selected guest configuration settings](#guest-configuration-and-compute-settings), [managed disk attachments](#manage-disk-attachments), growth-only guest disk resize, pool management, task cancellation, node execute batches, [media uploads and catalogue installation](#discover-and-install-guest-media), [guest backups](#guest-backups) and the reviewed credential/session setup operations.
+- Writes cover [QEMU creation and cloning](#create-and-clone-qemu-guests), [LXC creation and cloning](#create-and-clone-lxc-guests), [backup restoration](#restore-guest-backups), [confirmed guest execution and status retrieval](#confirmed-guest-execution), guest power operations, guest destruction, [selected guest configuration settings](#guest-configuration-and-compute-settings), [managed disk attachments](#manage-disk-attachments), growth-only guest disk resize, pool management, task cancellation, node execute batches, [media uploads and catalogue installation](#discover-and-install-guest-media), [guest backups](#guest-backups) and the reviewed credential/session setup operations.
   Effectful CIFS/PBS scans use the same preview and confirmation policy even though their vendor method is GET.
 - Inspect `schema create|set|delete <template>` and the generated `write-policy.json` before enabling an operation.
 - Enable an operation by adding its ID to the selected file profile: `writes: { "operations": ["<operation-id>"] }`.

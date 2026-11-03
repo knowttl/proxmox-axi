@@ -306,4 +306,69 @@ The byte receiver must verify successful exit, transfer status/count/digest and 
 `truncated: true` or `unknown` does not establish complete file delivery; increasing an offset or quota is a separate explicit read.
 File-read uses its separate provider permission, `VM.GuestAgent.FileRead` or `VM.GuestAgent.Unrestricted` in the current catalogue, and `VM.Monitor` in the legacy catalogue.
 Guest file contents can include credentials, so summarize only approved non-sensitive readiness facts.
-Generic agent command dispatch, execution, file writes, password changes, freeze/thaw, trimming and agent lifecycle commands remain refused.
+For separately authorized execution, use the [confirmed execution workflow](#confirmed-guest-execution).
+Generic agent command dispatch, file writes, password changes, freeze/thaw, trimming and agent lifecycle commands remain refused.
+
+## Confirmed guest execution
+
+Use only for an explicitly authorized program inside the selected QEMU guest; it runs with the guest-agent service's privileges, which can be administrative.
+Enable the exact POST `/nodes/{node}/qemu/{vmid}/agent/exec` and GET `/nodes/{node}/qemu/{vmid}/agent/exec-status` operation IDs in the selected profile and any independent host policy.
+The provider requires `VM.GuestAgent.Unrestricted` in the current catalogue or `VM.Monitor` in the legacy catalogue.
+Both routes are write effects with separate exact previews and confirmations, including GET status retrieval because it reaps completed processes and their captured metadata.
+
+Put a JSON array such as `["/usr/bin/id", "-u"]` in a protected UTF-8 file, or load that JSON through a caller-controlled environment variable.
+The first element is a nonempty guest program; subsequent elements are its arguments in exact order, without implicit shell parsing.
+Only nonempty, control-free strings are admitted, and both the referenced JSON and resolved request are bounded to 65536 bytes.
+Empty arguments remain refused because the provider's form decoder does not preserve an empty repeated value as an argv element.
+The protected JSON is resolved only in memory and HMAC-bound, including source revision, to confirmation; command values are not stored in journals or printed by preview.
+Inspect the intended program and arguments privately before authorizing that preview.
+Literal argv, stdin/input-data and unreviewed execution selectors remain refused.
+
+Prepare a protected request body containing:
+
+```json
+{"node":"<node>","vmid":100,"command":{"file":"<absolute-protected-argv-file>"}}
+```
+
+Use `{"env":"VM_ARGV_JSON"}` instead of the file reference when the caller already owns that environment source.
+File references must name owned absolute protected files; do not put command values into shell history or ordinary logs.
+
+```sh
+proxmox-axi create '/nodes/{node}/qemu/{vmid}/agent/exec' --body-file '<absolute-protected-request-file>' --profile '<profile>' --preview
+```
+
+After reviewing the target and argv privately, repeat the exact command with its confirmation and the [private result pipe](#private-configuration-reads).
+Its payload is the provider's PID object; store that guest PID privately with the selected profile, node, VMID and boot identity.
+API `status: success` means the launch request succeeded, not that the process finished or onboarding succeeded.
+A guest PID is not a Proxmox UPID; never pass it to `task wait` or `task cancel`.
+
+```sh
+proxmox-axi get '/nodes/{node}/qemu/{vmid}/agent/exec-status' --api-node '<node>' --api-vmid 100 --api-pid '<private-pid>' --profile '<profile>' --preview
+```
+
+Confirm that status preview separately, using the private result pipe again.
+For standalone execution and status, validate the private frame's request binding against SHA-256 of the fingerprint in the corresponding preview confirmation, including for GET; the ordinary read-path hash does not apply.
+Hosted callers use the authenticated request ID instead, as in the shared private-channel contract.
+The private status object contains `exited`, optional `exitcode` or `signal`, `out-data`, `err-data` and truncation flags.
+The provider decodes captured stdout/stderr; keep those strings private and inspect the supplied truncation flags rather than assuming complete output.
+`exited: 0` means the process is still running; any later status request requires a new explicit preview/confirmation.
+Only `exited: 1` with an acceptable `exitcode`, no failure signal and independently verified postconditions can establish that the requested setup succeeded.
+Successful status delivery can contain a nonzero guest exit code; its API journal status is not the process result.
+
+Completed status retrieval consumes the process record and its output, so do not automatically poll, repeat or retry it.
+If response/private delivery is lost, malformed or too large, retain uncertainty and the journal; the process may have started or its output may already be consumed.
+Do not launch the command again or use a rebooted guest's reused PID to recover from that uncertainty.
+Choose noninteractive, bounded-output checks; output beyond the shared response/frame bounds may be lost on consuming retrieval.
+No guest command cancellation or generic agent dispatch is added.
+
+## Onboard a guest
+
+1. Select the named profile and discover nodes, storage and an available VMID; an available ID is not reserved.
+2. Privately review the trusted source configuration, then use [QEMU creation/cloning](#qemu-creation-and-template-cloning), [LXC creation/cloning](#lxc-creation-and-template-cloning) or [backup restore](#restore-guest-backups) with explicit preview/confirmation.
+3. Confirm the needed compute, managed disk, NIC, boot and [cloud-init settings](#cloud-init-onboarding), including user/SSH keys/network and QEMU agent communication; the guest-agent service must also be installed in the image.
+4. Keep start unset or zero during preparation, then separately preview/confirm guest start and use the returned node/UPID with `task wait` and its journal ID; do not proceed as if a still-running task completed.
+5. For QEMU, use [private readiness and first-boot checks](#guest-agent-readiness-and-first-boot-checks); check the current guest/boot identity because an inherited boot marker can be stale.
+6. If authorized setup remains, privately prepare one noninteractive program and arguments, confirm execution, retain its private PID, then separately confirm status retrieval and inspect private exit/output/postconditions.
+7. Summarize approved non-sensitive readiness facts only; preserve uncertainty instead of automatically repeating failed or partially delivered work.
+
+Guest-agent execution applies to QEMU guests; no LXC guest-agent endpoint is invented.

@@ -692,6 +692,25 @@
       }
     },
     {
+      "command": "get /nodes/{node}/qemu/{vmid}/agent/exec-status",
+      "operationId": "OP-GET-5c2615eea3",
+      "method": "GET",
+      "path": "/nodes/{node}/qemu/{vmid}/agent/exec-status",
+      "sensitiveInputs": [],
+      "privateResult": true,
+      "effect": "write",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "preview": "boolean",
+        "confirm": "value",
+        "session": "value",
+        "api-node": "value",
+        "api-pid": "value",
+        "api-vmid": "value"
+      }
+    },
+    {
       "command": "get /nodes/{node}/scan/cifs",
       "operationId": "OP-GET-48e0b9a8fa",
       "method": "GET",
@@ -1573,6 +1592,26 @@
         "api-ipconfig29": "value",
         "api-ipconfig30": "value",
         "api-ipconfig31": "value"
+      }
+    },
+    {
+      "command": "create /nodes/{node}/qemu/{vmid}/agent/exec",
+      "operationId": "OP-POST-9e0f6204b6",
+      "method": "POST",
+      "path": "/nodes/{node}/qemu/{vmid}/agent/exec",
+      "sensitiveInputs": [
+        "command"
+      ],
+      "privateResult": true,
+      "effect": "write",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "preview": "boolean",
+        "confirm": "value",
+        "session": "value",
+        "api-node": "value",
+        "api-vmid": "value"
       }
     },
     {

@@ -17,6 +17,15 @@ const pool = new Set(['create_pool', 'update_pool', 'delete_pool'])
 export function reviewWrite(operation: Operation) {
   const { path, method } = operation
   const name = operation.vendorMetadata.name
+  const guestExec = path === '/nodes/{node}/qemu/{vmid}/agent/exec' && method === 'POST' && name === 'exec'
+  const guestExecStatus = path === '/nodes/{node}/qemu/{vmid}/agent/exec-status' && method === 'GET' && name === 'exec-status'
+  if ((guestExec || guestExecStatus) && operation.allowtoken !== 0) return { effect: 'write', transport: 'json', secrets: 'private-result',
+    allowedInputs: ['node', 'vmid', guestExec ? 'command' : 'pid'],
+    ...(guestExec ? { sensitiveInputs: ['command'], inputFormats: { command: 'pve-guest-argv' } } : {}),
+    reason: guestExec ? 'Confirmed guest execution using a SecretRef containing JSON argv; bounded private PID delivery, metadata-only journal, no stdin and no automatic retry.' :
+      'Confirmed guest execution-status retrieval; completed queries reap the process record, so GET retains write grants and exact confirmation. Process output is private.',
+    reconciliation: { kind: 'none', reason: 'Retain the private guest PID and execution result; status retrieval can consume completed output. Never repeat uncertain execution or retrieval automatically.' },
+    privileges: operation.permissions, response: operation.returns, source: 'Pinned guest exec/status schemas, provider QEMU agent implementation and QEMU completed-process reaping contract.' }
   if (method === 'POST' && path === '/nodes/{node}/vzdump' && name === 'vzdump' && operation.allowtoken !== 0) {
     return { effect: 'write', transport: 'json', secrets: 'none',
       allowedInputs: ['node', 'vmid', 'storage', 'mode', 'compress', 'bwlimit', 'protected', 'remove'], requiredInputs: ['node', 'vmid', 'storage'],

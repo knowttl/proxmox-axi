@@ -108,7 +108,11 @@ export function validateValue(value: unknown, schema: VendorSchema): void {
   }
   if (schema.type === 'array') {
     if (!Array.isArray(value) || !schema.items) throw invalid()
-    for (const item of value) validateValue(item, schema.items)
+    if (schema.format === 'pve-guest-argv') {
+      if (!value.length) throw invalid()
+      // The legacy argv item declares only format: string; validate the reviewed type explicitly.
+      for (const item of value) validateValue(item, { type: 'string', minLength: 1 })
+    } else for (const item of value) validateValue(item, schema.items)
   }
   if (schema.type === 'object') {
     if (!value || typeof value !== 'object' || Array.isArray(value)) throw invalid()
