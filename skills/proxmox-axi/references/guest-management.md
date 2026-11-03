@@ -109,10 +109,11 @@ Use a private configuration digest for concurrent-change protection and inspect 
 
 ## QEMU creation and template cloning
 
-Inspect `schema create '/nodes/{node}/qemu'` and enable only its operation ID in the selected profile and any independent host policy.
+Inspect `schema create '/nodes/{node}/qemu'` or `schema create '/nodes/{node}/qemu/{vmid}/clone'` for the selected operation and enable only its operation ID in the selected profile and any independent host policy.
 Choose a VMID using the cluster's nextid read or explicit inventory; a free-ID read is an observation, never a reservation.
 Create with required node/VMID and the reviewed compute, managed disk, NIC, boot, agent and cloud-init settings described above.
 Basic create-only inputs include `bios`, `scsihw`, `ostype`, `pool` and optional `start` from the selected vendor schema.
+Leave `start` unset or set it to `0` when onboarding must finish before first boot; `start=1` requests startup as part of creation.
 Passwords still require SecretRefs in a protected body file and SSH public keys retain the cloud-init encoding rules.
 For a blank installation, allocate a managed disk, attach an existing ISO, choose an ordinary boot order and preview the complete request.
 Restore/archive/force, delete/digest selectors, custom arguments, the template flag and unreviewed hardware/machine/EFI/TPM properties remain refused on creation.
