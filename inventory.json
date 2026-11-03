@@ -2110,23 +2110,75 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "none",
+            "allowedInputs": [
+              "node",
+              "vmid",
+              "snapname"
+            ],
+            "inputPatterns": {
+              "snapname": "^(?!current$)[A-Za-z][A-Za-z0-9._-]*$"
+            },
+            "reason": "Confirmed snapshot creation, deletion or rollback with exact guest/snapshot binding; force removal and the current pseudo-snapshot remain refused.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Track the returned UPID and inspect the snapshot tree or protected configuration independently; never repeat uncertain snapshot mutations automatically."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/vms/{vmid}",
+                [
+                  "VM.Snapshot"
+                ]
+              ]
+            },
+            "response": {
+              "description": "the task ID.",
+              "type": "string"
+            },
+            "source": "Pinned snapshot, delsnapshot and rollback schemas; existing effect, confirmation and task contracts."
           },
           "contract": "dist/contracts.json#/contracts/396"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "none",
+            "allowedInputs": [
+              "node",
+              "vmid",
+              "snapname"
+            ],
+            "inputPatterns": {
+              "snapname": "^(?!current$)[A-Za-z][A-Za-z0-9._-]*$"
+            },
+            "reason": "Confirmed snapshot creation, deletion or rollback with exact guest/snapshot binding; force removal and the current pseudo-snapshot remain refused.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Track the returned UPID and inspect the snapshot tree or protected configuration independently; never repeat uncertain snapshot mutations automatically."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/vms/{vmid}",
+                [
+                  "VM.Snapshot"
+                ]
+              ]
+            },
+            "response": {
+              "description": "the task ID.",
+              "type": "string"
+            },
+            "source": "Pinned snapshot, delsnapshot and rollback schemas; existing effect, confirmation and task contracts."
           },
           "contract": "dist/contracts.json#/contracts/1065"
         }
@@ -2424,23 +2476,75 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "none",
+            "allowedInputs": [
+              "node",
+              "vmid",
+              "snapname"
+            ],
+            "inputPatterns": {
+              "snapname": "^(?!current$)[A-Za-z][A-Za-z0-9._-]*$"
+            },
+            "reason": "Confirmed snapshot creation, deletion or rollback with exact guest/snapshot binding; force removal and the current pseudo-snapshot remain refused.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Track the returned UPID and inspect the snapshot tree or protected configuration independently; never repeat uncertain snapshot mutations automatically."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/vms/{vmid}",
+                [
+                  "VM.Snapshot"
+                ]
+              ]
+            },
+            "response": {
+              "description": "the task ID.",
+              "type": "string"
+            },
+            "source": "Pinned snapshot, delsnapshot and rollback schemas; existing effect, confirmation and task contracts."
           },
           "contract": "dist/contracts.json#/contracts/499"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "none",
+            "allowedInputs": [
+              "node",
+              "vmid",
+              "snapname"
+            ],
+            "inputPatterns": {
+              "snapname": "^(?!current$)[A-Za-z][A-Za-z0-9._-]*$"
+            },
+            "reason": "Confirmed snapshot creation, deletion or rollback with exact guest/snapshot binding; force removal and the current pseudo-snapshot remain refused.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Track the returned UPID and inspect the snapshot tree or protected configuration independently; never repeat uncertain snapshot mutations automatically."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/vms/{vmid}",
+                [
+                  "VM.Snapshot"
+                ]
+              ]
+            },
+            "response": {
+              "description": "the task ID.",
+              "type": "string"
+            },
+            "source": "Pinned snapshot, delsnapshot and rollback schemas; existing effect, confirmation and task contracts."
           },
           "contract": "dist/contracts.json#/contracts/1169"
         }
@@ -10125,23 +10229,33 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "read",
+            "transport": "json",
+            "secrets": "none",
+            "outputFields": [
+              "name",
+              "parent",
+              "snaptime"
+            ],
+            "reason": "Snapshot tree identifiers and timestamps only; descriptions and undeclared fields are excluded even with full output."
           },
           "contract": "dist/contracts.json#/contracts/394"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "read",
+            "transport": "json",
+            "secrets": "none",
+            "outputFields": [
+              "name",
+              "parent",
+              "snaptime"
+            ],
+            "reason": "Snapshot tree identifiers and timestamps only; descriptions and undeclared fields are excluded even with full output."
           },
           "contract": "dist/contracts.json#/contracts/1063"
         }
@@ -10158,23 +10272,29 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "read",
+            "transport": "json",
+            "secrets": "none",
+            "outputFields": [
+              "cmd"
+            ],
+            "reason": "Snapshot command index only; command names do not admit their operations."
           },
           "contract": "dist/contracts.json#/contracts/397"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "read",
+            "transport": "json",
+            "secrets": "none",
+            "outputFields": [
+              "cmd"
+            ],
+            "reason": "Snapshot command index only; command names do not admit their operations."
           },
           "contract": "dist/contracts.json#/contracts/1066"
         }
@@ -10191,23 +10311,23 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "read",
+            "transport": "json",
+            "secrets": "private-result",
+            "reason": "Snapshot configuration can contain guest credentials and protected settings; the complete bounded object requires an inherited private result pipe."
           },
           "contract": "dist/contracts.json#/contracts/398"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "read",
+            "transport": "json",
+            "secrets": "private-result",
+            "reason": "Snapshot configuration can contain guest credentials and protected settings; the complete bounded object requires an inherited private result pipe."
           },
           "contract": "dist/contracts.json#/contracts/1067"
         }
@@ -11715,23 +11835,35 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "read",
+            "transport": "json",
+            "secrets": "none",
+            "outputFields": [
+              "name",
+              "parent",
+              "snaptime",
+              "vmstate"
+            ],
+            "reason": "Snapshot tree identifiers, timestamps and RAM-state metadata only; descriptions and undeclared fields are excluded even with full output."
           },
           "contract": "dist/contracts.json#/contracts/497"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "read",
+            "transport": "json",
+            "secrets": "none",
+            "outputFields": [
+              "name",
+              "parent",
+              "snaptime",
+              "vmstate"
+            ],
+            "reason": "Snapshot tree identifiers, timestamps and RAM-state metadata only; descriptions and undeclared fields are excluded even with full output."
           },
           "contract": "dist/contracts.json#/contracts/1167"
         }
@@ -11748,23 +11880,29 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "read",
+            "transport": "json",
+            "secrets": "none",
+            "outputFields": [
+              "cmd"
+            ],
+            "reason": "Snapshot command index only; command names do not admit their operations."
           },
           "contract": "dist/contracts.json#/contracts/500"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "read",
+            "transport": "json",
+            "secrets": "none",
+            "outputFields": [
+              "cmd"
+            ],
+            "reason": "Snapshot command index only; command names do not admit their operations."
           },
           "contract": "dist/contracts.json#/contracts/1170"
         }
@@ -11781,23 +11919,23 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "read",
+            "transport": "json",
+            "secrets": "private-result",
+            "reason": "Snapshot configuration can contain guest credentials and protected settings; the complete bounded object requires an inherited private result pipe."
           },
           "contract": "dist/contracts.json#/contracts/501"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "read",
+            "transport": "json",
+            "secrets": "private-result",
+            "reason": "Snapshot configuration can contain guest credentials and protected settings; the complete bounded object requires an inherited private result pipe."
           },
           "contract": "dist/contracts.json#/contracts/1171"
         }
@@ -18536,23 +18674,77 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "none",
+            "allowedInputs": [
+              "node",
+              "vmid",
+              "snapname",
+              "description"
+            ],
+            "inputPatterns": {
+              "snapname": "^(?!current$)[A-Za-z][A-Za-z0-9._-]*$"
+            },
+            "reason": "Confirmed snapshot creation, deletion or rollback with exact guest/snapshot binding; force removal and the current pseudo-snapshot remain refused.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Track the returned UPID and inspect the snapshot tree or protected configuration independently; never repeat uncertain snapshot mutations automatically."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/vms/{vmid}",
+                [
+                  "VM.Snapshot"
+                ]
+              ]
+            },
+            "response": {
+              "description": "the task ID.",
+              "type": "string"
+            },
+            "source": "Pinned snapshot, delsnapshot and rollback schemas; existing effect, confirmation and task contracts."
           },
           "contract": "dist/contracts.json#/contracts/395"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "none",
+            "allowedInputs": [
+              "node",
+              "vmid",
+              "snapname",
+              "description"
+            ],
+            "inputPatterns": {
+              "snapname": "^(?!current$)[A-Za-z][A-Za-z0-9._-]*$"
+            },
+            "reason": "Confirmed snapshot creation, deletion or rollback with exact guest/snapshot binding; force removal and the current pseudo-snapshot remain refused.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Track the returned UPID and inspect the snapshot tree or protected configuration independently; never repeat uncertain snapshot mutations automatically."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/vms/{vmid}",
+                [
+                  "VM.Snapshot"
+                ]
+              ]
+            },
+            "response": {
+              "description": "the task ID.",
+              "type": "string"
+            },
+            "source": "Pinned snapshot, delsnapshot and rollback schemas; existing effect, confirmation and task contracts."
           },
           "contract": "dist/contracts.json#/contracts/1064"
         }
@@ -18569,23 +18761,83 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "none",
+            "allowedInputs": [
+              "node",
+              "vmid",
+              "snapname",
+              "start"
+            ],
+            "inputPatterns": {
+              "snapname": "^(?!current$)[A-Za-z][A-Za-z0-9._-]*$"
+            },
+            "reason": "Confirmed snapshot creation, deletion or rollback with exact guest/snapshot binding; force removal and the current pseudo-snapshot remain refused.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Track the returned UPID and inspect the snapshot tree or protected configuration independently; never repeat uncertain snapshot mutations automatically."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/vms/{vmid}",
+                [
+                  "VM.Snapshot",
+                  "VM.Snapshot.Rollback"
+                ],
+                "any",
+                1
+              ]
+            },
+            "response": {
+              "description": "the task ID.",
+              "type": "string"
+            },
+            "source": "Pinned snapshot, delsnapshot and rollback schemas; existing effect, confirmation and task contracts."
           },
           "contract": "dist/contracts.json#/contracts/400"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "none",
+            "allowedInputs": [
+              "node",
+              "vmid",
+              "snapname",
+              "start"
+            ],
+            "inputPatterns": {
+              "snapname": "^(?!current$)[A-Za-z][A-Za-z0-9._-]*$"
+            },
+            "reason": "Confirmed snapshot creation, deletion or rollback with exact guest/snapshot binding; force removal and the current pseudo-snapshot remain refused.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Track the returned UPID and inspect the snapshot tree or protected configuration independently; never repeat uncertain snapshot mutations automatically."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/vms/{vmid}",
+                [
+                  "VM.Snapshot",
+                  "VM.Snapshot.Rollback"
+                ],
+                "any",
+                1
+              ]
+            },
+            "response": {
+              "description": "the task ID.",
+              "type": "string"
+            },
+            "source": "Pinned snapshot, delsnapshot and rollback schemas; existing effect, confirmation and task contracts."
           },
           "contract": "dist/contracts.json#/contracts/1069"
         }
@@ -20916,23 +21168,79 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "none",
+            "allowedInputs": [
+              "node",
+              "vmid",
+              "snapname",
+              "description",
+              "vmstate"
+            ],
+            "inputPatterns": {
+              "snapname": "^(?!current$)[A-Za-z][A-Za-z0-9._-]*$"
+            },
+            "reason": "Confirmed snapshot creation, deletion or rollback with exact guest/snapshot binding; force removal and the current pseudo-snapshot remain refused.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Track the returned UPID and inspect the snapshot tree or protected configuration independently; never repeat uncertain snapshot mutations automatically."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/vms/{vmid}",
+                [
+                  "VM.Snapshot"
+                ]
+              ]
+            },
+            "response": {
+              "description": "the task ID.",
+              "type": "string"
+            },
+            "source": "Pinned snapshot, delsnapshot and rollback schemas; existing effect, confirmation and task contracts."
           },
           "contract": "dist/contracts.json#/contracts/498"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "none",
+            "allowedInputs": [
+              "node",
+              "vmid",
+              "snapname",
+              "description",
+              "vmstate"
+            ],
+            "inputPatterns": {
+              "snapname": "^(?!current$)[A-Za-z][A-Za-z0-9._-]*$"
+            },
+            "reason": "Confirmed snapshot creation, deletion or rollback with exact guest/snapshot binding; force removal and the current pseudo-snapshot remain refused.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Track the returned UPID and inspect the snapshot tree or protected configuration independently; never repeat uncertain snapshot mutations automatically."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/vms/{vmid}",
+                [
+                  "VM.Snapshot"
+                ]
+              ]
+            },
+            "response": {
+              "description": "the task ID.",
+              "type": "string"
+            },
+            "source": "Pinned snapshot, delsnapshot and rollback schemas; existing effect, confirmation and task contracts."
           },
           "contract": "dist/contracts.json#/contracts/1168"
         }
@@ -20949,23 +21257,83 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "none",
+            "allowedInputs": [
+              "node",
+              "vmid",
+              "snapname",
+              "start"
+            ],
+            "inputPatterns": {
+              "snapname": "^(?!current$)[A-Za-z][A-Za-z0-9._-]*$"
+            },
+            "reason": "Confirmed snapshot creation, deletion or rollback with exact guest/snapshot binding; force removal and the current pseudo-snapshot remain refused.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Track the returned UPID and inspect the snapshot tree or protected configuration independently; never repeat uncertain snapshot mutations automatically."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/vms/{vmid}",
+                [
+                  "VM.Snapshot",
+                  "VM.Snapshot.Rollback"
+                ],
+                "any",
+                1
+              ]
+            },
+            "response": {
+              "description": "the task ID.",
+              "type": "string"
+            },
+            "source": "Pinned snapshot, delsnapshot and rollback schemas; existing effect, confirmation and task contracts."
           },
           "contract": "dist/contracts.json#/contracts/503"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "none",
+            "allowedInputs": [
+              "node",
+              "vmid",
+              "snapname",
+              "start"
+            ],
+            "inputPatterns": {
+              "snapname": "^(?!current$)[A-Za-z][A-Za-z0-9._-]*$"
+            },
+            "reason": "Confirmed snapshot creation, deletion or rollback with exact guest/snapshot binding; force removal and the current pseudo-snapshot remain refused.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Track the returned UPID and inspect the snapshot tree or protected configuration independently; never repeat uncertain snapshot mutations automatically."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/vms/{vmid}",
+                [
+                  "VM.Snapshot",
+                  "VM.Snapshot.Rollback"
+                ],
+                "any",
+                1
+              ]
+            },
+            "response": {
+              "description": "the task ID.",
+              "type": "string"
+            },
+            "source": "Pinned snapshot, delsnapshot and rollback schemas; existing effect, confirmation and task contracts."
           },
           "contract": "dist/contracts.json#/contracts/1173"
         }

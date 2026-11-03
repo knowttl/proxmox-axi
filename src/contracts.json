@@ -61071,12 +61071,17 @@
       "id": "OP-GET-3dd428bcd4",
       "release": "legacy-8.2.7",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "read",
+        "transport": "json",
+        "secrets": "none",
+        "outputFields": [
+          "name",
+          "parent",
+          "snaptime"
+        ],
+        "reason": "Snapshot tree identifiers and timestamps only; descriptions and undeclared fields are excluded even with full output."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "get",
         "/nodes/{node}/lxc/{vmid}/snapshot"
@@ -61182,12 +61187,39 @@
       "id": "OP-POST-3986818be5",
       "release": "legacy-8.2.7",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "write",
+        "transport": "json",
+        "secrets": "none",
+        "allowedInputs": [
+          "node",
+          "vmid",
+          "snapname",
+          "description"
+        ],
+        "inputPatterns": {
+          "snapname": "^(?!current$)[A-Za-z][A-Za-z0-9._-]*$"
+        },
+        "reason": "Confirmed snapshot creation, deletion or rollback with exact guest/snapshot binding; force removal and the current pseudo-snapshot remain refused.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Track the returned UPID and inspect the snapshot tree or protected configuration independently; never repeat uncertain snapshot mutations automatically."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/vms/{vmid}",
+            [
+              "VM.Snapshot"
+            ]
+          ]
+        },
+        "response": {
+          "description": "the task ID.",
+          "type": "string"
+        },
+        "source": "Pinned snapshot, delsnapshot and rollback schemas; existing effect, confirmation and task contracts."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "post",
         "/nodes/{node}/lxc/{vmid}/snapshot"
@@ -61214,7 +61246,12 @@
                 "snapname": {
                   "type": "string",
                   "maxLength": 40,
-                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*$"
+                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*$",
+                  "allOf": [
+                    {
+                      "pattern": "^(?!current$)[A-Za-z][A-Za-z0-9._-]*$"
+                    }
+                  ]
                 },
                 "vmid": {
                   "type": "integer",
@@ -61302,12 +61339,38 @@
       "id": "OP-DELETE-3540081d0e",
       "release": "legacy-8.2.7",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "write",
+        "transport": "json",
+        "secrets": "none",
+        "allowedInputs": [
+          "node",
+          "vmid",
+          "snapname"
+        ],
+        "inputPatterns": {
+          "snapname": "^(?!current$)[A-Za-z][A-Za-z0-9._-]*$"
+        },
+        "reason": "Confirmed snapshot creation, deletion or rollback with exact guest/snapshot binding; force removal and the current pseudo-snapshot remain refused.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Track the returned UPID and inspect the snapshot tree or protected configuration independently; never repeat uncertain snapshot mutations automatically."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/vms/{vmid}",
+            [
+              "VM.Snapshot"
+            ]
+          ]
+        },
+        "response": {
+          "description": "the task ID.",
+          "type": "string"
+        },
+        "source": "Pinned snapshot, delsnapshot and rollback schemas; existing effect, confirmation and task contracts."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "delete",
         "/nodes/{node}/lxc/{vmid}/snapshot/{snapname}"
@@ -61324,9 +61387,6 @@
               "type": "object",
               "additionalProperties": false,
               "properties": {
-                "force": {
-                  "type": "boolean"
-                },
                 "node": {
                   "type": "string",
                   "pattern": "^[A-Za-z0-9][A-Za-z0-9.-]*$"
@@ -61334,7 +61394,12 @@
                 "snapname": {
                   "type": "string",
                   "maxLength": 40,
-                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*$"
+                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*$",
+                  "allOf": [
+                    {
+                      "pattern": "^(?!current$)[A-Za-z][A-Za-z0-9._-]*$"
+                    }
+                  ]
                 },
                 "vmid": {
                   "type": "integer",
@@ -61418,12 +61483,15 @@
       "id": "OP-GET-cad4dcb48f",
       "release": "legacy-8.2.7",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "read",
+        "transport": "json",
+        "secrets": "none",
+        "outputFields": [
+          "cmd"
+        ],
+        "reason": "Snapshot command index only; command names do not admit their operations."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "get",
         "/nodes/{node}/lxc/{vmid}/snapshot/{snapname}"
@@ -61532,12 +61600,12 @@
       "id": "OP-GET-f92e0d528d",
       "release": "legacy-8.2.7",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "read",
+        "transport": "json",
+        "secrets": "private-result",
+        "reason": "Snapshot configuration can contain guest credentials and protected settings; the complete bounded object requires an inherited private result pipe."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "get",
         "/nodes/{node}/lxc/{vmid}/snapshot/{snapname}/config"
@@ -61772,12 +61840,42 @@
       "id": "OP-POST-6610c2e6d1",
       "release": "legacy-8.2.7",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "write",
+        "transport": "json",
+        "secrets": "none",
+        "allowedInputs": [
+          "node",
+          "vmid",
+          "snapname",
+          "start"
+        ],
+        "inputPatterns": {
+          "snapname": "^(?!current$)[A-Za-z][A-Za-z0-9._-]*$"
+        },
+        "reason": "Confirmed snapshot creation, deletion or rollback with exact guest/snapshot binding; force removal and the current pseudo-snapshot remain refused.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Track the returned UPID and inspect the snapshot tree or protected configuration independently; never repeat uncertain snapshot mutations automatically."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/vms/{vmid}",
+            [
+              "VM.Snapshot",
+              "VM.Snapshot.Rollback"
+            ],
+            "any",
+            1
+          ]
+        },
+        "response": {
+          "description": "the task ID.",
+          "type": "string"
+        },
+        "source": "Pinned snapshot, delsnapshot and rollback schemas; existing effect, confirmation and task contracts."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "post",
         "/nodes/{node}/lxc/{vmid}/snapshot/{snapname}/rollback"
@@ -61801,7 +61899,12 @@
                 "snapname": {
                   "type": "string",
                   "maxLength": 40,
-                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*$"
+                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*$",
+                  "allOf": [
+                    {
+                      "pattern": "^(?!current$)[A-Za-z][A-Za-z0-9._-]*$"
+                    }
+                  ]
                 },
                 "start": {
                   "type": "boolean"
@@ -88835,12 +88938,18 @@
       "id": "OP-GET-21328c5bed",
       "release": "legacy-8.2.7",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "read",
+        "transport": "json",
+        "secrets": "none",
+        "outputFields": [
+          "name",
+          "parent",
+          "snaptime",
+          "vmstate"
+        ],
+        "reason": "Snapshot tree identifiers, timestamps and RAM-state metadata only; descriptions and undeclared fields are excluded even with full output."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "get",
         "/nodes/{node}/qemu/{vmid}/snapshot"
@@ -88952,12 +89061,40 @@
       "id": "OP-POST-7544b32562",
       "release": "legacy-8.2.7",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "write",
+        "transport": "json",
+        "secrets": "none",
+        "allowedInputs": [
+          "node",
+          "vmid",
+          "snapname",
+          "description",
+          "vmstate"
+        ],
+        "inputPatterns": {
+          "snapname": "^(?!current$)[A-Za-z][A-Za-z0-9._-]*$"
+        },
+        "reason": "Confirmed snapshot creation, deletion or rollback with exact guest/snapshot binding; force removal and the current pseudo-snapshot remain refused.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Track the returned UPID and inspect the snapshot tree or protected configuration independently; never repeat uncertain snapshot mutations automatically."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/vms/{vmid}",
+            [
+              "VM.Snapshot"
+            ]
+          ]
+        },
+        "response": {
+          "description": "the task ID.",
+          "type": "string"
+        },
+        "source": "Pinned snapshot, delsnapshot and rollback schemas; existing effect, confirmation and task contracts."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "post",
         "/nodes/{node}/qemu/{vmid}/snapshot"
@@ -88984,7 +89121,12 @@
                 "snapname": {
                   "type": "string",
                   "maxLength": 40,
-                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*$"
+                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*$",
+                  "allOf": [
+                    {
+                      "pattern": "^(?!current$)[A-Za-z][A-Za-z0-9._-]*$"
+                    }
+                  ]
                 },
                 "vmid": {
                   "type": "integer",
@@ -89075,12 +89217,38 @@
       "id": "OP-DELETE-1389a0eedf",
       "release": "legacy-8.2.7",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "write",
+        "transport": "json",
+        "secrets": "none",
+        "allowedInputs": [
+          "node",
+          "vmid",
+          "snapname"
+        ],
+        "inputPatterns": {
+          "snapname": "^(?!current$)[A-Za-z][A-Za-z0-9._-]*$"
+        },
+        "reason": "Confirmed snapshot creation, deletion or rollback with exact guest/snapshot binding; force removal and the current pseudo-snapshot remain refused.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Track the returned UPID and inspect the snapshot tree or protected configuration independently; never repeat uncertain snapshot mutations automatically."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/vms/{vmid}",
+            [
+              "VM.Snapshot"
+            ]
+          ]
+        },
+        "response": {
+          "description": "the task ID.",
+          "type": "string"
+        },
+        "source": "Pinned snapshot, delsnapshot and rollback schemas; existing effect, confirmation and task contracts."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "delete",
         "/nodes/{node}/qemu/{vmid}/snapshot/{snapname}"
@@ -89097,9 +89265,6 @@
               "type": "object",
               "additionalProperties": false,
               "properties": {
-                "force": {
-                  "type": "boolean"
-                },
                 "node": {
                   "type": "string",
                   "pattern": "^[A-Za-z0-9][A-Za-z0-9.-]*$"
@@ -89107,7 +89272,12 @@
                 "snapname": {
                   "type": "string",
                   "maxLength": 40,
-                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*$"
+                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*$",
+                  "allOf": [
+                    {
+                      "pattern": "^(?!current$)[A-Za-z][A-Za-z0-9._-]*$"
+                    }
+                  ]
                 },
                 "vmid": {
                   "type": "integer",
@@ -89191,12 +89361,15 @@
       "id": "OP-GET-31cf78f27d",
       "release": "legacy-8.2.7",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "read",
+        "transport": "json",
+        "secrets": "none",
+        "outputFields": [
+          "cmd"
+        ],
+        "reason": "Snapshot command index only; command names do not admit their operations."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "get",
         "/nodes/{node}/qemu/{vmid}/snapshot/{snapname}"
@@ -89305,12 +89478,12 @@
       "id": "OP-GET-566eee8b61",
       "release": "legacy-8.2.7",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "read",
+        "transport": "json",
+        "secrets": "private-result",
+        "reason": "Snapshot configuration can contain guest credentials and protected settings; the complete bounded object requires an inherited private result pipe."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "get",
         "/nodes/{node}/qemu/{vmid}/snapshot/{snapname}/config"
@@ -89545,12 +89718,42 @@
       "id": "OP-POST-a056e1d1f4",
       "release": "legacy-8.2.7",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "write",
+        "transport": "json",
+        "secrets": "none",
+        "allowedInputs": [
+          "node",
+          "vmid",
+          "snapname",
+          "start"
+        ],
+        "inputPatterns": {
+          "snapname": "^(?!current$)[A-Za-z][A-Za-z0-9._-]*$"
+        },
+        "reason": "Confirmed snapshot creation, deletion or rollback with exact guest/snapshot binding; force removal and the current pseudo-snapshot remain refused.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Track the returned UPID and inspect the snapshot tree or protected configuration independently; never repeat uncertain snapshot mutations automatically."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/vms/{vmid}",
+            [
+              "VM.Snapshot",
+              "VM.Snapshot.Rollback"
+            ],
+            "any",
+            1
+          ]
+        },
+        "response": {
+          "description": "the task ID.",
+          "type": "string"
+        },
+        "source": "Pinned snapshot, delsnapshot and rollback schemas; existing effect, confirmation and task contracts."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "post",
         "/nodes/{node}/qemu/{vmid}/snapshot/{snapname}/rollback"
@@ -89574,7 +89777,12 @@
                 "snapname": {
                   "type": "string",
                   "maxLength": 40,
-                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*$"
+                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*$",
+                  "allOf": [
+                    {
+                      "pattern": "^(?!current$)[A-Za-z][A-Za-z0-9._-]*$"
+                    }
+                  ]
                 },
                 "start": {
                   "type": "boolean"
@@ -182004,12 +182212,17 @@
       "id": "OP-GET-3dd428bcd4",
       "release": "published-current",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "read",
+        "transport": "json",
+        "secrets": "none",
+        "outputFields": [
+          "name",
+          "parent",
+          "snaptime"
+        ],
+        "reason": "Snapshot tree identifiers and timestamps only; descriptions and undeclared fields are excluded even with full output."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "get",
         "/nodes/{node}/lxc/{vmid}/snapshot"
@@ -182115,12 +182328,39 @@
       "id": "OP-POST-3986818be5",
       "release": "published-current",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "write",
+        "transport": "json",
+        "secrets": "none",
+        "allowedInputs": [
+          "node",
+          "vmid",
+          "snapname",
+          "description"
+        ],
+        "inputPatterns": {
+          "snapname": "^(?!current$)[A-Za-z][A-Za-z0-9._-]*$"
+        },
+        "reason": "Confirmed snapshot creation, deletion or rollback with exact guest/snapshot binding; force removal and the current pseudo-snapshot remain refused.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Track the returned UPID and inspect the snapshot tree or protected configuration independently; never repeat uncertain snapshot mutations automatically."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/vms/{vmid}",
+            [
+              "VM.Snapshot"
+            ]
+          ]
+        },
+        "response": {
+          "description": "the task ID.",
+          "type": "string"
+        },
+        "source": "Pinned snapshot, delsnapshot and rollback schemas; existing effect, confirmation and task contracts."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "post",
         "/nodes/{node}/lxc/{vmid}/snapshot"
@@ -182147,7 +182387,12 @@
                 "snapname": {
                   "type": "string",
                   "maxLength": 40,
-                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*$"
+                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*$",
+                  "allOf": [
+                    {
+                      "pattern": "^(?!current$)[A-Za-z][A-Za-z0-9._-]*$"
+                    }
+                  ]
                 },
                 "vmid": {
                   "type": "integer",
@@ -182235,12 +182480,38 @@
       "id": "OP-DELETE-3540081d0e",
       "release": "published-current",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "write",
+        "transport": "json",
+        "secrets": "none",
+        "allowedInputs": [
+          "node",
+          "vmid",
+          "snapname"
+        ],
+        "inputPatterns": {
+          "snapname": "^(?!current$)[A-Za-z][A-Za-z0-9._-]*$"
+        },
+        "reason": "Confirmed snapshot creation, deletion or rollback with exact guest/snapshot binding; force removal and the current pseudo-snapshot remain refused.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Track the returned UPID and inspect the snapshot tree or protected configuration independently; never repeat uncertain snapshot mutations automatically."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/vms/{vmid}",
+            [
+              "VM.Snapshot"
+            ]
+          ]
+        },
+        "response": {
+          "description": "the task ID.",
+          "type": "string"
+        },
+        "source": "Pinned snapshot, delsnapshot and rollback schemas; existing effect, confirmation and task contracts."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "delete",
         "/nodes/{node}/lxc/{vmid}/snapshot/{snapname}"
@@ -182257,9 +182528,6 @@
               "type": "object",
               "additionalProperties": false,
               "properties": {
-                "force": {
-                  "type": "boolean"
-                },
                 "node": {
                   "type": "string",
                   "pattern": "^[A-Za-z0-9][A-Za-z0-9.-]*$"
@@ -182267,7 +182535,12 @@
                 "snapname": {
                   "type": "string",
                   "maxLength": 40,
-                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*$"
+                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*$",
+                  "allOf": [
+                    {
+                      "pattern": "^(?!current$)[A-Za-z][A-Za-z0-9._-]*$"
+                    }
+                  ]
                 },
                 "vmid": {
                   "type": "integer",
@@ -182351,12 +182624,15 @@
       "id": "OP-GET-cad4dcb48f",
       "release": "published-current",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "read",
+        "transport": "json",
+        "secrets": "none",
+        "outputFields": [
+          "cmd"
+        ],
+        "reason": "Snapshot command index only; command names do not admit their operations."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "get",
         "/nodes/{node}/lxc/{vmid}/snapshot/{snapname}"
@@ -182465,12 +182741,12 @@
       "id": "OP-GET-f92e0d528d",
       "release": "published-current",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "read",
+        "transport": "json",
+        "secrets": "private-result",
+        "reason": "Snapshot configuration can contain guest credentials and protected settings; the complete bounded object requires an inherited private result pipe."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "get",
         "/nodes/{node}/lxc/{vmid}/snapshot/{snapname}/config"
@@ -182705,12 +182981,42 @@
       "id": "OP-POST-6610c2e6d1",
       "release": "published-current",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "write",
+        "transport": "json",
+        "secrets": "none",
+        "allowedInputs": [
+          "node",
+          "vmid",
+          "snapname",
+          "start"
+        ],
+        "inputPatterns": {
+          "snapname": "^(?!current$)[A-Za-z][A-Za-z0-9._-]*$"
+        },
+        "reason": "Confirmed snapshot creation, deletion or rollback with exact guest/snapshot binding; force removal and the current pseudo-snapshot remain refused.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Track the returned UPID and inspect the snapshot tree or protected configuration independently; never repeat uncertain snapshot mutations automatically."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/vms/{vmid}",
+            [
+              "VM.Snapshot",
+              "VM.Snapshot.Rollback"
+            ],
+            "any",
+            1
+          ]
+        },
+        "response": {
+          "description": "the task ID.",
+          "type": "string"
+        },
+        "source": "Pinned snapshot, delsnapshot and rollback schemas; existing effect, confirmation and task contracts."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "post",
         "/nodes/{node}/lxc/{vmid}/snapshot/{snapname}/rollback"
@@ -182734,7 +183040,12 @@
                 "snapname": {
                   "type": "string",
                   "maxLength": 40,
-                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*$"
+                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*$",
+                  "allOf": [
+                    {
+                      "pattern": "^(?!current$)[A-Za-z][A-Za-z0-9._-]*$"
+                    }
+                  ]
                 },
                 "start": {
                   "type": "boolean"
@@ -210198,12 +210509,18 @@
       "id": "OP-GET-21328c5bed",
       "release": "published-current",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "read",
+        "transport": "json",
+        "secrets": "none",
+        "outputFields": [
+          "name",
+          "parent",
+          "snaptime",
+          "vmstate"
+        ],
+        "reason": "Snapshot tree identifiers, timestamps and RAM-state metadata only; descriptions and undeclared fields are excluded even with full output."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "get",
         "/nodes/{node}/qemu/{vmid}/snapshot"
@@ -210315,12 +210632,40 @@
       "id": "OP-POST-7544b32562",
       "release": "published-current",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "write",
+        "transport": "json",
+        "secrets": "none",
+        "allowedInputs": [
+          "node",
+          "vmid",
+          "snapname",
+          "description",
+          "vmstate"
+        ],
+        "inputPatterns": {
+          "snapname": "^(?!current$)[A-Za-z][A-Za-z0-9._-]*$"
+        },
+        "reason": "Confirmed snapshot creation, deletion or rollback with exact guest/snapshot binding; force removal and the current pseudo-snapshot remain refused.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Track the returned UPID and inspect the snapshot tree or protected configuration independently; never repeat uncertain snapshot mutations automatically."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/vms/{vmid}",
+            [
+              "VM.Snapshot"
+            ]
+          ]
+        },
+        "response": {
+          "description": "the task ID.",
+          "type": "string"
+        },
+        "source": "Pinned snapshot, delsnapshot and rollback schemas; existing effect, confirmation and task contracts."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "post",
         "/nodes/{node}/qemu/{vmid}/snapshot"
@@ -210347,7 +210692,12 @@
                 "snapname": {
                   "type": "string",
                   "maxLength": 40,
-                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*$"
+                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*$",
+                  "allOf": [
+                    {
+                      "pattern": "^(?!current$)[A-Za-z][A-Za-z0-9._-]*$"
+                    }
+                  ]
                 },
                 "vmid": {
                   "type": "integer",
@@ -210438,12 +210788,38 @@
       "id": "OP-DELETE-1389a0eedf",
       "release": "published-current",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "write",
+        "transport": "json",
+        "secrets": "none",
+        "allowedInputs": [
+          "node",
+          "vmid",
+          "snapname"
+        ],
+        "inputPatterns": {
+          "snapname": "^(?!current$)[A-Za-z][A-Za-z0-9._-]*$"
+        },
+        "reason": "Confirmed snapshot creation, deletion or rollback with exact guest/snapshot binding; force removal and the current pseudo-snapshot remain refused.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Track the returned UPID and inspect the snapshot tree or protected configuration independently; never repeat uncertain snapshot mutations automatically."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/vms/{vmid}",
+            [
+              "VM.Snapshot"
+            ]
+          ]
+        },
+        "response": {
+          "description": "the task ID.",
+          "type": "string"
+        },
+        "source": "Pinned snapshot, delsnapshot and rollback schemas; existing effect, confirmation and task contracts."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "delete",
         "/nodes/{node}/qemu/{vmid}/snapshot/{snapname}"
@@ -210460,9 +210836,6 @@
               "type": "object",
               "additionalProperties": false,
               "properties": {
-                "force": {
-                  "type": "boolean"
-                },
                 "node": {
                   "type": "string",
                   "pattern": "^[A-Za-z0-9][A-Za-z0-9.-]*$"
@@ -210470,7 +210843,12 @@
                 "snapname": {
                   "type": "string",
                   "maxLength": 40,
-                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*$"
+                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*$",
+                  "allOf": [
+                    {
+                      "pattern": "^(?!current$)[A-Za-z][A-Za-z0-9._-]*$"
+                    }
+                  ]
                 },
                 "vmid": {
                   "type": "integer",
@@ -210554,12 +210932,15 @@
       "id": "OP-GET-31cf78f27d",
       "release": "published-current",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "read",
+        "transport": "json",
+        "secrets": "none",
+        "outputFields": [
+          "cmd"
+        ],
+        "reason": "Snapshot command index only; command names do not admit their operations."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "get",
         "/nodes/{node}/qemu/{vmid}/snapshot/{snapname}"
@@ -210668,12 +211049,12 @@
       "id": "OP-GET-566eee8b61",
       "release": "published-current",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "read",
+        "transport": "json",
+        "secrets": "private-result",
+        "reason": "Snapshot configuration can contain guest credentials and protected settings; the complete bounded object requires an inherited private result pipe."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "get",
         "/nodes/{node}/qemu/{vmid}/snapshot/{snapname}/config"
@@ -210908,12 +211289,42 @@
       "id": "OP-POST-a056e1d1f4",
       "release": "published-current",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "write",
+        "transport": "json",
+        "secrets": "none",
+        "allowedInputs": [
+          "node",
+          "vmid",
+          "snapname",
+          "start"
+        ],
+        "inputPatterns": {
+          "snapname": "^(?!current$)[A-Za-z][A-Za-z0-9._-]*$"
+        },
+        "reason": "Confirmed snapshot creation, deletion or rollback with exact guest/snapshot binding; force removal and the current pseudo-snapshot remain refused.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Track the returned UPID and inspect the snapshot tree or protected configuration independently; never repeat uncertain snapshot mutations automatically."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/vms/{vmid}",
+            [
+              "VM.Snapshot",
+              "VM.Snapshot.Rollback"
+            ],
+            "any",
+            1
+          ]
+        },
+        "response": {
+          "description": "the task ID.",
+          "type": "string"
+        },
+        "source": "Pinned snapshot, delsnapshot and rollback schemas; existing effect, confirmation and task contracts."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "post",
         "/nodes/{node}/qemu/{vmid}/snapshot/{snapname}/rollback"
@@ -210937,7 +211348,12 @@
                 "snapname": {
                   "type": "string",
                   "maxLength": 40,
-                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*$"
+                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*$",
+                  "allOf": [
+                    {
+                      "pattern": "^(?!current$)[A-Za-z][A-Za-z0-9._-]*$"
+                    }
+                  ]
                 },
                 "start": {
                   "type": "boolean"
