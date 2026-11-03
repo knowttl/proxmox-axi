@@ -2441,20 +2441,64 @@
       "contract": "dist/contracts.json#/contracts/250"
     },
     {
-      "id": "OP-GET-66bdd31664",
-      "method": "GET",
-      "path": "/nodes/{node}/aplinfo",
-      "release": "legacy-8.2.7",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/251"
-    },
-    {
       "id": "OP-POST-9b2e201640",
       "method": "POST",
       "path": "/nodes/{node}/aplinfo",
       "release": "legacy-8.2.7",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/252"
+      "admitted": true,
+      "contract": "dist/contracts.json#/contracts/252",
+      "policy": {
+        "effect": "write",
+        "transport": "json",
+        "secrets": "none",
+        "allowedInputs": [
+          "node",
+          "storage",
+          "template"
+        ],
+        "inputPatterns": {
+          "template": "^[A-Za-z0-9][A-Za-z0-9._-]*\\.tar\\.(?:zst|xz|gz)$"
+        },
+        "reason": "Confirmed installation of a provider-catalogue container template; URLs and arbitrary downloads remain refused.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Track the returned download UPID and inspect storage content after success; never retry uncertain installation automatically."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/storage/{storage}",
+            [
+              "Datastore.AllocateTemplate"
+            ]
+          ]
+        },
+        "response": {
+          "type": "string"
+        },
+        "source": "Pinned apl_download schemas and provider catalogue lookup; existing effect and task contracts."
+      },
+      "inputs": [
+        {
+          "name": "node",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "storage",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "template",
+          "admitted": true,
+          "sensitive": false
+        }
+      ],
+      "results": {
+        "type": "string",
+        "handling": "public metadata; protected inputs excluded"
+      }
     },
     {
       "id": "OP-GET-7e9b21c721",
@@ -13445,14 +13489,6 @@
       "contract": "dist/contracts.json#/contracts/554"
     },
     {
-      "id": "OP-GET-090607ccf4",
-      "method": "GET",
-      "path": "/nodes/{node}/storage/{storage}/content",
-      "release": "legacy-8.2.7",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/555"
-    },
-    {
       "id": "OP-POST-fb98c9c4ac",
       "method": "POST",
       "path": "/nodes/{node}/storage/{storage}/content",
@@ -13467,14 +13503,6 @@
       "release": "legacy-8.2.7",
       "admitted": false,
       "contract": "dist/contracts.json#/contracts/557"
-    },
-    {
-      "id": "OP-GET-d6c763e6d8",
-      "method": "GET",
-      "path": "/nodes/{node}/storage/{storage}/content/{volume}",
-      "release": "legacy-8.2.7",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/558"
     },
     {
       "id": "OP-POST-9476c6bacd",
@@ -17062,20 +17090,64 @@
       "contract": "dist/contracts.json#/contracts/913"
     },
     {
-      "id": "OP-GET-66bdd31664",
-      "method": "GET",
-      "path": "/nodes/{node}/aplinfo",
-      "release": "published-current",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/914"
-    },
-    {
       "id": "OP-POST-9b2e201640",
       "method": "POST",
       "path": "/nodes/{node}/aplinfo",
       "release": "published-current",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/915"
+      "admitted": true,
+      "contract": "dist/contracts.json#/contracts/915",
+      "policy": {
+        "effect": "write",
+        "transport": "json",
+        "secrets": "none",
+        "allowedInputs": [
+          "node",
+          "storage",
+          "template"
+        ],
+        "inputPatterns": {
+          "template": "^[A-Za-z0-9][A-Za-z0-9._-]*\\.tar\\.(?:zst|xz|gz)$"
+        },
+        "reason": "Confirmed installation of a provider-catalogue container template; URLs and arbitrary downloads remain refused.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Track the returned download UPID and inspect storage content after success; never retry uncertain installation automatically."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/storage/{storage}",
+            [
+              "Datastore.AllocateTemplate"
+            ]
+          ]
+        },
+        "response": {
+          "type": "string"
+        },
+        "source": "Pinned apl_download schemas and provider catalogue lookup; existing effect and task contracts."
+      },
+      "inputs": [
+        {
+          "name": "node",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "storage",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "template",
+          "admitted": true,
+          "sensitive": false
+        }
+      ],
+      "results": {
+        "type": "string",
+        "handling": "public metadata; protected inputs excluded"
+      }
     },
     {
       "id": "OP-GET-7e9b21c721",
@@ -28251,14 +28323,6 @@
       "contract": "dist/contracts.json#/contracts/1232"
     },
     {
-      "id": "OP-GET-090607ccf4",
-      "method": "GET",
-      "path": "/nodes/{node}/storage/{storage}/content",
-      "release": "published-current",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/1233"
-    },
-    {
       "id": "OP-POST-fb98c9c4ac",
       "method": "POST",
       "path": "/nodes/{node}/storage/{storage}/content",
@@ -28273,14 +28337,6 @@
       "release": "published-current",
       "admitted": false,
       "contract": "dist/contracts.json#/contracts/1235"
-    },
-    {
-      "id": "OP-GET-d6c763e6d8",
-      "method": "GET",
-      "path": "/nodes/{node}/storage/{storage}/content/{volume}",
-      "release": "published-current",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/1236"
     },
     {
       "id": "OP-POST-9476c6bacd",

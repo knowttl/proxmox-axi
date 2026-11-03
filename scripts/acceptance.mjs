@@ -466,7 +466,7 @@ async function verify(values, prepared, scratch) {
         const callable = route.callable && !(hosted && route.operation.path === '/nodes/{node}/tasks/{upid}/log' && Object.hasOwn(route.values, 'download'))
         const expected = route.privateResult ? { exitCode: hosted ? 2 : 1, requests: 0, error: hosted ? 'INVALID_INPUT' : 'PRIVATE_SINK_REQUIRED', hostBoundary: hosted } : callable ? route.operation.path === '/version' ?
           { exitCode: 0, requests: 1, version: true, identity } :
-          { exitCode: 0, requests: 1, path: route.expectedPath, data: route.response, identity } :
+          { exitCode: 0, requests: 1, path: route.expectedPath, data: route.publicResponse, identity } :
           { exitCode: hosted || route.managed ? 2 : 1, requests: 0, error: hosted || route.managed ? 'INVALID_INPUT' : route.reviewedWrite ? 'WRITE_DISABLED' : 'CONTRACT_UNRESOLVED', hostBoundary: hosted }
         await runCase(`${hosted ? 'artium' : 'standalone'}/contract/${route.id}/valid`, args, environment, expected,
           route.operation.path === '/version' ? success : { httpStatus: 200, body: { data: route.response } }, entry)

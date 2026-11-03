@@ -32,7 +32,7 @@ export interface Contract {
   parameters: VendorSchema
   returns: VendorSchema
   policy: { effect: string, transport: string, secrets: string, reason: string,
-    allowedInputs?: string[], sensitiveInputs?: string[], inputPatterns?: Record<string, string>, inputFormats?: Record<string, string>,
+    allowedInputs?: string[], sensitiveInputs?: string[], outputFields?: string[], inputPatterns?: Record<string, string>, inputFormats?: Record<string, string>,
     fixedInputs?: Record<string, string | number | boolean>, reconciliation?: { kind: string, path?: string, reason: string } }
   invocation: unknown
 }
@@ -133,12 +133,14 @@ export function validateParameters(values: Record<string, unknown>, schema: Vend
 }
 
 export function buildPath(contract: Contract, values: Record<string, unknown>): string {
-  validateParameters(values, { ...contract.parameters, properties: parameterProperties(contract.parameters, contract.policy.allowedInputs, contract.policy.inputFormats) })
+  const properties = parameterProperties(contract.parameters, contract.policy.allowedInputs, contract.policy.inputFormats)
+  validateParameters(values, { ...contract.parameters, properties })
   const used = new Set<string>()
   const path = contract.path.replace(/\{([^}]+)\}/g, (_, name: string) => {
     used.add(name)
     const value = String(values[name])
-    if (!value || value === '.' || value === '..' || /[\\/\x00-\x1f\x7f]/.test(value) || /%[0-9a-f]{2}/i.test(value)) throw invalid()
+    const separator = properties[name]?.format === 'pve-managed-volume' ? /[\\\x00-\x1f\x7f]/ : /[\\/\x00-\x1f\x7f]/
+    if (!value || value === '.' || value === '..' || separator.test(value) || /%[0-9a-f]{2}/i.test(value)) throw invalid()
     return encodeURIComponent(value)
   })
   const query = new URLSearchParams()

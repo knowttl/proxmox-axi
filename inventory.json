@@ -7427,23 +7427,41 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "read",
+            "transport": "json",
+            "secrets": "none",
+            "outputFields": [
+              "template",
+              "package",
+              "version",
+              "type",
+              "os",
+              "architecture",
+              "section"
+            ],
+            "reason": "Appliance catalogue identifiers and classification only; provider URLs, descriptions and undeclared fields are excluded even with full output."
           },
           "contract": "dist/contracts.json#/contracts/251"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "read",
+            "transport": "json",
+            "secrets": "none",
+            "outputFields": [
+              "template",
+              "package",
+              "version",
+              "type",
+              "os",
+              "architecture",
+              "section"
+            ],
+            "reason": "Appliance catalogue identifiers and classification only; provider URLs, descriptions and undeclared fields are excluded even with full output."
           },
           "contract": "dist/contracts.json#/contracts/914"
         }
@@ -13151,23 +13169,43 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "read",
+            "transport": "json",
+            "secrets": "none",
+            "outputFields": [
+              "volid",
+              "format",
+              "size",
+              "approximate-size",
+              "used",
+              "vmid",
+              "ctime",
+              "protected"
+            ],
+            "reason": "Permission-scoped volume discovery; notes, provider paths and undeclared metadata are excluded even with full output."
           },
           "contract": "dist/contracts.json#/contracts/555"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "read",
+            "transport": "json",
+            "secrets": "none",
+            "outputFields": [
+              "volid",
+              "format",
+              "size",
+              "approximate-size",
+              "used",
+              "vmid",
+              "ctime",
+              "protected"
+            ],
+            "reason": "Permission-scoped volume discovery; notes, provider paths and undeclared metadata are excluded even with full output."
           },
           "contract": "dist/contracts.json#/contracts/1233"
         }
@@ -13184,23 +13222,41 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "read",
+            "transport": "json",
+            "secrets": "none",
+            "inputFormats": {
+              "volume": "pve-managed-volume"
+            },
+            "outputFields": [
+              "format",
+              "size",
+              "used",
+              "protected"
+            ],
+            "reason": "Volume format and capacity metadata only; host paths, notes and undeclared fields are excluded even with full output."
           },
           "contract": "dist/contracts.json#/contracts/558"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "read",
+            "transport": "json",
+            "secrets": "none",
+            "inputFormats": {
+              "volume": "pve-managed-volume"
+            },
+            "outputFields": [
+              "format",
+              "size",
+              "used",
+              "protected"
+            ],
+            "reason": "Volume format and capacity metadata only; host paths, notes and undeclared fields are excluded even with full output."
           },
           "contract": "dist/contracts.json#/contracts/1236"
         }
@@ -16178,23 +16234,73 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "none",
+            "allowedInputs": [
+              "node",
+              "storage",
+              "template"
+            ],
+            "inputPatterns": {
+              "template": "^[A-Za-z0-9][A-Za-z0-9._-]*\\.tar\\.(?:zst|xz|gz)$"
+            },
+            "reason": "Confirmed installation of a provider-catalogue container template; URLs and arbitrary downloads remain refused.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Track the returned download UPID and inspect storage content after success; never retry uncertain installation automatically."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/storage/{storage}",
+                [
+                  "Datastore.AllocateTemplate"
+                ]
+              ]
+            },
+            "response": {
+              "type": "string"
+            },
+            "source": "Pinned apl_download schemas and provider catalogue lookup; existing effect and task contracts."
           },
           "contract": "dist/contracts.json#/contracts/252"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "none",
+            "allowedInputs": [
+              "node",
+              "storage",
+              "template"
+            ],
+            "inputPatterns": {
+              "template": "^[A-Za-z0-9][A-Za-z0-9._-]*\\.tar\\.(?:zst|xz|gz)$"
+            },
+            "reason": "Confirmed installation of a provider-catalogue container template; URLs and arbitrary downloads remain refused.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Track the returned download UPID and inspect storage content after success; never retry uncertain installation automatically."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/storage/{storage}",
+                [
+                  "Datastore.AllocateTemplate"
+                ]
+              ]
+            },
+            "response": {
+              "type": "string"
+            },
+            "source": "Pinned apl_download schemas and provider catalogue lookup; existing effect and task contracts."
           },
           "contract": "dist/contracts.json#/contracts/915"
         }

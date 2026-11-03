@@ -725,6 +725,25 @@
       }
     },
     {
+      "command": "create /nodes/{node}/aplinfo",
+      "operationId": "OP-POST-9b2e201640",
+      "method": "POST",
+      "path": "/nodes/{node}/aplinfo",
+      "sensitiveInputs": [],
+      "privateResult": false,
+      "effect": "write",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "preview": "boolean",
+        "confirm": "value",
+        "session": "value",
+        "api-node": "value",
+        "api-storage": "value",
+        "api-template": "value"
+      }
+    },
+    {
       "command": "create /nodes/{node}/certificates/custom",
       "operationId": "OP-POST-cc95340692",
       "method": "POST",
@@ -2464,6 +2483,19 @@
       }
     },
     {
+      "command": "ls /nodes/{node}/aplinfo",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "session": "value",
+        "limit": "value",
+        "fields": "value",
+        "full": "boolean",
+        "api-node": "value"
+      }
+    },
+    {
       "command": "ls /nodes/{node}/lxc",
       "effect": "read",
       "flags": {
@@ -2551,6 +2583,22 @@
         "api-node": "value",
         "api-storage": "value",
         "api-target": "value"
+      }
+    },
+    {
+      "command": "ls /nodes/{node}/storage/{storage}/content",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "session": "value",
+        "limit": "value",
+        "fields": "value",
+        "full": "boolean",
+        "api-content": "value",
+        "api-node": "value",
+        "api-storage": "value",
+        "api-vmid": "value"
       }
     },
     {
@@ -10212,6 +10260,27 @@
       ]
     },
     {
+      "command": "get /nodes/{node}/aplinfo",
+      "operationId": "OP-GET-66bdd31664",
+      "method": "GET",
+      "path": "/nodes/{node}/aplinfo",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value",
+        "limit": "value",
+        "fields": "value",
+        "full": "boolean",
+        "session": "value",
+        "api-node": "value"
+      },
+      "catalogues": [
+        "legacy-8.2.7",
+        "published-current"
+      ]
+    },
+    {
       "command": "get /nodes/{node}/lxc",
       "operationId": "OP-GET-2b0a4d1f88",
       "method": "GET",
@@ -10458,6 +10527,53 @@
         "api-node": "value",
         "api-storage": "value",
         "api-target": "value"
+      },
+      "catalogues": [
+        "legacy-8.2.7",
+        "published-current"
+      ]
+    },
+    {
+      "command": "get /nodes/{node}/storage/{storage}/content",
+      "operationId": "OP-GET-090607ccf4",
+      "method": "GET",
+      "path": "/nodes/{node}/storage/{storage}/content",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value",
+        "limit": "value",
+        "fields": "value",
+        "full": "boolean",
+        "session": "value",
+        "api-content": "value",
+        "api-node": "value",
+        "api-storage": "value",
+        "api-vmid": "value"
+      },
+      "catalogues": [
+        "legacy-8.2.7",
+        "published-current"
+      ]
+    },
+    {
+      "command": "get /nodes/{node}/storage/{storage}/content/{volume}",
+      "operationId": "OP-GET-d6c763e6d8",
+      "method": "GET",
+      "path": "/nodes/{node}/storage/{storage}/content/{volume}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value",
+        "limit": "value",
+        "fields": "value",
+        "full": "boolean",
+        "session": "value",
+        "api-node": "value",
+        "api-storage": "value",
+        "api-volume": "value"
       },
       "catalogues": [
         "legacy-8.2.7",

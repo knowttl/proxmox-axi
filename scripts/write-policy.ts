@@ -17,6 +17,13 @@ const pool = new Set(['create_pool', 'update_pool', 'delete_pool'])
 export function reviewWrite(operation: Operation) {
   const { path, method } = operation
   const name = operation.vendorMetadata.name
+  if (method === 'POST' && path === '/nodes/{node}/aplinfo' && name === 'apl_download' && operation.allowtoken !== 0) {
+    return { effect: 'write', transport: 'json', secrets: 'none', allowedInputs: ['node', 'storage', 'template'],
+      inputPatterns: { template: '^[A-Za-z0-9][A-Za-z0-9._-]*\\.tar\\.(?:zst|xz|gz)$' },
+      reason: 'Confirmed installation of a provider-catalogue container template; URLs and arbitrary downloads remain refused.',
+      reconciliation: { kind: 'none', reason: 'Track the returned download UPID and inspect storage content after success; never retry uncertain installation automatically.' },
+      privileges: operation.permissions, response: operation.returns, source: 'Pinned apl_download schemas and provider catalogue lookup; existing effect and task contracts.' }
+  }
   const upload = path === '/nodes/{node}/storage/{storage}/upload' && method === 'POST'
   const transferRead = method === 'GET' && (/\/rrd$/.test(path) || ['/nodes/{node}/journal', '/nodes/{node}/qemu/{vmid}/agent/file-read', '/nodes/{node}/storage/{storage}/file-restore/download'].includes(path))
   const spice = method === 'POST' && /\/(spiceproxy|spiceshell)$/.test(path)

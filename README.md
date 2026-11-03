@@ -282,6 +282,20 @@ Confirm each exact preview separately; regeneration returns synchronous success 
 `get .../cloudinit` exposes protected current/pending values only through the inherited private result pipe, including before regeneration.
 Cloud-init dumps, custom snippets and unreviewed input branches remain refused.
 
+### Discover and install guest media
+
+List managed ISO images, container templates, guest disks or backups, or inspect the provider's appliance catalogue:
+
+```sh
+proxmox-axi get '/nodes/{node}/storage/{storage}/content' --api-node '<node>' --api-storage local --api-content iso --profile lab
+proxmox-axi get '/nodes/{node}/aplinfo' --api-node '<node>' --profile lab
+proxmox-axi create '/nodes/{node}/aplinfo' --api-node '<node>' --api-storage local --api-template '<catalogue-template>.tar.zst' --profile lab --preview
+```
+
+The [media reference](skills/proxmox-axi/references/guest-management.md#iso-and-container-template-media) covers reviewed content-detail fields, catalogue installation and local ISO/template uploads through the existing private managed byte channel.
+Every upload/install needs exact preview confirmation; wait for the returned task and inspect storage content before using the media.
+See that reference for the fields retained with `--full` and the metadata excluded from public results.
+
 ### Create and clone QEMU guests
 
 Create a blank QEMU guest or clone an existing template with a preview:
@@ -310,7 +324,7 @@ Follow the [LXC provisioning reference](skills/proxmox-axi/references/guest-mana
   Managed transfers have separate administrator-controlled byte and elapsed limits.
 - Operations whose effects, transport or secret handling are not reviewed remain discoverable but uncallable.
   Unresolved policy fields deny invocation, and changing a capture never admits new operations automatically.
-- Writes cover [QEMU creation and cloning](#create-and-clone-qemu-guests), [LXC creation and cloning](#create-and-clone-lxc-guests), guest power operations, guest destruction, [selected guest configuration settings](#guest-configuration-and-compute-settings), [managed disk attachments](#manage-disk-attachments), growth-only guest disk resize, pool management, task cancellation, node execute batches, storage uploads and the reviewed credential/session setup operations.
+- Writes cover [QEMU creation and cloning](#create-and-clone-qemu-guests), [LXC creation and cloning](#create-and-clone-lxc-guests), guest power operations, guest destruction, [selected guest configuration settings](#guest-configuration-and-compute-settings), [managed disk attachments](#manage-disk-attachments), growth-only guest disk resize, pool management, task cancellation, node execute batches, [media uploads and catalogue installation](#discover-and-install-guest-media) and the reviewed credential/session setup operations.
   Effectful CIFS/PBS scans use the same preview and confirmation policy even though their vendor method is GET.
 - Inspect `schema create|set|delete <template>` and the generated `write-policy.json` before enabling an operation.
 - Enable an operation by adding its ID to the selected file profile: `writes: { "operations": ["<operation-id>"] }`.
@@ -420,7 +434,7 @@ No insecure-TLS flag or automatic trust update exists.
   `--limit <1-1000>` changes the display limit, `--fields` chooses fields, and `--full` includes all received rows and, unless `--fields` is supplied, all fields retained after safety filtering.
   Protected configuration and pending-setting reads follow the [private result contract](docs/s4-contract.md) instead of list display formatting.
   See [Infrastructure discovery across profiles](#infrastructure-discovery-across-profiles) for storage index filtering.
-  Unknown `--fields` names return `INVALID_INPUT` with available names from the selected response contract.
+  Unknown `--fields` names return `INVALID_INPUT` with available names from the selected policy's `outputFields` when defined, otherwise from the response schema.
   Except for `/version`, automatic reads validate field names after target catalogue detection; an explicit `--catalogue` validates them before network access.
 - Provider totals and pagination remain separate from received counts and display truncation.
   An empty received page with a positive `providerTotal` reports `empty: empty-page`, regardless of visibility.
