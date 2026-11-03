@@ -62,6 +62,10 @@ const contracts = catalogues.flatMap(catalogue => catalogue.operations.map(opera
     if (!api.properties?.[name]) throw new Error('Fixed setting names an unknown input')
     Object.assign(api.properties[name], { const: value, default: value })
   }
+  for (const name of review.requiredInputs ?? []) {
+    if (!api.properties?.[name]) throw new Error('Required setting names an unknown input')
+    if (!api.required.includes(name)) api.required.push(name)
+  }
   for (const name of review.allowedInputs ?? []) {
     const template = name.replace(/[0-9]+$/, '[n]')
     if (template === name || !Object.hasOwn(operation.parameters.properties ?? {}, template) || Object.hasOwn(operation.parameters.properties, name)) continue

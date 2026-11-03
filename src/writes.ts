@@ -35,6 +35,7 @@ async function invocation(credentials: Credentials, contract: Contract, input: R
   if (depth > 0 && contract.policy.transport !== 'json') throw new Failure('INVALID_INPUT', 'Batch children cannot open byte transports.', 'Execute each transfer separately through its managed channel.', 2)
   if (++budget.count > 64 || depth > 4) throw new Failure('INVALID_INPUT', 'Batch exceeds 64 total operations or four nesting levels.', 'Use a smaller reviewed batch.', 2)
   const values = { ...contract.policy.fixedInputs, ...input }
+  if (contract.policy.requiredInputs?.some(name => !Object.hasOwn(values, name))) throw new Failure('INVALID_INPUT', 'A required reviewed input is missing.', 'Inspect the invocation schema and supply every required input.', 2)
   for (const [name, value] of Object.entries(contract.policy.fixedInputs ?? {})) {
     if (values[name] !== value) throw new Failure('INVALID_INPUT', 'Input conflicts with a fixed reviewed setting.', 'Inspect the operation policy and use its fixed settings.', 2)
   }

@@ -32,7 +32,7 @@ export interface Contract {
   parameters: VendorSchema
   returns: VendorSchema
   policy: { effect: string, transport: string, secrets: string, reason: string,
-    allowedInputs?: string[], sensitiveInputs?: string[], outputFields?: string[], inputPatterns?: Record<string, string>, inputFormats?: Record<string, string>,
+    allowedInputs?: string[], requiredInputs?: string[], sensitiveInputs?: string[], outputFields?: string[], inputPatterns?: Record<string, string>, inputFormats?: Record<string, string>,
     fixedInputs?: Record<string, string | number | boolean>, reconciliation?: { kind: string, path?: string, reason: string } }
   invocation: unknown
 }

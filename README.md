@@ -333,6 +333,19 @@ Use the equivalent LXC paths for containers.
 The [snapshot reference](skills/proxmox-axi/references/guest-management.md#guest-snapshots) covers protected configuration reads, confirmation, task completion, RAM-state rollback behavior and remaining refusals.
 Rollback and deletion each require their own exact confirmation; QEMU RAM-state rollback may start the VM even when `start=0`.
 
+### Guest backups
+
+Back up explicitly selected guests to managed storage, then inspect completed backups:
+
+```sh
+proxmox-axi create '/nodes/{node}/vzdump' --api-node '<node>' --api-vmid '100,101' --api-storage backups --api-mode snapshot --api-compress zstd --profile lab --preview
+proxmox-axi get '/nodes/{node}/storage/{storage}/content' --api-node '<node>' --api-storage backups --api-content backup --profile lab
+```
+
+Creation fixes `remove=0` to prevent pruning; implicit guest selection, hooks, arbitrary paths and retention selectors remain refused.
+The [backup reference](skills/proxmox-axi/references/guest-management.md#guest-backups) covers task completion, selected backup modes and separately confirmed deletion of reviewed dump archives or PBS guest backups.
+General media/disk deletion, unprotecting backups and restoration remain refused by this admission.
+
 ## Safety
 
 - Ordinary JSON reads use trusted HTTPS, a five-second total deadline and a 64 KiB response bound, and reject redirects.

@@ -204,3 +204,28 @@ Force removal, snapshot-description updates and unreviewed inputs remain refused
 Every creation, rollback and deletion requires its own exact confirmation bound to profile, node, VMID, snapshot name and settings.
 A returned UPID means accepted, not completed; use `task wait` with the returned node/UPID, journal ID and profile.
 After success, inspect the tree and private configuration independently; after failure or uncertain delivery, retain the journal and never retry the mutation automatically.
+
+## Guest backups
+
+Preview `create '/nodes/{node}/vzdump'` with explicit node, managed destination storage and `--api-vmid '100,101'` to back up selected guests.
+The guest list is a comma-separated list of IDs from 100 through 999999999; implicit selection, all/pool/exclude selectors and backup-job cancellation remain refused.
+Reviewed optional inputs are mode (`snapshot`, `suspend` or `stop`), compression (`0`, `1`, `gzip`, `lzo` or `zstd`), bandwidth limit in KiB/s and protection of the new backups.
+Suspend/stop modes can interrupt the selected guests; inspect the mode and destination before confirming.
+Creation always sends `remove=0`, including when omitted, so it cannot prune older backups through storage retention defaults.
+An explicit request to enable removal, retention/pruning selectors, arbitrary dump/tmp paths, hooks and unreviewed performance or notification selectors is refused.
+Existing provider configuration, permissions and storage support still apply.
+
+Wait for the returned node/UPID with the journal ID and selected profile before treating a backup as complete.
+List results through `get '/nodes/{node}/storage/{storage}/content' --api-content backup`, using reviewed volume/protection metadata and the selected storage.
+Permission-filtered inventory and an absent row never prove success or reserve a backup name.
+Backup restoration remains refused by this admission.
+
+Preview `delete '/nodes/{node}/storage/{storage}/content/{volume}'` with explicit node, storage and the raw complete backup volume ID, then confirm the exact request.
+Deletion admits only conventional `storage:backup/vzdump-qemu-<id>-YYYY_MM_DD-HH_MM_SS.vma` or LXC `.tar` archives, optionally suffixed `.gz`, `.lzo` or `.zst`, and PBS `storage:backup/vm/<id>/YYYY-MM-DDTHH:MM:SSZ` or `ct` IDs.
+PBS namespace selection remains part of the existing storage configuration.
+The CLI encodes embedded separators as one path parameter; pass the raw ID without pre-encoding it.
+ISO images, guest disks, unrelated backup-directory files and non-guest PBS backups cannot use this deletion admission.
+The provider checks storage/volume consistency, permissions and backup protection; this admission does not unprotect backups or expose general storage-volume deletion.
+Delayed/null-result deletion variants remain refused so successful transmission returns a task UPID.
+Deletion is destructive and requires its own exact confirmation; a confirmation for one backup cannot authorize another volume or destination.
+After task success, inspect inventory independently; failed tasks and provider protection refusals stay failed in the journal, while uncertain delivery must never trigger an automatic retry.

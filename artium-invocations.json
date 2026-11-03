@@ -638,6 +638,25 @@
       }
     },
     {
+      "command": "delete /nodes/{node}/storage/{storage}/content/{volume}",
+      "operationId": "OP-DELETE-1ccf139670",
+      "method": "DELETE",
+      "path": "/nodes/{node}/storage/{storage}/content/{volume}",
+      "sensitiveInputs": [],
+      "privateResult": false,
+      "effect": "write",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "preview": "boolean",
+        "confirm": "value",
+        "session": "value",
+        "api-node": "value",
+        "api-storage": "value",
+        "api-volume": "value"
+      }
+    },
+    {
       "command": "delete /nodes/{node}/tasks/{upid}",
       "operationId": "OP-DELETE-d6b1eb65f2",
       "method": "DELETE",
@@ -1849,6 +1868,30 @@
         "session": "value",
         "api-node": "value",
         "api-websocket": "value"
+      }
+    },
+    {
+      "command": "create /nodes/{node}/vzdump",
+      "operationId": "OP-POST-4f48560bc6",
+      "method": "POST",
+      "path": "/nodes/{node}/vzdump",
+      "sensitiveInputs": [],
+      "privateResult": false,
+      "effect": "write",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "preview": "boolean",
+        "confirm": "value",
+        "session": "value",
+        "api-bwlimit": "value",
+        "api-compress": "value",
+        "api-mode": "value",
+        "api-node": "value",
+        "api-protected": "value",
+        "api-remove": "value",
+        "api-storage": "value",
+        "api-vmid": "value"
       }
     },
     {
