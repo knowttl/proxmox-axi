@@ -21,6 +21,15 @@ export function backupVolumePattern(family?: 'qemu' | 'lxc'): string {
 }
 
 export function namedFormatPattern(name: string): string | undefined {
+  if (name === 'pve-firewall-address') {
+    const hex = '[0-9A-Fa-f]{1,4}'
+    const ipv6 = [Array(8).fill(hex).join(':'), ...Array.from({ length: 8 }, (_, left) =>
+      Array.from({ length: 8 - left }, (_, right) => `${Array(left).fill(hex).join(':')}::${Array(right).fill(hex).join(':')}`)).flat()].join('|')
+    return `^(?:${ipv4}(?:/(?:[0-9]|[12][0-9]|3[0-2]))?|(?:${ipv6})(?:/(?:[0-9]|[1-9][0-9]|1[01][0-9]|12[0-8]))?)$`
+  }
+  if (name === 'pve-firewall-port') return '^(?:[1-9]|[1-9][0-9]{1,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])$'
+  if (name === 'pve-firewall-protocol') return '^(?:tcp|udp|icmp|icmpv6)$'
+  if (name === 'pve-firewall-interface') return '^[A-Za-z][A-Za-z0-9._-]{1,19}$'
   if (name === 'pve-backup-volume') return backupVolumePattern()
   if (name === 'pve-backup-vmid-list') return '^[1-9][0-9]{2,8}(?:,[1-9][0-9]{2,8})*$'
   if (name === 'pve-managed-volume') return '^[A-Za-z][A-Za-z0-9._-]*:[A-Za-z0-9][A-Za-z0-9._:-]*(?:/[A-Za-z0-9][A-Za-z0-9._:-]*)*$'

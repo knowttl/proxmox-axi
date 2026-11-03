@@ -11,6 +11,14 @@
     "reason": "Requires operation-specific effect, transport and secret review before admission."
   },
   "reviewed": {
+    "GET /cluster/firewall/rules": { "effect": "read", "transport": "json", "secrets": "private-result", "reason": "Complete ordered firewall rules, including provider digests and potentially sensitive comments, use the bounded private result channel." },
+    "GET /cluster/firewall/rules/{pos}": { "effect": "read", "transport": "json", "secrets": "private-result", "reason": "One firewall rule and its rules-list digest use the private result channel; position does not establish a stable rule identity." },
+    "GET /nodes/{node}/firewall/rules": { "effect": "read", "transport": "json", "secrets": "private-result", "reason": "Complete ordered firewall rules and potentially sensitive comments require bounded private results." },
+    "GET /nodes/{node}/firewall/rules/{pos}": { "effect": "read", "transport": "json", "secrets": "private-result", "reason": "One firewall rule and its rules-list digest require private results." },
+    "GET /nodes/{node}/qemu/{vmid}/firewall/rules": { "effect": "read", "transport": "json", "secrets": "private-result", "reason": "Complete ordered guest firewall rules and potentially sensitive comments require bounded private results." },
+    "GET /nodes/{node}/qemu/{vmid}/firewall/rules/{pos}": { "effect": "read", "transport": "json", "secrets": "private-result", "reason": "One guest firewall rule and its rules-list digest require private results." },
+    "GET /nodes/{node}/lxc/{vmid}/firewall/rules": { "effect": "read", "transport": "json", "secrets": "private-result", "reason": "Complete ordered guest firewall rules and potentially sensitive comments require bounded private results." },
+    "GET /nodes/{node}/lxc/{vmid}/firewall/rules/{pos}": { "effect": "read", "transport": "json", "secrets": "private-result", "reason": "One guest firewall rule and its rules-list digest require private results." },
     "GET /cluster/firewall/options": { "effect": "read", "transport": "json", "secrets": "none", "outputFields": ["enable", "policy_in", "policy_out", "policy_forward", "digest"], "reason": "Cluster firewall enable/default policies and concurrency digest only; undeclared and unrelated settings are excluded even with full output." },
     "GET /nodes/{node}/firewall/options": { "effect": "read", "transport": "json", "secrets": "none", "outputFields": ["enable", "digest"], "reason": "Node firewall enable setting and concurrency digest only; this scope has no default-policy inputs." },
     "GET /nodes/{node}/qemu/{vmid}/firewall/options": { "effect": "read", "transport": "json", "secrets": "none", "outputFields": ["enable", "policy_in", "policy_out", "digest"], "reason": "Guest firewall enable/default policies and concurrency digest only; undeclared and unrelated settings are excluded even with full output." },

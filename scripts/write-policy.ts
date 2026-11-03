@@ -17,6 +17,30 @@ const pool = new Set(['create_pool', 'update_pool', 'delete_pool'])
 export function reviewWrite(operation: Operation) {
   const { path, method } = operation
   const name = operation.vendorMetadata.name
+  const rulesPath = path.replace(/\/\{pos\}$/, '')
+  const firewallRules = rulesPath === '/cluster/firewall/rules' || /^\/nodes\/\{node\}(?:\/(qemu|lxc)\/\{vmid\})?\/firewall\/rules$/.test(rulesPath)
+  if (firewallRules && operation.allowtoken !== 0 && ((method === 'POST' && path === rulesPath && name === 'create_rule') ||
+    (method === 'PUT' && path !== rulesPath && name === 'update_rule') || (method === 'DELETE' && path !== rulesPath && name === 'delete_rule'))) {
+    const fields = ['type', 'action', 'enable', 'source', 'dest', 'proto', 'sport', 'dport', 'iface']
+    return { effect: 'write', transport: 'json', secrets: 'private-result', stateBinding: { kind: 'firewall-rules', path: rulesPath },
+      allowedInputs: ['node', 'vmid', ...(method === 'POST' ? fields : ['pos', 'digest', ...(method === 'PUT' ? [...fields, 'moveto'] : [])])]
+        .filter(key => operation.parameters.properties?.[key]), requiredInputs: path !== rulesPath ? ['pos'] : [],
+      ...(method === 'POST' ? { fixedInputs: { enable: 0 } } : method === 'PUT' ? { inputCases: [
+        { requiredInputs: ['moveto'], forbiddenInputs: fields }, { forbiddenInputs: ['moveto', 'enable'] },
+        { forbiddenInputs: ['moveto'], requiredValues: { enable: 0 } }, { forbiddenInputs: ['moveto'], requiredValues: { enable: 1 } },
+      ] } : {}),
+      ...(method !== 'DELETE' ? { inputPatterns: { type: '^(?:in|out)$', action: '^(?:ACCEPT|DROP|REJECT)$',
+        ...(path.includes('/{vmid}/') ? { iface: '^net(?:[0-9]|[12][0-9]|3[01])$' } : {}) }, inputFormats: {
+        source: 'pve-firewall-address', dest: 'pve-firewall-address', proto: 'pve-firewall-protocol', sport: 'pve-firewall-port', dport: 'pve-firewall-port', iface: 'pve-firewall-interface',
+      } } : {}),
+      confirmationWarnings: [{ message: 'Firewall rule changes can cut off management access or change protection. Inspect the complete private ordered plan before confirming.' },
+        ...(method === 'POST' ? [{ message: 'NON-ATOMIC CREATE: the provider ignores creation digests and prepends this fixed disabled rule. Unexpected observed order remains uncertain; enabling requires a separate fresh digest-guarded confirmation.' }] :
+          method === 'DELETE' ? [{ message: 'RULE DELETION: explicitly review the selected position and resulting ordered rules before confirming.' }] : [])],
+      reason: method === 'POST' ? 'Non-atomic creation of a fixed disabled rule only: provider POST ignores digest and prepends; private before/after plan, state recheck and post-write comparison apply. Enable separately with a fresh digest-guarded confirmation.' :
+        'Private state-bound ordered rule change with automatic provider digest guard; reorder is separate from field edits. No automatic retry or deletion after uncertainty.',
+      reconciliation: { kind: 'none', reason: 'Inspect complete current rules privately; a matching later list cannot establish attribution. Never retry or automatically delete after uncertainty.' },
+      privileges: operation.permissions, response: operation.returns, source: 'Pinned rule schemas and reviewed provider Rules.pm creation, digest-guarded updates/deletes and reorder semantics.' }
+  }
   const firewallOptions = path === '/cluster/firewall/options' || /^\/nodes\/\{node\}(?:\/(qemu|lxc)\/\{vmid\})?\/firewall\/options$/.test(path)
   if (method === 'PUT' && firewallOptions && name === 'set_options' && operation.allowtoken !== 0) {
     return { effect: 'write', transport: 'json', secrets: 'none',

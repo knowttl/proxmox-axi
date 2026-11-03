@@ -35,7 +35,8 @@ export interface Contract {
     allowedInputs?: string[], requiredInputs?: string[], sensitiveInputs?: string[], outputFields?: string[], inputPatterns?: Record<string, string>, inputFormats?: Record<string, string>,
     inputCases?: { requiredInputs?: string[], forbiddenInputs?: string[], requiredValues?: Record<string, string | number | boolean>, inputPatterns?: Record<string, string> }[],
     fixedInputs?: Record<string, string | number | boolean>, reconciliation?: { kind: string, path?: string, reason: string },
-    confirmationWarnings?: { message: string, when?: { input: string, values: (string | number | boolean)[] } }[] }
+    confirmationWarnings?: { message: string, when?: { input: string, values: (string | number | boolean)[] } }[],
+    stateBinding?: { kind: 'firewall-rules', path: string } }
   invocation: unknown
 }
 export const contracts: Contract[] = JSON.parse(readFileSync(new URL('./contracts.json', import.meta.url), 'utf8')).contracts

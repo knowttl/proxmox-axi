@@ -214,6 +214,13 @@ Firewall changes can cut off management access; review management allowances and
 See the [installed firewall guide](skills/proxmox-axi/references/firewall-management.md) for supported scopes and inputs, read projection, warning meanings, digest handling, filtering prerequisites, verification and recovery.
 For provider filtering and backend behavior, see the [Proxmox firewall documentation](https://github.com/proxmox/pve-docs/blob/master/pve-firewall.adoc).
 
+Ordered rule reads and individually confirmed creation, editing, reorder and deletion are also admitted at cluster, node and QEMU/LXC scope.
+Prepare the inherited private result pipe for complete rule reads and ordered previews, as described in the [ordered-rule guide](skills/proxmox-axi/references/firewall-management.md#ordered-firewall-rules).
+Creation is fixed disabled staging: the [provider implementation](https://github.com/proxmox/pve-firewall/blob/82888bc0a16a989e2858f47dc56c73741fd36d5b/src/PVE/API2/Firewall/Rules.pm) prepends and ignores creation digests, so preview/help disclose the non-atomic limitation and post-write comparison retains uncertainty on unexpected state.
+Enabling the staged rule requires a separate fresh rules-digest-guarded preview and confirmation.
+Edits, separate-branch reorder and deletion use native digest guards, complete before/after private plans and exact state/input binding; no rule operation retries or automatically deletes after uncertainty.
+Stateful rule writes in execute batches, SDN-vnet and security-group rule namespaces remain refused.
+
 ### Guest power control
 
 QEMU and LXC support guest `start`, `shutdown`, `stop`, `reboot`, `suspend` and `resume` through `create '/nodes/{node}/<qemu-or-lxc>/{vmid}/status/<action>'`.

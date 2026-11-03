@@ -6,6 +6,7 @@ import { readPrivateFile } from './private-file.js'
 import { Failure } from './errors.js'
 import { Journal, publicChildren, reconciliationValue, type JournalRecord } from './journal.js'
 import { resultBinding } from './private-results.js'
+import { prepareRules, verifyRules } from './firewall-rules.js'
 
 interface Invocation {
   contract: Contract
@@ -32,6 +33,7 @@ function checkPolicy(credentials: Credentials, contract: Contract): void {
 
 async function invocation(credentials: Credentials, contract: Contract, input: Record<string, unknown>, budget = { count: 0 }, depth = 0): Promise<Invocation> {
   checkPolicy(credentials, contract)
+  if (depth > 0 && contract.policy.stateBinding) throw new Failure('CONTRACT_UNRESOLVED', 'State-bound firewall rules cannot be changed in execute batches.', 'Preview and confirm each rule operation independently.')
   if (depth > 0 && contract.policy.transport !== 'json') throw new Failure('INVALID_INPUT', 'Batch children cannot open byte transports.', 'Execute each transfer separately through its managed channel.', 2)
   if (++budget.count > 64 || depth > 4) throw new Failure('INVALID_INPUT', 'Batch exceeds 64 total operations or four nesting levels.', 'Use a smaller reviewed batch.', 2)
   const values = { ...contract.policy.fixedInputs, ...input }
@@ -119,6 +121,7 @@ export async function writeOperation(credentials: Credentials, initial: Contract
   let call = await invocation(credentials, initial, values)
   checkPaths(call, credentials.results)
   const privateResult = (item: Invocation): boolean => item.contract.policy.secrets === 'private-result' || item.children.some(privateResult)
+  if (call.contract.policy.stateBinding) credentials.results.sink()
   if (!options.preview && privateResult(call) && !options.transport) credentials.results.sink()
   const journal = await openJournal()
   const tokenRevision = credentials.diagnostics.tokenSource.startsWith('file:') ? await lstat(credentials.diagnostics.tokenSource.slice(5)) : undefined
@@ -136,6 +139,11 @@ export async function writeOperation(credentials: Credentials, initial: Contract
   const release = version.version!.startsWith('8.') ? 'legacy-8.2.7' : 'published-current'
   if (release !== initial.release) call = await invocation(credentials, selectContract(initial.method, initial.path, release), values)
   checkPaths(call, credentials.results)
+  const rules = await prepareRules(credentials, call.contract, call.values)
+  if (rules) {
+    call.wire = buildPath(call.contract, call.values)
+    call.revisions.push({ orderedRules: rules.before })
+  }
   const fingerprint = binding()
   if (options.preview) {
     if (options.confirmation) throw new Failure('INVALID_INPUT', 'Preview cannot consume confirmation.', 'Choose preview or execution.', 2)
@@ -148,9 +156,14 @@ export async function writeOperation(credentials: Credentials, initial: Contract
     if (check) record.check = check
     await journal.save(record)
     const warnings = confirmationWarnings(call)
+    if (rules) {
+      await credentials.results.deliver(resultBinding(credentials.origin, credentials.tokenId, call.contract.id, fingerprint),
+        { before: rules.before, after: rules.after, nonAtomicCreate: call.contract.method === 'POST' })
+      if (rules.warnings.length) warnings.push({ target: call.wire.split('?')[0]!, messages: rules.warnings })
+    }
     return { status: 'preview', id, operation: record.operation, confirmation: `${id}.${fingerprint}`,
       expiresInSeconds: 300, reconciliation: record.reconciliation, children: publicChildren(record.children),
-      ...(warnings.length ? { warnings } : {}), ...(options.transport ? { transport: options.transport.binding } : {}) }
+      ...(rules ? { privatePlan: true } : {}), ...(warnings.length ? { warnings } : {}), ...(options.transport ? { transport: options.transport.binding } : {}) }
   }
   const [id, approval, extra] = (options.confirmation ?? '').split('.')
   if (!id || !approval || extra) throw new Failure('CONFIRMATION_REQUIRED', 'Execution requires an exact preview confirmation.', 'Run the same command with --preview first.')
@@ -183,6 +196,7 @@ export async function writeOperation(credentials: Credentials, initial: Contract
     } else data = await executeRequest(credentials, query ? call.wire : path!, { method: call.contract.method, ...(!query && body ? { body } : {}) })
     if (privateResult(call)) registerResults(call, data, credentials.results)
     if (!options.transport || data !== null) validateOperationResponse(data, call.contract)
+    if (rules) await verifyRules(credentials, call.contract, call.values, rules)
     outcome = resultStatus(call, data, credentials.results)
     if (privateResult(call) && !options.transport) await credentials.results.deliver(resultBinding(credentials.origin, credentials.tokenId, call.contract.id, fingerprint), data)
   } catch (error) {
