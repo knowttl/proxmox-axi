@@ -282,6 +282,21 @@ Confirm each exact preview separately; regeneration returns synchronous success 
 `get .../cloudinit` exposes protected current/pending values only through the inherited private result pipe, including before regeneration.
 Cloud-init dumps, custom snippets and unreviewed input branches remain refused.
 
+### Create and clone QEMU guests
+
+`create '/nodes/{node}/qemu'` admits reviewed compute, managed disks, NICs, boot/agent and cloud-init inputs, plus BIOS, SCSI controller, OS type, pool and start settings.
+Use the [QEMU provisioning reference](skills/proxmox-axi/references/guest-management.md#qemu-creation-and-template-cloning) for the complete workflow and remaining refusals.
+
+```sh
+proxmox-axi create '/nodes/{node}/qemu' --api-node '<node>' --api-vmid 200 --api-name new-guest --api-memory 2048 --api-cores 2 --api-scsihw virtio-scsi-single --api-scsi0 'local-lvm:8' --api-ide2 'local:iso/installer.iso,media=cdrom' --api-net0 'virtio,bridge=vmbr0' --api-boot 'order=ide2;scsi0' --api-ostype l26 --profile lab --preview
+proxmox-axi create '/nodes/{node}/qemu/{vmid}/clone' --api-node '<source-node>' --api-vmid '<template-id>' --api-newid 201 --api-name cloned-guest --api-full 1 --api-storage local-lvm --profile lab --preview
+```
+
+Confirm the exact preview, then use `task wait` with its returned node, UPID and journal ID before interpreting provisioning as complete.
+For cross-node clones, wait on the source node and inspect the new VMID on the destination node.
+After success, read configuration privately, apply reviewed onboarding settings and use the existing confirmed start/power operations as needed.
+Restore/archive/overwrite, snapshot-source clones, custom machine arguments and unreviewed EFI/TPM properties remain refused.
+
 ## Safety
 
 - Ordinary JSON reads use trusted HTTPS, a five-second total deadline and a 64 KiB response bound, and reject redirects.

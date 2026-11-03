@@ -6622,8 +6622,1245 @@
       "method": "POST",
       "path": "/nodes/{node}/qemu",
       "release": "legacy-8.2.7",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/424"
+      "admitted": true,
+      "contract": "dist/contracts.json#/contracts/424",
+      "policy": {
+        "effect": "write",
+        "transport": "json",
+        "secrets": "input-refs",
+        "reason": "Confirmed blank QEMU creation with reviewed compute, managed disks, NICs, boot and onboarding inputs; restore, overwrite and unreviewed hardware remain refused.",
+        "allowedInputs": [
+          "node",
+          "vmid",
+          "description",
+          "name",
+          "memory",
+          "cores",
+          "sockets",
+          "vcpus",
+          "balloon",
+          "cpu",
+          "cpulimit",
+          "cpuunits",
+          "onboot",
+          "startup",
+          "cipassword",
+          "ide0",
+          "ide1",
+          "ide2",
+          "ide3",
+          "sata0",
+          "sata1",
+          "sata2",
+          "sata3",
+          "sata4",
+          "sata5",
+          "scsi0",
+          "scsi1",
+          "scsi2",
+          "scsi3",
+          "scsi4",
+          "scsi5",
+          "scsi6",
+          "scsi7",
+          "scsi8",
+          "scsi9",
+          "scsi10",
+          "scsi11",
+          "scsi12",
+          "scsi13",
+          "scsi14",
+          "scsi15",
+          "scsi16",
+          "scsi17",
+          "scsi18",
+          "scsi19",
+          "scsi20",
+          "scsi21",
+          "scsi22",
+          "scsi23",
+          "scsi24",
+          "scsi25",
+          "scsi26",
+          "scsi27",
+          "scsi28",
+          "scsi29",
+          "scsi30",
+          "virtio0",
+          "virtio1",
+          "virtio2",
+          "virtio3",
+          "virtio4",
+          "virtio5",
+          "virtio6",
+          "virtio7",
+          "virtio8",
+          "virtio9",
+          "virtio10",
+          "virtio11",
+          "virtio12",
+          "virtio13",
+          "virtio14",
+          "virtio15",
+          "net0",
+          "net1",
+          "net2",
+          "net3",
+          "net4",
+          "net5",
+          "net6",
+          "net7",
+          "net8",
+          "net9",
+          "net10",
+          "net11",
+          "net12",
+          "net13",
+          "net14",
+          "net15",
+          "net16",
+          "net17",
+          "net18",
+          "net19",
+          "net20",
+          "net21",
+          "net22",
+          "net23",
+          "net24",
+          "net25",
+          "net26",
+          "net27",
+          "net28",
+          "net29",
+          "net30",
+          "net31",
+          "nameserver",
+          "searchdomain",
+          "boot",
+          "agent",
+          "ciuser",
+          "sshkeys",
+          "ipconfig0",
+          "ipconfig1",
+          "ipconfig2",
+          "ipconfig3",
+          "ipconfig4",
+          "ipconfig5",
+          "ipconfig6",
+          "ipconfig7",
+          "ipconfig8",
+          "ipconfig9",
+          "ipconfig10",
+          "ipconfig11",
+          "ipconfig12",
+          "ipconfig13",
+          "ipconfig14",
+          "ipconfig15",
+          "ipconfig16",
+          "ipconfig17",
+          "ipconfig18",
+          "ipconfig19",
+          "ipconfig20",
+          "ipconfig21",
+          "ipconfig22",
+          "ipconfig23",
+          "ipconfig24",
+          "ipconfig25",
+          "ipconfig26",
+          "ipconfig27",
+          "ipconfig28",
+          "ipconfig29",
+          "ipconfig30",
+          "ipconfig31",
+          "bios",
+          "scsihw",
+          "ostype",
+          "pool",
+          "start"
+        ],
+        "inputPatterns": {
+          "searchdomain": "^(?=.{1,255}$)[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?(?:\\.[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?)*(?: [A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?(?:\\.[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?)*)*$",
+          "ciuser": "^[a-z_][a-z0-9_-]{0,31}$",
+          "sshkeys": "^(?:ssh-ed25519|ssh-rsa|ecdsa-sha2-nistp256)%20(?=(?:(?:[A-Za-z0-9]|%2[BbFf])){32})(?:(?:[A-Za-z0-9]|%2[BbFf]){4})*(?:(?:[A-Za-z0-9]|%2[BbFf]){2}%3[Dd]%3[Dd]|(?:[A-Za-z0-9]|%2[BbFf]){3}%3[Dd])?(?:%20(?:[A-Za-z0-9._~-]|%20|%40|%2[Bb]|%3[Aa])+)?(?:%0[Aa](?:ssh-ed25519|ssh-rsa|ecdsa-sha2-nistp256)%20(?=(?:(?:[A-Za-z0-9]|%2[BbFf])){32})(?:(?:[A-Za-z0-9]|%2[BbFf]){4})*(?:(?:[A-Za-z0-9]|%2[BbFf]){2}%3[Dd]%3[Dd]|(?:[A-Za-z0-9]|%2[BbFf]){3}%3[Dd])?(?:%20(?:[A-Za-z0-9._~-]|%20|%40|%2[Bb]|%3[Aa])+)?)*(?:%0[Aa])?$",
+          "boot": "^order=(?:ide0|ide1|ide2|ide3|sata0|sata1|sata2|sata3|sata4|sata5|scsi0|scsi1|scsi2|scsi3|scsi4|scsi5|scsi6|scsi7|scsi8|scsi9|scsi10|scsi11|scsi12|scsi13|scsi14|scsi15|scsi16|scsi17|scsi18|scsi19|scsi20|scsi21|scsi22|scsi23|scsi24|scsi25|scsi26|scsi27|scsi28|scsi29|scsi30|virtio0|virtio1|virtio2|virtio3|virtio4|virtio5|virtio6|virtio7|virtio8|virtio9|virtio10|virtio11|virtio12|virtio13|virtio14|virtio15|net0|net1|net2|net3|net4|net5|net6|net7|net8|net9|net10|net11|net12|net13|net14|net15|net16|net17|net18|net19|net20|net21|net22|net23|net24|net25|net26|net27|net28|net29|net30|net31)(?:;(?:ide0|ide1|ide2|ide3|sata0|sata1|sata2|sata3|sata4|sata5|scsi0|scsi1|scsi2|scsi3|scsi4|scsi5|scsi6|scsi7|scsi8|scsi9|scsi10|scsi11|scsi12|scsi13|scsi14|scsi15|scsi16|scsi17|scsi18|scsi19|scsi20|scsi21|scsi22|scsi23|scsi24|scsi25|scsi26|scsi27|scsi28|scsi29|scsi30|virtio0|virtio1|virtio2|virtio3|virtio4|virtio5|virtio6|virtio7|virtio8|virtio9|virtio10|virtio11|virtio12|virtio13|virtio14|virtio15|net0|net1|net2|net3|net4|net5|net6|net7|net8|net9|net10|net11|net12|net13|net14|net15|net16|net17|net18|net19|net20|net21|net22|net23|net24|net25|net26|net27|net28|net29|net30|net31))*$"
+        },
+        "sensitiveInputs": [
+          "cipassword"
+        ],
+        "reconciliation": {
+          "kind": "none",
+          "reason": "No safe automated business-outcome proof is admitted for this variant. Use the retained UPID when available; otherwise retain uncertainty and inspect independently."
+        },
+        "privileges": {
+          "description": "You need 'VM.Allocate' permissions on /vms/{vmid} or on the VM pool /pool/{pool}. For restore (option 'archive'), it is enough if the user has 'VM.Backup' permission and the VM already exists. If you create disks you need 'Datastore.AllocateSpace' on any used storage.If you use a bridge/vlan, you need 'SDN.Use' on any used bridge/vlan.",
+          "user": "all"
+        },
+        "response": {
+          "type": "string"
+        },
+        "source": "Retained versioned API schema; design.md S3 write/outcome contract; pve-node-batch-source.txt for execute."
+      },
+      "inputs": [
+        {
+          "name": "acpi",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "affinity",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "agent",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "amd-sev",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "arch",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "archive",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "args",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "audio0",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "autostart",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "balloon",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "bios",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "boot",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "bootdisk",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "bwlimit",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "cdrom",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "cicustom",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "cipassword",
+          "admitted": true,
+          "sensitive": true
+        },
+        {
+          "name": "citype",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "ciupgrade",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "ciuser",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "cores",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "cpu",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "cpulimit",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "cpuunits",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "description",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "efidisk0",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "force",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "freeze",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "hookscript",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "hostpci[n]",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "hotplug",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "hugepages",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "ide[n]",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "import-working-storage",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "ipconfig[n]",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "ivshmem",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "keephugepages",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "keyboard",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "kvm",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "live-restore",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "localtime",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "lock",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "machine",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "memory",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "migrate_downtime",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "migrate_speed",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "name",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "nameserver",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "net[n]",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "node",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "numa",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "numa[n]",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "onboot",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "ostype",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "parallel[n]",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "pool",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "protection",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "reboot",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "rng0",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "sata[n]",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "scsi[n]",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "scsihw",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "searchdomain",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "serial[n]",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "shares",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "smbios1",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "smp",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "sockets",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "spice_enhancements",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "sshkeys",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "start",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "startdate",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "startup",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "storage",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "tablet",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "tags",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "tdf",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "template",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "tpmstate0",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "unique",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "unused[n]",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "usb[n]",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "vcpus",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "vga",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "virtio[n]",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "virtiofs[n]",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "vmgenid",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "vmid",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "vmstatestorage",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "watchdog",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "ide0",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "ide1",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "ide2",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "ide3",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "sata0",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "sata1",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "sata2",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "sata3",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "sata4",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "sata5",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "scsi0",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "scsi1",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "scsi2",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "scsi3",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "scsi4",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "scsi5",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "scsi6",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "scsi7",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "scsi8",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "scsi9",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "scsi10",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "scsi11",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "scsi12",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "scsi13",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "scsi14",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "scsi15",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "scsi16",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "scsi17",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "scsi18",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "scsi19",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "scsi20",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "scsi21",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "scsi22",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "scsi23",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "scsi24",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "scsi25",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "scsi26",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "scsi27",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "scsi28",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "scsi29",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "scsi30",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "virtio0",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "virtio1",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "virtio2",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "virtio3",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "virtio4",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "virtio5",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "virtio6",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "virtio7",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "virtio8",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "virtio9",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "virtio10",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "virtio11",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "virtio12",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "virtio13",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "virtio14",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "virtio15",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "net0",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "net1",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "net2",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "net3",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "net4",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "net5",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "net6",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "net7",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "net8",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "net9",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "net10",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "net11",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "net12",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "net13",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "net14",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "net15",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "net16",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "net17",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "net18",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "net19",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "net20",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "net21",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "net22",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "net23",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "net24",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "net25",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "net26",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "net27",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "net28",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "net29",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "net30",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "net31",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "ipconfig0",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "ipconfig1",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "ipconfig2",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "ipconfig3",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "ipconfig4",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "ipconfig5",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "ipconfig6",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "ipconfig7",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "ipconfig8",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "ipconfig9",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "ipconfig10",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "ipconfig11",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "ipconfig12",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "ipconfig13",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "ipconfig14",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "ipconfig15",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "ipconfig16",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "ipconfig17",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "ipconfig18",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "ipconfig19",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "ipconfig20",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "ipconfig21",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "ipconfig22",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "ipconfig23",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "ipconfig24",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "ipconfig25",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "ipconfig26",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "ipconfig27",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "ipconfig28",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "ipconfig29",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "ipconfig30",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "ipconfig31",
+          "admitted": true,
+          "sensitive": false
+        }
+      ],
+      "results": {
+        "type": "string",
+        "handling": "public metadata; protected inputs excluded"
+      }
     },
     {
       "id": "OP-DELETE-5e826ea6b0",
@@ -6916,8 +8153,133 @@
       "method": "POST",
       "path": "/nodes/{node}/qemu/{vmid}/clone",
       "release": "legacy-8.2.7",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/454"
+      "admitted": true,
+      "contract": "dist/contracts.json#/contracts/454",
+      "policy": {
+        "effect": "write",
+        "transport": "json",
+        "secrets": "none",
+        "allowedInputs": [
+          "node",
+          "vmid",
+          "newid",
+          "name",
+          "description",
+          "full",
+          "storage",
+          "format",
+          "target",
+          "pool",
+          "bwlimit"
+        ],
+        "reason": "Confirmed guest clone with reviewed destination and storage settings; snapshot-source variants remain refused.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Track the source-node UPID, then inspect the destination guest independently; never clone again after uncertain delivery."
+        },
+        "privileges": {
+          "check": [
+            "and",
+            [
+              "perm",
+              "/vms/{vmid}",
+              [
+                "VM.Clone"
+              ]
+            ],
+            [
+              "or",
+              [
+                "perm",
+                "/vms/{newid}",
+                [
+                  "VM.Allocate"
+                ]
+              ],
+              [
+                "perm",
+                "/pool/{pool}",
+                [
+                  "VM.Allocate"
+                ],
+                "require_param",
+                "pool"
+              ]
+            ]
+          ],
+          "description": "You need 'VM.Clone' permissions on /vms/{vmid}, and 'VM.Allocate' permissions on /vms/{newid} (or on the VM pool /pool/{pool}). You also need 'Datastore.AllocateSpace' on any used storage and 'SDN.Use' on any used bridge/vnet"
+        },
+        "response": {
+          "type": "string"
+        },
+        "source": "Pinned clone_vm schemas; existing effect and task contracts."
+      },
+      "inputs": [
+        {
+          "name": "bwlimit",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "description",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "format",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "full",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "name",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "newid",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "node",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "pool",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "snapname",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "storage",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "target",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "vmid",
+          "admitted": true,
+          "sensitive": false
+        }
+      ],
+      "results": {
+        "type": "string",
+        "handling": "public metadata; protected inputs excluded"
+      }
     },
     {
       "id": "OP-PUT-483437800e",
@@ -17822,8 +19184,1260 @@
       "method": "POST",
       "path": "/nodes/{node}/qemu",
       "release": "published-current",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/1093"
+      "admitted": true,
+      "contract": "dist/contracts.json#/contracts/1093",
+      "policy": {
+        "effect": "write",
+        "transport": "json",
+        "secrets": "input-refs",
+        "reason": "Confirmed blank QEMU creation with reviewed compute, managed disks, NICs, boot and onboarding inputs; restore, overwrite and unreviewed hardware remain refused.",
+        "allowedInputs": [
+          "node",
+          "vmid",
+          "description",
+          "name",
+          "memory",
+          "cores",
+          "sockets",
+          "vcpus",
+          "balloon",
+          "cpu",
+          "cpulimit",
+          "cpuunits",
+          "onboot",
+          "startup",
+          "cipassword",
+          "ide0",
+          "ide1",
+          "ide2",
+          "ide3",
+          "sata0",
+          "sata1",
+          "sata2",
+          "sata3",
+          "sata4",
+          "sata5",
+          "scsi0",
+          "scsi1",
+          "scsi2",
+          "scsi3",
+          "scsi4",
+          "scsi5",
+          "scsi6",
+          "scsi7",
+          "scsi8",
+          "scsi9",
+          "scsi10",
+          "scsi11",
+          "scsi12",
+          "scsi13",
+          "scsi14",
+          "scsi15",
+          "scsi16",
+          "scsi17",
+          "scsi18",
+          "scsi19",
+          "scsi20",
+          "scsi21",
+          "scsi22",
+          "scsi23",
+          "scsi24",
+          "scsi25",
+          "scsi26",
+          "scsi27",
+          "scsi28",
+          "scsi29",
+          "scsi30",
+          "virtio0",
+          "virtio1",
+          "virtio2",
+          "virtio3",
+          "virtio4",
+          "virtio5",
+          "virtio6",
+          "virtio7",
+          "virtio8",
+          "virtio9",
+          "virtio10",
+          "virtio11",
+          "virtio12",
+          "virtio13",
+          "virtio14",
+          "virtio15",
+          "net0",
+          "net1",
+          "net2",
+          "net3",
+          "net4",
+          "net5",
+          "net6",
+          "net7",
+          "net8",
+          "net9",
+          "net10",
+          "net11",
+          "net12",
+          "net13",
+          "net14",
+          "net15",
+          "net16",
+          "net17",
+          "net18",
+          "net19",
+          "net20",
+          "net21",
+          "net22",
+          "net23",
+          "net24",
+          "net25",
+          "net26",
+          "net27",
+          "net28",
+          "net29",
+          "net30",
+          "net31",
+          "nameserver",
+          "searchdomain",
+          "boot",
+          "agent",
+          "ciuser",
+          "sshkeys",
+          "ipconfig0",
+          "ipconfig1",
+          "ipconfig2",
+          "ipconfig3",
+          "ipconfig4",
+          "ipconfig5",
+          "ipconfig6",
+          "ipconfig7",
+          "ipconfig8",
+          "ipconfig9",
+          "ipconfig10",
+          "ipconfig11",
+          "ipconfig12",
+          "ipconfig13",
+          "ipconfig14",
+          "ipconfig15",
+          "ipconfig16",
+          "ipconfig17",
+          "ipconfig18",
+          "ipconfig19",
+          "ipconfig20",
+          "ipconfig21",
+          "ipconfig22",
+          "ipconfig23",
+          "ipconfig24",
+          "ipconfig25",
+          "ipconfig26",
+          "ipconfig27",
+          "ipconfig28",
+          "ipconfig29",
+          "ipconfig30",
+          "ipconfig31",
+          "bios",
+          "scsihw",
+          "ostype",
+          "pool",
+          "start"
+        ],
+        "inputPatterns": {
+          "searchdomain": "^(?=.{1,255}$)[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?(?:\\.[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?)*(?: [A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?(?:\\.[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?)*)*$",
+          "ciuser": "^[a-z_][a-z0-9_-]{0,31}$",
+          "sshkeys": "^(?:ssh-ed25519|ssh-rsa|ecdsa-sha2-nistp256)%20(?=(?:(?:[A-Za-z0-9]|%2[BbFf])){32})(?:(?:[A-Za-z0-9]|%2[BbFf]){4})*(?:(?:[A-Za-z0-9]|%2[BbFf]){2}%3[Dd]%3[Dd]|(?:[A-Za-z0-9]|%2[BbFf]){3}%3[Dd])?(?:%20(?:[A-Za-z0-9._~-]|%20|%40|%2[Bb]|%3[Aa])+)?(?:%0[Aa](?:ssh-ed25519|ssh-rsa|ecdsa-sha2-nistp256)%20(?=(?:(?:[A-Za-z0-9]|%2[BbFf])){32})(?:(?:[A-Za-z0-9]|%2[BbFf]){4})*(?:(?:[A-Za-z0-9]|%2[BbFf]){2}%3[Dd]%3[Dd]|(?:[A-Za-z0-9]|%2[BbFf]){3}%3[Dd])?(?:%20(?:[A-Za-z0-9._~-]|%20|%40|%2[Bb]|%3[Aa])+)?)*(?:%0[Aa])?$",
+          "boot": "^order=(?:ide0|ide1|ide2|ide3|sata0|sata1|sata2|sata3|sata4|sata5|scsi0|scsi1|scsi2|scsi3|scsi4|scsi5|scsi6|scsi7|scsi8|scsi9|scsi10|scsi11|scsi12|scsi13|scsi14|scsi15|scsi16|scsi17|scsi18|scsi19|scsi20|scsi21|scsi22|scsi23|scsi24|scsi25|scsi26|scsi27|scsi28|scsi29|scsi30|virtio0|virtio1|virtio2|virtio3|virtio4|virtio5|virtio6|virtio7|virtio8|virtio9|virtio10|virtio11|virtio12|virtio13|virtio14|virtio15|net0|net1|net2|net3|net4|net5|net6|net7|net8|net9|net10|net11|net12|net13|net14|net15|net16|net17|net18|net19|net20|net21|net22|net23|net24|net25|net26|net27|net28|net29|net30|net31)(?:;(?:ide0|ide1|ide2|ide3|sata0|sata1|sata2|sata3|sata4|sata5|scsi0|scsi1|scsi2|scsi3|scsi4|scsi5|scsi6|scsi7|scsi8|scsi9|scsi10|scsi11|scsi12|scsi13|scsi14|scsi15|scsi16|scsi17|scsi18|scsi19|scsi20|scsi21|scsi22|scsi23|scsi24|scsi25|scsi26|scsi27|scsi28|scsi29|scsi30|virtio0|virtio1|virtio2|virtio3|virtio4|virtio5|virtio6|virtio7|virtio8|virtio9|virtio10|virtio11|virtio12|virtio13|virtio14|virtio15|net0|net1|net2|net3|net4|net5|net6|net7|net8|net9|net10|net11|net12|net13|net14|net15|net16|net17|net18|net19|net20|net21|net22|net23|net24|net25|net26|net27|net28|net29|net30|net31))*$"
+        },
+        "sensitiveInputs": [
+          "cipassword"
+        ],
+        "reconciliation": {
+          "kind": "none",
+          "reason": "No safe automated business-outcome proof is admitted for this variant. Use the retained UPID when available; otherwise retain uncertainty and inspect independently."
+        },
+        "privileges": {
+          "description": "You need 'VM.Allocate' permissions on /vms/{vmid} or on the VM pool /pool/{pool}. For restore (option 'archive'), it is enough if the user has 'VM.Backup' permission and the VM already exists. If you create disks you need 'Datastore.AllocateSpace' on any used storage.If you use a bridge/vlan, you need 'SDN.Use' on any used bridge/vlan.",
+          "user": "all"
+        },
+        "response": {
+          "type": "string"
+        },
+        "source": "Retained versioned API schema; design.md S3 write/outcome contract; pve-node-batch-source.txt for execute."
+      },
+      "inputs": [
+        {
+          "name": "acpi",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "affinity",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "agent",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "allow-ksm",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "amd-sev",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "arch",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "archive",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "args",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "audio0",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "autostart",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "balloon",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "bios",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "boot",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "bootdisk",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "bwlimit",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "cdrom",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "cicustom",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "cipassword",
+          "admitted": true,
+          "sensitive": true
+        },
+        {
+          "name": "citype",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "ciupgrade",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "ciuser",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "cores",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "cpu",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "cpulimit",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "cpuunits",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "description",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "efidisk0",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "force",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "freeze",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "ha-managed",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "hookscript",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "hostpci[n]",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "hotplug",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "hugepages",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "ide[n]",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "import-working-storage",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "intel-tdx",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "ipconfig[n]",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "ivshmem",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "keephugepages",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "keyboard",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "kvm",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "live-restore",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "localtime",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "lock",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "machine",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "memory",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "migrate_downtime",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "migrate_speed",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "name",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "nameserver",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "net[n]",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "node",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "numa",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "numa[n]",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "onboot",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "ostype",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "parallel[n]",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "pool",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "protection",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "reboot",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "rng0",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "sata[n]",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "scsi[n]",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "scsihw",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "searchdomain",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "serial[n]",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "shares",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "smbios1",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "smp",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "sockets",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "spice_enhancements",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "sshkeys",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "start",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "startdate",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "startup",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "storage",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "tablet",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "tags",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "tdf",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "template",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "tpmstate0",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "unique",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "unused[n]",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "usb[n]",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "vcpus",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "vga",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "virtio[n]",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "virtiofs[n]",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "vmgenid",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "vmid",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "vmstatestorage",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "watchdog",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "ide0",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "ide1",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "ide2",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "ide3",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "sata0",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "sata1",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "sata2",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "sata3",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "sata4",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "sata5",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "scsi0",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "scsi1",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "scsi2",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "scsi3",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "scsi4",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "scsi5",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "scsi6",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "scsi7",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "scsi8",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "scsi9",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "scsi10",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "scsi11",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "scsi12",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "scsi13",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "scsi14",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "scsi15",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "scsi16",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "scsi17",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "scsi18",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "scsi19",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "scsi20",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "scsi21",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "scsi22",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "scsi23",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "scsi24",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "scsi25",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "scsi26",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "scsi27",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "scsi28",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "scsi29",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "scsi30",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "virtio0",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "virtio1",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "virtio2",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "virtio3",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "virtio4",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "virtio5",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "virtio6",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "virtio7",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "virtio8",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "virtio9",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "virtio10",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "virtio11",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "virtio12",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "virtio13",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "virtio14",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "virtio15",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "net0",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "net1",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "net2",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "net3",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "net4",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "net5",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "net6",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "net7",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "net8",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "net9",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "net10",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "net11",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "net12",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "net13",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "net14",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "net15",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "net16",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "net17",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "net18",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "net19",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "net20",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "net21",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "net22",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "net23",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "net24",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "net25",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "net26",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "net27",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "net28",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "net29",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "net30",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "net31",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "ipconfig0",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "ipconfig1",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "ipconfig2",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "ipconfig3",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "ipconfig4",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "ipconfig5",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "ipconfig6",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "ipconfig7",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "ipconfig8",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "ipconfig9",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "ipconfig10",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "ipconfig11",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "ipconfig12",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "ipconfig13",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "ipconfig14",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "ipconfig15",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "ipconfig16",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "ipconfig17",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "ipconfig18",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "ipconfig19",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "ipconfig20",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "ipconfig21",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "ipconfig22",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "ipconfig23",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "ipconfig24",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "ipconfig25",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "ipconfig26",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "ipconfig27",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "ipconfig28",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "ipconfig29",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "ipconfig30",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "ipconfig31",
+          "admitted": true,
+          "sensitive": false
+        }
+      ],
+      "results": {
+        "type": "string",
+        "handling": "public metadata; protected inputs excluded"
+      }
     },
     {
       "id": "OP-DELETE-5e826ea6b0",
@@ -18116,8 +20730,133 @@
       "method": "POST",
       "path": "/nodes/{node}/qemu/{vmid}/clone",
       "release": "published-current",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/1123"
+      "admitted": true,
+      "contract": "dist/contracts.json#/contracts/1123",
+      "policy": {
+        "effect": "write",
+        "transport": "json",
+        "secrets": "none",
+        "allowedInputs": [
+          "node",
+          "vmid",
+          "newid",
+          "name",
+          "description",
+          "full",
+          "storage",
+          "format",
+          "target",
+          "pool",
+          "bwlimit"
+        ],
+        "reason": "Confirmed guest clone with reviewed destination and storage settings; snapshot-source variants remain refused.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Track the source-node UPID, then inspect the destination guest independently; never clone again after uncertain delivery."
+        },
+        "privileges": {
+          "check": [
+            "and",
+            [
+              "perm",
+              "/vms/{vmid}",
+              [
+                "VM.Clone"
+              ]
+            ],
+            [
+              "or",
+              [
+                "perm",
+                "/vms/{newid}",
+                [
+                  "VM.Allocate"
+                ]
+              ],
+              [
+                "perm",
+                "/pool/{pool}",
+                [
+                  "VM.Allocate"
+                ],
+                "require_param",
+                "pool"
+              ]
+            ]
+          ],
+          "description": "You need 'VM.Clone' permissions on /vms/{vmid}, and 'VM.Allocate' permissions on /vms/{newid} (or on the VM pool /pool/{pool}). You also need 'Datastore.AllocateSpace' on any used storage and 'SDN.Use' on any used bridge/vnet"
+        },
+        "response": {
+          "type": "string"
+        },
+        "source": "Pinned clone_vm schemas; existing effect and task contracts."
+      },
+      "inputs": [
+        {
+          "name": "bwlimit",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "description",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "format",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "full",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "name",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "newid",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "node",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "pool",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "snapname",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "storage",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "target",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "vmid",
+          "admitted": true,
+          "sensitive": false
+        }
+      ],
+      "results": {
+        "type": "string",
+        "handling": "public metadata; protected inputs excluded"
+      }
     },
     {
       "id": "OP-PUT-483437800e",
