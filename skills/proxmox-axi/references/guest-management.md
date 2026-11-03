@@ -9,7 +9,7 @@ QEMU and LXC configuration, `/snapshot/{snapname}/config` and `/pending` GETs, i
 These payloads can contain credentials.
 Launch the CLI executable directly from the caller that owns that pipe.
 Terminals, regular files, stdout and stderr are refused, and a missing private pipe fails before provider access.
-Stdout contains `data: { "privateResult": true }`; the complete validated payload travels privately, is not trimmed by table display flags, and creates no journal.
+For standalone reads, stdout contains `data: { "privateResult": true }`; the complete validated payload travels privately, is not trimmed by table display flags, and creates no journal.
 Each frame is a four-byte unsigned big-endian byte length followed by at most 65536 bytes of UTF-8 JSON containing `version: 1`, `binding` and `payload`.
 Validate the frame version and expected origin, identity, operation, request, actor and credential-revision bindings before consuming it.
 Standalone guest-read request bindings hash `<selected catalogue> <encoded request path including query>` with SHA-256; hosted callers use the authenticated request ID supplied by the host.
@@ -135,7 +135,7 @@ If provisioning delivery is uncertain, inspect the journal and retained task rat
 
 Inspect `schema create '/nodes/{node}/lxc'` or `schema create '/nodes/{node}/lxc/{vmid}/clone'` and enable only the selected operation ID in the profile and any independent host policy.
 Create with required node, VMID and `ostemplate` using an existing managed template volume such as `local:vztmpl/base.tar.zst`.
-Template filenames may end in `.tar.zst`, `.tar.xz` or `.tar.gz`; backup archives and host paths remain refused.
+Template filenames may end in `.tar.zst`, `.tar.xz` or `.tar.gz`; for backup archives, use the [restore workflow](#restore-guest-backups).
 Creation always sends `unprivileged=1`, including when omitted; explicitly requesting a privileged container is refused before provider access.
 Reviewed options include hostname, description, cores, CPU limits/weights, integer memory/swap, managed rootfs/mount points, NICs, DNS, onboot/startup, storage, pool and optional start.
 Leave `start` unset or `0` to finish onboarding before first boot.
