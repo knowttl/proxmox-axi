@@ -107,6 +107,12 @@ export interface EffectTransport {
   execute: (credentials: Credentials, contract: Contract, values: Record<string, unknown>) => Promise<{ data: unknown, transfer: unknown }>
 }
 
+function confirmationWarnings(call: Invocation): { target: string, messages: string[] }[] {
+  const messages = (call.contract.policy.confirmationWarnings ?? []).filter(({ when }) =>
+    !when || when.values.some(value => value === call.values[when.input])).map(({ message }) => message)
+  return [...(messages.length ? [{ target: call.wire.split('?')[0]!, messages }] : []), ...call.children.flatMap(confirmationWarnings)]
+}
+
 export async function writeOperation(credentials: Credentials, initial: Contract, values: Record<string, unknown>, options: { preview: boolean, confirmation?: string, transport?: EffectTransport }) {
   if (!['write', 'batch'].includes(initial.policy.effect)) throw denied()
   // All policy and input failures happen before any provider request.
@@ -141,8 +147,10 @@ export async function writeOperation(credentials: Credentials, initial: Contract
     const check = reconciliationCheck(call, journal)
     if (check) record.check = check
     await journal.save(record)
+    const warnings = confirmationWarnings(call)
     return { status: 'preview', id, operation: record.operation, confirmation: `${id}.${fingerprint}`,
-      expiresInSeconds: 300, reconciliation: record.reconciliation, children: publicChildren(record.children), ...(options.transport ? { transport: options.transport.binding } : {}) }
+      expiresInSeconds: 300, reconciliation: record.reconciliation, children: publicChildren(record.children),
+      ...(warnings.length ? { warnings } : {}), ...(options.transport ? { transport: options.transport.binding } : {}) }
   }
   const [id, approval, extra] = (options.confirmation ?? '').split('.')
   if (!id || !approval || extra) throw new Failure('CONFIRMATION_REQUIRED', 'Execution requires an exact preview confirmation.', 'Run the same command with --preview first.')

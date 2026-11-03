@@ -200,6 +200,28 @@ For example, a protected config can keep two independent profiles with separate 
 Supply credentials through the referenced secret source and set file ownership and permissions as described under [Configuration](#configuration).
 These reads do not grant storage administration, node power control, or cluster membership changes.
 
+### Firewall options and default policies
+
+Read `/cluster/firewall/options`, `/nodes/{node}/firewall/options` or `/nodes/{node}/qemu/{vmid}/firewall/options` and its LXC equivalent with the selected profile and path parameters.
+These reads expose configured enable/default-policy settings and a provider digest when available; unrelated and undeclared fields remain excluded even with `--full`.
+Confirmed `set` supports enable at all four scopes, in/out default policies at cluster and guest scope, and forward default policy at cluster scope.
+Node schemas have no default-policy inputs; cluster enable is narrowed to integer 0/1.
+
+```sh
+proxmox-axi get '/nodes/{node}/qemu/{vmid}/firewall/options' --api-node '<node>' --api-vmid 100 --profile '<profile>'
+proxmox-axi set '/nodes/{node}/qemu/{vmid}/firewall/options' --api-node '<node>' --api-vmid 100 --api-enable 1 --api-policy_in DROP --api-policy_out ACCEPT --api-digest '<digest>' --profile '<profile>' --preview
+```
+
+Enable the exact mutation ID in the selected profile and any independent host policy, inspect the target/settings and preview `warnings`, then repeat the exact request with `--confirm '<confirmation>'`.
+Disabling protection and ACCEPT defaults receive explicit warnings, including inside confirmed batches; ACCEPT is the action for unmatched traffic in its direction, not removal of explicit rules.
+Changed scope, enable/policy inputs or supplied digest invalidate confirmation, and the provider can reject an intervening digest conflict.
+Firewall changes can cut off management access; review management allowances and recovery access before confirming.
+The provider can update filtering automatically, and guest coverage also requires the NIC firewall flag; forward behavior depends on the active backend, as described in the [Proxmox firewall documentation](https://github.com/proxmox/pve-docs/blob/master/pve-firewall.adoc).
+The synchronous null result confirms the configuration request, not effective filtering or connectivity, and supplies no UPID for task waiting.
+Read options again, retain failed/uncertain journal outcomes and never automatically retry or disable protection after lost access.
+See the [installed firewall guide](skills/proxmox-axi/references/firewall-management.md) for scope, digest and recovery details.
+Other firewall option selectors and SDN-vnet firewall options remain refused in this slice.
+
 ### Guest power control
 
 QEMU and LXC support guest `start`, `shutdown`, `stop`, `reboot`, `suspend` and `resume` through `create '/nodes/{node}/<qemu-or-lxc>/{vmid}/status/<action>'`.

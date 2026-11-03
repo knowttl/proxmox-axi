@@ -39,6 +39,8 @@ Use `--fields`, `--limit` and `--full` when more detail is needed within the out
 ## Discover operations and complete confirmed tasks
 
 For QEMU/LXC resource metrics, read `/nodes/{node}/qemu/{vmid}/status/current` or its LXC equivalent with the selected node, VMID and profile.
+For cluster, node and guest firewall option reads or confirmed enable/default-policy updates, follow the [firewall guidance](references/firewall-management.md).
+Review its protection and management-access warnings before confirming; configuration success does not establish effective filtering.
 For guest power control, confirmed execution/onboarding, private guest-agent readiness/first-boot checks, backup/restore, snapshots, media discovery/uploads, QEMU/LXC creation/cloning, protected reads, compute settings, guest NICs/boot/agent setup, managed disks and growth-only disk resize, follow the [guest management reference](references/guest-management.md).
 That reference ships inside this skill folder and includes private pipe setup, receiver bindings, input constraints and digest handling.
 

@@ -17,6 +17,23 @@ const pool = new Set(['create_pool', 'update_pool', 'delete_pool'])
 export function reviewWrite(operation: Operation) {
   const { path, method } = operation
   const name = operation.vendorMetadata.name
+  const firewallOptions = path === '/cluster/firewall/options' || /^\/nodes\/\{node\}(?:\/(qemu|lxc)\/\{vmid\})?\/firewall\/options$/.test(path)
+  if (method === 'PUT' && firewallOptions && name === 'set_options' && operation.allowtoken !== 0) {
+    return { effect: 'write', transport: 'json', secrets: 'none',
+      allowedInputs: ['node', 'vmid', 'enable', 'policy_in', 'policy_out', 'policy_forward', 'digest'].filter(key => operation.parameters.properties?.[key]),
+      ...(path === '/cluster/firewall/options' ? { inputCases: [
+        { forbiddenInputs: ['enable'] }, { requiredValues: { enable: 0 } }, { requiredValues: { enable: 1 } },
+      ] } : {}),
+      confirmationWarnings: [
+        { message: 'Firewall configuration changes can cut off management access. Review the exact target, settings and recovery access before confirming.' },
+        { when: { input: 'enable', values: [false, 0] }, message: 'FIREWALL PROTECTION DISABLED: this request disables firewall protection at the selected scope.' },
+        ...['policy_in', 'policy_out', 'policy_forward'].map(input => ({ when: { input, values: ['ACCEPT'] },
+          message: `DEFAULT ACCEPT: ${input} will accept unmatched traffic at the selected scope. Explicitly authorize this default allowance.` })),
+      ],
+      reason: 'Confirmed firewall enable/default-policy configuration only; disabling protection and ACCEPT defaults are prominently disclosed. Backend, filter, delete and other selectors remain refused.',
+      reconciliation: { kind: 'read', path, reason: 'Observe supplied firewall settings only; configuration equality does not establish effective filtering or management reachability.' },
+      privileges: operation.permissions, response: operation.returns, source: 'Pinned firewall get_options/set_options schemas and provider firewall documentation; shared exact confirmation and journal policy.' }
+  }
   const guestExec = path === '/nodes/{node}/qemu/{vmid}/agent/exec' && method === 'POST' && name === 'exec'
   const guestExecStatus = path === '/nodes/{node}/qemu/{vmid}/agent/exec-status' && method === 'GET' && name === 'exec-status'
   if ((guestExec || guestExecStatus) && operation.allowtoken !== 0) return { effect: 'write', transport: 'json', secrets: 'private-result',
