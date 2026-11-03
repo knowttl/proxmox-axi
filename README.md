@@ -492,6 +492,8 @@ pnpm verify:acceptance -- --task S5.1 --pack /absolute/path/to/pack --out /absol
 pnpm verify:acceptance -- --task S5.2 --pack /absolute/path/to/pack --out /absolute/new/run/S5.2 --network fake-only --through standalone --repeat-through S5
 ```
 
+`--repeat-through S2` includes catalogue route cases in the standalone journey and, with `--through both`, the hosted journey.
+
 The S5 selectors cover transfers/formatters (S5.1) and console/migration duplex sessions (S5.2).
 S5.2 also runs the S5.1 journeys.
 Hosted S5 proof is optional per slice; select `--through both` only when the pinned external fixture is available.
@@ -499,6 +501,8 @@ Hosted S5 proof is optional per slice; select `--through both` only when the pin
 Use this repository's `evidence` directory for `--pack`, and create the parent run directory first.
 The task output directory must be new and outside the checkout.
 The driver verifies retained fixture hashes and records package integrity, fixture identity, sanitized public transcripts, case outcomes and the fake request ledger.
+S6 `result.json` coverage summaries match evidence IDs as complete slash-delimited segments, including an exact case ID without a suffix, and map executed S5.2 transfer, duplex, guest-file and batch-policy cases to their transport outcomes.
+`AC-FULL`, `AC-COVERAGE` and `AC-PLATFORM` remain pending even when cases are recorded; see the [S6 release limitations](#development).
 Before retaining each public transcript, it rejects canaries in raw, JSON-escaped or URL-encoded form in either stdout or stderr.
 Private scratch state and canary values are removed before it returns.
 
