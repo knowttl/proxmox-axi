@@ -1,6 +1,8 @@
 // These names and paths identify reviewed vendor operations, not method-based admission.
 // The generated table retains every other route with an explicit refusal.
 import { backupVolumePattern, cloudInitSshKeysPattern, namedFormatPattern } from '../src/property-format.ts'
+import type { Contract } from '../src/contract.ts'
+type InputCase = NonNullable<Contract['policy']['inputCases']>[number]
 interface Operation {
   method: string
   path: string
@@ -17,6 +19,16 @@ const pool = new Set(['create_pool', 'update_pool', 'delete_pool'])
 export function reviewWrite(operation: Operation) {
   const { path, method } = operation
   const name = operation.vendorMetadata.name
+  if (operation.allowtoken !== 0 && ((method === 'POST' && path === '/cluster/firewall/groups' && name === 'create_security_group') ||
+    (method === 'DELETE' && path === '/cluster/firewall/groups/{group}' && name === 'delete_security_group'))) {
+    return { effect: 'write', transport: 'json', secrets: 'private-result', allowedInputs: ['group', ...(method === 'POST' ? ['comment'] : [])],
+      sensitiveInputs: method === 'POST' ? ['comment'] : [], inputFormats: { group: 'pve-firewall-group', ...(method === 'POST' ? { comment: 'pve-firewall-comment' } : {}) },
+      confirmationWarnings: [{ message: 'Shared security groups affect existing cluster, node and guest references, including management traffic. Inspect dependencies before confirming.' },
+        ...(method === 'DELETE' ? [{ message: 'GROUP DELETION: the provider permits only empty groups; remove guest references separately. Empty does not mean unreferenced.' }] : [])],
+      reason: 'Confirmed creation or native empty-only security-group deletion. Comments use SecretRefs; rename, metadata-update and cross-scope reference rewrites remain refused.',
+      reconciliation: { kind: 'none', reason: 'Inspect the group and references privately; never retry, detach references or recreate a group automatically after uncertainty.' },
+      privileges: operation.permissions, response: operation.returns, source: 'Pinned Groups.pm creation and Rules.pm empty-group deletion under the cluster lock.' }
+  }
   const firewallObjects = /^(?:\/cluster|\/nodes\/\{node\}\/(?:qemu|lxc)\/\{vmid\})\/firewall\/(aliases|ipset)(?:\/\{name\})?(?:\/\{cidr\})?$/.exec(path)
   if (firewallObjects && operation.allowtoken !== 0 && ['create_alias', 'update_alias', 'remove_alias', 'create_ipset', 'delete_ipset', 'create_ip', 'update_ip', 'remove_ip'].includes(name ?? '')) {
     const alias = firewallObjects[1] === 'aliases', member = path.endsWith('/{cidr}') || name === 'create_ip'
@@ -37,22 +49,30 @@ export function reviewWrite(operation: Operation) {
       privileges: operation.permissions, response: operation.returns, source: 'Pinned schemas and reviewed Aliases.pm/IPSet.pm locks, digest guards, empty-set deletion and member replacement behavior.' }
   }
   const rulesPath = path.replace(/\/\{pos\}$/, '')
-  const firewallRules = rulesPath === '/cluster/firewall/rules' || /^\/nodes\/\{node\}(?:\/(qemu|lxc)\/\{vmid\})?\/firewall\/rules$/.test(rulesPath)
+  const groupRules = rulesPath === '/cluster/firewall/groups/{group}', guestRules = /^\/nodes\/\{node\}\/(qemu|lxc)\/\{vmid\}\/firewall\/rules$/.test(rulesPath)
+  const firewallRules = groupRules || rulesPath === '/cluster/firewall/rules' || /^\/nodes\/\{node\}(?:\/(qemu|lxc)\/\{vmid\})?\/firewall\/rules$/.test(rulesPath)
   if (firewallRules && operation.allowtoken !== 0 && ((method === 'POST' && path === rulesPath && name === 'create_rule') ||
     (method === 'PUT' && path !== rulesPath && name === 'update_rule') || (method === 'DELETE' && path !== rulesPath && name === 'delete_rule'))) {
-    const fields = ['type', 'action', 'enable', 'source', 'dest', 'proto', 'sport', 'dport', 'iface']
+    const fields = ['type', 'action', 'enable', 'source', 'dest', 'proto', 'sport', 'dport', ...(!groupRules ? ['iface'] : [])]
+    const actions = '^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])'
+    const selectors: InputCase[] = ['in', 'out'].map(type => ({ requiredValues: { type }, inputPatterns: { action: actions } }))
+    selectors.push({ requiredValues: { type: 'group' }, forbiddenInputs: ['source', 'dest', 'proto', 'sport', 'dport'], inputPatterns: { action: namedFormatPattern('pve-firewall-group')! } })
+    const edits: InputCase[] = guestRules ? [...selectors, { forbiddenInputs: ['type', 'action'] }, { requiredInputs: ['action'], forbiddenInputs: ['type'], inputPatterns: { action: actions } }] : [{}]
+    const enableCases: InputCase[] = [{ forbiddenInputs: ['enable'] }, { requiredValues: { enable: 0 } }, { requiredValues: { enable: 1 } }]
+    const inputCases = method === 'POST' ? guestRules ? selectors : undefined : method === 'PUT' ? [
+      { requiredInputs: ['moveto'], forbiddenInputs: fields }, ...enableCases.flatMap(enable => edits.map(edit => ({ ...edit,
+        requiredValues: { ...edit.requiredValues, ...enable.requiredValues }, forbiddenInputs: ['moveto', ...(edit.forbiddenInputs ?? []), ...(enable.forbiddenInputs ?? [])] }))),
+    ] : undefined
     return { effect: 'write', transport: 'json', secrets: 'private-result', stateBinding: { kind: 'firewall-rules', path: rulesPath },
-      allowedInputs: ['node', 'vmid', ...(method === 'POST' ? fields : ['pos', 'digest', ...(method === 'PUT' ? [...fields, 'moveto'] : [])])]
+      allowedInputs: ['node', 'vmid', 'group', ...(method === 'POST' ? fields : ['pos', 'digest', ...(method === 'PUT' ? [...fields, 'moveto'] : [])])]
         .filter(key => operation.parameters.properties?.[key]), requiredInputs: path !== rulesPath ? ['pos'] : [],
-      ...(method === 'POST' ? { fixedInputs: { enable: 0 } } : method === 'PUT' ? { inputCases: [
-        { requiredInputs: ['moveto'], forbiddenInputs: fields }, { forbiddenInputs: ['moveto', 'enable'] },
-        { forbiddenInputs: ['moveto'], requiredValues: { enable: 0 } }, { forbiddenInputs: ['moveto'], requiredValues: { enable: 1 } },
-      ] } : {}),
-      ...(method !== 'DELETE' ? { inputPatterns: { type: '^(?:in|out)$', action: '^(?:ACCEPT|DROP|REJECT)$',
+      ...(method === 'POST' ? { fixedInputs: { enable: 0 } } : {}), ...(inputCases ? { inputCases } : {}),
+      ...(method !== 'DELETE' ? { inputPatterns: { type: guestRules ? '^(?:in|out|group)$' : '^(?:in|out)$', action: guestRules ? namedFormatPattern('pve-firewall-group')! : actions,
         ...(path.includes('/{vmid}/') ? { iface: '^net(?:[0-9]|[12][0-9]|3[01])$' } : {}) }, inputFormats: {
-        source: 'pve-firewall-address', dest: 'pve-firewall-address', proto: 'pve-firewall-protocol', sport: 'pve-firewall-port', dport: 'pve-firewall-port', iface: 'pve-firewall-interface',
+        source: 'pve-firewall-address', dest: 'pve-firewall-address', proto: 'pve-firewall-protocol', sport: 'pve-firewall-port', dport: 'pve-firewall-port', iface: 'pve-firewall-interface', group: 'pve-firewall-group',
       } } : {}),
       confirmationWarnings: [{ message: 'Firewall rule changes can cut off management access or change protection. Inspect the complete private ordered plan before confirming.' },
+        ...(groupRules ? [{ message: 'SHARED GROUP: this ordered change affects every existing cluster, node or guest reference, including management traffic. Audit those dependencies explicitly.' }] : []),
         ...(method === 'POST' ? [{ message: 'NON-ATOMIC CREATE: the provider ignores creation digests and prepends this fixed disabled rule. Unexpected observed order remains uncertain; enabling requires a separate fresh digest-guarded confirmation.' }] :
           method === 'DELETE' ? [{ message: 'RULE DELETION: explicitly review the selected position and resulting ordered rules before confirming.' }] : [])],
       reason: method === 'POST' ? 'Non-atomic creation of a fixed disabled rule only: provider POST ignores digest and prepends; private before/after plan, state recheck and post-write comparison apply. Enable separately with a fresh digest-guarded confirmation.' :

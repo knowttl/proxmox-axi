@@ -142,7 +142,7 @@ export async function writeOperation(credentials: Credentials, initial: Contract
   const rules = await prepareRules(credentials, call.contract, call.values)
   if (rules) {
     call.wire = buildPath(call.contract, call.values)
-    call.revisions.push({ orderedRules: rules.before })
+    call.revisions.push({ orderedRules: rules.before, ...(rules.referencedGroup ? { referencedGroup: rules.referencedGroup } : {}) })
   }
   const fingerprint = binding()
   if (options.preview) {
@@ -158,7 +158,7 @@ export async function writeOperation(credentials: Credentials, initial: Contract
     const warnings = confirmationWarnings(call)
     if (rules) {
       await credentials.results.deliver(resultBinding(credentials.origin, credentials.tokenId, call.contract.id, fingerprint),
-        { before: rules.before, after: rules.after, nonAtomicCreate: call.contract.method === 'POST' })
+        { before: rules.before, after: rules.after, nonAtomicCreate: call.contract.method === 'POST', ...(rules.referencedGroup ? { referencedGroup: rules.referencedGroup } : {}) })
       if (rules.warnings.length) warnings.push({ target: call.wire.split('?')[0]!, messages: rules.warnings })
     }
     return { status: 'preview', id, operation: record.operation, confirmation: `${id}.${fingerprint}`,

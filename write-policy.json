@@ -1383,68 +1383,578 @@
       }
     },
     {
-      "id": "OP-GET-5a8972086f",
-      "method": "GET",
-      "path": "/cluster/firewall/groups",
-      "release": "legacy-8.2.7",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/91"
-    },
-    {
       "id": "OP-POST-fb39335d0b",
       "method": "POST",
       "path": "/cluster/firewall/groups",
       "release": "legacy-8.2.7",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/92"
+      "admitted": true,
+      "contract": "dist/contracts.json#/contracts/92",
+      "policy": {
+        "effect": "write",
+        "transport": "json",
+        "secrets": "private-result",
+        "allowedInputs": [
+          "group",
+          "comment"
+        ],
+        "sensitiveInputs": [
+          "comment"
+        ],
+        "inputFormats": {
+          "group": "pve-firewall-group",
+          "comment": "pve-firewall-comment"
+        },
+        "confirmationWarnings": [
+          {
+            "message": "Shared security groups affect existing cluster, node and guest references, including management traffic. Inspect dependencies before confirming."
+          }
+        ],
+        "reason": "Confirmed creation or native empty-only security-group deletion. Comments use SecretRefs; rename, metadata-update and cross-scope reference rewrites remain refused.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Inspect the group and references privately; never retry, detach references or recreate a group automatically after uncertainty."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/",
+            [
+              "Sys.Modify"
+            ]
+          ]
+        },
+        "response": {
+          "type": "null"
+        },
+        "source": "Pinned Groups.pm creation and Rules.pm empty-group deletion under the cluster lock."
+      },
+      "inputs": [
+        {
+          "name": "comment",
+          "admitted": true,
+          "sensitive": true
+        },
+        {
+          "name": "digest",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "group",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "rename",
+          "admitted": false,
+          "sensitive": false
+        }
+      ],
+      "results": {
+        "type": "null",
+        "handling": "versioned inherited private pipe; public metadata only"
+      }
     },
     {
       "id": "OP-DELETE-37fc2d324c",
       "method": "DELETE",
       "path": "/cluster/firewall/groups/{group}",
       "release": "legacy-8.2.7",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/93"
-    },
-    {
-      "id": "OP-GET-c0cec274a4",
-      "method": "GET",
-      "path": "/cluster/firewall/groups/{group}",
-      "release": "legacy-8.2.7",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/94"
+      "admitted": true,
+      "contract": "dist/contracts.json#/contracts/93",
+      "policy": {
+        "effect": "write",
+        "transport": "json",
+        "secrets": "private-result",
+        "allowedInputs": [
+          "group"
+        ],
+        "sensitiveInputs": [],
+        "inputFormats": {
+          "group": "pve-firewall-group"
+        },
+        "confirmationWarnings": [
+          {
+            "message": "Shared security groups affect existing cluster, node and guest references, including management traffic. Inspect dependencies before confirming."
+          },
+          {
+            "message": "GROUP DELETION: the provider permits only empty groups; remove guest references separately. Empty does not mean unreferenced."
+          }
+        ],
+        "reason": "Confirmed creation or native empty-only security-group deletion. Comments use SecretRefs; rename, metadata-update and cross-scope reference rewrites remain refused.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Inspect the group and references privately; never retry, detach references or recreate a group automatically after uncertainty."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/",
+            [
+              "Sys.Modify"
+            ]
+          ]
+        },
+        "response": {
+          "type": "null"
+        },
+        "source": "Pinned Groups.pm creation and Rules.pm empty-group deletion under the cluster lock."
+      },
+      "inputs": [
+        {
+          "name": "group",
+          "admitted": true,
+          "sensitive": false
+        }
+      ],
+      "results": {
+        "type": "null",
+        "handling": "versioned inherited private pipe; public metadata only"
+      }
     },
     {
       "id": "OP-POST-8ca32093a6",
       "method": "POST",
       "path": "/cluster/firewall/groups/{group}",
       "release": "legacy-8.2.7",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/95"
+      "admitted": true,
+      "contract": "dist/contracts.json#/contracts/95",
+      "policy": {
+        "effect": "write",
+        "transport": "json",
+        "secrets": "private-result",
+        "stateBinding": {
+          "kind": "firewall-rules",
+          "path": "/cluster/firewall/groups/{group}"
+        },
+        "allowedInputs": [
+          "group",
+          "type",
+          "action",
+          "enable",
+          "source",
+          "dest",
+          "proto",
+          "sport",
+          "dport"
+        ],
+        "requiredInputs": [],
+        "fixedInputs": {
+          "enable": 0
+        },
+        "inputPatterns": {
+          "type": "^(?:in|out)$",
+          "action": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+        },
+        "inputFormats": {
+          "source": "pve-firewall-address",
+          "dest": "pve-firewall-address",
+          "proto": "pve-firewall-protocol",
+          "sport": "pve-firewall-port",
+          "dport": "pve-firewall-port",
+          "iface": "pve-firewall-interface",
+          "group": "pve-firewall-group"
+        },
+        "confirmationWarnings": [
+          {
+            "message": "Firewall rule changes can cut off management access or change protection. Inspect the complete private ordered plan before confirming."
+          },
+          {
+            "message": "SHARED GROUP: this ordered change affects every existing cluster, node or guest reference, including management traffic. Audit those dependencies explicitly."
+          },
+          {
+            "message": "NON-ATOMIC CREATE: the provider ignores creation digests and prepends this fixed disabled rule. Unexpected observed order remains uncertain; enabling requires a separate fresh digest-guarded confirmation."
+          }
+        ],
+        "reason": "Non-atomic creation of a fixed disabled rule only: provider POST ignores digest and prepends; private before/after plan, state recheck and post-write comparison apply. Enable separately with a fresh digest-guarded confirmation.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Inspect complete current rules privately; a matching later list cannot establish attribution. Never retry or automatically delete after uncertainty."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/",
+            [
+              "Sys.Modify"
+            ]
+          ]
+        },
+        "response": {
+          "type": "null"
+        },
+        "source": "Pinned rule schemas and reviewed provider Rules.pm creation, digest-guarded updates/deletes and reorder semantics."
+      },
+      "inputs": [
+        {
+          "name": "action",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "comment",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "dest",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "digest",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "dport",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "enable",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "group",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "icmp-type",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "iface",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "log",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "macro",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "pos",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "proto",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "source",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "sport",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "type",
+          "admitted": true,
+          "sensitive": false
+        }
+      ],
+      "results": {
+        "type": "null",
+        "handling": "versioned inherited private pipe; public metadata only"
+      }
     },
     {
       "id": "OP-DELETE-903157d1bd",
       "method": "DELETE",
       "path": "/cluster/firewall/groups/{group}/{pos}",
       "release": "legacy-8.2.7",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/96"
-    },
-    {
-      "id": "OP-GET-75b2fb0274",
-      "method": "GET",
-      "path": "/cluster/firewall/groups/{group}/{pos}",
-      "release": "legacy-8.2.7",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/97"
+      "admitted": true,
+      "contract": "dist/contracts.json#/contracts/96",
+      "policy": {
+        "effect": "write",
+        "transport": "json",
+        "secrets": "private-result",
+        "stateBinding": {
+          "kind": "firewall-rules",
+          "path": "/cluster/firewall/groups/{group}"
+        },
+        "allowedInputs": [
+          "group",
+          "pos",
+          "digest"
+        ],
+        "requiredInputs": [
+          "pos"
+        ],
+        "confirmationWarnings": [
+          {
+            "message": "Firewall rule changes can cut off management access or change protection. Inspect the complete private ordered plan before confirming."
+          },
+          {
+            "message": "SHARED GROUP: this ordered change affects every existing cluster, node or guest reference, including management traffic. Audit those dependencies explicitly."
+          },
+          {
+            "message": "RULE DELETION: explicitly review the selected position and resulting ordered rules before confirming."
+          }
+        ],
+        "reason": "Private state-bound ordered rule change with automatic provider digest guard; reorder is separate from field edits. No automatic retry or deletion after uncertainty.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Inspect complete current rules privately; a matching later list cannot establish attribution. Never retry or automatically delete after uncertainty."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/",
+            [
+              "Sys.Modify"
+            ]
+          ]
+        },
+        "response": {
+          "type": "null"
+        },
+        "source": "Pinned rule schemas and reviewed provider Rules.pm creation, digest-guarded updates/deletes and reorder semantics."
+      },
+      "inputs": [
+        {
+          "name": "digest",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "group",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "pos",
+          "admitted": true,
+          "sensitive": false
+        }
+      ],
+      "results": {
+        "type": "null",
+        "handling": "versioned inherited private pipe; public metadata only"
+      }
     },
     {
       "id": "OP-PUT-4a9d0e8136",
       "method": "PUT",
       "path": "/cluster/firewall/groups/{group}/{pos}",
       "release": "legacy-8.2.7",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/98"
+      "admitted": true,
+      "contract": "dist/contracts.json#/contracts/98",
+      "policy": {
+        "effect": "write",
+        "transport": "json",
+        "secrets": "private-result",
+        "stateBinding": {
+          "kind": "firewall-rules",
+          "path": "/cluster/firewall/groups/{group}"
+        },
+        "allowedInputs": [
+          "group",
+          "pos",
+          "digest",
+          "type",
+          "action",
+          "enable",
+          "source",
+          "dest",
+          "proto",
+          "sport",
+          "dport",
+          "moveto"
+        ],
+        "requiredInputs": [
+          "pos"
+        ],
+        "inputCases": [
+          {
+            "requiredInputs": [
+              "moveto"
+            ],
+            "forbiddenInputs": [
+              "type",
+              "action",
+              "enable",
+              "source",
+              "dest",
+              "proto",
+              "sport",
+              "dport"
+            ]
+          },
+          {
+            "requiredValues": {},
+            "forbiddenInputs": [
+              "moveto",
+              "enable"
+            ]
+          },
+          {
+            "requiredValues": {
+              "enable": 0
+            },
+            "forbiddenInputs": [
+              "moveto"
+            ]
+          },
+          {
+            "requiredValues": {
+              "enable": 1
+            },
+            "forbiddenInputs": [
+              "moveto"
+            ]
+          }
+        ],
+        "inputPatterns": {
+          "type": "^(?:in|out)$",
+          "action": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+        },
+        "inputFormats": {
+          "source": "pve-firewall-address",
+          "dest": "pve-firewall-address",
+          "proto": "pve-firewall-protocol",
+          "sport": "pve-firewall-port",
+          "dport": "pve-firewall-port",
+          "iface": "pve-firewall-interface",
+          "group": "pve-firewall-group"
+        },
+        "confirmationWarnings": [
+          {
+            "message": "Firewall rule changes can cut off management access or change protection. Inspect the complete private ordered plan before confirming."
+          },
+          {
+            "message": "SHARED GROUP: this ordered change affects every existing cluster, node or guest reference, including management traffic. Audit those dependencies explicitly."
+          }
+        ],
+        "reason": "Private state-bound ordered rule change with automatic provider digest guard; reorder is separate from field edits. No automatic retry or deletion after uncertainty.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Inspect complete current rules privately; a matching later list cannot establish attribution. Never retry or automatically delete after uncertainty."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/",
+            [
+              "Sys.Modify"
+            ]
+          ]
+        },
+        "response": {
+          "type": "null"
+        },
+        "source": "Pinned rule schemas and reviewed provider Rules.pm creation, digest-guarded updates/deletes and reorder semantics."
+      },
+      "inputs": [
+        {
+          "name": "action",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "comment",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "delete",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "dest",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "digest",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "dport",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "enable",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "group",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "icmp-type",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "iface",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "log",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "macro",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "moveto",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "pos",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "proto",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "source",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "sport",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "type",
+          "admitted": true,
+          "sensitive": false
+        }
+      ],
+      "results": {
+        "type": "null",
+        "handling": "versioned inherited private pipe; public metadata only"
+      }
     },
     {
       "id": "OP-POST-9811b3d98d",
@@ -2025,7 +2535,7 @@
         },
         "inputPatterns": {
           "type": "^(?:in|out)$",
-          "action": "^(?:ACCEPT|DROP|REJECT)$"
+          "action": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
         },
         "inputFormats": {
           "source": "pve-firewall-address",
@@ -2033,7 +2543,8 @@
           "proto": "pve-firewall-protocol",
           "sport": "pve-firewall-port",
           "dport": "pve-firewall-port",
-          "iface": "pve-firewall-interface"
+          "iface": "pve-firewall-interface",
+          "group": "pve-firewall-group"
         },
         "confirmationWarnings": [
           {
@@ -2260,31 +2771,32 @@
             ]
           },
           {
+            "requiredValues": {},
             "forbiddenInputs": [
               "moveto",
               "enable"
             ]
           },
           {
-            "forbiddenInputs": [
-              "moveto"
-            ],
             "requiredValues": {
               "enable": 0
-            }
-          },
-          {
+            },
             "forbiddenInputs": [
               "moveto"
-            ],
+            ]
+          },
+          {
             "requiredValues": {
               "enable": 1
-            }
+            },
+            "forbiddenInputs": [
+              "moveto"
+            ]
           }
         ],
         "inputPatterns": {
           "type": "^(?:in|out)$",
-          "action": "^(?:ACCEPT|DROP|REJECT)$"
+          "action": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
         },
         "inputFormats": {
           "source": "pve-firewall-address",
@@ -2292,7 +2804,8 @@
           "proto": "pve-firewall-protocol",
           "sport": "pve-firewall-port",
           "dport": "pve-firewall-port",
-          "iface": "pve-firewall-interface"
+          "iface": "pve-firewall-interface",
+          "group": "pve-firewall-group"
         },
         "confirmationWarnings": [
           {
@@ -4578,7 +5091,7 @@
         },
         "inputPatterns": {
           "type": "^(?:in|out)$",
-          "action": "^(?:ACCEPT|DROP|REJECT)$"
+          "action": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
         },
         "inputFormats": {
           "source": "pve-firewall-address",
@@ -4586,7 +5099,8 @@
           "proto": "pve-firewall-protocol",
           "sport": "pve-firewall-port",
           "dport": "pve-firewall-port",
-          "iface": "pve-firewall-interface"
+          "iface": "pve-firewall-interface",
+          "group": "pve-firewall-group"
         },
         "confirmationWarnings": [
           {
@@ -4825,31 +5339,32 @@
             ]
           },
           {
+            "requiredValues": {},
             "forbiddenInputs": [
               "moveto",
               "enable"
             ]
           },
           {
-            "forbiddenInputs": [
-              "moveto"
-            ],
             "requiredValues": {
               "enable": 0
-            }
-          },
-          {
+            },
             "forbiddenInputs": [
               "moveto"
-            ],
+            ]
+          },
+          {
             "requiredValues": {
               "enable": 1
-            }
+            },
+            "forbiddenInputs": [
+              "moveto"
+            ]
           }
         ],
         "inputPatterns": {
           "type": "^(?:in|out)$",
-          "action": "^(?:ACCEPT|DROP|REJECT)$"
+          "action": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
         },
         "inputFormats": {
           "source": "pve-firewall-address",
@@ -4857,7 +5372,8 @@
           "proto": "pve-firewall-protocol",
           "sport": "pve-firewall-port",
           "dport": "pve-firewall-port",
-          "iface": "pve-firewall-interface"
+          "iface": "pve-firewall-interface",
+          "group": "pve-firewall-group"
         },
         "confirmationWarnings": [
           {
@@ -10194,9 +10710,42 @@
         "fixedInputs": {
           "enable": 0
         },
+        "inputCases": [
+          {
+            "requiredValues": {
+              "type": "in"
+            },
+            "inputPatterns": {
+              "action": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+            }
+          },
+          {
+            "requiredValues": {
+              "type": "out"
+            },
+            "inputPatterns": {
+              "action": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+            }
+          },
+          {
+            "requiredValues": {
+              "type": "group"
+            },
+            "forbiddenInputs": [
+              "source",
+              "dest",
+              "proto",
+              "sport",
+              "dport"
+            ],
+            "inputPatterns": {
+              "action": "^[A-Za-z][A-Za-z0-9_-]{1,17}$(?![\\s\\S])"
+            }
+          }
+        ],
         "inputPatterns": {
-          "type": "^(?:in|out)$",
-          "action": "^(?:ACCEPT|DROP|REJECT)$",
+          "type": "^(?:in|out|group)$",
+          "action": "^[A-Za-z][A-Za-z0-9_-]{1,17}$(?![\\s\\S])",
           "iface": "^net(?:[0-9]|[12][0-9]|3[01])$"
         },
         "inputFormats": {
@@ -10205,7 +10754,8 @@
           "proto": "pve-firewall-protocol",
           "sport": "pve-firewall-port",
           "dport": "pve-firewall-port",
-          "iface": "pve-firewall-interface"
+          "iface": "pve-firewall-interface",
+          "group": "pve-firewall-group"
         },
         "confirmationWarnings": [
           {
@@ -10456,31 +11006,205 @@
             ]
           },
           {
+            "requiredValues": {
+              "type": "in"
+            },
+            "inputPatterns": {
+              "action": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+            },
             "forbiddenInputs": [
               "moveto",
               "enable"
             ]
           },
           {
+            "requiredValues": {
+              "type": "out"
+            },
+            "inputPatterns": {
+              "action": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+            },
+            "forbiddenInputs": [
+              "moveto",
+              "enable"
+            ]
+          },
+          {
+            "requiredValues": {
+              "type": "group"
+            },
+            "forbiddenInputs": [
+              "moveto",
+              "source",
+              "dest",
+              "proto",
+              "sport",
+              "dport",
+              "enable"
+            ],
+            "inputPatterns": {
+              "action": "^[A-Za-z][A-Za-z0-9_-]{1,17}$(?![\\s\\S])"
+            }
+          },
+          {
+            "forbiddenInputs": [
+              "moveto",
+              "type",
+              "action",
+              "enable"
+            ],
+            "requiredValues": {}
+          },
+          {
+            "requiredInputs": [
+              "action"
+            ],
+            "forbiddenInputs": [
+              "moveto",
+              "type",
+              "enable"
+            ],
+            "inputPatterns": {
+              "action": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+            },
+            "requiredValues": {}
+          },
+          {
+            "requiredValues": {
+              "type": "in",
+              "enable": 0
+            },
+            "inputPatterns": {
+              "action": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+            },
             "forbiddenInputs": [
               "moveto"
+            ]
+          },
+          {
+            "requiredValues": {
+              "type": "out",
+              "enable": 0
+            },
+            "inputPatterns": {
+              "action": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+            },
+            "forbiddenInputs": [
+              "moveto"
+            ]
+          },
+          {
+            "requiredValues": {
+              "type": "group",
+              "enable": 0
+            },
+            "forbiddenInputs": [
+              "moveto",
+              "source",
+              "dest",
+              "proto",
+              "sport",
+              "dport"
+            ],
+            "inputPatterns": {
+              "action": "^[A-Za-z][A-Za-z0-9_-]{1,17}$(?![\\s\\S])"
+            }
+          },
+          {
+            "forbiddenInputs": [
+              "moveto",
+              "type",
+              "action"
             ],
             "requiredValues": {
               "enable": 0
             }
           },
           {
+            "requiredInputs": [
+              "action"
+            ],
+            "forbiddenInputs": [
+              "moveto",
+              "type"
+            ],
+            "inputPatterns": {
+              "action": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+            },
+            "requiredValues": {
+              "enable": 0
+            }
+          },
+          {
+            "requiredValues": {
+              "type": "in",
+              "enable": 1
+            },
+            "inputPatterns": {
+              "action": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+            },
             "forbiddenInputs": [
               "moveto"
+            ]
+          },
+          {
+            "requiredValues": {
+              "type": "out",
+              "enable": 1
+            },
+            "inputPatterns": {
+              "action": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+            },
+            "forbiddenInputs": [
+              "moveto"
+            ]
+          },
+          {
+            "requiredValues": {
+              "type": "group",
+              "enable": 1
+            },
+            "forbiddenInputs": [
+              "moveto",
+              "source",
+              "dest",
+              "proto",
+              "sport",
+              "dport"
             ],
+            "inputPatterns": {
+              "action": "^[A-Za-z][A-Za-z0-9_-]{1,17}$(?![\\s\\S])"
+            }
+          },
+          {
+            "forbiddenInputs": [
+              "moveto",
+              "type",
+              "action"
+            ],
+            "requiredValues": {
+              "enable": 1
+            }
+          },
+          {
+            "requiredInputs": [
+              "action"
+            ],
+            "forbiddenInputs": [
+              "moveto",
+              "type"
+            ],
+            "inputPatterns": {
+              "action": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+            },
             "requiredValues": {
               "enable": 1
             }
           }
         ],
         "inputPatterns": {
-          "type": "^(?:in|out)$",
-          "action": "^(?:ACCEPT|DROP|REJECT)$",
+          "type": "^(?:in|out|group)$",
+          "action": "^[A-Za-z][A-Za-z0-9_-]{1,17}$(?![\\s\\S])",
           "iface": "^net(?:[0-9]|[12][0-9]|3[01])$"
         },
         "inputFormats": {
@@ -10489,7 +11213,8 @@
           "proto": "pve-firewall-protocol",
           "sport": "pve-firewall-port",
           "dport": "pve-firewall-port",
-          "iface": "pve-firewall-interface"
+          "iface": "pve-firewall-interface",
+          "group": "pve-firewall-group"
         },
         "confirmationWarnings": [
           {
@@ -15821,9 +16546,42 @@
         "fixedInputs": {
           "enable": 0
         },
+        "inputCases": [
+          {
+            "requiredValues": {
+              "type": "in"
+            },
+            "inputPatterns": {
+              "action": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+            }
+          },
+          {
+            "requiredValues": {
+              "type": "out"
+            },
+            "inputPatterns": {
+              "action": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+            }
+          },
+          {
+            "requiredValues": {
+              "type": "group"
+            },
+            "forbiddenInputs": [
+              "source",
+              "dest",
+              "proto",
+              "sport",
+              "dport"
+            ],
+            "inputPatterns": {
+              "action": "^[A-Za-z][A-Za-z0-9_-]{1,17}$(?![\\s\\S])"
+            }
+          }
+        ],
         "inputPatterns": {
-          "type": "^(?:in|out)$",
-          "action": "^(?:ACCEPT|DROP|REJECT)$",
+          "type": "^(?:in|out|group)$",
+          "action": "^[A-Za-z][A-Za-z0-9_-]{1,17}$(?![\\s\\S])",
           "iface": "^net(?:[0-9]|[12][0-9]|3[01])$"
         },
         "inputFormats": {
@@ -15832,7 +16590,8 @@
           "proto": "pve-firewall-protocol",
           "sport": "pve-firewall-port",
           "dport": "pve-firewall-port",
-          "iface": "pve-firewall-interface"
+          "iface": "pve-firewall-interface",
+          "group": "pve-firewall-group"
         },
         "confirmationWarnings": [
           {
@@ -16083,31 +16842,205 @@
             ]
           },
           {
+            "requiredValues": {
+              "type": "in"
+            },
+            "inputPatterns": {
+              "action": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+            },
             "forbiddenInputs": [
               "moveto",
               "enable"
             ]
           },
           {
+            "requiredValues": {
+              "type": "out"
+            },
+            "inputPatterns": {
+              "action": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+            },
+            "forbiddenInputs": [
+              "moveto",
+              "enable"
+            ]
+          },
+          {
+            "requiredValues": {
+              "type": "group"
+            },
+            "forbiddenInputs": [
+              "moveto",
+              "source",
+              "dest",
+              "proto",
+              "sport",
+              "dport",
+              "enable"
+            ],
+            "inputPatterns": {
+              "action": "^[A-Za-z][A-Za-z0-9_-]{1,17}$(?![\\s\\S])"
+            }
+          },
+          {
+            "forbiddenInputs": [
+              "moveto",
+              "type",
+              "action",
+              "enable"
+            ],
+            "requiredValues": {}
+          },
+          {
+            "requiredInputs": [
+              "action"
+            ],
+            "forbiddenInputs": [
+              "moveto",
+              "type",
+              "enable"
+            ],
+            "inputPatterns": {
+              "action": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+            },
+            "requiredValues": {}
+          },
+          {
+            "requiredValues": {
+              "type": "in",
+              "enable": 0
+            },
+            "inputPatterns": {
+              "action": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+            },
             "forbiddenInputs": [
               "moveto"
+            ]
+          },
+          {
+            "requiredValues": {
+              "type": "out",
+              "enable": 0
+            },
+            "inputPatterns": {
+              "action": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+            },
+            "forbiddenInputs": [
+              "moveto"
+            ]
+          },
+          {
+            "requiredValues": {
+              "type": "group",
+              "enable": 0
+            },
+            "forbiddenInputs": [
+              "moveto",
+              "source",
+              "dest",
+              "proto",
+              "sport",
+              "dport"
+            ],
+            "inputPatterns": {
+              "action": "^[A-Za-z][A-Za-z0-9_-]{1,17}$(?![\\s\\S])"
+            }
+          },
+          {
+            "forbiddenInputs": [
+              "moveto",
+              "type",
+              "action"
             ],
             "requiredValues": {
               "enable": 0
             }
           },
           {
+            "requiredInputs": [
+              "action"
+            ],
+            "forbiddenInputs": [
+              "moveto",
+              "type"
+            ],
+            "inputPatterns": {
+              "action": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+            },
+            "requiredValues": {
+              "enable": 0
+            }
+          },
+          {
+            "requiredValues": {
+              "type": "in",
+              "enable": 1
+            },
+            "inputPatterns": {
+              "action": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+            },
             "forbiddenInputs": [
               "moveto"
+            ]
+          },
+          {
+            "requiredValues": {
+              "type": "out",
+              "enable": 1
+            },
+            "inputPatterns": {
+              "action": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+            },
+            "forbiddenInputs": [
+              "moveto"
+            ]
+          },
+          {
+            "requiredValues": {
+              "type": "group",
+              "enable": 1
+            },
+            "forbiddenInputs": [
+              "moveto",
+              "source",
+              "dest",
+              "proto",
+              "sport",
+              "dport"
             ],
+            "inputPatterns": {
+              "action": "^[A-Za-z][A-Za-z0-9_-]{1,17}$(?![\\s\\S])"
+            }
+          },
+          {
+            "forbiddenInputs": [
+              "moveto",
+              "type",
+              "action"
+            ],
+            "requiredValues": {
+              "enable": 1
+            }
+          },
+          {
+            "requiredInputs": [
+              "action"
+            ],
+            "forbiddenInputs": [
+              "moveto",
+              "type"
+            ],
+            "inputPatterns": {
+              "action": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+            },
             "requiredValues": {
               "enable": 1
             }
           }
         ],
         "inputPatterns": {
-          "type": "^(?:in|out)$",
-          "action": "^(?:ACCEPT|DROP|REJECT)$",
+          "type": "^(?:in|out|group)$",
+          "action": "^[A-Za-z][A-Za-z0-9_-]{1,17}$(?![\\s\\S])",
           "iface": "^net(?:[0-9]|[12][0-9]|3[01])$"
         },
         "inputFormats": {
@@ -16116,7 +17049,8 @@
           "proto": "pve-firewall-protocol",
           "sport": "pve-firewall-port",
           "dport": "pve-firewall-port",
-          "iface": "pve-firewall-interface"
+          "iface": "pve-firewall-interface",
+          "group": "pve-firewall-group"
         },
         "confirmationWarnings": [
           {
@@ -20383,68 +21317,578 @@
       }
     },
     {
-      "id": "OP-GET-5a8972086f",
-      "method": "GET",
-      "path": "/cluster/firewall/groups",
-      "release": "published-current",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/706"
-    },
-    {
       "id": "OP-POST-fb39335d0b",
       "method": "POST",
       "path": "/cluster/firewall/groups",
       "release": "published-current",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/707"
+      "admitted": true,
+      "contract": "dist/contracts.json#/contracts/707",
+      "policy": {
+        "effect": "write",
+        "transport": "json",
+        "secrets": "private-result",
+        "allowedInputs": [
+          "group",
+          "comment"
+        ],
+        "sensitiveInputs": [
+          "comment"
+        ],
+        "inputFormats": {
+          "group": "pve-firewall-group",
+          "comment": "pve-firewall-comment"
+        },
+        "confirmationWarnings": [
+          {
+            "message": "Shared security groups affect existing cluster, node and guest references, including management traffic. Inspect dependencies before confirming."
+          }
+        ],
+        "reason": "Confirmed creation or native empty-only security-group deletion. Comments use SecretRefs; rename, metadata-update and cross-scope reference rewrites remain refused.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Inspect the group and references privately; never retry, detach references or recreate a group automatically after uncertainty."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/",
+            [
+              "Sys.Modify"
+            ]
+          ]
+        },
+        "response": {
+          "type": "null"
+        },
+        "source": "Pinned Groups.pm creation and Rules.pm empty-group deletion under the cluster lock."
+      },
+      "inputs": [
+        {
+          "name": "comment",
+          "admitted": true,
+          "sensitive": true
+        },
+        {
+          "name": "digest",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "group",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "rename",
+          "admitted": false,
+          "sensitive": false
+        }
+      ],
+      "results": {
+        "type": "null",
+        "handling": "versioned inherited private pipe; public metadata only"
+      }
     },
     {
       "id": "OP-DELETE-37fc2d324c",
       "method": "DELETE",
       "path": "/cluster/firewall/groups/{group}",
       "release": "published-current",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/708"
-    },
-    {
-      "id": "OP-GET-c0cec274a4",
-      "method": "GET",
-      "path": "/cluster/firewall/groups/{group}",
-      "release": "published-current",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/709"
+      "admitted": true,
+      "contract": "dist/contracts.json#/contracts/708",
+      "policy": {
+        "effect": "write",
+        "transport": "json",
+        "secrets": "private-result",
+        "allowedInputs": [
+          "group"
+        ],
+        "sensitiveInputs": [],
+        "inputFormats": {
+          "group": "pve-firewall-group"
+        },
+        "confirmationWarnings": [
+          {
+            "message": "Shared security groups affect existing cluster, node and guest references, including management traffic. Inspect dependencies before confirming."
+          },
+          {
+            "message": "GROUP DELETION: the provider permits only empty groups; remove guest references separately. Empty does not mean unreferenced."
+          }
+        ],
+        "reason": "Confirmed creation or native empty-only security-group deletion. Comments use SecretRefs; rename, metadata-update and cross-scope reference rewrites remain refused.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Inspect the group and references privately; never retry, detach references or recreate a group automatically after uncertainty."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/",
+            [
+              "Sys.Modify"
+            ]
+          ]
+        },
+        "response": {
+          "type": "null"
+        },
+        "source": "Pinned Groups.pm creation and Rules.pm empty-group deletion under the cluster lock."
+      },
+      "inputs": [
+        {
+          "name": "group",
+          "admitted": true,
+          "sensitive": false
+        }
+      ],
+      "results": {
+        "type": "null",
+        "handling": "versioned inherited private pipe; public metadata only"
+      }
     },
     {
       "id": "OP-POST-8ca32093a6",
       "method": "POST",
       "path": "/cluster/firewall/groups/{group}",
       "release": "published-current",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/710"
+      "admitted": true,
+      "contract": "dist/contracts.json#/contracts/710",
+      "policy": {
+        "effect": "write",
+        "transport": "json",
+        "secrets": "private-result",
+        "stateBinding": {
+          "kind": "firewall-rules",
+          "path": "/cluster/firewall/groups/{group}"
+        },
+        "allowedInputs": [
+          "group",
+          "type",
+          "action",
+          "enable",
+          "source",
+          "dest",
+          "proto",
+          "sport",
+          "dport"
+        ],
+        "requiredInputs": [],
+        "fixedInputs": {
+          "enable": 0
+        },
+        "inputPatterns": {
+          "type": "^(?:in|out)$",
+          "action": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+        },
+        "inputFormats": {
+          "source": "pve-firewall-address",
+          "dest": "pve-firewall-address",
+          "proto": "pve-firewall-protocol",
+          "sport": "pve-firewall-port",
+          "dport": "pve-firewall-port",
+          "iface": "pve-firewall-interface",
+          "group": "pve-firewall-group"
+        },
+        "confirmationWarnings": [
+          {
+            "message": "Firewall rule changes can cut off management access or change protection. Inspect the complete private ordered plan before confirming."
+          },
+          {
+            "message": "SHARED GROUP: this ordered change affects every existing cluster, node or guest reference, including management traffic. Audit those dependencies explicitly."
+          },
+          {
+            "message": "NON-ATOMIC CREATE: the provider ignores creation digests and prepends this fixed disabled rule. Unexpected observed order remains uncertain; enabling requires a separate fresh digest-guarded confirmation."
+          }
+        ],
+        "reason": "Non-atomic creation of a fixed disabled rule only: provider POST ignores digest and prepends; private before/after plan, state recheck and post-write comparison apply. Enable separately with a fresh digest-guarded confirmation.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Inspect complete current rules privately; a matching later list cannot establish attribution. Never retry or automatically delete after uncertainty."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/",
+            [
+              "Sys.Modify"
+            ]
+          ]
+        },
+        "response": {
+          "type": "null"
+        },
+        "source": "Pinned rule schemas and reviewed provider Rules.pm creation, digest-guarded updates/deletes and reorder semantics."
+      },
+      "inputs": [
+        {
+          "name": "action",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "comment",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "dest",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "digest",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "dport",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "enable",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "group",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "icmp-type",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "iface",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "log",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "macro",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "pos",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "proto",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "source",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "sport",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "type",
+          "admitted": true,
+          "sensitive": false
+        }
+      ],
+      "results": {
+        "type": "null",
+        "handling": "versioned inherited private pipe; public metadata only"
+      }
     },
     {
       "id": "OP-DELETE-903157d1bd",
       "method": "DELETE",
       "path": "/cluster/firewall/groups/{group}/{pos}",
       "release": "published-current",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/711"
-    },
-    {
-      "id": "OP-GET-75b2fb0274",
-      "method": "GET",
-      "path": "/cluster/firewall/groups/{group}/{pos}",
-      "release": "published-current",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/712"
+      "admitted": true,
+      "contract": "dist/contracts.json#/contracts/711",
+      "policy": {
+        "effect": "write",
+        "transport": "json",
+        "secrets": "private-result",
+        "stateBinding": {
+          "kind": "firewall-rules",
+          "path": "/cluster/firewall/groups/{group}"
+        },
+        "allowedInputs": [
+          "group",
+          "pos",
+          "digest"
+        ],
+        "requiredInputs": [
+          "pos"
+        ],
+        "confirmationWarnings": [
+          {
+            "message": "Firewall rule changes can cut off management access or change protection. Inspect the complete private ordered plan before confirming."
+          },
+          {
+            "message": "SHARED GROUP: this ordered change affects every existing cluster, node or guest reference, including management traffic. Audit those dependencies explicitly."
+          },
+          {
+            "message": "RULE DELETION: explicitly review the selected position and resulting ordered rules before confirming."
+          }
+        ],
+        "reason": "Private state-bound ordered rule change with automatic provider digest guard; reorder is separate from field edits. No automatic retry or deletion after uncertainty.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Inspect complete current rules privately; a matching later list cannot establish attribution. Never retry or automatically delete after uncertainty."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/",
+            [
+              "Sys.Modify"
+            ]
+          ]
+        },
+        "response": {
+          "type": "null"
+        },
+        "source": "Pinned rule schemas and reviewed provider Rules.pm creation, digest-guarded updates/deletes and reorder semantics."
+      },
+      "inputs": [
+        {
+          "name": "digest",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "group",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "pos",
+          "admitted": true,
+          "sensitive": false
+        }
+      ],
+      "results": {
+        "type": "null",
+        "handling": "versioned inherited private pipe; public metadata only"
+      }
     },
     {
       "id": "OP-PUT-4a9d0e8136",
       "method": "PUT",
       "path": "/cluster/firewall/groups/{group}/{pos}",
       "release": "published-current",
-      "admitted": false,
-      "contract": "dist/contracts.json#/contracts/713"
+      "admitted": true,
+      "contract": "dist/contracts.json#/contracts/713",
+      "policy": {
+        "effect": "write",
+        "transport": "json",
+        "secrets": "private-result",
+        "stateBinding": {
+          "kind": "firewall-rules",
+          "path": "/cluster/firewall/groups/{group}"
+        },
+        "allowedInputs": [
+          "group",
+          "pos",
+          "digest",
+          "type",
+          "action",
+          "enable",
+          "source",
+          "dest",
+          "proto",
+          "sport",
+          "dport",
+          "moveto"
+        ],
+        "requiredInputs": [
+          "pos"
+        ],
+        "inputCases": [
+          {
+            "requiredInputs": [
+              "moveto"
+            ],
+            "forbiddenInputs": [
+              "type",
+              "action",
+              "enable",
+              "source",
+              "dest",
+              "proto",
+              "sport",
+              "dport"
+            ]
+          },
+          {
+            "requiredValues": {},
+            "forbiddenInputs": [
+              "moveto",
+              "enable"
+            ]
+          },
+          {
+            "requiredValues": {
+              "enable": 0
+            },
+            "forbiddenInputs": [
+              "moveto"
+            ]
+          },
+          {
+            "requiredValues": {
+              "enable": 1
+            },
+            "forbiddenInputs": [
+              "moveto"
+            ]
+          }
+        ],
+        "inputPatterns": {
+          "type": "^(?:in|out)$",
+          "action": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+        },
+        "inputFormats": {
+          "source": "pve-firewall-address",
+          "dest": "pve-firewall-address",
+          "proto": "pve-firewall-protocol",
+          "sport": "pve-firewall-port",
+          "dport": "pve-firewall-port",
+          "iface": "pve-firewall-interface",
+          "group": "pve-firewall-group"
+        },
+        "confirmationWarnings": [
+          {
+            "message": "Firewall rule changes can cut off management access or change protection. Inspect the complete private ordered plan before confirming."
+          },
+          {
+            "message": "SHARED GROUP: this ordered change affects every existing cluster, node or guest reference, including management traffic. Audit those dependencies explicitly."
+          }
+        ],
+        "reason": "Private state-bound ordered rule change with automatic provider digest guard; reorder is separate from field edits. No automatic retry or deletion after uncertainty.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Inspect complete current rules privately; a matching later list cannot establish attribution. Never retry or automatically delete after uncertainty."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/",
+            [
+              "Sys.Modify"
+            ]
+          ]
+        },
+        "response": {
+          "type": "null"
+        },
+        "source": "Pinned rule schemas and reviewed provider Rules.pm creation, digest-guarded updates/deletes and reorder semantics."
+      },
+      "inputs": [
+        {
+          "name": "action",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "comment",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "delete",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "dest",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "digest",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "dport",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "enable",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "group",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "icmp-type",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "iface",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "log",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "macro",
+          "admitted": false,
+          "sensitive": false
+        },
+        {
+          "name": "moveto",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "pos",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "proto",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "source",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "sport",
+          "admitted": true,
+          "sensitive": false
+        },
+        {
+          "name": "type",
+          "admitted": true,
+          "sensitive": false
+        }
+      ],
+      "results": {
+        "type": "null",
+        "handling": "versioned inherited private pipe; public metadata only"
+      }
     },
     {
       "id": "OP-POST-9811b3d98d",
@@ -21025,7 +22469,7 @@
         },
         "inputPatterns": {
           "type": "^(?:in|out)$",
-          "action": "^(?:ACCEPT|DROP|REJECT)$"
+          "action": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
         },
         "inputFormats": {
           "source": "pve-firewall-address",
@@ -21033,7 +22477,8 @@
           "proto": "pve-firewall-protocol",
           "sport": "pve-firewall-port",
           "dport": "pve-firewall-port",
-          "iface": "pve-firewall-interface"
+          "iface": "pve-firewall-interface",
+          "group": "pve-firewall-group"
         },
         "confirmationWarnings": [
           {
@@ -21260,31 +22705,32 @@
             ]
           },
           {
+            "requiredValues": {},
             "forbiddenInputs": [
               "moveto",
               "enable"
             ]
           },
           {
-            "forbiddenInputs": [
-              "moveto"
-            ],
             "requiredValues": {
               "enable": 0
-            }
-          },
-          {
+            },
             "forbiddenInputs": [
               "moveto"
-            ],
+            ]
+          },
+          {
             "requiredValues": {
               "enable": 1
-            }
+            },
+            "forbiddenInputs": [
+              "moveto"
+            ]
           }
         ],
         "inputPatterns": {
           "type": "^(?:in|out)$",
-          "action": "^(?:ACCEPT|DROP|REJECT)$"
+          "action": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
         },
         "inputFormats": {
           "source": "pve-firewall-address",
@@ -21292,7 +22738,8 @@
           "proto": "pve-firewall-protocol",
           "sport": "pve-firewall-port",
           "dport": "pve-firewall-port",
-          "iface": "pve-firewall-interface"
+          "iface": "pve-firewall-interface",
+          "group": "pve-firewall-group"
         },
         "confirmationWarnings": [
           {
@@ -24002,7 +25449,7 @@
         },
         "inputPatterns": {
           "type": "^(?:in|out)$",
-          "action": "^(?:ACCEPT|DROP|REJECT)$"
+          "action": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
         },
         "inputFormats": {
           "source": "pve-firewall-address",
@@ -24010,7 +25457,8 @@
           "proto": "pve-firewall-protocol",
           "sport": "pve-firewall-port",
           "dport": "pve-firewall-port",
-          "iface": "pve-firewall-interface"
+          "iface": "pve-firewall-interface",
+          "group": "pve-firewall-group"
         },
         "confirmationWarnings": [
           {
@@ -24249,31 +25697,32 @@
             ]
           },
           {
+            "requiredValues": {},
             "forbiddenInputs": [
               "moveto",
               "enable"
             ]
           },
           {
-            "forbiddenInputs": [
-              "moveto"
-            ],
             "requiredValues": {
               "enable": 0
-            }
-          },
-          {
+            },
             "forbiddenInputs": [
               "moveto"
-            ],
+            ]
+          },
+          {
             "requiredValues": {
               "enable": 1
-            }
+            },
+            "forbiddenInputs": [
+              "moveto"
+            ]
           }
         ],
         "inputPatterns": {
           "type": "^(?:in|out)$",
-          "action": "^(?:ACCEPT|DROP|REJECT)$"
+          "action": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
         },
         "inputFormats": {
           "source": "pve-firewall-address",
@@ -24281,7 +25730,8 @@
           "proto": "pve-firewall-protocol",
           "sport": "pve-firewall-port",
           "dport": "pve-firewall-port",
-          "iface": "pve-firewall-interface"
+          "iface": "pve-firewall-interface",
+          "group": "pve-firewall-group"
         },
         "confirmationWarnings": [
           {
@@ -29643,9 +31093,42 @@
         "fixedInputs": {
           "enable": 0
         },
+        "inputCases": [
+          {
+            "requiredValues": {
+              "type": "in"
+            },
+            "inputPatterns": {
+              "action": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+            }
+          },
+          {
+            "requiredValues": {
+              "type": "out"
+            },
+            "inputPatterns": {
+              "action": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+            }
+          },
+          {
+            "requiredValues": {
+              "type": "group"
+            },
+            "forbiddenInputs": [
+              "source",
+              "dest",
+              "proto",
+              "sport",
+              "dport"
+            ],
+            "inputPatterns": {
+              "action": "^[A-Za-z][A-Za-z0-9_-]{1,17}$(?![\\s\\S])"
+            }
+          }
+        ],
         "inputPatterns": {
-          "type": "^(?:in|out)$",
-          "action": "^(?:ACCEPT|DROP|REJECT)$",
+          "type": "^(?:in|out|group)$",
+          "action": "^[A-Za-z][A-Za-z0-9_-]{1,17}$(?![\\s\\S])",
           "iface": "^net(?:[0-9]|[12][0-9]|3[01])$"
         },
         "inputFormats": {
@@ -29654,7 +31137,8 @@
           "proto": "pve-firewall-protocol",
           "sport": "pve-firewall-port",
           "dport": "pve-firewall-port",
-          "iface": "pve-firewall-interface"
+          "iface": "pve-firewall-interface",
+          "group": "pve-firewall-group"
         },
         "confirmationWarnings": [
           {
@@ -29905,31 +31389,205 @@
             ]
           },
           {
+            "requiredValues": {
+              "type": "in"
+            },
+            "inputPatterns": {
+              "action": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+            },
             "forbiddenInputs": [
               "moveto",
               "enable"
             ]
           },
           {
+            "requiredValues": {
+              "type": "out"
+            },
+            "inputPatterns": {
+              "action": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+            },
+            "forbiddenInputs": [
+              "moveto",
+              "enable"
+            ]
+          },
+          {
+            "requiredValues": {
+              "type": "group"
+            },
+            "forbiddenInputs": [
+              "moveto",
+              "source",
+              "dest",
+              "proto",
+              "sport",
+              "dport",
+              "enable"
+            ],
+            "inputPatterns": {
+              "action": "^[A-Za-z][A-Za-z0-9_-]{1,17}$(?![\\s\\S])"
+            }
+          },
+          {
+            "forbiddenInputs": [
+              "moveto",
+              "type",
+              "action",
+              "enable"
+            ],
+            "requiredValues": {}
+          },
+          {
+            "requiredInputs": [
+              "action"
+            ],
+            "forbiddenInputs": [
+              "moveto",
+              "type",
+              "enable"
+            ],
+            "inputPatterns": {
+              "action": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+            },
+            "requiredValues": {}
+          },
+          {
+            "requiredValues": {
+              "type": "in",
+              "enable": 0
+            },
+            "inputPatterns": {
+              "action": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+            },
             "forbiddenInputs": [
               "moveto"
+            ]
+          },
+          {
+            "requiredValues": {
+              "type": "out",
+              "enable": 0
+            },
+            "inputPatterns": {
+              "action": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+            },
+            "forbiddenInputs": [
+              "moveto"
+            ]
+          },
+          {
+            "requiredValues": {
+              "type": "group",
+              "enable": 0
+            },
+            "forbiddenInputs": [
+              "moveto",
+              "source",
+              "dest",
+              "proto",
+              "sport",
+              "dport"
+            ],
+            "inputPatterns": {
+              "action": "^[A-Za-z][A-Za-z0-9_-]{1,17}$(?![\\s\\S])"
+            }
+          },
+          {
+            "forbiddenInputs": [
+              "moveto",
+              "type",
+              "action"
             ],
             "requiredValues": {
               "enable": 0
             }
           },
           {
+            "requiredInputs": [
+              "action"
+            ],
+            "forbiddenInputs": [
+              "moveto",
+              "type"
+            ],
+            "inputPatterns": {
+              "action": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+            },
+            "requiredValues": {
+              "enable": 0
+            }
+          },
+          {
+            "requiredValues": {
+              "type": "in",
+              "enable": 1
+            },
+            "inputPatterns": {
+              "action": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+            },
             "forbiddenInputs": [
               "moveto"
+            ]
+          },
+          {
+            "requiredValues": {
+              "type": "out",
+              "enable": 1
+            },
+            "inputPatterns": {
+              "action": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+            },
+            "forbiddenInputs": [
+              "moveto"
+            ]
+          },
+          {
+            "requiredValues": {
+              "type": "group",
+              "enable": 1
+            },
+            "forbiddenInputs": [
+              "moveto",
+              "source",
+              "dest",
+              "proto",
+              "sport",
+              "dport"
             ],
+            "inputPatterns": {
+              "action": "^[A-Za-z][A-Za-z0-9_-]{1,17}$(?![\\s\\S])"
+            }
+          },
+          {
+            "forbiddenInputs": [
+              "moveto",
+              "type",
+              "action"
+            ],
+            "requiredValues": {
+              "enable": 1
+            }
+          },
+          {
+            "requiredInputs": [
+              "action"
+            ],
+            "forbiddenInputs": [
+              "moveto",
+              "type"
+            ],
+            "inputPatterns": {
+              "action": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+            },
             "requiredValues": {
               "enable": 1
             }
           }
         ],
         "inputPatterns": {
-          "type": "^(?:in|out)$",
-          "action": "^(?:ACCEPT|DROP|REJECT)$",
+          "type": "^(?:in|out|group)$",
+          "action": "^[A-Za-z][A-Za-z0-9_-]{1,17}$(?![\\s\\S])",
           "iface": "^net(?:[0-9]|[12][0-9]|3[01])$"
         },
         "inputFormats": {
@@ -29938,7 +31596,8 @@
           "proto": "pve-firewall-protocol",
           "sport": "pve-firewall-port",
           "dport": "pve-firewall-port",
-          "iface": "pve-firewall-interface"
+          "iface": "pve-firewall-interface",
+          "group": "pve-firewall-group"
         },
         "confirmationWarnings": [
           {
@@ -35316,9 +36975,42 @@
         "fixedInputs": {
           "enable": 0
         },
+        "inputCases": [
+          {
+            "requiredValues": {
+              "type": "in"
+            },
+            "inputPatterns": {
+              "action": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+            }
+          },
+          {
+            "requiredValues": {
+              "type": "out"
+            },
+            "inputPatterns": {
+              "action": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+            }
+          },
+          {
+            "requiredValues": {
+              "type": "group"
+            },
+            "forbiddenInputs": [
+              "source",
+              "dest",
+              "proto",
+              "sport",
+              "dport"
+            ],
+            "inputPatterns": {
+              "action": "^[A-Za-z][A-Za-z0-9_-]{1,17}$(?![\\s\\S])"
+            }
+          }
+        ],
         "inputPatterns": {
-          "type": "^(?:in|out)$",
-          "action": "^(?:ACCEPT|DROP|REJECT)$",
+          "type": "^(?:in|out|group)$",
+          "action": "^[A-Za-z][A-Za-z0-9_-]{1,17}$(?![\\s\\S])",
           "iface": "^net(?:[0-9]|[12][0-9]|3[01])$"
         },
         "inputFormats": {
@@ -35327,7 +37019,8 @@
           "proto": "pve-firewall-protocol",
           "sport": "pve-firewall-port",
           "dport": "pve-firewall-port",
-          "iface": "pve-firewall-interface"
+          "iface": "pve-firewall-interface",
+          "group": "pve-firewall-group"
         },
         "confirmationWarnings": [
           {
@@ -35578,31 +37271,205 @@
             ]
           },
           {
+            "requiredValues": {
+              "type": "in"
+            },
+            "inputPatterns": {
+              "action": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+            },
             "forbiddenInputs": [
               "moveto",
               "enable"
             ]
           },
           {
+            "requiredValues": {
+              "type": "out"
+            },
+            "inputPatterns": {
+              "action": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+            },
+            "forbiddenInputs": [
+              "moveto",
+              "enable"
+            ]
+          },
+          {
+            "requiredValues": {
+              "type": "group"
+            },
+            "forbiddenInputs": [
+              "moveto",
+              "source",
+              "dest",
+              "proto",
+              "sport",
+              "dport",
+              "enable"
+            ],
+            "inputPatterns": {
+              "action": "^[A-Za-z][A-Za-z0-9_-]{1,17}$(?![\\s\\S])"
+            }
+          },
+          {
+            "forbiddenInputs": [
+              "moveto",
+              "type",
+              "action",
+              "enable"
+            ],
+            "requiredValues": {}
+          },
+          {
+            "requiredInputs": [
+              "action"
+            ],
+            "forbiddenInputs": [
+              "moveto",
+              "type",
+              "enable"
+            ],
+            "inputPatterns": {
+              "action": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+            },
+            "requiredValues": {}
+          },
+          {
+            "requiredValues": {
+              "type": "in",
+              "enable": 0
+            },
+            "inputPatterns": {
+              "action": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+            },
             "forbiddenInputs": [
               "moveto"
+            ]
+          },
+          {
+            "requiredValues": {
+              "type": "out",
+              "enable": 0
+            },
+            "inputPatterns": {
+              "action": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+            },
+            "forbiddenInputs": [
+              "moveto"
+            ]
+          },
+          {
+            "requiredValues": {
+              "type": "group",
+              "enable": 0
+            },
+            "forbiddenInputs": [
+              "moveto",
+              "source",
+              "dest",
+              "proto",
+              "sport",
+              "dport"
+            ],
+            "inputPatterns": {
+              "action": "^[A-Za-z][A-Za-z0-9_-]{1,17}$(?![\\s\\S])"
+            }
+          },
+          {
+            "forbiddenInputs": [
+              "moveto",
+              "type",
+              "action"
             ],
             "requiredValues": {
               "enable": 0
             }
           },
           {
+            "requiredInputs": [
+              "action"
+            ],
+            "forbiddenInputs": [
+              "moveto",
+              "type"
+            ],
+            "inputPatterns": {
+              "action": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+            },
+            "requiredValues": {
+              "enable": 0
+            }
+          },
+          {
+            "requiredValues": {
+              "type": "in",
+              "enable": 1
+            },
+            "inputPatterns": {
+              "action": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+            },
             "forbiddenInputs": [
               "moveto"
+            ]
+          },
+          {
+            "requiredValues": {
+              "type": "out",
+              "enable": 1
+            },
+            "inputPatterns": {
+              "action": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+            },
+            "forbiddenInputs": [
+              "moveto"
+            ]
+          },
+          {
+            "requiredValues": {
+              "type": "group",
+              "enable": 1
+            },
+            "forbiddenInputs": [
+              "moveto",
+              "source",
+              "dest",
+              "proto",
+              "sport",
+              "dport"
             ],
+            "inputPatterns": {
+              "action": "^[A-Za-z][A-Za-z0-9_-]{1,17}$(?![\\s\\S])"
+            }
+          },
+          {
+            "forbiddenInputs": [
+              "moveto",
+              "type",
+              "action"
+            ],
+            "requiredValues": {
+              "enable": 1
+            }
+          },
+          {
+            "requiredInputs": [
+              "action"
+            ],
+            "forbiddenInputs": [
+              "moveto",
+              "type"
+            ],
+            "inputPatterns": {
+              "action": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+            },
             "requiredValues": {
               "enable": 1
             }
           }
         ],
         "inputPatterns": {
-          "type": "^(?:in|out)$",
-          "action": "^(?:ACCEPT|DROP|REJECT)$",
+          "type": "^(?:in|out|group)$",
+          "action": "^[A-Za-z][A-Za-z0-9_-]{1,17}$(?![\\s\\S])",
           "iface": "^net(?:[0-9]|[12][0-9]|3[01])$"
         },
         "inputFormats": {
@@ -35611,7 +37478,8 @@
           "proto": "pve-firewall-protocol",
           "sport": "pve-firewall-port",
           "dport": "pve-firewall-port",
-          "iface": "pve-firewall-interface"
+          "iface": "pve-firewall-interface",
+          "group": "pve-firewall-group"
         },
         "confirmationWarnings": [
           {

@@ -223,6 +223,11 @@ See the [alias and IP-set guide](skills/proxmox-axi/references/firewall-manageme
 Neither retained catalogue exposes node-local alias/IP-set routes; renames, force deletion and member alias references remain refused.
 The pinned [alias implementation](https://github.com/proxmox/pve-firewall/blob/82888bc0a16a989e2858f47dc56c73741fd36d5b/src/PVE/API2/Firewall/Aliases.pm) and [IP-set implementation](https://github.com/proxmox/pve-firewall/blob/82888bc0a16a989e2858f47dc56c73741fd36d5b/src/PVE/API2/Firewall/IPSet.pm) define native digest and member-replacement behavior.
 
+Security-group definition creation, private discovery, empty-only deletion and ordered group rules are admitted, together with QEMU/LXC group references.
+Follow the [security-group guide](skills/proxmox-axi/references/firewall-management.md#security-groups-and-guest-references) for staged attachment, private referenced definitions, shared effects and cross-scope uncertainty.
+The pinned [group implementation](https://github.com/proxmox/pve-firewall/blob/82888bc0a16a989e2858f47dc56c73741fd36d5b/src/PVE/API2/Firewall/Groups.pm) handles definitions; the shared rule implementation enforces empty-only deletion and native position guards.
+Renames, nested groups, group-rule interfaces and cluster/node reference mutations remain refused.
+
 ### Guest power control
 
 QEMU and LXC support guest `start`, `shutdown`, `stop`, `reboot`, `suspend` and `resume` through `create '/nodes/{node}/<qemu-or-lxc>/{vmid}/status/<action>'`.

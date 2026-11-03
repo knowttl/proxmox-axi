@@ -577,6 +577,42 @@
       }
     },
     {
+      "command": "delete /cluster/firewall/groups/{group}",
+      "operationId": "OP-DELETE-37fc2d324c",
+      "method": "DELETE",
+      "path": "/cluster/firewall/groups/{group}",
+      "sensitiveInputs": [],
+      "privateResult": true,
+      "effect": "write",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "preview": "boolean",
+        "confirm": "value",
+        "session": "value",
+        "api-group": "value"
+      }
+    },
+    {
+      "command": "delete /cluster/firewall/groups/{group}/{pos}",
+      "operationId": "OP-DELETE-903157d1bd",
+      "method": "DELETE",
+      "path": "/cluster/firewall/groups/{group}/{pos}",
+      "sensitiveInputs": [],
+      "privateResult": true,
+      "effect": "write",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "preview": "boolean",
+        "confirm": "value",
+        "session": "value",
+        "api-digest": "value",
+        "api-group": "value",
+        "api-pos": "value"
+      }
+    },
+    {
       "command": "delete /cluster/firewall/ipset/{name}",
       "operationId": "OP-DELETE-78b51cb6e2",
       "method": "DELETE",
@@ -1069,6 +1105,50 @@
         "session": "value",
         "api-cidr": "value",
         "api-name": "value"
+      }
+    },
+    {
+      "command": "create /cluster/firewall/groups",
+      "operationId": "OP-POST-fb39335d0b",
+      "method": "POST",
+      "path": "/cluster/firewall/groups",
+      "sensitiveInputs": [
+        "comment"
+      ],
+      "privateResult": true,
+      "effect": "write",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "preview": "boolean",
+        "confirm": "value",
+        "session": "value",
+        "api-group": "value"
+      }
+    },
+    {
+      "command": "create /cluster/firewall/groups/{group}",
+      "operationId": "OP-POST-8ca32093a6",
+      "method": "POST",
+      "path": "/cluster/firewall/groups/{group}",
+      "sensitiveInputs": [],
+      "privateResult": true,
+      "effect": "write",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "preview": "boolean",
+        "confirm": "value",
+        "session": "value",
+        "api-action": "value",
+        "api-dest": "value",
+        "api-dport": "value",
+        "api-enable": "value",
+        "api-group": "value",
+        "api-proto": "value",
+        "api-source": "value",
+        "api-sport": "value",
+        "api-type": "value"
       }
     },
     {
@@ -2593,6 +2673,34 @@
       }
     },
     {
+      "command": "set /cluster/firewall/groups/{group}/{pos}",
+      "operationId": "OP-PUT-4a9d0e8136",
+      "method": "PUT",
+      "path": "/cluster/firewall/groups/{group}/{pos}",
+      "sensitiveInputs": [],
+      "privateResult": true,
+      "effect": "write",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "preview": "boolean",
+        "confirm": "value",
+        "session": "value",
+        "api-action": "value",
+        "api-dest": "value",
+        "api-digest": "value",
+        "api-dport": "value",
+        "api-enable": "value",
+        "api-group": "value",
+        "api-moveto": "value",
+        "api-pos": "value",
+        "api-proto": "value",
+        "api-source": "value",
+        "api-sport": "value",
+        "api-type": "value"
+      }
+    },
+    {
       "command": "set /cluster/firewall/ipset/{name}/{cidr}",
       "operationId": "OP-PUT-91fcd48a95",
       "method": "PUT",
@@ -3550,6 +3658,33 @@
         "limit": "value",
         "fields": "value",
         "full": "boolean"
+      }
+    },
+    {
+      "command": "ls /cluster/firewall/groups",
+      "effect": "read",
+      "privateResult": true,
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "session": "value",
+        "limit": "value",
+        "fields": "value",
+        "full": "boolean"
+      }
+    },
+    {
+      "command": "ls /cluster/firewall/groups/{group}",
+      "effect": "read",
+      "privateResult": true,
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "session": "value",
+        "limit": "value",
+        "fields": "value",
+        "full": "boolean",
+        "api-group": "value"
       }
     },
     {
@@ -11554,6 +11689,72 @@
         "full": "boolean",
         "session": "value",
         "api-name": "value"
+      },
+      "privateResult": true,
+      "catalogues": [
+        "legacy-8.2.7",
+        "published-current"
+      ]
+    },
+    {
+      "command": "get /cluster/firewall/groups",
+      "operationId": "OP-GET-5a8972086f",
+      "method": "GET",
+      "path": "/cluster/firewall/groups",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value",
+        "limit": "value",
+        "fields": "value",
+        "full": "boolean",
+        "session": "value"
+      },
+      "privateResult": true,
+      "catalogues": [
+        "legacy-8.2.7",
+        "published-current"
+      ]
+    },
+    {
+      "command": "get /cluster/firewall/groups/{group}",
+      "operationId": "OP-GET-c0cec274a4",
+      "method": "GET",
+      "path": "/cluster/firewall/groups/{group}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value",
+        "limit": "value",
+        "fields": "value",
+        "full": "boolean",
+        "session": "value",
+        "api-group": "value"
+      },
+      "privateResult": true,
+      "catalogues": [
+        "legacy-8.2.7",
+        "published-current"
+      ]
+    },
+    {
+      "command": "get /cluster/firewall/groups/{group}/{pos}",
+      "operationId": "OP-GET-75b2fb0274",
+      "method": "GET",
+      "path": "/cluster/firewall/groups/{group}/{pos}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value",
+        "limit": "value",
+        "fields": "value",
+        "full": "boolean",
+        "session": "value",
+        "api-group": "value",
+        "api-pos": "value"
       },
       "privateResult": true,
       "catalogues": [

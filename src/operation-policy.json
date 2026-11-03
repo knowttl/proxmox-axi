@@ -11,6 +11,9 @@
     "reason": "Requires operation-specific effect, transport and secret review before admission."
   },
   "reviewed": {
+    "GET /cluster/firewall/groups": { "effect": "read", "transport": "json", "secrets": "private-result", "reason": "Security-group identities, comments and index digest require bounded private results." },
+    "GET /cluster/firewall/groups/{group}": { "effect": "read", "transport": "json", "secrets": "private-result", "reason": "Complete ordered group rules, comments and native rules digest require private results." },
+    "GET /cluster/firewall/groups/{group}/{pos}": { "effect": "read", "transport": "json", "secrets": "private-result", "reason": "One group rule and its native list digest require private results." },
     "GET /cluster/firewall/aliases": { "effect": "read", "transport": "json", "secrets": "private-result", "reason": "Scoped aliases, addresses, comments and digests require bounded private results." },
     "GET /cluster/firewall/aliases/{name}": { "effect": "read", "transport": "json", "secrets": "private-result", "reason": "Selected alias configuration and comments require private results." },
     "GET /cluster/firewall/ipset": { "effect": "read", "transport": "json", "secrets": "private-result", "reason": "Scoped set identities, comments and digests require private results." },

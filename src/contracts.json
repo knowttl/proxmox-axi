@@ -13225,12 +13225,12 @@
       "id": "OP-GET-5a8972086f",
       "release": "legacy-8.2.7",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "read",
+        "transport": "json",
+        "secrets": "private-result",
+        "reason": "Security-group identities, comments and index digest require bounded private results."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "get",
         "/cluster/firewall/groups"
@@ -13320,12 +13320,45 @@
       "id": "OP-POST-fb39335d0b",
       "release": "legacy-8.2.7",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "write",
+        "transport": "json",
+        "secrets": "private-result",
+        "allowedInputs": [
+          "group",
+          "comment"
+        ],
+        "sensitiveInputs": [
+          "comment"
+        ],
+        "inputFormats": {
+          "group": "pve-firewall-group",
+          "comment": "pve-firewall-comment"
+        },
+        "confirmationWarnings": [
+          {
+            "message": "Shared security groups affect existing cluster, node and guest references, including management traffic. Inspect dependencies before confirming."
+          }
+        ],
+        "reason": "Confirmed creation or native empty-only security-group deletion. Comments use SecretRefs; rename, metadata-update and cross-scope reference rewrites remain refused.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Inspect the group and references privately; never retry, detach references or recreate a group automatically after uncertainty."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/",
+            [
+              "Sys.Modify"
+            ]
+          ]
+        },
+        "response": {
+          "type": "null"
+        },
+        "source": "Pinned Groups.pm creation and Rules.pm empty-group deletion under the cluster lock."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "post",
         "/cluster/firewall/groups"
@@ -13343,23 +13376,46 @@
               "additionalProperties": false,
               "properties": {
                 "comment": {
-                  "type": "string"
-                },
-                "digest": {
-                  "type": "string",
-                  "maxLength": 64
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "env"
+                      ],
+                      "properties": {
+                        "env": {
+                          "type": "string",
+                          "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "file"
+                      ],
+                      "properties": {
+                        "file": {
+                          "type": "string",
+                          "minLength": 1
+                        }
+                      }
+                    }
+                  ],
+                  "x-secret": true
                 },
                 "group": {
                   "type": "string",
                   "minLength": 2,
                   "maxLength": 18,
-                  "pattern": "^(?:[A-Za-z][A-Za-z0-9_-]+)$"
-                },
-                "rename": {
-                  "type": "string",
-                  "minLength": 2,
-                  "maxLength": 18,
-                  "pattern": "^(?:[A-Za-z][A-Za-z0-9_-]+)$"
+                  "pattern": "^(?:[A-Za-z][A-Za-z0-9_-]+)$",
+                  "allOf": [
+                    {
+                      "pattern": "^[A-Za-z][A-Za-z0-9_-]{1,17}$(?![\\s\\S])"
+                    }
+                  ]
                 }
               },
               "required": [
@@ -13417,12 +13473,44 @@
       "id": "OP-DELETE-37fc2d324c",
       "release": "legacy-8.2.7",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "write",
+        "transport": "json",
+        "secrets": "private-result",
+        "allowedInputs": [
+          "group"
+        ],
+        "sensitiveInputs": [],
+        "inputFormats": {
+          "group": "pve-firewall-group"
+        },
+        "confirmationWarnings": [
+          {
+            "message": "Shared security groups affect existing cluster, node and guest references, including management traffic. Inspect dependencies before confirming."
+          },
+          {
+            "message": "GROUP DELETION: the provider permits only empty groups; remove guest references separately. Empty does not mean unreferenced."
+          }
+        ],
+        "reason": "Confirmed creation or native empty-only security-group deletion. Comments use SecretRefs; rename, metadata-update and cross-scope reference rewrites remain refused.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Inspect the group and references privately; never retry, detach references or recreate a group automatically after uncertainty."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/",
+            [
+              "Sys.Modify"
+            ]
+          ]
+        },
+        "response": {
+          "type": "null"
+        },
+        "source": "Pinned Groups.pm creation and Rules.pm empty-group deletion under the cluster lock."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "delete",
         "/cluster/firewall/groups/{group}"
@@ -13443,7 +13531,12 @@
                   "type": "string",
                   "minLength": 2,
                   "maxLength": 18,
-                  "pattern": "^(?:[A-Za-z][A-Za-z0-9_-]+)$"
+                  "pattern": "^(?:[A-Za-z][A-Za-z0-9_-]+)$",
+                  "allOf": [
+                    {
+                      "pattern": "^[A-Za-z][A-Za-z0-9_-]{1,17}$(?![\\s\\S])"
+                    }
+                  ]
                 }
               },
               "required": [
@@ -13516,12 +13609,12 @@
       "id": "OP-GET-c0cec274a4",
       "release": "legacy-8.2.7",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "read",
+        "transport": "json",
+        "secrets": "private-result",
+        "reason": "Complete ordered group rules, comments and native rules digest require private results."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "get",
         "/cluster/firewall/groups/{group}"
@@ -13723,12 +13816,72 @@
       "id": "OP-POST-8ca32093a6",
       "release": "legacy-8.2.7",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "write",
+        "transport": "json",
+        "secrets": "private-result",
+        "stateBinding": {
+          "kind": "firewall-rules",
+          "path": "/cluster/firewall/groups/{group}"
+        },
+        "allowedInputs": [
+          "group",
+          "type",
+          "action",
+          "enable",
+          "source",
+          "dest",
+          "proto",
+          "sport",
+          "dport"
+        ],
+        "requiredInputs": [],
+        "fixedInputs": {
+          "enable": 0
+        },
+        "inputPatterns": {
+          "type": "^(?:in|out)$",
+          "action": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+        },
+        "inputFormats": {
+          "source": "pve-firewall-address",
+          "dest": "pve-firewall-address",
+          "proto": "pve-firewall-protocol",
+          "sport": "pve-firewall-port",
+          "dport": "pve-firewall-port",
+          "iface": "pve-firewall-interface",
+          "group": "pve-firewall-group"
+        },
+        "confirmationWarnings": [
+          {
+            "message": "Firewall rule changes can cut off management access or change protection. Inspect the complete private ordered plan before confirming."
+          },
+          {
+            "message": "SHARED GROUP: this ordered change affects every existing cluster, node or guest reference, including management traffic. Audit those dependencies explicitly."
+          },
+          {
+            "message": "NON-ATOMIC CREATE: the provider ignores creation digests and prepends this fixed disabled rule. Unexpected observed order remains uncertain; enabling requires a separate fresh digest-guarded confirmation."
+          }
+        ],
+        "reason": "Non-atomic creation of a fixed disabled rule only: provider POST ignores digest and prepends; private before/after plan, state recheck and post-write comparison apply. Enable separately with a fresh digest-guarded confirmation.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Inspect complete current rules privately; a matching later list cannot establish attribution. Never retry or automatically delete after uncertainty."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/",
+            [
+              "Sys.Modify"
+            ]
+          ]
+        },
+        "response": {
+          "type": "null"
+        },
+        "source": "Pinned rule schemas and reviewed provider Rules.pm creation, digest-guarded updates/deletes and reorder semantics."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "post",
         "/cluster/firewall/groups/{group}"
@@ -13749,85 +13902,51 @@
                   "type": "string",
                   "minLength": 2,
                   "maxLength": 20,
-                  "pattern": "^(?:[A-Za-z][A-Za-z0-9_-]+)$"
-                },
-                "comment": {
-                  "type": "string"
+                  "pattern": "^(?:[A-Za-z][A-Za-z0-9_-]+)$",
+                  "allOf": [
+                    {
+                      "pattern": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+                    }
+                  ]
                 },
                 "dest": {
                   "type": "string",
                   "maxLength": 512,
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
-                },
-                "digest": {
-                  "type": "string",
-                  "maxLength": 64
+                  "pattern": "^(?:(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])(?:\\.(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])){3}(?:/(?:[0-9]|[12][0-9]|3[0-2]))?|(?:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::|::[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::)(?:/(?:[0-9]|[1-9][0-9]|1[01][0-9]|12[0-8]))?)$(?![\\s\\S])"
                 },
                 "dport": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^(?:[1-9]|[1-9][0-9]{1,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])$"
                 },
                 "enable": {
                   "type": "integer",
-                  "minimum": 0
+                  "minimum": 0,
+                  "const": 0,
+                  "default": 0
                 },
                 "group": {
                   "type": "string",
                   "minLength": 2,
                   "maxLength": 18,
-                  "pattern": "^(?:[A-Za-z][A-Za-z0-9_-]+)$"
-                },
-                "icmp-type": {
-                  "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
-                },
-                "iface": {
-                  "type": "string",
-                  "minLength": 2,
-                  "maxLength": 20,
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
-                },
-                "log": {
-                  "enum": [
-                    "emerg",
-                    "alert",
-                    "crit",
-                    "err",
-                    "warning",
-                    "notice",
-                    "info",
-                    "debug",
-                    "nolog"
-                  ],
-                  "type": "string"
-                },
-                "macro": {
-                  "type": "string",
-                  "maxLength": 128
-                },
-                "pos": {
-                  "type": "integer",
-                  "minimum": 0
+                  "pattern": "^(?:[A-Za-z][A-Za-z0-9_-]+)$",
+                  "allOf": [
+                    {
+                      "pattern": "^[A-Za-z][A-Za-z0-9_-]{1,17}$(?![\\s\\S])"
+                    }
+                  ]
                 },
                 "proto": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^(?:tcp|udp|icmp|icmpv6)$"
                 },
                 "source": {
                   "type": "string",
                   "maxLength": 512,
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^(?:(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])(?:\\.(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])){3}(?:/(?:[0-9]|[12][0-9]|3[0-2]))?|(?:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::|::[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::)(?:/(?:[0-9]|[1-9][0-9]|1[01][0-9]|12[0-8]))?)$(?![\\s\\S])"
                 },
                 "sport": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^(?:[1-9]|[1-9][0-9]{1,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])$"
                 },
                 "type": {
                   "enum": [
@@ -13836,7 +13955,12 @@
                     "forward",
                     "group"
                   ],
-                  "type": "string"
+                  "type": "string",
+                  "allOf": [
+                    {
+                      "pattern": "^(?:in|out)$"
+                    }
+                  ]
                 }
               },
               "required": [
@@ -13911,12 +14035,52 @@
       "id": "OP-DELETE-903157d1bd",
       "release": "legacy-8.2.7",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "write",
+        "transport": "json",
+        "secrets": "private-result",
+        "stateBinding": {
+          "kind": "firewall-rules",
+          "path": "/cluster/firewall/groups/{group}"
+        },
+        "allowedInputs": [
+          "group",
+          "pos",
+          "digest"
+        ],
+        "requiredInputs": [
+          "pos"
+        ],
+        "confirmationWarnings": [
+          {
+            "message": "Firewall rule changes can cut off management access or change protection. Inspect the complete private ordered plan before confirming."
+          },
+          {
+            "message": "SHARED GROUP: this ordered change affects every existing cluster, node or guest reference, including management traffic. Audit those dependencies explicitly."
+          },
+          {
+            "message": "RULE DELETION: explicitly review the selected position and resulting ordered rules before confirming."
+          }
+        ],
+        "reason": "Private state-bound ordered rule change with automatic provider digest guard; reorder is separate from field edits. No automatic retry or deletion after uncertainty.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Inspect complete current rules privately; a matching later list cannot establish attribution. Never retry or automatically delete after uncertainty."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/",
+            [
+              "Sys.Modify"
+            ]
+          ]
+        },
+        "response": {
+          "type": "null"
+        },
+        "source": "Pinned rule schemas and reviewed provider Rules.pm creation, digest-guarded updates/deletes and reorder semantics."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "delete",
         "/cluster/firewall/groups/{group}/{pos}"
@@ -13949,7 +14113,8 @@
                 }
               },
               "required": [
-                "group"
+                "group",
+                "pos"
               ],
               "dependencies": {}
             }
@@ -14082,12 +14247,12 @@
       "id": "OP-GET-75b2fb0274",
       "release": "legacy-8.2.7",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "read",
+        "transport": "json",
+        "secrets": "private-result",
+        "reason": "One group rule and its native list digest require private results."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "get",
         "/cluster/firewall/groups/{group}/{pos}"
@@ -14307,12 +14472,111 @@
       "id": "OP-PUT-4a9d0e8136",
       "release": "legacy-8.2.7",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "write",
+        "transport": "json",
+        "secrets": "private-result",
+        "stateBinding": {
+          "kind": "firewall-rules",
+          "path": "/cluster/firewall/groups/{group}"
+        },
+        "allowedInputs": [
+          "group",
+          "pos",
+          "digest",
+          "type",
+          "action",
+          "enable",
+          "source",
+          "dest",
+          "proto",
+          "sport",
+          "dport",
+          "moveto"
+        ],
+        "requiredInputs": [
+          "pos"
+        ],
+        "inputCases": [
+          {
+            "requiredInputs": [
+              "moveto"
+            ],
+            "forbiddenInputs": [
+              "type",
+              "action",
+              "enable",
+              "source",
+              "dest",
+              "proto",
+              "sport",
+              "dport"
+            ]
+          },
+          {
+            "requiredValues": {},
+            "forbiddenInputs": [
+              "moveto",
+              "enable"
+            ]
+          },
+          {
+            "requiredValues": {
+              "enable": 0
+            },
+            "forbiddenInputs": [
+              "moveto"
+            ]
+          },
+          {
+            "requiredValues": {
+              "enable": 1
+            },
+            "forbiddenInputs": [
+              "moveto"
+            ]
+          }
+        ],
+        "inputPatterns": {
+          "type": "^(?:in|out)$",
+          "action": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+        },
+        "inputFormats": {
+          "source": "pve-firewall-address",
+          "dest": "pve-firewall-address",
+          "proto": "pve-firewall-protocol",
+          "sport": "pve-firewall-port",
+          "dport": "pve-firewall-port",
+          "iface": "pve-firewall-interface",
+          "group": "pve-firewall-group"
+        },
+        "confirmationWarnings": [
+          {
+            "message": "Firewall rule changes can cut off management access or change protection. Inspect the complete private ordered plan before confirming."
+          },
+          {
+            "message": "SHARED GROUP: this ordered change affects every existing cluster, node or guest reference, including management traffic. Audit those dependencies explicitly."
+          }
+        ],
+        "reason": "Private state-bound ordered rule change with automatic provider digest guard; reorder is separate from field edits. No automatic retry or deletion after uncertainty.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Inspect complete current rules privately; a matching later list cannot establish attribution. Never retry or automatically delete after uncertainty."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/",
+            [
+              "Sys.Modify"
+            ]
+          ]
+        },
+        "response": {
+          "type": "null"
+        },
+        "source": "Pinned rule schemas and reviewed provider Rules.pm creation, digest-guarded updates/deletes and reorder semantics."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "put",
         "/cluster/firewall/groups/{group}/{pos}"
@@ -14333,20 +14597,17 @@
                   "type": "string",
                   "minLength": 2,
                   "maxLength": 20,
-                  "pattern": "^(?:[A-Za-z][A-Za-z0-9_-]+)$"
-                },
-                "comment": {
-                  "type": "string"
-                },
-                "delete": {
-                  "type": "string",
-                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*(?:[,; ][A-Za-z][A-Za-z0-9._-]*)*$"
+                  "pattern": "^(?:[A-Za-z][A-Za-z0-9_-]+)$",
+                  "allOf": [
+                    {
+                      "pattern": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+                    }
+                  ]
                 },
                 "dest": {
                   "type": "string",
                   "maxLength": 512,
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^(?:(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])(?:\\.(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])){3}(?:/(?:[0-9]|[12][0-9]|3[0-2]))?|(?:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::|::[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::)(?:/(?:[0-9]|[1-9][0-9]|1[01][0-9]|12[0-8]))?)$(?![\\s\\S])"
                 },
                 "digest": {
                   "type": "string",
@@ -14354,8 +14615,7 @@
                 },
                 "dport": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^(?:[1-9]|[1-9][0-9]{1,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])$"
                 },
                 "enable": {
                   "type": "integer",
@@ -14365,37 +14625,12 @@
                   "type": "string",
                   "minLength": 2,
                   "maxLength": 18,
-                  "pattern": "^(?:[A-Za-z][A-Za-z0-9_-]+)$"
-                },
-                "icmp-type": {
-                  "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
-                },
-                "iface": {
-                  "type": "string",
-                  "minLength": 2,
-                  "maxLength": 20,
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
-                },
-                "log": {
-                  "enum": [
-                    "emerg",
-                    "alert",
-                    "crit",
-                    "err",
-                    "warning",
-                    "notice",
-                    "info",
-                    "debug",
-                    "nolog"
-                  ],
-                  "type": "string"
-                },
-                "macro": {
-                  "type": "string",
-                  "maxLength": 128
+                  "pattern": "^(?:[A-Za-z][A-Za-z0-9_-]+)$",
+                  "allOf": [
+                    {
+                      "pattern": "^[A-Za-z][A-Za-z0-9_-]{1,17}$(?![\\s\\S])"
+                    }
+                  ]
                 },
                 "moveto": {
                   "type": "integer",
@@ -14407,19 +14642,16 @@
                 },
                 "proto": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^(?:tcp|udp|icmp|icmpv6)$"
                 },
                 "source": {
                   "type": "string",
                   "maxLength": 512,
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^(?:(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])(?:\\.(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])){3}(?:/(?:[0-9]|[12][0-9]|3[0-2]))?|(?:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::|::[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::)(?:/(?:[0-9]|[1-9][0-9]|1[01][0-9]|12[0-8]))?)$(?![\\s\\S])"
                 },
                 "sport": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^(?:[1-9]|[1-9][0-9]{1,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])$"
                 },
                 "type": {
                   "enum": [
@@ -14428,13 +14660,127 @@
                     "forward",
                     "group"
                   ],
-                  "type": "string"
+                  "type": "string",
+                  "allOf": [
+                    {
+                      "pattern": "^(?:in|out)$"
+                    }
+                  ]
                 }
               },
               "required": [
-                "group"
+                "group",
+                "pos"
               ],
-              "dependencies": {}
+              "dependencies": {},
+              "anyOf": [
+                {
+                  "required": [
+                    "moveto"
+                  ],
+                  "properties": {},
+                  "not": {
+                    "anyOf": [
+                      {
+                        "required": [
+                          "type"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "action"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "enable"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "source"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "dest"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "proto"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "sport"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "dport"
+                        ]
+                      }
+                    ]
+                  }
+                },
+                {
+                  "required": [],
+                  "properties": {},
+                  "not": {
+                    "anyOf": [
+                      {
+                        "required": [
+                          "moveto"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "enable"
+                        ]
+                      }
+                    ]
+                  }
+                },
+                {
+                  "required": [
+                    "enable"
+                  ],
+                  "properties": {
+                    "enable": {
+                      "const": 0
+                    }
+                  },
+                  "not": {
+                    "anyOf": [
+                      {
+                        "required": [
+                          "moveto"
+                        ]
+                      }
+                    ]
+                  }
+                },
+                {
+                  "required": [
+                    "enable"
+                  ],
+                  "properties": {
+                    "enable": {
+                      "const": 1
+                    }
+                  },
+                  "not": {
+                    "anyOf": [
+                      {
+                        "required": [
+                          "moveto"
+                        ]
+                      }
+                    ]
+                  }
+                }
+              ]
             }
           },
           "required": [
@@ -16498,7 +16844,7 @@
         },
         "inputPatterns": {
           "type": "^(?:in|out)$",
-          "action": "^(?:ACCEPT|DROP|REJECT)$"
+          "action": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
         },
         "inputFormats": {
           "source": "pve-firewall-address",
@@ -16506,7 +16852,8 @@
           "proto": "pve-firewall-protocol",
           "sport": "pve-firewall-port",
           "dport": "pve-firewall-port",
-          "iface": "pve-firewall-interface"
+          "iface": "pve-firewall-interface",
+          "group": "pve-firewall-group"
         },
         "confirmationWarnings": [
           {
@@ -16559,7 +16906,7 @@
                   "pattern": "^(?:[A-Za-z][A-Za-z0-9_-]+)$",
                   "allOf": [
                     {
-                      "pattern": "^(?:ACCEPT|DROP|REJECT)$"
+                      "pattern": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
                     }
                   ]
                 },
@@ -17122,31 +17469,32 @@
             ]
           },
           {
+            "requiredValues": {},
             "forbiddenInputs": [
               "moveto",
               "enable"
             ]
           },
           {
-            "forbiddenInputs": [
-              "moveto"
-            ],
             "requiredValues": {
               "enable": 0
-            }
-          },
-          {
+            },
             "forbiddenInputs": [
               "moveto"
-            ],
+            ]
+          },
+          {
             "requiredValues": {
               "enable": 1
-            }
+            },
+            "forbiddenInputs": [
+              "moveto"
+            ]
           }
         ],
         "inputPatterns": {
           "type": "^(?:in|out)$",
-          "action": "^(?:ACCEPT|DROP|REJECT)$"
+          "action": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
         },
         "inputFormats": {
           "source": "pve-firewall-address",
@@ -17154,7 +17502,8 @@
           "proto": "pve-firewall-protocol",
           "sport": "pve-firewall-port",
           "dport": "pve-firewall-port",
-          "iface": "pve-firewall-interface"
+          "iface": "pve-firewall-interface",
+          "group": "pve-firewall-group"
         },
         "confirmationWarnings": [
           {
@@ -17204,7 +17553,7 @@
                   "pattern": "^(?:[A-Za-z][A-Za-z0-9_-]+)$",
                   "allOf": [
                     {
-                      "pattern": "^(?:ACCEPT|DROP|REJECT)$"
+                      "pattern": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
                     }
                   ]
                 },
@@ -46849,7 +47198,7 @@
         },
         "inputPatterns": {
           "type": "^(?:in|out)$",
-          "action": "^(?:ACCEPT|DROP|REJECT)$"
+          "action": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
         },
         "inputFormats": {
           "source": "pve-firewall-address",
@@ -46857,7 +47206,8 @@
           "proto": "pve-firewall-protocol",
           "sport": "pve-firewall-port",
           "dport": "pve-firewall-port",
-          "iface": "pve-firewall-interface"
+          "iface": "pve-firewall-interface",
+          "group": "pve-firewall-group"
         },
         "confirmationWarnings": [
           {
@@ -46910,7 +47260,7 @@
                   "pattern": "^(?:[A-Za-z][A-Za-z0-9_-]+)$",
                   "allOf": [
                     {
-                      "pattern": "^(?:ACCEPT|DROP|REJECT)$"
+                      "pattern": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
                     }
                   ]
                 },
@@ -47509,31 +47859,32 @@
             ]
           },
           {
+            "requiredValues": {},
             "forbiddenInputs": [
               "moveto",
               "enable"
             ]
           },
           {
-            "forbiddenInputs": [
-              "moveto"
-            ],
             "requiredValues": {
               "enable": 0
-            }
-          },
-          {
+            },
             "forbiddenInputs": [
               "moveto"
-            ],
+            ]
+          },
+          {
             "requiredValues": {
               "enable": 1
-            }
+            },
+            "forbiddenInputs": [
+              "moveto"
+            ]
           }
         ],
         "inputPatterns": {
           "type": "^(?:in|out)$",
-          "action": "^(?:ACCEPT|DROP|REJECT)$"
+          "action": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
         },
         "inputFormats": {
           "source": "pve-firewall-address",
@@ -47541,7 +47892,8 @@
           "proto": "pve-firewall-protocol",
           "sport": "pve-firewall-port",
           "dport": "pve-firewall-port",
-          "iface": "pve-firewall-interface"
+          "iface": "pve-firewall-interface",
+          "group": "pve-firewall-group"
         },
         "confirmationWarnings": [
           {
@@ -47591,7 +47943,7 @@
                   "pattern": "^(?:[A-Za-z][A-Za-z0-9_-]+)$",
                   "allOf": [
                     {
-                      "pattern": "^(?:ACCEPT|DROP|REJECT)$"
+                      "pattern": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
                     }
                   ]
                 },
@@ -57722,9 +58074,42 @@
         "fixedInputs": {
           "enable": 0
         },
+        "inputCases": [
+          {
+            "requiredValues": {
+              "type": "in"
+            },
+            "inputPatterns": {
+              "action": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+            }
+          },
+          {
+            "requiredValues": {
+              "type": "out"
+            },
+            "inputPatterns": {
+              "action": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+            }
+          },
+          {
+            "requiredValues": {
+              "type": "group"
+            },
+            "forbiddenInputs": [
+              "source",
+              "dest",
+              "proto",
+              "sport",
+              "dport"
+            ],
+            "inputPatterns": {
+              "action": "^[A-Za-z][A-Za-z0-9_-]{1,17}$(?![\\s\\S])"
+            }
+          }
+        ],
         "inputPatterns": {
-          "type": "^(?:in|out)$",
-          "action": "^(?:ACCEPT|DROP|REJECT)$",
+          "type": "^(?:in|out|group)$",
+          "action": "^[A-Za-z][A-Za-z0-9_-]{1,17}$(?![\\s\\S])",
           "iface": "^net(?:[0-9]|[12][0-9]|3[01])$"
         },
         "inputFormats": {
@@ -57733,7 +58118,8 @@
           "proto": "pve-firewall-protocol",
           "sport": "pve-firewall-port",
           "dport": "pve-firewall-port",
-          "iface": "pve-firewall-interface"
+          "iface": "pve-firewall-interface",
+          "group": "pve-firewall-group"
         },
         "confirmationWarnings": [
           {
@@ -57786,7 +58172,7 @@
                   "pattern": "^(?:[A-Za-z][A-Za-z0-9_-]+)$",
                   "allOf": [
                     {
-                      "pattern": "^(?:ACCEPT|DROP|REJECT)$"
+                      "pattern": "^[A-Za-z][A-Za-z0-9_-]{1,17}$(?![\\s\\S])"
                     }
                   ]
                 },
@@ -57843,7 +58229,7 @@
                   "type": "string",
                   "allOf": [
                     {
-                      "pattern": "^(?:in|out)$"
+                      "pattern": "^(?:in|out|group)$"
                     }
                   ]
                 },
@@ -57860,7 +58246,77 @@
                 "type",
                 "vmid"
               ],
-              "dependencies": {}
+              "dependencies": {},
+              "anyOf": [
+                {
+                  "required": [
+                    "type"
+                  ],
+                  "properties": {
+                    "action": {
+                      "pattern": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+                    },
+                    "type": {
+                      "const": "in"
+                    }
+                  }
+                },
+                {
+                  "required": [
+                    "type"
+                  ],
+                  "properties": {
+                    "action": {
+                      "pattern": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+                    },
+                    "type": {
+                      "const": "out"
+                    }
+                  }
+                },
+                {
+                  "required": [
+                    "type"
+                  ],
+                  "properties": {
+                    "action": {
+                      "pattern": "^[A-Za-z][A-Za-z0-9_-]{1,17}$(?![\\s\\S])"
+                    },
+                    "type": {
+                      "const": "group"
+                    }
+                  },
+                  "not": {
+                    "anyOf": [
+                      {
+                        "required": [
+                          "source"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "dest"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "proto"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "sport"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "dport"
+                        ]
+                      }
+                    ]
+                  }
+                }
+              ]
             }
           },
           "required": [
@@ -58437,31 +58893,205 @@
             ]
           },
           {
+            "requiredValues": {
+              "type": "in"
+            },
+            "inputPatterns": {
+              "action": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+            },
             "forbiddenInputs": [
               "moveto",
               "enable"
             ]
           },
           {
+            "requiredValues": {
+              "type": "out"
+            },
+            "inputPatterns": {
+              "action": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+            },
+            "forbiddenInputs": [
+              "moveto",
+              "enable"
+            ]
+          },
+          {
+            "requiredValues": {
+              "type": "group"
+            },
+            "forbiddenInputs": [
+              "moveto",
+              "source",
+              "dest",
+              "proto",
+              "sport",
+              "dport",
+              "enable"
+            ],
+            "inputPatterns": {
+              "action": "^[A-Za-z][A-Za-z0-9_-]{1,17}$(?![\\s\\S])"
+            }
+          },
+          {
+            "forbiddenInputs": [
+              "moveto",
+              "type",
+              "action",
+              "enable"
+            ],
+            "requiredValues": {}
+          },
+          {
+            "requiredInputs": [
+              "action"
+            ],
+            "forbiddenInputs": [
+              "moveto",
+              "type",
+              "enable"
+            ],
+            "inputPatterns": {
+              "action": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+            },
+            "requiredValues": {}
+          },
+          {
+            "requiredValues": {
+              "type": "in",
+              "enable": 0
+            },
+            "inputPatterns": {
+              "action": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+            },
             "forbiddenInputs": [
               "moveto"
+            ]
+          },
+          {
+            "requiredValues": {
+              "type": "out",
+              "enable": 0
+            },
+            "inputPatterns": {
+              "action": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+            },
+            "forbiddenInputs": [
+              "moveto"
+            ]
+          },
+          {
+            "requiredValues": {
+              "type": "group",
+              "enable": 0
+            },
+            "forbiddenInputs": [
+              "moveto",
+              "source",
+              "dest",
+              "proto",
+              "sport",
+              "dport"
+            ],
+            "inputPatterns": {
+              "action": "^[A-Za-z][A-Za-z0-9_-]{1,17}$(?![\\s\\S])"
+            }
+          },
+          {
+            "forbiddenInputs": [
+              "moveto",
+              "type",
+              "action"
             ],
             "requiredValues": {
               "enable": 0
             }
           },
           {
+            "requiredInputs": [
+              "action"
+            ],
+            "forbiddenInputs": [
+              "moveto",
+              "type"
+            ],
+            "inputPatterns": {
+              "action": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+            },
+            "requiredValues": {
+              "enable": 0
+            }
+          },
+          {
+            "requiredValues": {
+              "type": "in",
+              "enable": 1
+            },
+            "inputPatterns": {
+              "action": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+            },
             "forbiddenInputs": [
               "moveto"
+            ]
+          },
+          {
+            "requiredValues": {
+              "type": "out",
+              "enable": 1
+            },
+            "inputPatterns": {
+              "action": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+            },
+            "forbiddenInputs": [
+              "moveto"
+            ]
+          },
+          {
+            "requiredValues": {
+              "type": "group",
+              "enable": 1
+            },
+            "forbiddenInputs": [
+              "moveto",
+              "source",
+              "dest",
+              "proto",
+              "sport",
+              "dport"
             ],
+            "inputPatterns": {
+              "action": "^[A-Za-z][A-Za-z0-9_-]{1,17}$(?![\\s\\S])"
+            }
+          },
+          {
+            "forbiddenInputs": [
+              "moveto",
+              "type",
+              "action"
+            ],
+            "requiredValues": {
+              "enable": 1
+            }
+          },
+          {
+            "requiredInputs": [
+              "action"
+            ],
+            "forbiddenInputs": [
+              "moveto",
+              "type"
+            ],
+            "inputPatterns": {
+              "action": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+            },
             "requiredValues": {
               "enable": 1
             }
           }
         ],
         "inputPatterns": {
-          "type": "^(?:in|out)$",
-          "action": "^(?:ACCEPT|DROP|REJECT)$",
+          "type": "^(?:in|out|group)$",
+          "action": "^[A-Za-z][A-Za-z0-9_-]{1,17}$(?![\\s\\S])",
           "iface": "^net(?:[0-9]|[12][0-9]|3[01])$"
         },
         "inputFormats": {
@@ -58470,7 +59100,8 @@
           "proto": "pve-firewall-protocol",
           "sport": "pve-firewall-port",
           "dport": "pve-firewall-port",
-          "iface": "pve-firewall-interface"
+          "iface": "pve-firewall-interface",
+          "group": "pve-firewall-group"
         },
         "confirmationWarnings": [
           {
@@ -58520,7 +59151,7 @@
                   "pattern": "^(?:[A-Za-z][A-Za-z0-9_-]+)$",
                   "allOf": [
                     {
-                      "pattern": "^(?:ACCEPT|DROP|REJECT)$"
+                      "pattern": "^[A-Za-z][A-Za-z0-9_-]{1,17}$(?![\\s\\S])"
                     }
                   ]
                 },
@@ -58587,7 +59218,7 @@
                   "type": "string",
                   "allOf": [
                     {
-                      "pattern": "^(?:in|out)$"
+                      "pattern": "^(?:in|out|group)$"
                     }
                   ]
                 },
@@ -58661,6 +59292,112 @@
                   }
                 },
                 {
+                  "required": [
+                    "type"
+                  ],
+                  "properties": {
+                    "action": {
+                      "pattern": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+                    },
+                    "type": {
+                      "const": "in"
+                    }
+                  },
+                  "not": {
+                    "anyOf": [
+                      {
+                        "required": [
+                          "moveto"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "enable"
+                        ]
+                      }
+                    ]
+                  }
+                },
+                {
+                  "required": [
+                    "type"
+                  ],
+                  "properties": {
+                    "action": {
+                      "pattern": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+                    },
+                    "type": {
+                      "const": "out"
+                    }
+                  },
+                  "not": {
+                    "anyOf": [
+                      {
+                        "required": [
+                          "moveto"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "enable"
+                        ]
+                      }
+                    ]
+                  }
+                },
+                {
+                  "required": [
+                    "type"
+                  ],
+                  "properties": {
+                    "action": {
+                      "pattern": "^[A-Za-z][A-Za-z0-9_-]{1,17}$(?![\\s\\S])"
+                    },
+                    "type": {
+                      "const": "group"
+                    }
+                  },
+                  "not": {
+                    "anyOf": [
+                      {
+                        "required": [
+                          "moveto"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "source"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "dest"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "proto"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "sport"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "dport"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "enable"
+                        ]
+                      }
+                    ]
+                  }
+                },
+                {
                   "required": [],
                   "properties": {},
                   "not": {
@@ -58672,7 +59409,149 @@
                       },
                       {
                         "required": [
+                          "type"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "action"
+                        ]
+                      },
+                      {
+                        "required": [
                           "enable"
+                        ]
+                      }
+                    ]
+                  }
+                },
+                {
+                  "required": [
+                    "action"
+                  ],
+                  "properties": {
+                    "action": {
+                      "pattern": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+                    }
+                  },
+                  "not": {
+                    "anyOf": [
+                      {
+                        "required": [
+                          "moveto"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "type"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "enable"
+                        ]
+                      }
+                    ]
+                  }
+                },
+                {
+                  "required": [
+                    "type",
+                    "enable"
+                  ],
+                  "properties": {
+                    "action": {
+                      "pattern": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+                    },
+                    "type": {
+                      "const": "in"
+                    },
+                    "enable": {
+                      "const": 0
+                    }
+                  },
+                  "not": {
+                    "anyOf": [
+                      {
+                        "required": [
+                          "moveto"
+                        ]
+                      }
+                    ]
+                  }
+                },
+                {
+                  "required": [
+                    "type",
+                    "enable"
+                  ],
+                  "properties": {
+                    "action": {
+                      "pattern": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+                    },
+                    "type": {
+                      "const": "out"
+                    },
+                    "enable": {
+                      "const": 0
+                    }
+                  },
+                  "not": {
+                    "anyOf": [
+                      {
+                        "required": [
+                          "moveto"
+                        ]
+                      }
+                    ]
+                  }
+                },
+                {
+                  "required": [
+                    "type",
+                    "enable"
+                  ],
+                  "properties": {
+                    "action": {
+                      "pattern": "^[A-Za-z][A-Za-z0-9_-]{1,17}$(?![\\s\\S])"
+                    },
+                    "type": {
+                      "const": "group"
+                    },
+                    "enable": {
+                      "const": 0
+                    }
+                  },
+                  "not": {
+                    "anyOf": [
+                      {
+                        "required": [
+                          "moveto"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "source"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "dest"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "proto"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "sport"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "dport"
                         ]
                       }
                     ]
@@ -58693,6 +59572,147 @@
                         "required": [
                           "moveto"
                         ]
+                      },
+                      {
+                        "required": [
+                          "type"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "action"
+                        ]
+                      }
+                    ]
+                  }
+                },
+                {
+                  "required": [
+                    "action",
+                    "enable"
+                  ],
+                  "properties": {
+                    "action": {
+                      "pattern": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+                    },
+                    "enable": {
+                      "const": 0
+                    }
+                  },
+                  "not": {
+                    "anyOf": [
+                      {
+                        "required": [
+                          "moveto"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "type"
+                        ]
+                      }
+                    ]
+                  }
+                },
+                {
+                  "required": [
+                    "type",
+                    "enable"
+                  ],
+                  "properties": {
+                    "action": {
+                      "pattern": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+                    },
+                    "type": {
+                      "const": "in"
+                    },
+                    "enable": {
+                      "const": 1
+                    }
+                  },
+                  "not": {
+                    "anyOf": [
+                      {
+                        "required": [
+                          "moveto"
+                        ]
+                      }
+                    ]
+                  }
+                },
+                {
+                  "required": [
+                    "type",
+                    "enable"
+                  ],
+                  "properties": {
+                    "action": {
+                      "pattern": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+                    },
+                    "type": {
+                      "const": "out"
+                    },
+                    "enable": {
+                      "const": 1
+                    }
+                  },
+                  "not": {
+                    "anyOf": [
+                      {
+                        "required": [
+                          "moveto"
+                        ]
+                      }
+                    ]
+                  }
+                },
+                {
+                  "required": [
+                    "type",
+                    "enable"
+                  ],
+                  "properties": {
+                    "action": {
+                      "pattern": "^[A-Za-z][A-Za-z0-9_-]{1,17}$(?![\\s\\S])"
+                    },
+                    "type": {
+                      "const": "group"
+                    },
+                    "enable": {
+                      "const": 1
+                    }
+                  },
+                  "not": {
+                    "anyOf": [
+                      {
+                        "required": [
+                          "moveto"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "source"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "dest"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "proto"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "sport"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "dport"
+                        ]
                       }
                     ]
                   }
@@ -58711,6 +59731,44 @@
                       {
                         "required": [
                           "moveto"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "type"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "action"
+                        ]
+                      }
+                    ]
+                  }
+                },
+                {
+                  "required": [
+                    "action",
+                    "enable"
+                  ],
+                  "properties": {
+                    "action": {
+                      "pattern": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+                    },
+                    "enable": {
+                      "const": 1
+                    }
+                  },
+                  "not": {
+                    "anyOf": [
+                      {
+                        "required": [
+                          "moveto"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "type"
                         ]
                       }
                     ]
@@ -87819,9 +88877,42 @@
         "fixedInputs": {
           "enable": 0
         },
+        "inputCases": [
+          {
+            "requiredValues": {
+              "type": "in"
+            },
+            "inputPatterns": {
+              "action": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+            }
+          },
+          {
+            "requiredValues": {
+              "type": "out"
+            },
+            "inputPatterns": {
+              "action": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+            }
+          },
+          {
+            "requiredValues": {
+              "type": "group"
+            },
+            "forbiddenInputs": [
+              "source",
+              "dest",
+              "proto",
+              "sport",
+              "dport"
+            ],
+            "inputPatterns": {
+              "action": "^[A-Za-z][A-Za-z0-9_-]{1,17}$(?![\\s\\S])"
+            }
+          }
+        ],
         "inputPatterns": {
-          "type": "^(?:in|out)$",
-          "action": "^(?:ACCEPT|DROP|REJECT)$",
+          "type": "^(?:in|out|group)$",
+          "action": "^[A-Za-z][A-Za-z0-9_-]{1,17}$(?![\\s\\S])",
           "iface": "^net(?:[0-9]|[12][0-9]|3[01])$"
         },
         "inputFormats": {
@@ -87830,7 +88921,8 @@
           "proto": "pve-firewall-protocol",
           "sport": "pve-firewall-port",
           "dport": "pve-firewall-port",
-          "iface": "pve-firewall-interface"
+          "iface": "pve-firewall-interface",
+          "group": "pve-firewall-group"
         },
         "confirmationWarnings": [
           {
@@ -87883,7 +88975,7 @@
                   "pattern": "^(?:[A-Za-z][A-Za-z0-9_-]+)$",
                   "allOf": [
                     {
-                      "pattern": "^(?:ACCEPT|DROP|REJECT)$"
+                      "pattern": "^[A-Za-z][A-Za-z0-9_-]{1,17}$(?![\\s\\S])"
                     }
                   ]
                 },
@@ -87940,7 +89032,7 @@
                   "type": "string",
                   "allOf": [
                     {
-                      "pattern": "^(?:in|out)$"
+                      "pattern": "^(?:in|out|group)$"
                     }
                   ]
                 },
@@ -87957,7 +89049,77 @@
                 "type",
                 "vmid"
               ],
-              "dependencies": {}
+              "dependencies": {},
+              "anyOf": [
+                {
+                  "required": [
+                    "type"
+                  ],
+                  "properties": {
+                    "action": {
+                      "pattern": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+                    },
+                    "type": {
+                      "const": "in"
+                    }
+                  }
+                },
+                {
+                  "required": [
+                    "type"
+                  ],
+                  "properties": {
+                    "action": {
+                      "pattern": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+                    },
+                    "type": {
+                      "const": "out"
+                    }
+                  }
+                },
+                {
+                  "required": [
+                    "type"
+                  ],
+                  "properties": {
+                    "action": {
+                      "pattern": "^[A-Za-z][A-Za-z0-9_-]{1,17}$(?![\\s\\S])"
+                    },
+                    "type": {
+                      "const": "group"
+                    }
+                  },
+                  "not": {
+                    "anyOf": [
+                      {
+                        "required": [
+                          "source"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "dest"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "proto"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "sport"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "dport"
+                        ]
+                      }
+                    ]
+                  }
+                }
+              ]
             }
           },
           "required": [
@@ -88534,31 +89696,205 @@
             ]
           },
           {
+            "requiredValues": {
+              "type": "in"
+            },
+            "inputPatterns": {
+              "action": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+            },
             "forbiddenInputs": [
               "moveto",
               "enable"
             ]
           },
           {
+            "requiredValues": {
+              "type": "out"
+            },
+            "inputPatterns": {
+              "action": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+            },
+            "forbiddenInputs": [
+              "moveto",
+              "enable"
+            ]
+          },
+          {
+            "requiredValues": {
+              "type": "group"
+            },
+            "forbiddenInputs": [
+              "moveto",
+              "source",
+              "dest",
+              "proto",
+              "sport",
+              "dport",
+              "enable"
+            ],
+            "inputPatterns": {
+              "action": "^[A-Za-z][A-Za-z0-9_-]{1,17}$(?![\\s\\S])"
+            }
+          },
+          {
+            "forbiddenInputs": [
+              "moveto",
+              "type",
+              "action",
+              "enable"
+            ],
+            "requiredValues": {}
+          },
+          {
+            "requiredInputs": [
+              "action"
+            ],
+            "forbiddenInputs": [
+              "moveto",
+              "type",
+              "enable"
+            ],
+            "inputPatterns": {
+              "action": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+            },
+            "requiredValues": {}
+          },
+          {
+            "requiredValues": {
+              "type": "in",
+              "enable": 0
+            },
+            "inputPatterns": {
+              "action": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+            },
             "forbiddenInputs": [
               "moveto"
+            ]
+          },
+          {
+            "requiredValues": {
+              "type": "out",
+              "enable": 0
+            },
+            "inputPatterns": {
+              "action": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+            },
+            "forbiddenInputs": [
+              "moveto"
+            ]
+          },
+          {
+            "requiredValues": {
+              "type": "group",
+              "enable": 0
+            },
+            "forbiddenInputs": [
+              "moveto",
+              "source",
+              "dest",
+              "proto",
+              "sport",
+              "dport"
+            ],
+            "inputPatterns": {
+              "action": "^[A-Za-z][A-Za-z0-9_-]{1,17}$(?![\\s\\S])"
+            }
+          },
+          {
+            "forbiddenInputs": [
+              "moveto",
+              "type",
+              "action"
             ],
             "requiredValues": {
               "enable": 0
             }
           },
           {
+            "requiredInputs": [
+              "action"
+            ],
+            "forbiddenInputs": [
+              "moveto",
+              "type"
+            ],
+            "inputPatterns": {
+              "action": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+            },
+            "requiredValues": {
+              "enable": 0
+            }
+          },
+          {
+            "requiredValues": {
+              "type": "in",
+              "enable": 1
+            },
+            "inputPatterns": {
+              "action": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+            },
             "forbiddenInputs": [
               "moveto"
+            ]
+          },
+          {
+            "requiredValues": {
+              "type": "out",
+              "enable": 1
+            },
+            "inputPatterns": {
+              "action": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+            },
+            "forbiddenInputs": [
+              "moveto"
+            ]
+          },
+          {
+            "requiredValues": {
+              "type": "group",
+              "enable": 1
+            },
+            "forbiddenInputs": [
+              "moveto",
+              "source",
+              "dest",
+              "proto",
+              "sport",
+              "dport"
             ],
+            "inputPatterns": {
+              "action": "^[A-Za-z][A-Za-z0-9_-]{1,17}$(?![\\s\\S])"
+            }
+          },
+          {
+            "forbiddenInputs": [
+              "moveto",
+              "type",
+              "action"
+            ],
+            "requiredValues": {
+              "enable": 1
+            }
+          },
+          {
+            "requiredInputs": [
+              "action"
+            ],
+            "forbiddenInputs": [
+              "moveto",
+              "type"
+            ],
+            "inputPatterns": {
+              "action": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+            },
             "requiredValues": {
               "enable": 1
             }
           }
         ],
         "inputPatterns": {
-          "type": "^(?:in|out)$",
-          "action": "^(?:ACCEPT|DROP|REJECT)$",
+          "type": "^(?:in|out|group)$",
+          "action": "^[A-Za-z][A-Za-z0-9_-]{1,17}$(?![\\s\\S])",
           "iface": "^net(?:[0-9]|[12][0-9]|3[01])$"
         },
         "inputFormats": {
@@ -88567,7 +89903,8 @@
           "proto": "pve-firewall-protocol",
           "sport": "pve-firewall-port",
           "dport": "pve-firewall-port",
-          "iface": "pve-firewall-interface"
+          "iface": "pve-firewall-interface",
+          "group": "pve-firewall-group"
         },
         "confirmationWarnings": [
           {
@@ -88617,7 +89954,7 @@
                   "pattern": "^(?:[A-Za-z][A-Za-z0-9_-]+)$",
                   "allOf": [
                     {
-                      "pattern": "^(?:ACCEPT|DROP|REJECT)$"
+                      "pattern": "^[A-Za-z][A-Za-z0-9_-]{1,17}$(?![\\s\\S])"
                     }
                   ]
                 },
@@ -88684,7 +90021,7 @@
                   "type": "string",
                   "allOf": [
                     {
-                      "pattern": "^(?:in|out)$"
+                      "pattern": "^(?:in|out|group)$"
                     }
                   ]
                 },
@@ -88758,6 +90095,112 @@
                   }
                 },
                 {
+                  "required": [
+                    "type"
+                  ],
+                  "properties": {
+                    "action": {
+                      "pattern": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+                    },
+                    "type": {
+                      "const": "in"
+                    }
+                  },
+                  "not": {
+                    "anyOf": [
+                      {
+                        "required": [
+                          "moveto"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "enable"
+                        ]
+                      }
+                    ]
+                  }
+                },
+                {
+                  "required": [
+                    "type"
+                  ],
+                  "properties": {
+                    "action": {
+                      "pattern": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+                    },
+                    "type": {
+                      "const": "out"
+                    }
+                  },
+                  "not": {
+                    "anyOf": [
+                      {
+                        "required": [
+                          "moveto"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "enable"
+                        ]
+                      }
+                    ]
+                  }
+                },
+                {
+                  "required": [
+                    "type"
+                  ],
+                  "properties": {
+                    "action": {
+                      "pattern": "^[A-Za-z][A-Za-z0-9_-]{1,17}$(?![\\s\\S])"
+                    },
+                    "type": {
+                      "const": "group"
+                    }
+                  },
+                  "not": {
+                    "anyOf": [
+                      {
+                        "required": [
+                          "moveto"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "source"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "dest"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "proto"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "sport"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "dport"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "enable"
+                        ]
+                      }
+                    ]
+                  }
+                },
+                {
                   "required": [],
                   "properties": {},
                   "not": {
@@ -88769,7 +90212,149 @@
                       },
                       {
                         "required": [
+                          "type"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "action"
+                        ]
+                      },
+                      {
+                        "required": [
                           "enable"
+                        ]
+                      }
+                    ]
+                  }
+                },
+                {
+                  "required": [
+                    "action"
+                  ],
+                  "properties": {
+                    "action": {
+                      "pattern": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+                    }
+                  },
+                  "not": {
+                    "anyOf": [
+                      {
+                        "required": [
+                          "moveto"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "type"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "enable"
+                        ]
+                      }
+                    ]
+                  }
+                },
+                {
+                  "required": [
+                    "type",
+                    "enable"
+                  ],
+                  "properties": {
+                    "action": {
+                      "pattern": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+                    },
+                    "type": {
+                      "const": "in"
+                    },
+                    "enable": {
+                      "const": 0
+                    }
+                  },
+                  "not": {
+                    "anyOf": [
+                      {
+                        "required": [
+                          "moveto"
+                        ]
+                      }
+                    ]
+                  }
+                },
+                {
+                  "required": [
+                    "type",
+                    "enable"
+                  ],
+                  "properties": {
+                    "action": {
+                      "pattern": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+                    },
+                    "type": {
+                      "const": "out"
+                    },
+                    "enable": {
+                      "const": 0
+                    }
+                  },
+                  "not": {
+                    "anyOf": [
+                      {
+                        "required": [
+                          "moveto"
+                        ]
+                      }
+                    ]
+                  }
+                },
+                {
+                  "required": [
+                    "type",
+                    "enable"
+                  ],
+                  "properties": {
+                    "action": {
+                      "pattern": "^[A-Za-z][A-Za-z0-9_-]{1,17}$(?![\\s\\S])"
+                    },
+                    "type": {
+                      "const": "group"
+                    },
+                    "enable": {
+                      "const": 0
+                    }
+                  },
+                  "not": {
+                    "anyOf": [
+                      {
+                        "required": [
+                          "moveto"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "source"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "dest"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "proto"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "sport"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "dport"
                         ]
                       }
                     ]
@@ -88790,6 +90375,147 @@
                         "required": [
                           "moveto"
                         ]
+                      },
+                      {
+                        "required": [
+                          "type"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "action"
+                        ]
+                      }
+                    ]
+                  }
+                },
+                {
+                  "required": [
+                    "action",
+                    "enable"
+                  ],
+                  "properties": {
+                    "action": {
+                      "pattern": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+                    },
+                    "enable": {
+                      "const": 0
+                    }
+                  },
+                  "not": {
+                    "anyOf": [
+                      {
+                        "required": [
+                          "moveto"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "type"
+                        ]
+                      }
+                    ]
+                  }
+                },
+                {
+                  "required": [
+                    "type",
+                    "enable"
+                  ],
+                  "properties": {
+                    "action": {
+                      "pattern": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+                    },
+                    "type": {
+                      "const": "in"
+                    },
+                    "enable": {
+                      "const": 1
+                    }
+                  },
+                  "not": {
+                    "anyOf": [
+                      {
+                        "required": [
+                          "moveto"
+                        ]
+                      }
+                    ]
+                  }
+                },
+                {
+                  "required": [
+                    "type",
+                    "enable"
+                  ],
+                  "properties": {
+                    "action": {
+                      "pattern": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+                    },
+                    "type": {
+                      "const": "out"
+                    },
+                    "enable": {
+                      "const": 1
+                    }
+                  },
+                  "not": {
+                    "anyOf": [
+                      {
+                        "required": [
+                          "moveto"
+                        ]
+                      }
+                    ]
+                  }
+                },
+                {
+                  "required": [
+                    "type",
+                    "enable"
+                  ],
+                  "properties": {
+                    "action": {
+                      "pattern": "^[A-Za-z][A-Za-z0-9_-]{1,17}$(?![\\s\\S])"
+                    },
+                    "type": {
+                      "const": "group"
+                    },
+                    "enable": {
+                      "const": 1
+                    }
+                  },
+                  "not": {
+                    "anyOf": [
+                      {
+                        "required": [
+                          "moveto"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "source"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "dest"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "proto"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "sport"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "dport"
+                        ]
                       }
                     ]
                   }
@@ -88808,6 +90534,44 @@
                       {
                         "required": [
                           "moveto"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "type"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "action"
+                        ]
+                      }
+                    ]
+                  }
+                },
+                {
+                  "required": [
+                    "action",
+                    "enable"
+                  ],
+                  "properties": {
+                    "action": {
+                      "pattern": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+                    },
+                    "enable": {
+                      "const": 1
+                    }
+                  },
+                  "not": {
+                    "anyOf": [
+                      {
+                        "required": [
+                          "moveto"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "type"
                         ]
                       }
                     ]
@@ -123642,12 +125406,12 @@
       "id": "OP-GET-5a8972086f",
       "release": "published-current",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "read",
+        "transport": "json",
+        "secrets": "private-result",
+        "reason": "Security-group identities, comments and index digest require bounded private results."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "get",
         "/cluster/firewall/groups"
@@ -123738,12 +125502,45 @@
       "id": "OP-POST-fb39335d0b",
       "release": "published-current",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "write",
+        "transport": "json",
+        "secrets": "private-result",
+        "allowedInputs": [
+          "group",
+          "comment"
+        ],
+        "sensitiveInputs": [
+          "comment"
+        ],
+        "inputFormats": {
+          "group": "pve-firewall-group",
+          "comment": "pve-firewall-comment"
+        },
+        "confirmationWarnings": [
+          {
+            "message": "Shared security groups affect existing cluster, node and guest references, including management traffic. Inspect dependencies before confirming."
+          }
+        ],
+        "reason": "Confirmed creation or native empty-only security-group deletion. Comments use SecretRefs; rename, metadata-update and cross-scope reference rewrites remain refused.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Inspect the group and references privately; never retry, detach references or recreate a group automatically after uncertainty."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/",
+            [
+              "Sys.Modify"
+            ]
+          ]
+        },
+        "response": {
+          "type": "null"
+        },
+        "source": "Pinned Groups.pm creation and Rules.pm empty-group deletion under the cluster lock."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "post",
         "/cluster/firewall/groups"
@@ -123761,25 +125558,46 @@
               "additionalProperties": false,
               "properties": {
                 "comment": {
-                  "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
-                },
-                "digest": {
-                  "type": "string",
-                  "maxLength": 64
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "env"
+                      ],
+                      "properties": {
+                        "env": {
+                          "type": "string",
+                          "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "file"
+                      ],
+                      "properties": {
+                        "file": {
+                          "type": "string",
+                          "minLength": 1
+                        }
+                      }
+                    }
+                  ],
+                  "x-secret": true
                 },
                 "group": {
                   "type": "string",
                   "minLength": 2,
                   "maxLength": 18,
-                  "pattern": "^(?:[A-Za-z][A-Za-z0-9_-]+)$"
-                },
-                "rename": {
-                  "type": "string",
-                  "minLength": 2,
-                  "maxLength": 18,
-                  "pattern": "^(?:[A-Za-z][A-Za-z0-9_-]+)$"
+                  "pattern": "^(?:[A-Za-z][A-Za-z0-9_-]+)$",
+                  "allOf": [
+                    {
+                      "pattern": "^[A-Za-z][A-Za-z0-9_-]{1,17}$(?![\\s\\S])"
+                    }
+                  ]
                 }
               },
               "required": [
@@ -123837,12 +125655,44 @@
       "id": "OP-DELETE-37fc2d324c",
       "release": "published-current",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "write",
+        "transport": "json",
+        "secrets": "private-result",
+        "allowedInputs": [
+          "group"
+        ],
+        "sensitiveInputs": [],
+        "inputFormats": {
+          "group": "pve-firewall-group"
+        },
+        "confirmationWarnings": [
+          {
+            "message": "Shared security groups affect existing cluster, node and guest references, including management traffic. Inspect dependencies before confirming."
+          },
+          {
+            "message": "GROUP DELETION: the provider permits only empty groups; remove guest references separately. Empty does not mean unreferenced."
+          }
+        ],
+        "reason": "Confirmed creation or native empty-only security-group deletion. Comments use SecretRefs; rename, metadata-update and cross-scope reference rewrites remain refused.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Inspect the group and references privately; never retry, detach references or recreate a group automatically after uncertainty."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/",
+            [
+              "Sys.Modify"
+            ]
+          ]
+        },
+        "response": {
+          "type": "null"
+        },
+        "source": "Pinned Groups.pm creation and Rules.pm empty-group deletion under the cluster lock."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "delete",
         "/cluster/firewall/groups/{group}"
@@ -123863,7 +125713,12 @@
                   "type": "string",
                   "minLength": 2,
                   "maxLength": 18,
-                  "pattern": "^(?:[A-Za-z][A-Za-z0-9_-]+)$"
+                  "pattern": "^(?:[A-Za-z][A-Za-z0-9_-]+)$",
+                  "allOf": [
+                    {
+                      "pattern": "^[A-Za-z][A-Za-z0-9_-]{1,17}$(?![\\s\\S])"
+                    }
+                  ]
                 }
               },
               "required": [
@@ -124016,12 +125871,12 @@
       "id": "OP-GET-c0cec274a4",
       "release": "published-current",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "read",
+        "transport": "json",
+        "secrets": "private-result",
+        "reason": "Complete ordered group rules, comments and native rules digest require private results."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "get",
         "/cluster/firewall/groups/{group}"
@@ -124224,12 +126079,72 @@
       "id": "OP-POST-8ca32093a6",
       "release": "published-current",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "write",
+        "transport": "json",
+        "secrets": "private-result",
+        "stateBinding": {
+          "kind": "firewall-rules",
+          "path": "/cluster/firewall/groups/{group}"
+        },
+        "allowedInputs": [
+          "group",
+          "type",
+          "action",
+          "enable",
+          "source",
+          "dest",
+          "proto",
+          "sport",
+          "dport"
+        ],
+        "requiredInputs": [],
+        "fixedInputs": {
+          "enable": 0
+        },
+        "inputPatterns": {
+          "type": "^(?:in|out)$",
+          "action": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+        },
+        "inputFormats": {
+          "source": "pve-firewall-address",
+          "dest": "pve-firewall-address",
+          "proto": "pve-firewall-protocol",
+          "sport": "pve-firewall-port",
+          "dport": "pve-firewall-port",
+          "iface": "pve-firewall-interface",
+          "group": "pve-firewall-group"
+        },
+        "confirmationWarnings": [
+          {
+            "message": "Firewall rule changes can cut off management access or change protection. Inspect the complete private ordered plan before confirming."
+          },
+          {
+            "message": "SHARED GROUP: this ordered change affects every existing cluster, node or guest reference, including management traffic. Audit those dependencies explicitly."
+          },
+          {
+            "message": "NON-ATOMIC CREATE: the provider ignores creation digests and prepends this fixed disabled rule. Unexpected observed order remains uncertain; enabling requires a separate fresh digest-guarded confirmation."
+          }
+        ],
+        "reason": "Non-atomic creation of a fixed disabled rule only: provider POST ignores digest and prepends; private before/after plan, state recheck and post-write comparison apply. Enable separately with a fresh digest-guarded confirmation.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Inspect complete current rules privately; a matching later list cannot establish attribution. Never retry or automatically delete after uncertainty."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/",
+            [
+              "Sys.Modify"
+            ]
+          ]
+        },
+        "response": {
+          "type": "null"
+        },
+        "source": "Pinned rule schemas and reviewed provider Rules.pm creation, digest-guarded updates/deletes and reorder semantics."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "post",
         "/cluster/firewall/groups/{group}"
@@ -124250,87 +126165,51 @@
                   "type": "string",
                   "minLength": 2,
                   "maxLength": 20,
-                  "pattern": "^(?:[A-Za-z][A-Za-z0-9_-]+)$"
-                },
-                "comment": {
-                  "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^(?:[A-Za-z][A-Za-z0-9_-]+)$",
+                  "allOf": [
+                    {
+                      "pattern": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+                    }
+                  ]
                 },
                 "dest": {
                   "type": "string",
                   "maxLength": 512,
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
-                },
-                "digest": {
-                  "type": "string",
-                  "maxLength": 64
+                  "pattern": "^(?:(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])(?:\\.(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])){3}(?:/(?:[0-9]|[12][0-9]|3[0-2]))?|(?:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::|::[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::)(?:/(?:[0-9]|[1-9][0-9]|1[01][0-9]|12[0-8]))?)$(?![\\s\\S])"
                 },
                 "dport": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^(?:[1-9]|[1-9][0-9]{1,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])$"
                 },
                 "enable": {
                   "type": "integer",
-                  "minimum": 0
+                  "minimum": 0,
+                  "const": 0,
+                  "default": 0
                 },
                 "group": {
                   "type": "string",
                   "minLength": 2,
                   "maxLength": 18,
-                  "pattern": "^(?:[A-Za-z][A-Za-z0-9_-]+)$"
-                },
-                "icmp-type": {
-                  "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
-                },
-                "iface": {
-                  "type": "string",
-                  "minLength": 2,
-                  "maxLength": 20,
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
-                },
-                "log": {
-                  "enum": [
-                    "emerg",
-                    "alert",
-                    "crit",
-                    "err",
-                    "warning",
-                    "notice",
-                    "info",
-                    "debug",
-                    "nolog"
-                  ],
-                  "type": "string"
-                },
-                "macro": {
-                  "type": "string",
-                  "maxLength": 128
-                },
-                "pos": {
-                  "type": "integer",
-                  "minimum": 0
+                  "pattern": "^(?:[A-Za-z][A-Za-z0-9_-]+)$",
+                  "allOf": [
+                    {
+                      "pattern": "^[A-Za-z][A-Za-z0-9_-]{1,17}$(?![\\s\\S])"
+                    }
+                  ]
                 },
                 "proto": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^(?:tcp|udp|icmp|icmpv6)$"
                 },
                 "source": {
                   "type": "string",
                   "maxLength": 512,
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^(?:(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])(?:\\.(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])){3}(?:/(?:[0-9]|[12][0-9]|3[0-2]))?|(?:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::|::[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::)(?:/(?:[0-9]|[1-9][0-9]|1[01][0-9]|12[0-8]))?)$(?![\\s\\S])"
                 },
                 "sport": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^(?:[1-9]|[1-9][0-9]{1,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])$"
                 },
                 "type": {
                   "enum": [
@@ -124339,7 +126218,12 @@
                     "forward",
                     "group"
                   ],
-                  "type": "string"
+                  "type": "string",
+                  "allOf": [
+                    {
+                      "pattern": "^(?:in|out)$"
+                    }
+                  ]
                 }
               },
               "required": [
@@ -124414,12 +126298,52 @@
       "id": "OP-DELETE-903157d1bd",
       "release": "published-current",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "write",
+        "transport": "json",
+        "secrets": "private-result",
+        "stateBinding": {
+          "kind": "firewall-rules",
+          "path": "/cluster/firewall/groups/{group}"
+        },
+        "allowedInputs": [
+          "group",
+          "pos",
+          "digest"
+        ],
+        "requiredInputs": [
+          "pos"
+        ],
+        "confirmationWarnings": [
+          {
+            "message": "Firewall rule changes can cut off management access or change protection. Inspect the complete private ordered plan before confirming."
+          },
+          {
+            "message": "SHARED GROUP: this ordered change affects every existing cluster, node or guest reference, including management traffic. Audit those dependencies explicitly."
+          },
+          {
+            "message": "RULE DELETION: explicitly review the selected position and resulting ordered rules before confirming."
+          }
+        ],
+        "reason": "Private state-bound ordered rule change with automatic provider digest guard; reorder is separate from field edits. No automatic retry or deletion after uncertainty.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Inspect complete current rules privately; a matching later list cannot establish attribution. Never retry or automatically delete after uncertainty."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/",
+            [
+              "Sys.Modify"
+            ]
+          ]
+        },
+        "response": {
+          "type": "null"
+        },
+        "source": "Pinned rule schemas and reviewed provider Rules.pm creation, digest-guarded updates/deletes and reorder semantics."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "delete",
         "/cluster/firewall/groups/{group}/{pos}"
@@ -124452,7 +126376,8 @@
                 }
               },
               "required": [
-                "group"
+                "group",
+                "pos"
               ],
               "dependencies": {}
             }
@@ -124599,12 +126524,12 @@
       "id": "OP-GET-75b2fb0274",
       "release": "published-current",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "read",
+        "transport": "json",
+        "secrets": "private-result",
+        "reason": "One group rule and its native list digest require private results."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "get",
         "/cluster/firewall/groups/{group}/{pos}"
@@ -124825,12 +126750,111 @@
       "id": "OP-PUT-4a9d0e8136",
       "release": "published-current",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "write",
+        "transport": "json",
+        "secrets": "private-result",
+        "stateBinding": {
+          "kind": "firewall-rules",
+          "path": "/cluster/firewall/groups/{group}"
+        },
+        "allowedInputs": [
+          "group",
+          "pos",
+          "digest",
+          "type",
+          "action",
+          "enable",
+          "source",
+          "dest",
+          "proto",
+          "sport",
+          "dport",
+          "moveto"
+        ],
+        "requiredInputs": [
+          "pos"
+        ],
+        "inputCases": [
+          {
+            "requiredInputs": [
+              "moveto"
+            ],
+            "forbiddenInputs": [
+              "type",
+              "action",
+              "enable",
+              "source",
+              "dest",
+              "proto",
+              "sport",
+              "dport"
+            ]
+          },
+          {
+            "requiredValues": {},
+            "forbiddenInputs": [
+              "moveto",
+              "enable"
+            ]
+          },
+          {
+            "requiredValues": {
+              "enable": 0
+            },
+            "forbiddenInputs": [
+              "moveto"
+            ]
+          },
+          {
+            "requiredValues": {
+              "enable": 1
+            },
+            "forbiddenInputs": [
+              "moveto"
+            ]
+          }
+        ],
+        "inputPatterns": {
+          "type": "^(?:in|out)$",
+          "action": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+        },
+        "inputFormats": {
+          "source": "pve-firewall-address",
+          "dest": "pve-firewall-address",
+          "proto": "pve-firewall-protocol",
+          "sport": "pve-firewall-port",
+          "dport": "pve-firewall-port",
+          "iface": "pve-firewall-interface",
+          "group": "pve-firewall-group"
+        },
+        "confirmationWarnings": [
+          {
+            "message": "Firewall rule changes can cut off management access or change protection. Inspect the complete private ordered plan before confirming."
+          },
+          {
+            "message": "SHARED GROUP: this ordered change affects every existing cluster, node or guest reference, including management traffic. Audit those dependencies explicitly."
+          }
+        ],
+        "reason": "Private state-bound ordered rule change with automatic provider digest guard; reorder is separate from field edits. No automatic retry or deletion after uncertainty.",
+        "reconciliation": {
+          "kind": "none",
+          "reason": "Inspect complete current rules privately; a matching later list cannot establish attribution. Never retry or automatically delete after uncertainty."
+        },
+        "privileges": {
+          "check": [
+            "perm",
+            "/",
+            [
+              "Sys.Modify"
+            ]
+          ]
+        },
+        "response": {
+          "type": "null"
+        },
+        "source": "Pinned rule schemas and reviewed provider Rules.pm creation, digest-guarded updates/deletes and reorder semantics."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "put",
         "/cluster/firewall/groups/{group}/{pos}"
@@ -124851,22 +126875,17 @@
                   "type": "string",
                   "minLength": 2,
                   "maxLength": 20,
-                  "pattern": "^(?:[A-Za-z][A-Za-z0-9_-]+)$"
-                },
-                "comment": {
-                  "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
-                },
-                "delete": {
-                  "type": "string",
-                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*(?:[,; ][A-Za-z][A-Za-z0-9._-]*)*$"
+                  "pattern": "^(?:[A-Za-z][A-Za-z0-9_-]+)$",
+                  "allOf": [
+                    {
+                      "pattern": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+                    }
+                  ]
                 },
                 "dest": {
                   "type": "string",
                   "maxLength": 512,
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^(?:(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])(?:\\.(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])){3}(?:/(?:[0-9]|[12][0-9]|3[0-2]))?|(?:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::|::[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::)(?:/(?:[0-9]|[1-9][0-9]|1[01][0-9]|12[0-8]))?)$(?![\\s\\S])"
                 },
                 "digest": {
                   "type": "string",
@@ -124874,8 +126893,7 @@
                 },
                 "dport": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^(?:[1-9]|[1-9][0-9]{1,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])$"
                 },
                 "enable": {
                   "type": "integer",
@@ -124885,37 +126903,12 @@
                   "type": "string",
                   "minLength": 2,
                   "maxLength": 18,
-                  "pattern": "^(?:[A-Za-z][A-Za-z0-9_-]+)$"
-                },
-                "icmp-type": {
-                  "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
-                },
-                "iface": {
-                  "type": "string",
-                  "minLength": 2,
-                  "maxLength": 20,
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
-                },
-                "log": {
-                  "enum": [
-                    "emerg",
-                    "alert",
-                    "crit",
-                    "err",
-                    "warning",
-                    "notice",
-                    "info",
-                    "debug",
-                    "nolog"
-                  ],
-                  "type": "string"
-                },
-                "macro": {
-                  "type": "string",
-                  "maxLength": 128
+                  "pattern": "^(?:[A-Za-z][A-Za-z0-9_-]+)$",
+                  "allOf": [
+                    {
+                      "pattern": "^[A-Za-z][A-Za-z0-9_-]{1,17}$(?![\\s\\S])"
+                    }
+                  ]
                 },
                 "moveto": {
                   "type": "integer",
@@ -124927,19 +126920,16 @@
                 },
                 "proto": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^(?:tcp|udp|icmp|icmpv6)$"
                 },
                 "source": {
                   "type": "string",
                   "maxLength": 512,
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^(?:(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])(?:\\.(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])){3}(?:/(?:[0-9]|[12][0-9]|3[0-2]))?|(?:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::|::[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::)(?:/(?:[0-9]|[1-9][0-9]|1[01][0-9]|12[0-8]))?)$(?![\\s\\S])"
                 },
                 "sport": {
                   "type": "string",
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^(?:[1-9]|[1-9][0-9]{1,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])$"
                 },
                 "type": {
                   "enum": [
@@ -124948,13 +126938,127 @@
                     "forward",
                     "group"
                   ],
-                  "type": "string"
+                  "type": "string",
+                  "allOf": [
+                    {
+                      "pattern": "^(?:in|out)$"
+                    }
+                  ]
                 }
               },
               "required": [
-                "group"
+                "group",
+                "pos"
               ],
-              "dependencies": {}
+              "dependencies": {},
+              "anyOf": [
+                {
+                  "required": [
+                    "moveto"
+                  ],
+                  "properties": {},
+                  "not": {
+                    "anyOf": [
+                      {
+                        "required": [
+                          "type"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "action"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "enable"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "source"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "dest"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "proto"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "sport"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "dport"
+                        ]
+                      }
+                    ]
+                  }
+                },
+                {
+                  "required": [],
+                  "properties": {},
+                  "not": {
+                    "anyOf": [
+                      {
+                        "required": [
+                          "moveto"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "enable"
+                        ]
+                      }
+                    ]
+                  }
+                },
+                {
+                  "required": [
+                    "enable"
+                  ],
+                  "properties": {
+                    "enable": {
+                      "const": 0
+                    }
+                  },
+                  "not": {
+                    "anyOf": [
+                      {
+                        "required": [
+                          "moveto"
+                        ]
+                      }
+                    ]
+                  }
+                },
+                {
+                  "required": [
+                    "enable"
+                  ],
+                  "properties": {
+                    "enable": {
+                      "const": 1
+                    }
+                  },
+                  "not": {
+                    "anyOf": [
+                      {
+                        "required": [
+                          "moveto"
+                        ]
+                      }
+                    ]
+                  }
+                }
+              ]
             }
           },
           "required": [
@@ -127109,7 +129213,7 @@
         },
         "inputPatterns": {
           "type": "^(?:in|out)$",
-          "action": "^(?:ACCEPT|DROP|REJECT)$"
+          "action": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
         },
         "inputFormats": {
           "source": "pve-firewall-address",
@@ -127117,7 +129221,8 @@
           "proto": "pve-firewall-protocol",
           "sport": "pve-firewall-port",
           "dport": "pve-firewall-port",
-          "iface": "pve-firewall-interface"
+          "iface": "pve-firewall-interface",
+          "group": "pve-firewall-group"
         },
         "confirmationWarnings": [
           {
@@ -127170,7 +129275,7 @@
                   "pattern": "^(?:[A-Za-z][A-Za-z0-9_-]+)$",
                   "allOf": [
                     {
-                      "pattern": "^(?:ACCEPT|DROP|REJECT)$"
+                      "pattern": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
                     }
                   ]
                 },
@@ -127748,31 +129853,32 @@
             ]
           },
           {
+            "requiredValues": {},
             "forbiddenInputs": [
               "moveto",
               "enable"
             ]
           },
           {
-            "forbiddenInputs": [
-              "moveto"
-            ],
             "requiredValues": {
               "enable": 0
-            }
-          },
-          {
+            },
             "forbiddenInputs": [
               "moveto"
-            ],
+            ]
+          },
+          {
             "requiredValues": {
               "enable": 1
-            }
+            },
+            "forbiddenInputs": [
+              "moveto"
+            ]
           }
         ],
         "inputPatterns": {
           "type": "^(?:in|out)$",
-          "action": "^(?:ACCEPT|DROP|REJECT)$"
+          "action": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
         },
         "inputFormats": {
           "source": "pve-firewall-address",
@@ -127780,7 +129886,8 @@
           "proto": "pve-firewall-protocol",
           "sport": "pve-firewall-port",
           "dport": "pve-firewall-port",
-          "iface": "pve-firewall-interface"
+          "iface": "pve-firewall-interface",
+          "group": "pve-firewall-group"
         },
         "confirmationWarnings": [
           {
@@ -127830,7 +129937,7 @@
                   "pattern": "^(?:[A-Za-z][A-Za-z0-9_-]+)$",
                   "allOf": [
                     {
-                      "pattern": "^(?:ACCEPT|DROP|REJECT)$"
+                      "pattern": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
                     }
                   ]
                 },
@@ -170641,7 +172748,7 @@
         },
         "inputPatterns": {
           "type": "^(?:in|out)$",
-          "action": "^(?:ACCEPT|DROP|REJECT)$"
+          "action": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
         },
         "inputFormats": {
           "source": "pve-firewall-address",
@@ -170649,7 +172756,8 @@
           "proto": "pve-firewall-protocol",
           "sport": "pve-firewall-port",
           "dport": "pve-firewall-port",
-          "iface": "pve-firewall-interface"
+          "iface": "pve-firewall-interface",
+          "group": "pve-firewall-group"
         },
         "confirmationWarnings": [
           {
@@ -170702,7 +172810,7 @@
                   "pattern": "^(?:[A-Za-z][A-Za-z0-9_-]+)$",
                   "allOf": [
                     {
-                      "pattern": "^(?:ACCEPT|DROP|REJECT)$"
+                      "pattern": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
                     }
                   ]
                 },
@@ -171316,31 +173424,32 @@
             ]
           },
           {
+            "requiredValues": {},
             "forbiddenInputs": [
               "moveto",
               "enable"
             ]
           },
           {
-            "forbiddenInputs": [
-              "moveto"
-            ],
             "requiredValues": {
               "enable": 0
-            }
-          },
-          {
+            },
             "forbiddenInputs": [
               "moveto"
-            ],
+            ]
+          },
+          {
             "requiredValues": {
               "enable": 1
-            }
+            },
+            "forbiddenInputs": [
+              "moveto"
+            ]
           }
         ],
         "inputPatterns": {
           "type": "^(?:in|out)$",
-          "action": "^(?:ACCEPT|DROP|REJECT)$"
+          "action": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
         },
         "inputFormats": {
           "source": "pve-firewall-address",
@@ -171348,7 +173457,8 @@
           "proto": "pve-firewall-protocol",
           "sport": "pve-firewall-port",
           "dport": "pve-firewall-port",
-          "iface": "pve-firewall-interface"
+          "iface": "pve-firewall-interface",
+          "group": "pve-firewall-group"
         },
         "confirmationWarnings": [
           {
@@ -171398,7 +173508,7 @@
                   "pattern": "^(?:[A-Za-z][A-Za-z0-9_-]+)$",
                   "allOf": [
                     {
-                      "pattern": "^(?:ACCEPT|DROP|REJECT)$"
+                      "pattern": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
                     }
                   ]
                 },
@@ -181844,9 +183954,42 @@
         "fixedInputs": {
           "enable": 0
         },
+        "inputCases": [
+          {
+            "requiredValues": {
+              "type": "in"
+            },
+            "inputPatterns": {
+              "action": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+            }
+          },
+          {
+            "requiredValues": {
+              "type": "out"
+            },
+            "inputPatterns": {
+              "action": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+            }
+          },
+          {
+            "requiredValues": {
+              "type": "group"
+            },
+            "forbiddenInputs": [
+              "source",
+              "dest",
+              "proto",
+              "sport",
+              "dport"
+            ],
+            "inputPatterns": {
+              "action": "^[A-Za-z][A-Za-z0-9_-]{1,17}$(?![\\s\\S])"
+            }
+          }
+        ],
         "inputPatterns": {
-          "type": "^(?:in|out)$",
-          "action": "^(?:ACCEPT|DROP|REJECT)$",
+          "type": "^(?:in|out|group)$",
+          "action": "^[A-Za-z][A-Za-z0-9_-]{1,17}$(?![\\s\\S])",
           "iface": "^net(?:[0-9]|[12][0-9]|3[01])$"
         },
         "inputFormats": {
@@ -181855,7 +183998,8 @@
           "proto": "pve-firewall-protocol",
           "sport": "pve-firewall-port",
           "dport": "pve-firewall-port",
-          "iface": "pve-firewall-interface"
+          "iface": "pve-firewall-interface",
+          "group": "pve-firewall-group"
         },
         "confirmationWarnings": [
           {
@@ -181908,7 +184052,7 @@
                   "pattern": "^(?:[A-Za-z][A-Za-z0-9_-]+)$",
                   "allOf": [
                     {
-                      "pattern": "^(?:ACCEPT|DROP|REJECT)$"
+                      "pattern": "^[A-Za-z][A-Za-z0-9_-]{1,17}$(?![\\s\\S])"
                     }
                   ]
                 },
@@ -181965,7 +184109,7 @@
                   "type": "string",
                   "allOf": [
                     {
-                      "pattern": "^(?:in|out)$"
+                      "pattern": "^(?:in|out|group)$"
                     }
                   ]
                 },
@@ -181982,7 +184126,77 @@
                 "type",
                 "vmid"
               ],
-              "dependencies": {}
+              "dependencies": {},
+              "anyOf": [
+                {
+                  "required": [
+                    "type"
+                  ],
+                  "properties": {
+                    "action": {
+                      "pattern": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+                    },
+                    "type": {
+                      "const": "in"
+                    }
+                  }
+                },
+                {
+                  "required": [
+                    "type"
+                  ],
+                  "properties": {
+                    "action": {
+                      "pattern": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+                    },
+                    "type": {
+                      "const": "out"
+                    }
+                  }
+                },
+                {
+                  "required": [
+                    "type"
+                  ],
+                  "properties": {
+                    "action": {
+                      "pattern": "^[A-Za-z][A-Za-z0-9_-]{1,17}$(?![\\s\\S])"
+                    },
+                    "type": {
+                      "const": "group"
+                    }
+                  },
+                  "not": {
+                    "anyOf": [
+                      {
+                        "required": [
+                          "source"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "dest"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "proto"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "sport"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "dport"
+                        ]
+                      }
+                    ]
+                  }
+                }
+              ]
             }
           },
           "required": [
@@ -182574,31 +184788,205 @@
             ]
           },
           {
+            "requiredValues": {
+              "type": "in"
+            },
+            "inputPatterns": {
+              "action": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+            },
             "forbiddenInputs": [
               "moveto",
               "enable"
             ]
           },
           {
+            "requiredValues": {
+              "type": "out"
+            },
+            "inputPatterns": {
+              "action": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+            },
+            "forbiddenInputs": [
+              "moveto",
+              "enable"
+            ]
+          },
+          {
+            "requiredValues": {
+              "type": "group"
+            },
+            "forbiddenInputs": [
+              "moveto",
+              "source",
+              "dest",
+              "proto",
+              "sport",
+              "dport",
+              "enable"
+            ],
+            "inputPatterns": {
+              "action": "^[A-Za-z][A-Za-z0-9_-]{1,17}$(?![\\s\\S])"
+            }
+          },
+          {
+            "forbiddenInputs": [
+              "moveto",
+              "type",
+              "action",
+              "enable"
+            ],
+            "requiredValues": {}
+          },
+          {
+            "requiredInputs": [
+              "action"
+            ],
+            "forbiddenInputs": [
+              "moveto",
+              "type",
+              "enable"
+            ],
+            "inputPatterns": {
+              "action": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+            },
+            "requiredValues": {}
+          },
+          {
+            "requiredValues": {
+              "type": "in",
+              "enable": 0
+            },
+            "inputPatterns": {
+              "action": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+            },
             "forbiddenInputs": [
               "moveto"
+            ]
+          },
+          {
+            "requiredValues": {
+              "type": "out",
+              "enable": 0
+            },
+            "inputPatterns": {
+              "action": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+            },
+            "forbiddenInputs": [
+              "moveto"
+            ]
+          },
+          {
+            "requiredValues": {
+              "type": "group",
+              "enable": 0
+            },
+            "forbiddenInputs": [
+              "moveto",
+              "source",
+              "dest",
+              "proto",
+              "sport",
+              "dport"
+            ],
+            "inputPatterns": {
+              "action": "^[A-Za-z][A-Za-z0-9_-]{1,17}$(?![\\s\\S])"
+            }
+          },
+          {
+            "forbiddenInputs": [
+              "moveto",
+              "type",
+              "action"
             ],
             "requiredValues": {
               "enable": 0
             }
           },
           {
+            "requiredInputs": [
+              "action"
+            ],
+            "forbiddenInputs": [
+              "moveto",
+              "type"
+            ],
+            "inputPatterns": {
+              "action": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+            },
+            "requiredValues": {
+              "enable": 0
+            }
+          },
+          {
+            "requiredValues": {
+              "type": "in",
+              "enable": 1
+            },
+            "inputPatterns": {
+              "action": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+            },
             "forbiddenInputs": [
               "moveto"
+            ]
+          },
+          {
+            "requiredValues": {
+              "type": "out",
+              "enable": 1
+            },
+            "inputPatterns": {
+              "action": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+            },
+            "forbiddenInputs": [
+              "moveto"
+            ]
+          },
+          {
+            "requiredValues": {
+              "type": "group",
+              "enable": 1
+            },
+            "forbiddenInputs": [
+              "moveto",
+              "source",
+              "dest",
+              "proto",
+              "sport",
+              "dport"
             ],
+            "inputPatterns": {
+              "action": "^[A-Za-z][A-Za-z0-9_-]{1,17}$(?![\\s\\S])"
+            }
+          },
+          {
+            "forbiddenInputs": [
+              "moveto",
+              "type",
+              "action"
+            ],
+            "requiredValues": {
+              "enable": 1
+            }
+          },
+          {
+            "requiredInputs": [
+              "action"
+            ],
+            "forbiddenInputs": [
+              "moveto",
+              "type"
+            ],
+            "inputPatterns": {
+              "action": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+            },
             "requiredValues": {
               "enable": 1
             }
           }
         ],
         "inputPatterns": {
-          "type": "^(?:in|out)$",
-          "action": "^(?:ACCEPT|DROP|REJECT)$",
+          "type": "^(?:in|out|group)$",
+          "action": "^[A-Za-z][A-Za-z0-9_-]{1,17}$(?![\\s\\S])",
           "iface": "^net(?:[0-9]|[12][0-9]|3[01])$"
         },
         "inputFormats": {
@@ -182607,7 +184995,8 @@
           "proto": "pve-firewall-protocol",
           "sport": "pve-firewall-port",
           "dport": "pve-firewall-port",
-          "iface": "pve-firewall-interface"
+          "iface": "pve-firewall-interface",
+          "group": "pve-firewall-group"
         },
         "confirmationWarnings": [
           {
@@ -182657,7 +185046,7 @@
                   "pattern": "^(?:[A-Za-z][A-Za-z0-9_-]+)$",
                   "allOf": [
                     {
-                      "pattern": "^(?:ACCEPT|DROP|REJECT)$"
+                      "pattern": "^[A-Za-z][A-Za-z0-9_-]{1,17}$(?![\\s\\S])"
                     }
                   ]
                 },
@@ -182724,7 +185113,7 @@
                   "type": "string",
                   "allOf": [
                     {
-                      "pattern": "^(?:in|out)$"
+                      "pattern": "^(?:in|out|group)$"
                     }
                   ]
                 },
@@ -182798,6 +185187,112 @@
                   }
                 },
                 {
+                  "required": [
+                    "type"
+                  ],
+                  "properties": {
+                    "action": {
+                      "pattern": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+                    },
+                    "type": {
+                      "const": "in"
+                    }
+                  },
+                  "not": {
+                    "anyOf": [
+                      {
+                        "required": [
+                          "moveto"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "enable"
+                        ]
+                      }
+                    ]
+                  }
+                },
+                {
+                  "required": [
+                    "type"
+                  ],
+                  "properties": {
+                    "action": {
+                      "pattern": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+                    },
+                    "type": {
+                      "const": "out"
+                    }
+                  },
+                  "not": {
+                    "anyOf": [
+                      {
+                        "required": [
+                          "moveto"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "enable"
+                        ]
+                      }
+                    ]
+                  }
+                },
+                {
+                  "required": [
+                    "type"
+                  ],
+                  "properties": {
+                    "action": {
+                      "pattern": "^[A-Za-z][A-Za-z0-9_-]{1,17}$(?![\\s\\S])"
+                    },
+                    "type": {
+                      "const": "group"
+                    }
+                  },
+                  "not": {
+                    "anyOf": [
+                      {
+                        "required": [
+                          "moveto"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "source"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "dest"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "proto"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "sport"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "dport"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "enable"
+                        ]
+                      }
+                    ]
+                  }
+                },
+                {
                   "required": [],
                   "properties": {},
                   "not": {
@@ -182809,7 +185304,149 @@
                       },
                       {
                         "required": [
+                          "type"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "action"
+                        ]
+                      },
+                      {
+                        "required": [
                           "enable"
+                        ]
+                      }
+                    ]
+                  }
+                },
+                {
+                  "required": [
+                    "action"
+                  ],
+                  "properties": {
+                    "action": {
+                      "pattern": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+                    }
+                  },
+                  "not": {
+                    "anyOf": [
+                      {
+                        "required": [
+                          "moveto"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "type"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "enable"
+                        ]
+                      }
+                    ]
+                  }
+                },
+                {
+                  "required": [
+                    "type",
+                    "enable"
+                  ],
+                  "properties": {
+                    "action": {
+                      "pattern": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+                    },
+                    "type": {
+                      "const": "in"
+                    },
+                    "enable": {
+                      "const": 0
+                    }
+                  },
+                  "not": {
+                    "anyOf": [
+                      {
+                        "required": [
+                          "moveto"
+                        ]
+                      }
+                    ]
+                  }
+                },
+                {
+                  "required": [
+                    "type",
+                    "enable"
+                  ],
+                  "properties": {
+                    "action": {
+                      "pattern": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+                    },
+                    "type": {
+                      "const": "out"
+                    },
+                    "enable": {
+                      "const": 0
+                    }
+                  },
+                  "not": {
+                    "anyOf": [
+                      {
+                        "required": [
+                          "moveto"
+                        ]
+                      }
+                    ]
+                  }
+                },
+                {
+                  "required": [
+                    "type",
+                    "enable"
+                  ],
+                  "properties": {
+                    "action": {
+                      "pattern": "^[A-Za-z][A-Za-z0-9_-]{1,17}$(?![\\s\\S])"
+                    },
+                    "type": {
+                      "const": "group"
+                    },
+                    "enable": {
+                      "const": 0
+                    }
+                  },
+                  "not": {
+                    "anyOf": [
+                      {
+                        "required": [
+                          "moveto"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "source"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "dest"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "proto"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "sport"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "dport"
                         ]
                       }
                     ]
@@ -182830,6 +185467,147 @@
                         "required": [
                           "moveto"
                         ]
+                      },
+                      {
+                        "required": [
+                          "type"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "action"
+                        ]
+                      }
+                    ]
+                  }
+                },
+                {
+                  "required": [
+                    "action",
+                    "enable"
+                  ],
+                  "properties": {
+                    "action": {
+                      "pattern": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+                    },
+                    "enable": {
+                      "const": 0
+                    }
+                  },
+                  "not": {
+                    "anyOf": [
+                      {
+                        "required": [
+                          "moveto"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "type"
+                        ]
+                      }
+                    ]
+                  }
+                },
+                {
+                  "required": [
+                    "type",
+                    "enable"
+                  ],
+                  "properties": {
+                    "action": {
+                      "pattern": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+                    },
+                    "type": {
+                      "const": "in"
+                    },
+                    "enable": {
+                      "const": 1
+                    }
+                  },
+                  "not": {
+                    "anyOf": [
+                      {
+                        "required": [
+                          "moveto"
+                        ]
+                      }
+                    ]
+                  }
+                },
+                {
+                  "required": [
+                    "type",
+                    "enable"
+                  ],
+                  "properties": {
+                    "action": {
+                      "pattern": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+                    },
+                    "type": {
+                      "const": "out"
+                    },
+                    "enable": {
+                      "const": 1
+                    }
+                  },
+                  "not": {
+                    "anyOf": [
+                      {
+                        "required": [
+                          "moveto"
+                        ]
+                      }
+                    ]
+                  }
+                },
+                {
+                  "required": [
+                    "type",
+                    "enable"
+                  ],
+                  "properties": {
+                    "action": {
+                      "pattern": "^[A-Za-z][A-Za-z0-9_-]{1,17}$(?![\\s\\S])"
+                    },
+                    "type": {
+                      "const": "group"
+                    },
+                    "enable": {
+                      "const": 1
+                    }
+                  },
+                  "not": {
+                    "anyOf": [
+                      {
+                        "required": [
+                          "moveto"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "source"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "dest"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "proto"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "sport"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "dport"
+                        ]
                       }
                     ]
                   }
@@ -182848,6 +185626,44 @@
                       {
                         "required": [
                           "moveto"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "type"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "action"
+                        ]
+                      }
+                    ]
+                  }
+                },
+                {
+                  "required": [
+                    "action",
+                    "enable"
+                  ],
+                  "properties": {
+                    "action": {
+                      "pattern": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+                    },
+                    "enable": {
+                      "const": 1
+                    }
+                  },
+                  "not": {
+                    "anyOf": [
+                      {
+                        "required": [
+                          "moveto"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "type"
                         ]
                       }
                     ]
@@ -212471,9 +215287,42 @@
         "fixedInputs": {
           "enable": 0
         },
+        "inputCases": [
+          {
+            "requiredValues": {
+              "type": "in"
+            },
+            "inputPatterns": {
+              "action": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+            }
+          },
+          {
+            "requiredValues": {
+              "type": "out"
+            },
+            "inputPatterns": {
+              "action": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+            }
+          },
+          {
+            "requiredValues": {
+              "type": "group"
+            },
+            "forbiddenInputs": [
+              "source",
+              "dest",
+              "proto",
+              "sport",
+              "dport"
+            ],
+            "inputPatterns": {
+              "action": "^[A-Za-z][A-Za-z0-9_-]{1,17}$(?![\\s\\S])"
+            }
+          }
+        ],
         "inputPatterns": {
-          "type": "^(?:in|out)$",
-          "action": "^(?:ACCEPT|DROP|REJECT)$",
+          "type": "^(?:in|out|group)$",
+          "action": "^[A-Za-z][A-Za-z0-9_-]{1,17}$(?![\\s\\S])",
           "iface": "^net(?:[0-9]|[12][0-9]|3[01])$"
         },
         "inputFormats": {
@@ -212482,7 +215331,8 @@
           "proto": "pve-firewall-protocol",
           "sport": "pve-firewall-port",
           "dport": "pve-firewall-port",
-          "iface": "pve-firewall-interface"
+          "iface": "pve-firewall-interface",
+          "group": "pve-firewall-group"
         },
         "confirmationWarnings": [
           {
@@ -212535,7 +215385,7 @@
                   "pattern": "^(?:[A-Za-z][A-Za-z0-9_-]+)$",
                   "allOf": [
                     {
-                      "pattern": "^(?:ACCEPT|DROP|REJECT)$"
+                      "pattern": "^[A-Za-z][A-Za-z0-9_-]{1,17}$(?![\\s\\S])"
                     }
                   ]
                 },
@@ -212592,7 +215442,7 @@
                   "type": "string",
                   "allOf": [
                     {
-                      "pattern": "^(?:in|out)$"
+                      "pattern": "^(?:in|out|group)$"
                     }
                   ]
                 },
@@ -212609,7 +215459,77 @@
                 "type",
                 "vmid"
               ],
-              "dependencies": {}
+              "dependencies": {},
+              "anyOf": [
+                {
+                  "required": [
+                    "type"
+                  ],
+                  "properties": {
+                    "action": {
+                      "pattern": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+                    },
+                    "type": {
+                      "const": "in"
+                    }
+                  }
+                },
+                {
+                  "required": [
+                    "type"
+                  ],
+                  "properties": {
+                    "action": {
+                      "pattern": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+                    },
+                    "type": {
+                      "const": "out"
+                    }
+                  }
+                },
+                {
+                  "required": [
+                    "type"
+                  ],
+                  "properties": {
+                    "action": {
+                      "pattern": "^[A-Za-z][A-Za-z0-9_-]{1,17}$(?![\\s\\S])"
+                    },
+                    "type": {
+                      "const": "group"
+                    }
+                  },
+                  "not": {
+                    "anyOf": [
+                      {
+                        "required": [
+                          "source"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "dest"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "proto"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "sport"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "dport"
+                        ]
+                      }
+                    ]
+                  }
+                }
+              ]
             }
           },
           "required": [
@@ -213201,31 +216121,205 @@
             ]
           },
           {
+            "requiredValues": {
+              "type": "in"
+            },
+            "inputPatterns": {
+              "action": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+            },
             "forbiddenInputs": [
               "moveto",
               "enable"
             ]
           },
           {
+            "requiredValues": {
+              "type": "out"
+            },
+            "inputPatterns": {
+              "action": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+            },
+            "forbiddenInputs": [
+              "moveto",
+              "enable"
+            ]
+          },
+          {
+            "requiredValues": {
+              "type": "group"
+            },
+            "forbiddenInputs": [
+              "moveto",
+              "source",
+              "dest",
+              "proto",
+              "sport",
+              "dport",
+              "enable"
+            ],
+            "inputPatterns": {
+              "action": "^[A-Za-z][A-Za-z0-9_-]{1,17}$(?![\\s\\S])"
+            }
+          },
+          {
+            "forbiddenInputs": [
+              "moveto",
+              "type",
+              "action",
+              "enable"
+            ],
+            "requiredValues": {}
+          },
+          {
+            "requiredInputs": [
+              "action"
+            ],
+            "forbiddenInputs": [
+              "moveto",
+              "type",
+              "enable"
+            ],
+            "inputPatterns": {
+              "action": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+            },
+            "requiredValues": {}
+          },
+          {
+            "requiredValues": {
+              "type": "in",
+              "enable": 0
+            },
+            "inputPatterns": {
+              "action": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+            },
             "forbiddenInputs": [
               "moveto"
+            ]
+          },
+          {
+            "requiredValues": {
+              "type": "out",
+              "enable": 0
+            },
+            "inputPatterns": {
+              "action": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+            },
+            "forbiddenInputs": [
+              "moveto"
+            ]
+          },
+          {
+            "requiredValues": {
+              "type": "group",
+              "enable": 0
+            },
+            "forbiddenInputs": [
+              "moveto",
+              "source",
+              "dest",
+              "proto",
+              "sport",
+              "dport"
+            ],
+            "inputPatterns": {
+              "action": "^[A-Za-z][A-Za-z0-9_-]{1,17}$(?![\\s\\S])"
+            }
+          },
+          {
+            "forbiddenInputs": [
+              "moveto",
+              "type",
+              "action"
             ],
             "requiredValues": {
               "enable": 0
             }
           },
           {
+            "requiredInputs": [
+              "action"
+            ],
+            "forbiddenInputs": [
+              "moveto",
+              "type"
+            ],
+            "inputPatterns": {
+              "action": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+            },
+            "requiredValues": {
+              "enable": 0
+            }
+          },
+          {
+            "requiredValues": {
+              "type": "in",
+              "enable": 1
+            },
+            "inputPatterns": {
+              "action": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+            },
             "forbiddenInputs": [
               "moveto"
+            ]
+          },
+          {
+            "requiredValues": {
+              "type": "out",
+              "enable": 1
+            },
+            "inputPatterns": {
+              "action": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+            },
+            "forbiddenInputs": [
+              "moveto"
+            ]
+          },
+          {
+            "requiredValues": {
+              "type": "group",
+              "enable": 1
+            },
+            "forbiddenInputs": [
+              "moveto",
+              "source",
+              "dest",
+              "proto",
+              "sport",
+              "dport"
             ],
+            "inputPatterns": {
+              "action": "^[A-Za-z][A-Za-z0-9_-]{1,17}$(?![\\s\\S])"
+            }
+          },
+          {
+            "forbiddenInputs": [
+              "moveto",
+              "type",
+              "action"
+            ],
+            "requiredValues": {
+              "enable": 1
+            }
+          },
+          {
+            "requiredInputs": [
+              "action"
+            ],
+            "forbiddenInputs": [
+              "moveto",
+              "type"
+            ],
+            "inputPatterns": {
+              "action": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+            },
             "requiredValues": {
               "enable": 1
             }
           }
         ],
         "inputPatterns": {
-          "type": "^(?:in|out)$",
-          "action": "^(?:ACCEPT|DROP|REJECT)$",
+          "type": "^(?:in|out|group)$",
+          "action": "^[A-Za-z][A-Za-z0-9_-]{1,17}$(?![\\s\\S])",
           "iface": "^net(?:[0-9]|[12][0-9]|3[01])$"
         },
         "inputFormats": {
@@ -213234,7 +216328,8 @@
           "proto": "pve-firewall-protocol",
           "sport": "pve-firewall-port",
           "dport": "pve-firewall-port",
-          "iface": "pve-firewall-interface"
+          "iface": "pve-firewall-interface",
+          "group": "pve-firewall-group"
         },
         "confirmationWarnings": [
           {
@@ -213284,7 +216379,7 @@
                   "pattern": "^(?:[A-Za-z][A-Za-z0-9_-]+)$",
                   "allOf": [
                     {
-                      "pattern": "^(?:ACCEPT|DROP|REJECT)$"
+                      "pattern": "^[A-Za-z][A-Za-z0-9_-]{1,17}$(?![\\s\\S])"
                     }
                   ]
                 },
@@ -213351,7 +216446,7 @@
                   "type": "string",
                   "allOf": [
                     {
-                      "pattern": "^(?:in|out)$"
+                      "pattern": "^(?:in|out|group)$"
                     }
                   ]
                 },
@@ -213425,6 +216520,112 @@
                   }
                 },
                 {
+                  "required": [
+                    "type"
+                  ],
+                  "properties": {
+                    "action": {
+                      "pattern": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+                    },
+                    "type": {
+                      "const": "in"
+                    }
+                  },
+                  "not": {
+                    "anyOf": [
+                      {
+                        "required": [
+                          "moveto"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "enable"
+                        ]
+                      }
+                    ]
+                  }
+                },
+                {
+                  "required": [
+                    "type"
+                  ],
+                  "properties": {
+                    "action": {
+                      "pattern": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+                    },
+                    "type": {
+                      "const": "out"
+                    }
+                  },
+                  "not": {
+                    "anyOf": [
+                      {
+                        "required": [
+                          "moveto"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "enable"
+                        ]
+                      }
+                    ]
+                  }
+                },
+                {
+                  "required": [
+                    "type"
+                  ],
+                  "properties": {
+                    "action": {
+                      "pattern": "^[A-Za-z][A-Za-z0-9_-]{1,17}$(?![\\s\\S])"
+                    },
+                    "type": {
+                      "const": "group"
+                    }
+                  },
+                  "not": {
+                    "anyOf": [
+                      {
+                        "required": [
+                          "moveto"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "source"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "dest"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "proto"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "sport"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "dport"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "enable"
+                        ]
+                      }
+                    ]
+                  }
+                },
+                {
                   "required": [],
                   "properties": {},
                   "not": {
@@ -213436,7 +216637,149 @@
                       },
                       {
                         "required": [
+                          "type"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "action"
+                        ]
+                      },
+                      {
+                        "required": [
                           "enable"
+                        ]
+                      }
+                    ]
+                  }
+                },
+                {
+                  "required": [
+                    "action"
+                  ],
+                  "properties": {
+                    "action": {
+                      "pattern": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+                    }
+                  },
+                  "not": {
+                    "anyOf": [
+                      {
+                        "required": [
+                          "moveto"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "type"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "enable"
+                        ]
+                      }
+                    ]
+                  }
+                },
+                {
+                  "required": [
+                    "type",
+                    "enable"
+                  ],
+                  "properties": {
+                    "action": {
+                      "pattern": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+                    },
+                    "type": {
+                      "const": "in"
+                    },
+                    "enable": {
+                      "const": 0
+                    }
+                  },
+                  "not": {
+                    "anyOf": [
+                      {
+                        "required": [
+                          "moveto"
+                        ]
+                      }
+                    ]
+                  }
+                },
+                {
+                  "required": [
+                    "type",
+                    "enable"
+                  ],
+                  "properties": {
+                    "action": {
+                      "pattern": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+                    },
+                    "type": {
+                      "const": "out"
+                    },
+                    "enable": {
+                      "const": 0
+                    }
+                  },
+                  "not": {
+                    "anyOf": [
+                      {
+                        "required": [
+                          "moveto"
+                        ]
+                      }
+                    ]
+                  }
+                },
+                {
+                  "required": [
+                    "type",
+                    "enable"
+                  ],
+                  "properties": {
+                    "action": {
+                      "pattern": "^[A-Za-z][A-Za-z0-9_-]{1,17}$(?![\\s\\S])"
+                    },
+                    "type": {
+                      "const": "group"
+                    },
+                    "enable": {
+                      "const": 0
+                    }
+                  },
+                  "not": {
+                    "anyOf": [
+                      {
+                        "required": [
+                          "moveto"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "source"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "dest"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "proto"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "sport"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "dport"
                         ]
                       }
                     ]
@@ -213457,6 +216800,147 @@
                         "required": [
                           "moveto"
                         ]
+                      },
+                      {
+                        "required": [
+                          "type"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "action"
+                        ]
+                      }
+                    ]
+                  }
+                },
+                {
+                  "required": [
+                    "action",
+                    "enable"
+                  ],
+                  "properties": {
+                    "action": {
+                      "pattern": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+                    },
+                    "enable": {
+                      "const": 0
+                    }
+                  },
+                  "not": {
+                    "anyOf": [
+                      {
+                        "required": [
+                          "moveto"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "type"
+                        ]
+                      }
+                    ]
+                  }
+                },
+                {
+                  "required": [
+                    "type",
+                    "enable"
+                  ],
+                  "properties": {
+                    "action": {
+                      "pattern": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+                    },
+                    "type": {
+                      "const": "in"
+                    },
+                    "enable": {
+                      "const": 1
+                    }
+                  },
+                  "not": {
+                    "anyOf": [
+                      {
+                        "required": [
+                          "moveto"
+                        ]
+                      }
+                    ]
+                  }
+                },
+                {
+                  "required": [
+                    "type",
+                    "enable"
+                  ],
+                  "properties": {
+                    "action": {
+                      "pattern": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+                    },
+                    "type": {
+                      "const": "out"
+                    },
+                    "enable": {
+                      "const": 1
+                    }
+                  },
+                  "not": {
+                    "anyOf": [
+                      {
+                        "required": [
+                          "moveto"
+                        ]
+                      }
+                    ]
+                  }
+                },
+                {
+                  "required": [
+                    "type",
+                    "enable"
+                  ],
+                  "properties": {
+                    "action": {
+                      "pattern": "^[A-Za-z][A-Za-z0-9_-]{1,17}$(?![\\s\\S])"
+                    },
+                    "type": {
+                      "const": "group"
+                    },
+                    "enable": {
+                      "const": 1
+                    }
+                  },
+                  "not": {
+                    "anyOf": [
+                      {
+                        "required": [
+                          "moveto"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "source"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "dest"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "proto"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "sport"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "dport"
+                        ]
                       }
                     ]
                   }
@@ -213475,6 +216959,44 @@
                       {
                         "required": [
                           "moveto"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "type"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "action"
+                        ]
+                      }
+                    ]
+                  }
+                },
+                {
+                  "required": [
+                    "action",
+                    "enable"
+                  ],
+                  "properties": {
+                    "action": {
+                      "pattern": "^(?:ACCEPT|DROP|REJECT)$(?![\\s\\S])"
+                    },
+                    "enable": {
+                      "const": 1
+                    }
+                  },
+                  "not": {
+                    "anyOf": [
+                      {
+                        "required": [
+                          "moveto"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "type"
                         ]
                       }
                     ]
