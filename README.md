@@ -278,10 +278,7 @@ proxmox-axi post '/nodes/{node}/qemu/{vmid}/agent/ping' --api-node '<node>' --ap
 ```
 
 Ping uses the provider's POST method but is a reviewed read, without mutation permission, confirmation or a standalone journal.
-It establishes agent responsiveness, not cloud-init completion or application health.
-Agent failures require checking guest power, agent enablement and the service inside the VM; they do not establish that the VM is unhealthy.
-For approved first-boot marker files, reuse `transfer get .../agent/file-read --response-format guest-file` with a private byte channel, preserving the selected release's encoding, size and truncation limits.
-Generic guest-agent dispatch, execution and file writes remain refused.
+Follow the readiness reference above for prerequisites, interpretation of results and failures, and private first-boot marker checks.
 
 ### Cloud-init onboarding
 
