@@ -65,7 +65,7 @@ Discover the exact operation ID and executable schema with `schema create|set|de
 Stateful rule changes inside execute batches remain refused; use a separate preview and confirmation per operation.
 
 Creation is a staged operation with a fixed integer `enable=0` that callers cannot override.
-The [provider implementation](https://github.com/proxmox/pve-firewall/blob/82888bc0a16a989e2858f47dc56c73741fd36d5b/src/PVE/API2/Firewall/Rules.pm) prepends the new disabled rule and ignores creation digests; create-position and digest inputs are refused by this admission.
+The provider prepends the new disabled rule and ignores creation digests; create-position and digest inputs are refused by this admission.
 This is NON-ATOMIC CREATE: the client rechecks the observed list before dispatch, but another writer can change it between that read and creation.
 The client compares the observed ordered result afterward and reports uncertainty on any unexpected result or unavailable verification.
 It never retries creation or automatically deletes an entry to recover.

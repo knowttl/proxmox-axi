@@ -216,6 +216,7 @@ For provider filtering and backend behavior, see the [Proxmox firewall documenta
 
 Ordered rule reads and individually confirmed creation, editing, reorder and deletion are also admitted at cluster, node and QEMU/LXC scope.
 Follow the [ordered-rule guide](skills/proxmox-axi/references/firewall-management.md#ordered-firewall-rules) for private pipe setup, disabled staging, non-atomic creation limits, digest guards, supported inputs and uncertainty handling.
+The pinned [provider implementation](https://github.com/proxmox/pve-firewall/blob/82888bc0a16a989e2858f47dc56c73741fd36d5b/src/PVE/API2/Firewall/Rules.pm) prepends new rules and ignores creation digests.
 
 ### Guest power control
 
