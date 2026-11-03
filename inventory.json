@@ -410,23 +410,103 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "private-result",
+            "allowedInputs": [
+              "name",
+              "digest"
+            ],
+            "requiredInputs": [
+              "digest"
+            ],
+            "sensitiveInputs": [],
+            "inputPatterns": {
+              "name": "^[a-z][a-z0-9_-]{1,63}$(?![\\s\\S])",
+              "digest": "^[a-fA-F0-9]{40}$(?![\\s\\S])"
+            },
+            "inputFormats": {
+              "cidr": "pve-firewall-address"
+            },
+            "confirmationWarnings": [
+              {
+                "message": "Firewall alias or IP-set changes can alter referencing rules, guest IP filtering and management access. Confirm the exact scope, name and literal CIDR."
+              },
+              {
+                "message": "DELETION: explicitly confirm the selected alias, member or empty set. Force deletion of nonempty sets is refused."
+              }
+            ],
+            "reason": "Confirmed named firewall objects and literal members only; native digests required where supported, empty-only set deletion, no rename/force/member-alias branches. Comments use SecretRefs and reads remain private.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Inspect the selected scope privately; do not retry uncertain operations. Creation and empty-set deletion provide no native optimistic guard."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/",
+                [
+                  "Sys.Modify"
+                ]
+              ]
+            },
+            "response": {
+              "type": "null"
+            },
+            "source": "Pinned schemas and reviewed Aliases.pm/IPSet.pm locks, digest guards, empty-set deletion and member replacement behavior."
           },
           "contract": "dist/contracts.json#/contracts/88"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "private-result",
+            "allowedInputs": [
+              "name",
+              "digest"
+            ],
+            "requiredInputs": [
+              "digest"
+            ],
+            "sensitiveInputs": [],
+            "inputPatterns": {
+              "name": "^[a-z][a-z0-9_-]{1,63}$(?![\\s\\S])",
+              "digest": "^[a-fA-F0-9]{40}$(?![\\s\\S])"
+            },
+            "inputFormats": {
+              "cidr": "pve-firewall-address"
+            },
+            "confirmationWarnings": [
+              {
+                "message": "Firewall alias or IP-set changes can alter referencing rules, guest IP filtering and management access. Confirm the exact scope, name and literal CIDR."
+              },
+              {
+                "message": "DELETION: explicitly confirm the selected alias, member or empty set. Force deletion of nonempty sets is refused."
+              }
+            ],
+            "reason": "Confirmed named firewall objects and literal members only; native digests required where supported, empty-only set deletion, no rename/force/member-alias branches. Comments use SecretRefs and reads remain private.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Inspect the selected scope privately; do not retry uncertain operations. Creation and empty-set deletion provide no native optimistic guard."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/",
+                [
+                  "Sys.Modify"
+                ]
+              ]
+            },
+            "response": {
+              "type": "null"
+            },
+            "source": "Pinned schemas and reviewed Aliases.pm/IPSet.pm locks, digest guards, empty-set deletion and member replacement behavior."
           },
           "contract": "dist/contracts.json#/contracts/703"
         }
@@ -509,23 +589,91 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "private-result",
+            "allowedInputs": [
+              "name"
+            ],
+            "requiredInputs": [],
+            "sensitiveInputs": [],
+            "inputPatterns": {
+              "name": "^[a-z][a-z0-9_-]{1,63}$(?![\\s\\S])"
+            },
+            "inputFormats": {},
+            "confirmationWarnings": [
+              {
+                "message": "Firewall alias or IP-set changes can alter referencing rules, guest IP filtering and management access. Confirm the exact scope, name and literal CIDR."
+              },
+              {
+                "message": "DELETION: explicitly confirm the selected alias, member or empty set. Force deletion of nonempty sets is refused."
+              }
+            ],
+            "reason": "Confirmed named firewall objects and literal members only; native digests required where supported, empty-only set deletion, no rename/force/member-alias branches. Comments use SecretRefs and reads remain private.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Inspect the selected scope privately; do not retry uncertain operations. Creation and empty-set deletion provide no native optimistic guard."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/",
+                [
+                  "Sys.Modify"
+                ]
+              ]
+            },
+            "response": {
+              "type": "null"
+            },
+            "source": "Pinned schemas and reviewed Aliases.pm/IPSet.pm locks, digest guards, empty-set deletion and member replacement behavior."
           },
           "contract": "dist/contracts.json#/contracts/101"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "private-result",
+            "allowedInputs": [
+              "name"
+            ],
+            "requiredInputs": [],
+            "sensitiveInputs": [],
+            "inputPatterns": {
+              "name": "^[a-z][a-z0-9_-]{1,63}$(?![\\s\\S])"
+            },
+            "inputFormats": {},
+            "confirmationWarnings": [
+              {
+                "message": "Firewall alias or IP-set changes can alter referencing rules, guest IP filtering and management access. Confirm the exact scope, name and literal CIDR."
+              },
+              {
+                "message": "DELETION: explicitly confirm the selected alias, member or empty set. Force deletion of nonempty sets is refused."
+              }
+            ],
+            "reason": "Confirmed named firewall objects and literal members only; native digests required where supported, empty-only set deletion, no rename/force/member-alias branches. Comments use SecretRefs and reads remain private.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Inspect the selected scope privately; do not retry uncertain operations. Creation and empty-set deletion provide no native optimistic guard."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/",
+                [
+                  "Sys.Modify"
+                ]
+              ]
+            },
+            "response": {
+              "type": "null"
+            },
+            "source": "Pinned schemas and reviewed Aliases.pm/IPSet.pm locks, digest guards, empty-set deletion and member replacement behavior."
           },
           "contract": "dist/contracts.json#/contracts/716"
         }
@@ -542,23 +690,105 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "private-result",
+            "allowedInputs": [
+              "name",
+              "cidr",
+              "digest"
+            ],
+            "requiredInputs": [
+              "digest"
+            ],
+            "sensitiveInputs": [],
+            "inputPatterns": {
+              "name": "^[a-z][a-z0-9_-]{1,63}$(?![\\s\\S])",
+              "digest": "^[a-fA-F0-9]{40}$(?![\\s\\S])"
+            },
+            "inputFormats": {
+              "cidr": "pve-firewall-member"
+            },
+            "confirmationWarnings": [
+              {
+                "message": "Firewall alias or IP-set changes can alter referencing rules, guest IP filtering and management access. Confirm the exact scope, name and literal CIDR."
+              },
+              {
+                "message": "DELETION: explicitly confirm the selected alias, member or empty set. Force deletion of nonempty sets is refused."
+              }
+            ],
+            "reason": "Confirmed named firewall objects and literal members only; native digests required where supported, empty-only set deletion, no rename/force/member-alias branches. Comments use SecretRefs and reads remain private.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Inspect the selected scope privately; do not retry uncertain operations. Creation and empty-set deletion provide no native optimistic guard."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/",
+                [
+                  "Sys.Modify"
+                ]
+              ]
+            },
+            "response": {
+              "type": "null"
+            },
+            "source": "Pinned schemas and reviewed Aliases.pm/IPSet.pm locks, digest guards, empty-set deletion and member replacement behavior."
           },
           "contract": "dist/contracts.json#/contracts/104"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "private-result",
+            "allowedInputs": [
+              "name",
+              "cidr",
+              "digest"
+            ],
+            "requiredInputs": [
+              "digest"
+            ],
+            "sensitiveInputs": [],
+            "inputPatterns": {
+              "name": "^[a-z][a-z0-9_-]{1,63}$(?![\\s\\S])",
+              "digest": "^[a-fA-F0-9]{40}$(?![\\s\\S])"
+            },
+            "inputFormats": {
+              "cidr": "pve-firewall-member"
+            },
+            "confirmationWarnings": [
+              {
+                "message": "Firewall alias or IP-set changes can alter referencing rules, guest IP filtering and management access. Confirm the exact scope, name and literal CIDR."
+              },
+              {
+                "message": "DELETION: explicitly confirm the selected alias, member or empty set. Force deletion of nonempty sets is refused."
+              }
+            ],
+            "reason": "Confirmed named firewall objects and literal members only; native digests required where supported, empty-only set deletion, no rename/force/member-alias branches. Comments use SecretRefs and reads remain private.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Inspect the selected scope privately; do not retry uncertain operations. Creation and empty-set deletion provide no native optimistic guard."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/",
+                [
+                  "Sys.Modify"
+                ]
+              ]
+            },
+            "response": {
+              "type": "null"
+            },
+            "source": "Pinned schemas and reviewed Aliases.pm/IPSet.pm locks, digest guards, empty-set deletion and member replacement behavior."
           },
           "contract": "dist/contracts.json#/contracts/719"
         }
@@ -2124,23 +2354,107 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "private-result",
+            "allowedInputs": [
+              "node",
+              "vmid",
+              "name",
+              "digest"
+            ],
+            "requiredInputs": [
+              "digest"
+            ],
+            "sensitiveInputs": [],
+            "inputPatterns": {
+              "name": "^[a-z][a-z0-9_-]{1,63}$(?![\\s\\S])",
+              "digest": "^[a-fA-F0-9]{40}$(?![\\s\\S])"
+            },
+            "inputFormats": {
+              "cidr": "pve-firewall-address"
+            },
+            "confirmationWarnings": [
+              {
+                "message": "Firewall alias or IP-set changes can alter referencing rules, guest IP filtering and management access. Confirm the exact scope, name and literal CIDR."
+              },
+              {
+                "message": "DELETION: explicitly confirm the selected alias, member or empty set. Force deletion of nonempty sets is refused."
+              }
+            ],
+            "reason": "Confirmed named firewall objects and literal members only; native digests required where supported, empty-only set deletion, no rename/force/member-alias branches. Comments use SecretRefs and reads remain private.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Inspect the selected scope privately; do not retry uncertain operations. Creation and empty-set deletion provide no native optimistic guard."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/vms/{vmid}",
+                [
+                  "VM.Config.Network"
+                ]
+              ]
+            },
+            "response": {
+              "type": "null"
+            },
+            "source": "Pinned schemas and reviewed Aliases.pm/IPSet.pm locks, digest guards, empty-set deletion and member replacement behavior."
           },
           "contract": "dist/contracts.json#/contracts/364"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "private-result",
+            "allowedInputs": [
+              "node",
+              "vmid",
+              "name",
+              "digest"
+            ],
+            "requiredInputs": [
+              "digest"
+            ],
+            "sensitiveInputs": [],
+            "inputPatterns": {
+              "name": "^[a-z][a-z0-9_-]{1,63}$(?![\\s\\S])",
+              "digest": "^[a-fA-F0-9]{40}$(?![\\s\\S])"
+            },
+            "inputFormats": {
+              "cidr": "pve-firewall-address"
+            },
+            "confirmationWarnings": [
+              {
+                "message": "Firewall alias or IP-set changes can alter referencing rules, guest IP filtering and management access. Confirm the exact scope, name and literal CIDR."
+              },
+              {
+                "message": "DELETION: explicitly confirm the selected alias, member or empty set. Force deletion of nonempty sets is refused."
+              }
+            ],
+            "reason": "Confirmed named firewall objects and literal members only; native digests required where supported, empty-only set deletion, no rename/force/member-alias branches. Comments use SecretRefs and reads remain private.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Inspect the selected scope privately; do not retry uncertain operations. Creation and empty-set deletion provide no native optimistic guard."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/vms/{vmid}",
+                [
+                  "VM.Config.Network"
+                ]
+              ]
+            },
+            "response": {
+              "type": "null"
+            },
+            "source": "Pinned schemas and reviewed Aliases.pm/IPSet.pm locks, digest guards, empty-set deletion and member replacement behavior."
           },
           "contract": "dist/contracts.json#/contracts/1032"
         }
@@ -2157,23 +2471,95 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "private-result",
+            "allowedInputs": [
+              "node",
+              "vmid",
+              "name"
+            ],
+            "requiredInputs": [],
+            "sensitiveInputs": [],
+            "inputPatterns": {
+              "name": "^[a-z][a-z0-9_-]{1,63}$(?![\\s\\S])"
+            },
+            "inputFormats": {},
+            "confirmationWarnings": [
+              {
+                "message": "Firewall alias or IP-set changes can alter referencing rules, guest IP filtering and management access. Confirm the exact scope, name and literal CIDR."
+              },
+              {
+                "message": "DELETION: explicitly confirm the selected alias, member or empty set. Force deletion of nonempty sets is refused."
+              }
+            ],
+            "reason": "Confirmed named firewall objects and literal members only; native digests required where supported, empty-only set deletion, no rename/force/member-alias branches. Comments use SecretRefs and reads remain private.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Inspect the selected scope privately; do not retry uncertain operations. Creation and empty-set deletion provide no native optimistic guard."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/vms/{vmid}",
+                [
+                  "VM.Config.Network"
+                ]
+              ]
+            },
+            "response": {
+              "type": "null"
+            },
+            "source": "Pinned schemas and reviewed Aliases.pm/IPSet.pm locks, digest guards, empty-set deletion and member replacement behavior."
           },
           "contract": "dist/contracts.json#/contracts/369"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "private-result",
+            "allowedInputs": [
+              "node",
+              "vmid",
+              "name"
+            ],
+            "requiredInputs": [],
+            "sensitiveInputs": [],
+            "inputPatterns": {
+              "name": "^[a-z][a-z0-9_-]{1,63}$(?![\\s\\S])"
+            },
+            "inputFormats": {},
+            "confirmationWarnings": [
+              {
+                "message": "Firewall alias or IP-set changes can alter referencing rules, guest IP filtering and management access. Confirm the exact scope, name and literal CIDR."
+              },
+              {
+                "message": "DELETION: explicitly confirm the selected alias, member or empty set. Force deletion of nonempty sets is refused."
+              }
+            ],
+            "reason": "Confirmed named firewall objects and literal members only; native digests required where supported, empty-only set deletion, no rename/force/member-alias branches. Comments use SecretRefs and reads remain private.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Inspect the selected scope privately; do not retry uncertain operations. Creation and empty-set deletion provide no native optimistic guard."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/vms/{vmid}",
+                [
+                  "VM.Config.Network"
+                ]
+              ]
+            },
+            "response": {
+              "type": "null"
+            },
+            "source": "Pinned schemas and reviewed Aliases.pm/IPSet.pm locks, digest guards, empty-set deletion and member replacement behavior."
           },
           "contract": "dist/contracts.json#/contracts/1037"
         }
@@ -2190,23 +2576,109 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "private-result",
+            "allowedInputs": [
+              "node",
+              "vmid",
+              "name",
+              "cidr",
+              "digest"
+            ],
+            "requiredInputs": [
+              "digest"
+            ],
+            "sensitiveInputs": [],
+            "inputPatterns": {
+              "name": "^[a-z][a-z0-9_-]{1,63}$(?![\\s\\S])",
+              "digest": "^[a-fA-F0-9]{40}$(?![\\s\\S])"
+            },
+            "inputFormats": {
+              "cidr": "pve-firewall-member"
+            },
+            "confirmationWarnings": [
+              {
+                "message": "Firewall alias or IP-set changes can alter referencing rules, guest IP filtering and management access. Confirm the exact scope, name and literal CIDR."
+              },
+              {
+                "message": "DELETION: explicitly confirm the selected alias, member or empty set. Force deletion of nonempty sets is refused."
+              }
+            ],
+            "reason": "Confirmed named firewall objects and literal members only; native digests required where supported, empty-only set deletion, no rename/force/member-alias branches. Comments use SecretRefs and reads remain private.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Inspect the selected scope privately; do not retry uncertain operations. Creation and empty-set deletion provide no native optimistic guard."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/vms/{vmid}",
+                [
+                  "VM.Config.Network"
+                ]
+              ]
+            },
+            "response": {
+              "type": "null"
+            },
+            "source": "Pinned schemas and reviewed Aliases.pm/IPSet.pm locks, digest guards, empty-set deletion and member replacement behavior."
           },
           "contract": "dist/contracts.json#/contracts/372"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "private-result",
+            "allowedInputs": [
+              "node",
+              "vmid",
+              "name",
+              "cidr",
+              "digest"
+            ],
+            "requiredInputs": [
+              "digest"
+            ],
+            "sensitiveInputs": [],
+            "inputPatterns": {
+              "name": "^[a-z][a-z0-9_-]{1,63}$(?![\\s\\S])",
+              "digest": "^[a-fA-F0-9]{40}$(?![\\s\\S])"
+            },
+            "inputFormats": {
+              "cidr": "pve-firewall-member"
+            },
+            "confirmationWarnings": [
+              {
+                "message": "Firewall alias or IP-set changes can alter referencing rules, guest IP filtering and management access. Confirm the exact scope, name and literal CIDR."
+              },
+              {
+                "message": "DELETION: explicitly confirm the selected alias, member or empty set. Force deletion of nonempty sets is refused."
+              }
+            ],
+            "reason": "Confirmed named firewall objects and literal members only; native digests required where supported, empty-only set deletion, no rename/force/member-alias branches. Comments use SecretRefs and reads remain private.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Inspect the selected scope privately; do not retry uncertain operations. Creation and empty-set deletion provide no native optimistic guard."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/vms/{vmid}",
+                [
+                  "VM.Config.Network"
+                ]
+              ]
+            },
+            "response": {
+              "type": "null"
+            },
+            "source": "Pinned schemas and reviewed Aliases.pm/IPSet.pm locks, digest guards, empty-set deletion and member replacement behavior."
           },
           "contract": "dist/contracts.json#/contracts/1040"
         }
@@ -2566,23 +3038,107 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "private-result",
+            "allowedInputs": [
+              "node",
+              "vmid",
+              "name",
+              "digest"
+            ],
+            "requiredInputs": [
+              "digest"
+            ],
+            "sensitiveInputs": [],
+            "inputPatterns": {
+              "name": "^[a-z][a-z0-9_-]{1,63}$(?![\\s\\S])",
+              "digest": "^[a-fA-F0-9]{40}$(?![\\s\\S])"
+            },
+            "inputFormats": {
+              "cidr": "pve-firewall-address"
+            },
+            "confirmationWarnings": [
+              {
+                "message": "Firewall alias or IP-set changes can alter referencing rules, guest IP filtering and management access. Confirm the exact scope, name and literal CIDR."
+              },
+              {
+                "message": "DELETION: explicitly confirm the selected alias, member or empty set. Force deletion of nonempty sets is refused."
+              }
+            ],
+            "reason": "Confirmed named firewall objects and literal members only; native digests required where supported, empty-only set deletion, no rename/force/member-alias branches. Comments use SecretRefs and reads remain private.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Inspect the selected scope privately; do not retry uncertain operations. Creation and empty-set deletion provide no native optimistic guard."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/vms/{vmid}",
+                [
+                  "VM.Config.Network"
+                ]
+              ]
+            },
+            "response": {
+              "type": "null"
+            },
+            "source": "Pinned schemas and reviewed Aliases.pm/IPSet.pm locks, digest guards, empty-set deletion and member replacement behavior."
           },
           "contract": "dist/contracts.json#/contracts/465"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "private-result",
+            "allowedInputs": [
+              "node",
+              "vmid",
+              "name",
+              "digest"
+            ],
+            "requiredInputs": [
+              "digest"
+            ],
+            "sensitiveInputs": [],
+            "inputPatterns": {
+              "name": "^[a-z][a-z0-9_-]{1,63}$(?![\\s\\S])",
+              "digest": "^[a-fA-F0-9]{40}$(?![\\s\\S])"
+            },
+            "inputFormats": {
+              "cidr": "pve-firewall-address"
+            },
+            "confirmationWarnings": [
+              {
+                "message": "Firewall alias or IP-set changes can alter referencing rules, guest IP filtering and management access. Confirm the exact scope, name and literal CIDR."
+              },
+              {
+                "message": "DELETION: explicitly confirm the selected alias, member or empty set. Force deletion of nonempty sets is refused."
+              }
+            ],
+            "reason": "Confirmed named firewall objects and literal members only; native digests required where supported, empty-only set deletion, no rename/force/member-alias branches. Comments use SecretRefs and reads remain private.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Inspect the selected scope privately; do not retry uncertain operations. Creation and empty-set deletion provide no native optimistic guard."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/vms/{vmid}",
+                [
+                  "VM.Config.Network"
+                ]
+              ]
+            },
+            "response": {
+              "type": "null"
+            },
+            "source": "Pinned schemas and reviewed Aliases.pm/IPSet.pm locks, digest guards, empty-set deletion and member replacement behavior."
           },
           "contract": "dist/contracts.json#/contracts/1135"
         }
@@ -2599,23 +3155,95 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "private-result",
+            "allowedInputs": [
+              "node",
+              "vmid",
+              "name"
+            ],
+            "requiredInputs": [],
+            "sensitiveInputs": [],
+            "inputPatterns": {
+              "name": "^[a-z][a-z0-9_-]{1,63}$(?![\\s\\S])"
+            },
+            "inputFormats": {},
+            "confirmationWarnings": [
+              {
+                "message": "Firewall alias or IP-set changes can alter referencing rules, guest IP filtering and management access. Confirm the exact scope, name and literal CIDR."
+              },
+              {
+                "message": "DELETION: explicitly confirm the selected alias, member or empty set. Force deletion of nonempty sets is refused."
+              }
+            ],
+            "reason": "Confirmed named firewall objects and literal members only; native digests required where supported, empty-only set deletion, no rename/force/member-alias branches. Comments use SecretRefs and reads remain private.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Inspect the selected scope privately; do not retry uncertain operations. Creation and empty-set deletion provide no native optimistic guard."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/vms/{vmid}",
+                [
+                  "VM.Config.Network"
+                ]
+              ]
+            },
+            "response": {
+              "type": "null"
+            },
+            "source": "Pinned schemas and reviewed Aliases.pm/IPSet.pm locks, digest guards, empty-set deletion and member replacement behavior."
           },
           "contract": "dist/contracts.json#/contracts/470"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "private-result",
+            "allowedInputs": [
+              "node",
+              "vmid",
+              "name"
+            ],
+            "requiredInputs": [],
+            "sensitiveInputs": [],
+            "inputPatterns": {
+              "name": "^[a-z][a-z0-9_-]{1,63}$(?![\\s\\S])"
+            },
+            "inputFormats": {},
+            "confirmationWarnings": [
+              {
+                "message": "Firewall alias or IP-set changes can alter referencing rules, guest IP filtering and management access. Confirm the exact scope, name and literal CIDR."
+              },
+              {
+                "message": "DELETION: explicitly confirm the selected alias, member or empty set. Force deletion of nonempty sets is refused."
+              }
+            ],
+            "reason": "Confirmed named firewall objects and literal members only; native digests required where supported, empty-only set deletion, no rename/force/member-alias branches. Comments use SecretRefs and reads remain private.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Inspect the selected scope privately; do not retry uncertain operations. Creation and empty-set deletion provide no native optimistic guard."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/vms/{vmid}",
+                [
+                  "VM.Config.Network"
+                ]
+              ]
+            },
+            "response": {
+              "type": "null"
+            },
+            "source": "Pinned schemas and reviewed Aliases.pm/IPSet.pm locks, digest guards, empty-set deletion and member replacement behavior."
           },
           "contract": "dist/contracts.json#/contracts/1140"
         }
@@ -2632,23 +3260,109 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "private-result",
+            "allowedInputs": [
+              "node",
+              "vmid",
+              "name",
+              "cidr",
+              "digest"
+            ],
+            "requiredInputs": [
+              "digest"
+            ],
+            "sensitiveInputs": [],
+            "inputPatterns": {
+              "name": "^[a-z][a-z0-9_-]{1,63}$(?![\\s\\S])",
+              "digest": "^[a-fA-F0-9]{40}$(?![\\s\\S])"
+            },
+            "inputFormats": {
+              "cidr": "pve-firewall-member"
+            },
+            "confirmationWarnings": [
+              {
+                "message": "Firewall alias or IP-set changes can alter referencing rules, guest IP filtering and management access. Confirm the exact scope, name and literal CIDR."
+              },
+              {
+                "message": "DELETION: explicitly confirm the selected alias, member or empty set. Force deletion of nonempty sets is refused."
+              }
+            ],
+            "reason": "Confirmed named firewall objects and literal members only; native digests required where supported, empty-only set deletion, no rename/force/member-alias branches. Comments use SecretRefs and reads remain private.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Inspect the selected scope privately; do not retry uncertain operations. Creation and empty-set deletion provide no native optimistic guard."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/vms/{vmid}",
+                [
+                  "VM.Config.Network"
+                ]
+              ]
+            },
+            "response": {
+              "type": "null"
+            },
+            "source": "Pinned schemas and reviewed Aliases.pm/IPSet.pm locks, digest guards, empty-set deletion and member replacement behavior."
           },
           "contract": "dist/contracts.json#/contracts/473"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "private-result",
+            "allowedInputs": [
+              "node",
+              "vmid",
+              "name",
+              "cidr",
+              "digest"
+            ],
+            "requiredInputs": [
+              "digest"
+            ],
+            "sensitiveInputs": [],
+            "inputPatterns": {
+              "name": "^[a-z][a-z0-9_-]{1,63}$(?![\\s\\S])",
+              "digest": "^[a-fA-F0-9]{40}$(?![\\s\\S])"
+            },
+            "inputFormats": {
+              "cidr": "pve-firewall-member"
+            },
+            "confirmationWarnings": [
+              {
+                "message": "Firewall alias or IP-set changes can alter referencing rules, guest IP filtering and management access. Confirm the exact scope, name and literal CIDR."
+              },
+              {
+                "message": "DELETION: explicitly confirm the selected alias, member or empty set. Force deletion of nonempty sets is refused."
+              }
+            ],
+            "reason": "Confirmed named firewall objects and literal members only; native digests required where supported, empty-only set deletion, no rename/force/member-alias branches. Comments use SecretRefs and reads remain private.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Inspect the selected scope privately; do not retry uncertain operations. Creation and empty-set deletion provide no native optimistic guard."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/vms/{vmid}",
+                [
+                  "VM.Config.Network"
+                ]
+              ]
+            },
+            "response": {
+              "type": "null"
+            },
+            "source": "Pinned schemas and reviewed Aliases.pm/IPSet.pm locks, digest guards, empty-set deletion and member replacement behavior."
           },
           "contract": "dist/contracts.json#/contracts/1143"
         }
@@ -4796,23 +5510,23 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "read",
+            "transport": "json",
+            "secrets": "private-result",
+            "reason": "Scoped aliases, addresses, comments and digests require bounded private results."
           },
           "contract": "dist/contracts.json#/contracts/86"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "read",
+            "transport": "json",
+            "secrets": "private-result",
+            "reason": "Scoped aliases, addresses, comments and digests require bounded private results."
           },
           "contract": "dist/contracts.json#/contracts/701"
         }
@@ -4829,23 +5543,23 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "read",
+            "transport": "json",
+            "secrets": "private-result",
+            "reason": "Selected alias configuration and comments require private results."
           },
           "contract": "dist/contracts.json#/contracts/89"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "read",
+            "transport": "json",
+            "secrets": "private-result",
+            "reason": "Selected alias configuration and comments require private results."
           },
           "contract": "dist/contracts.json#/contracts/704"
         }
@@ -4961,23 +5675,23 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "read",
+            "transport": "json",
+            "secrets": "private-result",
+            "reason": "Scoped set identities, comments and digests require private results."
           },
           "contract": "dist/contracts.json#/contracts/99"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "read",
+            "transport": "json",
+            "secrets": "private-result",
+            "reason": "Scoped set identities, comments and digests require private results."
           },
           "contract": "dist/contracts.json#/contracts/714"
         }
@@ -4994,23 +5708,23 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "read",
+            "transport": "json",
+            "secrets": "private-result",
+            "reason": "Complete selected set members, comments and digest require private results."
           },
           "contract": "dist/contracts.json#/contracts/102"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "read",
+            "transport": "json",
+            "secrets": "private-result",
+            "reason": "Complete selected set members, comments and digest require private results."
           },
           "contract": "dist/contracts.json#/contracts/717"
         }
@@ -5027,23 +5741,29 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "read",
+            "transport": "json",
+            "secrets": "private-result",
+            "inputFormats": {
+              "cidr": "pve-firewall-member"
+            },
+            "reason": "Selected literal member and comments require private results; CIDR identity is encoded once."
           },
           "contract": "dist/contracts.json#/contracts/105"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "read",
+            "transport": "json",
+            "secrets": "private-result",
+            "inputFormats": {
+              "cidr": "pve-firewall-member"
+            },
+            "reason": "Selected literal member and comments require private results; CIDR identity is encoded once."
           },
           "contract": "dist/contracts.json#/contracts/720"
         }
@@ -10046,23 +10766,23 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "read",
+            "transport": "json",
+            "secrets": "private-result",
+            "reason": "Scoped container aliases, addresses, comments and digests require private results."
           },
           "contract": "dist/contracts.json#/contracts/362"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "read",
+            "transport": "json",
+            "secrets": "private-result",
+            "reason": "Scoped container aliases, addresses, comments and digests require private results."
           },
           "contract": "dist/contracts.json#/contracts/1030"
         }
@@ -10079,23 +10799,23 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "read",
+            "transport": "json",
+            "secrets": "private-result",
+            "reason": "Selected container alias configuration and comments require private results."
           },
           "contract": "dist/contracts.json#/contracts/365"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "read",
+            "transport": "json",
+            "secrets": "private-result",
+            "reason": "Selected container alias configuration and comments require private results."
           },
           "contract": "dist/contracts.json#/contracts/1033"
         }
@@ -10112,23 +10832,23 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "read",
+            "transport": "json",
+            "secrets": "private-result",
+            "reason": "Scoped container set identities, comments and digests require private results."
           },
           "contract": "dist/contracts.json#/contracts/367"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "read",
+            "transport": "json",
+            "secrets": "private-result",
+            "reason": "Scoped container set identities, comments and digests require private results."
           },
           "contract": "dist/contracts.json#/contracts/1035"
         }
@@ -10145,23 +10865,23 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "read",
+            "transport": "json",
+            "secrets": "private-result",
+            "reason": "Complete selected container set members, comments and digest require private results."
           },
           "contract": "dist/contracts.json#/contracts/370"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "read",
+            "transport": "json",
+            "secrets": "private-result",
+            "reason": "Complete selected container set members, comments and digest require private results."
           },
           "contract": "dist/contracts.json#/contracts/1038"
         }
@@ -10178,23 +10898,29 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "read",
+            "transport": "json",
+            "secrets": "private-result",
+            "inputFormats": {
+              "cidr": "pve-firewall-member"
+            },
+            "reason": "Selected literal container member and comments require private results; CIDR identity is encoded once."
           },
           "contract": "dist/contracts.json#/contracts/373"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "read",
+            "transport": "json",
+            "secrets": "private-result",
+            "inputFormats": {
+              "cidr": "pve-firewall-member"
+            },
+            "reason": "Selected literal container member and comments require private results; CIDR identity is encoded once."
           },
           "contract": "dist/contracts.json#/contracts/1041"
         }
@@ -11802,23 +12528,23 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "read",
+            "transport": "json",
+            "secrets": "private-result",
+            "reason": "Scoped guest aliases, addresses, comments and digests require private results."
           },
           "contract": "dist/contracts.json#/contracts/463"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "read",
+            "transport": "json",
+            "secrets": "private-result",
+            "reason": "Scoped guest aliases, addresses, comments and digests require private results."
           },
           "contract": "dist/contracts.json#/contracts/1133"
         }
@@ -11835,23 +12561,23 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "read",
+            "transport": "json",
+            "secrets": "private-result",
+            "reason": "Selected guest alias configuration and comments require private results."
           },
           "contract": "dist/contracts.json#/contracts/466"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "read",
+            "transport": "json",
+            "secrets": "private-result",
+            "reason": "Selected guest alias configuration and comments require private results."
           },
           "contract": "dist/contracts.json#/contracts/1136"
         }
@@ -11868,23 +12594,23 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "read",
+            "transport": "json",
+            "secrets": "private-result",
+            "reason": "Scoped guest set identities, comments and digests require private results."
           },
           "contract": "dist/contracts.json#/contracts/468"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "read",
+            "transport": "json",
+            "secrets": "private-result",
+            "reason": "Scoped guest set identities, comments and digests require private results."
           },
           "contract": "dist/contracts.json#/contracts/1138"
         }
@@ -11901,23 +12627,23 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "read",
+            "transport": "json",
+            "secrets": "private-result",
+            "reason": "Complete selected guest set members, comments and digest require private results."
           },
           "contract": "dist/contracts.json#/contracts/471"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "read",
+            "transport": "json",
+            "secrets": "private-result",
+            "reason": "Complete selected guest set members, comments and digest require private results."
           },
           "contract": "dist/contracts.json#/contracts/1141"
         }
@@ -11934,23 +12660,29 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "read",
+            "transport": "json",
+            "secrets": "private-result",
+            "inputFormats": {
+              "cidr": "pve-firewall-member"
+            },
+            "reason": "Selected literal guest member and comments require private results; CIDR identity is encoded once."
           },
           "contract": "dist/contracts.json#/contracts/474"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "read",
+            "transport": "json",
+            "secrets": "private-result",
+            "inputFormats": {
+              "cidr": "pve-firewall-member"
+            },
+            "reason": "Selected literal guest member and comments require private results; CIDR identity is encoded once."
           },
           "contract": "dist/contracts.json#/contracts/1144"
         }
@@ -15664,23 +16396,99 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "private-result",
+            "allowedInputs": [
+              "name",
+              "cidr",
+              "comment"
+            ],
+            "requiredInputs": [],
+            "sensitiveInputs": [
+              "comment"
+            ],
+            "inputPatterns": {
+              "name": "^[a-z][a-z0-9_-]{1,63}$(?![\\s\\S])"
+            },
+            "inputFormats": {
+              "cidr": "pve-firewall-address",
+              "comment": "pve-firewall-comment"
+            },
+            "confirmationWarnings": [
+              {
+                "message": "Firewall alias or IP-set changes can alter referencing rules, guest IP filtering and management access. Confirm the exact scope, name and literal CIDR."
+              }
+            ],
+            "reason": "Confirmed named firewall objects and literal members only; native digests required where supported, empty-only set deletion, no rename/force/member-alias branches. Comments use SecretRefs and reads remain private.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Inspect the selected scope privately; do not retry uncertain operations. Creation and empty-set deletion provide no native optimistic guard."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/",
+                [
+                  "Sys.Modify"
+                ]
+              ]
+            },
+            "response": {
+              "type": "null"
+            },
+            "source": "Pinned schemas and reviewed Aliases.pm/IPSet.pm locks, digest guards, empty-set deletion and member replacement behavior."
           },
           "contract": "dist/contracts.json#/contracts/87"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "private-result",
+            "allowedInputs": [
+              "name",
+              "cidr",
+              "comment"
+            ],
+            "requiredInputs": [],
+            "sensitiveInputs": [
+              "comment"
+            ],
+            "inputPatterns": {
+              "name": "^[a-z][a-z0-9_-]{1,63}$(?![\\s\\S])"
+            },
+            "inputFormats": {
+              "cidr": "pve-firewall-address",
+              "comment": "pve-firewall-comment"
+            },
+            "confirmationWarnings": [
+              {
+                "message": "Firewall alias or IP-set changes can alter referencing rules, guest IP filtering and management access. Confirm the exact scope, name and literal CIDR."
+              }
+            ],
+            "reason": "Confirmed named firewall objects and literal members only; native digests required where supported, empty-only set deletion, no rename/force/member-alias branches. Comments use SecretRefs and reads remain private.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Inspect the selected scope privately; do not retry uncertain operations. Creation and empty-set deletion provide no native optimistic guard."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/",
+                [
+                  "Sys.Modify"
+                ]
+              ]
+            },
+            "response": {
+              "type": "null"
+            },
+            "source": "Pinned schemas and reviewed Aliases.pm/IPSet.pm locks, digest guards, empty-set deletion and member replacement behavior."
           },
           "contract": "dist/contracts.json#/contracts/702"
         }
@@ -15763,23 +16571,95 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "private-result",
+            "allowedInputs": [
+              "name",
+              "comment"
+            ],
+            "requiredInputs": [],
+            "sensitiveInputs": [
+              "comment"
+            ],
+            "inputPatterns": {
+              "name": "^[a-z][a-z0-9_-]{1,63}$(?![\\s\\S])"
+            },
+            "inputFormats": {
+              "comment": "pve-firewall-comment"
+            },
+            "confirmationWarnings": [
+              {
+                "message": "Firewall alias or IP-set changes can alter referencing rules, guest IP filtering and management access. Confirm the exact scope, name and literal CIDR."
+              }
+            ],
+            "reason": "Confirmed named firewall objects and literal members only; native digests required where supported, empty-only set deletion, no rename/force/member-alias branches. Comments use SecretRefs and reads remain private.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Inspect the selected scope privately; do not retry uncertain operations. Creation and empty-set deletion provide no native optimistic guard."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/",
+                [
+                  "Sys.Modify"
+                ]
+              ]
+            },
+            "response": {
+              "type": "null"
+            },
+            "source": "Pinned schemas and reviewed Aliases.pm/IPSet.pm locks, digest guards, empty-set deletion and member replacement behavior."
           },
           "contract": "dist/contracts.json#/contracts/100"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "private-result",
+            "allowedInputs": [
+              "name",
+              "comment"
+            ],
+            "requiredInputs": [],
+            "sensitiveInputs": [
+              "comment"
+            ],
+            "inputPatterns": {
+              "name": "^[a-z][a-z0-9_-]{1,63}$(?![\\s\\S])"
+            },
+            "inputFormats": {
+              "comment": "pve-firewall-comment"
+            },
+            "confirmationWarnings": [
+              {
+                "message": "Firewall alias or IP-set changes can alter referencing rules, guest IP filtering and management access. Confirm the exact scope, name and literal CIDR."
+              }
+            ],
+            "reason": "Confirmed named firewall objects and literal members only; native digests required where supported, empty-only set deletion, no rename/force/member-alias branches. Comments use SecretRefs and reads remain private.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Inspect the selected scope privately; do not retry uncertain operations. Creation and empty-set deletion provide no native optimistic guard."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/",
+                [
+                  "Sys.Modify"
+                ]
+              ]
+            },
+            "response": {
+              "type": "null"
+            },
+            "source": "Pinned schemas and reviewed Aliases.pm/IPSet.pm locks, digest guards, empty-set deletion and member replacement behavior."
           },
           "contract": "dist/contracts.json#/contracts/715"
         }
@@ -15796,23 +16676,101 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "private-result",
+            "allowedInputs": [
+              "name",
+              "cidr",
+              "comment",
+              "nomatch"
+            ],
+            "requiredInputs": [],
+            "sensitiveInputs": [
+              "comment"
+            ],
+            "inputPatterns": {
+              "name": "^[a-z][a-z0-9_-]{1,63}$(?![\\s\\S])"
+            },
+            "inputFormats": {
+              "cidr": "pve-firewall-member",
+              "comment": "pve-firewall-comment"
+            },
+            "confirmationWarnings": [
+              {
+                "message": "Firewall alias or IP-set changes can alter referencing rules, guest IP filtering and management access. Confirm the exact scope, name and literal CIDR."
+              }
+            ],
+            "reason": "Confirmed named firewall objects and literal members only; native digests required where supported, empty-only set deletion, no rename/force/member-alias branches. Comments use SecretRefs and reads remain private.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Inspect the selected scope privately; do not retry uncertain operations. Creation and empty-set deletion provide no native optimistic guard."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/",
+                [
+                  "Sys.Modify"
+                ]
+              ]
+            },
+            "response": {
+              "type": "null"
+            },
+            "source": "Pinned schemas and reviewed Aliases.pm/IPSet.pm locks, digest guards, empty-set deletion and member replacement behavior."
           },
           "contract": "dist/contracts.json#/contracts/103"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "private-result",
+            "allowedInputs": [
+              "name",
+              "cidr",
+              "comment",
+              "nomatch"
+            ],
+            "requiredInputs": [],
+            "sensitiveInputs": [
+              "comment"
+            ],
+            "inputPatterns": {
+              "name": "^[a-z][a-z0-9_-]{1,63}$(?![\\s\\S])"
+            },
+            "inputFormats": {
+              "cidr": "pve-firewall-member",
+              "comment": "pve-firewall-comment"
+            },
+            "confirmationWarnings": [
+              {
+                "message": "Firewall alias or IP-set changes can alter referencing rules, guest IP filtering and management access. Confirm the exact scope, name and literal CIDR."
+              }
+            ],
+            "reason": "Confirmed named firewall objects and literal members only; native digests required where supported, empty-only set deletion, no rename/force/member-alias branches. Comments use SecretRefs and reads remain private.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Inspect the selected scope privately; do not retry uncertain operations. Creation and empty-set deletion provide no native optimistic guard."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/",
+                [
+                  "Sys.Modify"
+                ]
+              ]
+            },
+            "response": {
+              "type": "null"
+            },
+            "source": "Pinned schemas and reviewed Aliases.pm/IPSet.pm locks, digest guards, empty-set deletion and member replacement behavior."
           },
           "contract": "dist/contracts.json#/contracts/718"
         }
@@ -19132,23 +20090,103 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "private-result",
+            "allowedInputs": [
+              "node",
+              "vmid",
+              "name",
+              "cidr",
+              "comment"
+            ],
+            "requiredInputs": [],
+            "sensitiveInputs": [
+              "comment"
+            ],
+            "inputPatterns": {
+              "name": "^[a-z][a-z0-9_-]{1,63}$(?![\\s\\S])"
+            },
+            "inputFormats": {
+              "cidr": "pve-firewall-address",
+              "comment": "pve-firewall-comment"
+            },
+            "confirmationWarnings": [
+              {
+                "message": "Firewall alias or IP-set changes can alter referencing rules, guest IP filtering and management access. Confirm the exact scope, name and literal CIDR."
+              }
+            ],
+            "reason": "Confirmed named firewall objects and literal members only; native digests required where supported, empty-only set deletion, no rename/force/member-alias branches. Comments use SecretRefs and reads remain private.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Inspect the selected scope privately; do not retry uncertain operations. Creation and empty-set deletion provide no native optimistic guard."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/vms/{vmid}",
+                [
+                  "VM.Config.Network"
+                ]
+              ]
+            },
+            "response": {
+              "type": "null"
+            },
+            "source": "Pinned schemas and reviewed Aliases.pm/IPSet.pm locks, digest guards, empty-set deletion and member replacement behavior."
           },
           "contract": "dist/contracts.json#/contracts/363"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "private-result",
+            "allowedInputs": [
+              "node",
+              "vmid",
+              "name",
+              "cidr",
+              "comment"
+            ],
+            "requiredInputs": [],
+            "sensitiveInputs": [
+              "comment"
+            ],
+            "inputPatterns": {
+              "name": "^[a-z][a-z0-9_-]{1,63}$(?![\\s\\S])"
+            },
+            "inputFormats": {
+              "cidr": "pve-firewall-address",
+              "comment": "pve-firewall-comment"
+            },
+            "confirmationWarnings": [
+              {
+                "message": "Firewall alias or IP-set changes can alter referencing rules, guest IP filtering and management access. Confirm the exact scope, name and literal CIDR."
+              }
+            ],
+            "reason": "Confirmed named firewall objects and literal members only; native digests required where supported, empty-only set deletion, no rename/force/member-alias branches. Comments use SecretRefs and reads remain private.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Inspect the selected scope privately; do not retry uncertain operations. Creation and empty-set deletion provide no native optimistic guard."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/vms/{vmid}",
+                [
+                  "VM.Config.Network"
+                ]
+              ]
+            },
+            "response": {
+              "type": "null"
+            },
+            "source": "Pinned schemas and reviewed Aliases.pm/IPSet.pm locks, digest guards, empty-set deletion and member replacement behavior."
           },
           "contract": "dist/contracts.json#/contracts/1031"
         }
@@ -19165,23 +20203,99 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "private-result",
+            "allowedInputs": [
+              "node",
+              "vmid",
+              "name",
+              "comment"
+            ],
+            "requiredInputs": [],
+            "sensitiveInputs": [
+              "comment"
+            ],
+            "inputPatterns": {
+              "name": "^[a-z][a-z0-9_-]{1,63}$(?![\\s\\S])"
+            },
+            "inputFormats": {
+              "comment": "pve-firewall-comment"
+            },
+            "confirmationWarnings": [
+              {
+                "message": "Firewall alias or IP-set changes can alter referencing rules, guest IP filtering and management access. Confirm the exact scope, name and literal CIDR."
+              }
+            ],
+            "reason": "Confirmed named firewall objects and literal members only; native digests required where supported, empty-only set deletion, no rename/force/member-alias branches. Comments use SecretRefs and reads remain private.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Inspect the selected scope privately; do not retry uncertain operations. Creation and empty-set deletion provide no native optimistic guard."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/vms/{vmid}",
+                [
+                  "VM.Config.Network"
+                ]
+              ]
+            },
+            "response": {
+              "type": "null"
+            },
+            "source": "Pinned schemas and reviewed Aliases.pm/IPSet.pm locks, digest guards, empty-set deletion and member replacement behavior."
           },
           "contract": "dist/contracts.json#/contracts/368"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "private-result",
+            "allowedInputs": [
+              "node",
+              "vmid",
+              "name",
+              "comment"
+            ],
+            "requiredInputs": [],
+            "sensitiveInputs": [
+              "comment"
+            ],
+            "inputPatterns": {
+              "name": "^[a-z][a-z0-9_-]{1,63}$(?![\\s\\S])"
+            },
+            "inputFormats": {
+              "comment": "pve-firewall-comment"
+            },
+            "confirmationWarnings": [
+              {
+                "message": "Firewall alias or IP-set changes can alter referencing rules, guest IP filtering and management access. Confirm the exact scope, name and literal CIDR."
+              }
+            ],
+            "reason": "Confirmed named firewall objects and literal members only; native digests required where supported, empty-only set deletion, no rename/force/member-alias branches. Comments use SecretRefs and reads remain private.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Inspect the selected scope privately; do not retry uncertain operations. Creation and empty-set deletion provide no native optimistic guard."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/vms/{vmid}",
+                [
+                  "VM.Config.Network"
+                ]
+              ]
+            },
+            "response": {
+              "type": "null"
+            },
+            "source": "Pinned schemas and reviewed Aliases.pm/IPSet.pm locks, digest guards, empty-set deletion and member replacement behavior."
           },
           "contract": "dist/contracts.json#/contracts/1036"
         }
@@ -19198,23 +20312,105 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "private-result",
+            "allowedInputs": [
+              "node",
+              "vmid",
+              "name",
+              "cidr",
+              "comment",
+              "nomatch"
+            ],
+            "requiredInputs": [],
+            "sensitiveInputs": [
+              "comment"
+            ],
+            "inputPatterns": {
+              "name": "^[a-z][a-z0-9_-]{1,63}$(?![\\s\\S])"
+            },
+            "inputFormats": {
+              "cidr": "pve-firewall-member",
+              "comment": "pve-firewall-comment"
+            },
+            "confirmationWarnings": [
+              {
+                "message": "Firewall alias or IP-set changes can alter referencing rules, guest IP filtering and management access. Confirm the exact scope, name and literal CIDR."
+              }
+            ],
+            "reason": "Confirmed named firewall objects and literal members only; native digests required where supported, empty-only set deletion, no rename/force/member-alias branches. Comments use SecretRefs and reads remain private.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Inspect the selected scope privately; do not retry uncertain operations. Creation and empty-set deletion provide no native optimistic guard."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/vms/{vmid}",
+                [
+                  "VM.Config.Network"
+                ]
+              ]
+            },
+            "response": {
+              "type": "null"
+            },
+            "source": "Pinned schemas and reviewed Aliases.pm/IPSet.pm locks, digest guards, empty-set deletion and member replacement behavior."
           },
           "contract": "dist/contracts.json#/contracts/371"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "private-result",
+            "allowedInputs": [
+              "node",
+              "vmid",
+              "name",
+              "cidr",
+              "comment",
+              "nomatch"
+            ],
+            "requiredInputs": [],
+            "sensitiveInputs": [
+              "comment"
+            ],
+            "inputPatterns": {
+              "name": "^[a-z][a-z0-9_-]{1,63}$(?![\\s\\S])"
+            },
+            "inputFormats": {
+              "cidr": "pve-firewall-member",
+              "comment": "pve-firewall-comment"
+            },
+            "confirmationWarnings": [
+              {
+                "message": "Firewall alias or IP-set changes can alter referencing rules, guest IP filtering and management access. Confirm the exact scope, name and literal CIDR."
+              }
+            ],
+            "reason": "Confirmed named firewall objects and literal members only; native digests required where supported, empty-only set deletion, no rename/force/member-alias branches. Comments use SecretRefs and reads remain private.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Inspect the selected scope privately; do not retry uncertain operations. Creation and empty-set deletion provide no native optimistic guard."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/vms/{vmid}",
+                [
+                  "VM.Config.Network"
+                ]
+              ]
+            },
+            "response": {
+              "type": "null"
+            },
+            "source": "Pinned schemas and reviewed Aliases.pm/IPSet.pm locks, digest guards, empty-set deletion and member replacement behavior."
           },
           "contract": "dist/contracts.json#/contracts/1039"
         }
@@ -21939,23 +23135,103 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "private-result",
+            "allowedInputs": [
+              "node",
+              "vmid",
+              "name",
+              "cidr",
+              "comment"
+            ],
+            "requiredInputs": [],
+            "sensitiveInputs": [
+              "comment"
+            ],
+            "inputPatterns": {
+              "name": "^[a-z][a-z0-9_-]{1,63}$(?![\\s\\S])"
+            },
+            "inputFormats": {
+              "cidr": "pve-firewall-address",
+              "comment": "pve-firewall-comment"
+            },
+            "confirmationWarnings": [
+              {
+                "message": "Firewall alias or IP-set changes can alter referencing rules, guest IP filtering and management access. Confirm the exact scope, name and literal CIDR."
+              }
+            ],
+            "reason": "Confirmed named firewall objects and literal members only; native digests required where supported, empty-only set deletion, no rename/force/member-alias branches. Comments use SecretRefs and reads remain private.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Inspect the selected scope privately; do not retry uncertain operations. Creation and empty-set deletion provide no native optimistic guard."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/vms/{vmid}",
+                [
+                  "VM.Config.Network"
+                ]
+              ]
+            },
+            "response": {
+              "type": "null"
+            },
+            "source": "Pinned schemas and reviewed Aliases.pm/IPSet.pm locks, digest guards, empty-set deletion and member replacement behavior."
           },
           "contract": "dist/contracts.json#/contracts/464"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "private-result",
+            "allowedInputs": [
+              "node",
+              "vmid",
+              "name",
+              "cidr",
+              "comment"
+            ],
+            "requiredInputs": [],
+            "sensitiveInputs": [
+              "comment"
+            ],
+            "inputPatterns": {
+              "name": "^[a-z][a-z0-9_-]{1,63}$(?![\\s\\S])"
+            },
+            "inputFormats": {
+              "cidr": "pve-firewall-address",
+              "comment": "pve-firewall-comment"
+            },
+            "confirmationWarnings": [
+              {
+                "message": "Firewall alias or IP-set changes can alter referencing rules, guest IP filtering and management access. Confirm the exact scope, name and literal CIDR."
+              }
+            ],
+            "reason": "Confirmed named firewall objects and literal members only; native digests required where supported, empty-only set deletion, no rename/force/member-alias branches. Comments use SecretRefs and reads remain private.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Inspect the selected scope privately; do not retry uncertain operations. Creation and empty-set deletion provide no native optimistic guard."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/vms/{vmid}",
+                [
+                  "VM.Config.Network"
+                ]
+              ]
+            },
+            "response": {
+              "type": "null"
+            },
+            "source": "Pinned schemas and reviewed Aliases.pm/IPSet.pm locks, digest guards, empty-set deletion and member replacement behavior."
           },
           "contract": "dist/contracts.json#/contracts/1134"
         }
@@ -21972,23 +23248,99 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "private-result",
+            "allowedInputs": [
+              "node",
+              "vmid",
+              "name",
+              "comment"
+            ],
+            "requiredInputs": [],
+            "sensitiveInputs": [
+              "comment"
+            ],
+            "inputPatterns": {
+              "name": "^[a-z][a-z0-9_-]{1,63}$(?![\\s\\S])"
+            },
+            "inputFormats": {
+              "comment": "pve-firewall-comment"
+            },
+            "confirmationWarnings": [
+              {
+                "message": "Firewall alias or IP-set changes can alter referencing rules, guest IP filtering and management access. Confirm the exact scope, name and literal CIDR."
+              }
+            ],
+            "reason": "Confirmed named firewall objects and literal members only; native digests required where supported, empty-only set deletion, no rename/force/member-alias branches. Comments use SecretRefs and reads remain private.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Inspect the selected scope privately; do not retry uncertain operations. Creation and empty-set deletion provide no native optimistic guard."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/vms/{vmid}",
+                [
+                  "VM.Config.Network"
+                ]
+              ]
+            },
+            "response": {
+              "type": "null"
+            },
+            "source": "Pinned schemas and reviewed Aliases.pm/IPSet.pm locks, digest guards, empty-set deletion and member replacement behavior."
           },
           "contract": "dist/contracts.json#/contracts/469"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "private-result",
+            "allowedInputs": [
+              "node",
+              "vmid",
+              "name",
+              "comment"
+            ],
+            "requiredInputs": [],
+            "sensitiveInputs": [
+              "comment"
+            ],
+            "inputPatterns": {
+              "name": "^[a-z][a-z0-9_-]{1,63}$(?![\\s\\S])"
+            },
+            "inputFormats": {
+              "comment": "pve-firewall-comment"
+            },
+            "confirmationWarnings": [
+              {
+                "message": "Firewall alias or IP-set changes can alter referencing rules, guest IP filtering and management access. Confirm the exact scope, name and literal CIDR."
+              }
+            ],
+            "reason": "Confirmed named firewall objects and literal members only; native digests required where supported, empty-only set deletion, no rename/force/member-alias branches. Comments use SecretRefs and reads remain private.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Inspect the selected scope privately; do not retry uncertain operations. Creation and empty-set deletion provide no native optimistic guard."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/vms/{vmid}",
+                [
+                  "VM.Config.Network"
+                ]
+              ]
+            },
+            "response": {
+              "type": "null"
+            },
+            "source": "Pinned schemas and reviewed Aliases.pm/IPSet.pm locks, digest guards, empty-set deletion and member replacement behavior."
           },
           "contract": "dist/contracts.json#/contracts/1139"
         }
@@ -22005,23 +23357,105 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "private-result",
+            "allowedInputs": [
+              "node",
+              "vmid",
+              "name",
+              "cidr",
+              "comment",
+              "nomatch"
+            ],
+            "requiredInputs": [],
+            "sensitiveInputs": [
+              "comment"
+            ],
+            "inputPatterns": {
+              "name": "^[a-z][a-z0-9_-]{1,63}$(?![\\s\\S])"
+            },
+            "inputFormats": {
+              "cidr": "pve-firewall-member",
+              "comment": "pve-firewall-comment"
+            },
+            "confirmationWarnings": [
+              {
+                "message": "Firewall alias or IP-set changes can alter referencing rules, guest IP filtering and management access. Confirm the exact scope, name and literal CIDR."
+              }
+            ],
+            "reason": "Confirmed named firewall objects and literal members only; native digests required where supported, empty-only set deletion, no rename/force/member-alias branches. Comments use SecretRefs and reads remain private.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Inspect the selected scope privately; do not retry uncertain operations. Creation and empty-set deletion provide no native optimistic guard."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/vms/{vmid}",
+                [
+                  "VM.Config.Network"
+                ]
+              ]
+            },
+            "response": {
+              "type": "null"
+            },
+            "source": "Pinned schemas and reviewed Aliases.pm/IPSet.pm locks, digest guards, empty-set deletion and member replacement behavior."
           },
           "contract": "dist/contracts.json#/contracts/472"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "private-result",
+            "allowedInputs": [
+              "node",
+              "vmid",
+              "name",
+              "cidr",
+              "comment",
+              "nomatch"
+            ],
+            "requiredInputs": [],
+            "sensitiveInputs": [
+              "comment"
+            ],
+            "inputPatterns": {
+              "name": "^[a-z][a-z0-9_-]{1,63}$(?![\\s\\S])"
+            },
+            "inputFormats": {
+              "cidr": "pve-firewall-member",
+              "comment": "pve-firewall-comment"
+            },
+            "confirmationWarnings": [
+              {
+                "message": "Firewall alias or IP-set changes can alter referencing rules, guest IP filtering and management access. Confirm the exact scope, name and literal CIDR."
+              }
+            ],
+            "reason": "Confirmed named firewall objects and literal members only; native digests required where supported, empty-only set deletion, no rename/force/member-alias branches. Comments use SecretRefs and reads remain private.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Inspect the selected scope privately; do not retry uncertain operations. Creation and empty-set deletion provide no native optimistic guard."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/vms/{vmid}",
+                [
+                  "VM.Config.Network"
+                ]
+              ]
+            },
+            "response": {
+              "type": "null"
+            },
+            "source": "Pinned schemas and reviewed Aliases.pm/IPSet.pm locks, digest guards, empty-set deletion and member replacement behavior."
           },
           "contract": "dist/contracts.json#/contracts/1142"
         }
@@ -25391,23 +26825,107 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "private-result",
+            "allowedInputs": [
+              "name",
+              "cidr",
+              "comment",
+              "digest"
+            ],
+            "requiredInputs": [
+              "digest"
+            ],
+            "sensitiveInputs": [
+              "comment"
+            ],
+            "inputPatterns": {
+              "name": "^[a-z][a-z0-9_-]{1,63}$(?![\\s\\S])",
+              "digest": "^[a-fA-F0-9]{40}$(?![\\s\\S])"
+            },
+            "inputFormats": {
+              "cidr": "pve-firewall-address",
+              "comment": "pve-firewall-comment"
+            },
+            "confirmationWarnings": [
+              {
+                "message": "Firewall alias or IP-set changes can alter referencing rules, guest IP filtering and management access. Confirm the exact scope, name and literal CIDR."
+              }
+            ],
+            "reason": "Confirmed named firewall objects and literal members only; native digests required where supported, empty-only set deletion, no rename/force/member-alias branches. Comments use SecretRefs and reads remain private.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Inspect the selected scope privately; do not retry uncertain operations. Creation and empty-set deletion provide no native optimistic guard."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/",
+                [
+                  "Sys.Modify"
+                ]
+              ]
+            },
+            "response": {
+              "type": "null"
+            },
+            "source": "Pinned schemas and reviewed Aliases.pm/IPSet.pm locks, digest guards, empty-set deletion and member replacement behavior."
           },
           "contract": "dist/contracts.json#/contracts/90"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "private-result",
+            "allowedInputs": [
+              "name",
+              "cidr",
+              "comment",
+              "digest"
+            ],
+            "requiredInputs": [
+              "digest"
+            ],
+            "sensitiveInputs": [
+              "comment"
+            ],
+            "inputPatterns": {
+              "name": "^[a-z][a-z0-9_-]{1,63}$(?![\\s\\S])",
+              "digest": "^[a-fA-F0-9]{40}$(?![\\s\\S])"
+            },
+            "inputFormats": {
+              "cidr": "pve-firewall-address",
+              "comment": "pve-firewall-comment"
+            },
+            "confirmationWarnings": [
+              {
+                "message": "Firewall alias or IP-set changes can alter referencing rules, guest IP filtering and management access. Confirm the exact scope, name and literal CIDR."
+              }
+            ],
+            "reason": "Confirmed named firewall objects and literal members only; native digests required where supported, empty-only set deletion, no rename/force/member-alias branches. Comments use SecretRefs and reads remain private.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Inspect the selected scope privately; do not retry uncertain operations. Creation and empty-set deletion provide no native optimistic guard."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/",
+                [
+                  "Sys.Modify"
+                ]
+              ]
+            },
+            "response": {
+              "type": "null"
+            },
+            "source": "Pinned schemas and reviewed Aliases.pm/IPSet.pm locks, digest guards, empty-set deletion and member replacement behavior."
           },
           "contract": "dist/contracts.json#/contracts/705"
         }
@@ -25457,23 +26975,117 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "private-result",
+            "allowedInputs": [
+              "name",
+              "cidr",
+              "comment",
+              "nomatch",
+              "digest"
+            ],
+            "requiredInputs": [
+              "digest",
+              "nomatch"
+            ],
+            "sensitiveInputs": [
+              "comment"
+            ],
+            "inputPatterns": {
+              "name": "^[a-z][a-z0-9_-]{1,63}$(?![\\s\\S])",
+              "digest": "^[a-fA-F0-9]{40}$(?![\\s\\S])"
+            },
+            "inputFormats": {
+              "cidr": "pve-firewall-member",
+              "comment": "pve-firewall-comment"
+            },
+            "confirmationWarnings": [
+              {
+                "message": "Firewall alias or IP-set changes can alter referencing rules, guest IP filtering and management access. Confirm the exact scope, name and literal CIDR."
+              },
+              {
+                "message": "MEMBER UPDATE replaces nomatch and comment; omitting comment clears it. Supply the existing comment through a SecretRef to preserve it."
+              }
+            ],
+            "reason": "Confirmed named firewall objects and literal members only; native digests required where supported, empty-only set deletion, no rename/force/member-alias branches. Comments use SecretRefs and reads remain private.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Inspect the selected scope privately; do not retry uncertain operations. Creation and empty-set deletion provide no native optimistic guard."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/",
+                [
+                  "Sys.Modify"
+                ]
+              ]
+            },
+            "response": {
+              "type": "null"
+            },
+            "source": "Pinned schemas and reviewed Aliases.pm/IPSet.pm locks, digest guards, empty-set deletion and member replacement behavior."
           },
           "contract": "dist/contracts.json#/contracts/106"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "private-result",
+            "allowedInputs": [
+              "name",
+              "cidr",
+              "comment",
+              "nomatch",
+              "digest"
+            ],
+            "requiredInputs": [
+              "digest",
+              "nomatch"
+            ],
+            "sensitiveInputs": [
+              "comment"
+            ],
+            "inputPatterns": {
+              "name": "^[a-z][a-z0-9_-]{1,63}$(?![\\s\\S])",
+              "digest": "^[a-fA-F0-9]{40}$(?![\\s\\S])"
+            },
+            "inputFormats": {
+              "cidr": "pve-firewall-member",
+              "comment": "pve-firewall-comment"
+            },
+            "confirmationWarnings": [
+              {
+                "message": "Firewall alias or IP-set changes can alter referencing rules, guest IP filtering and management access. Confirm the exact scope, name and literal CIDR."
+              },
+              {
+                "message": "MEMBER UPDATE replaces nomatch and comment; omitting comment clears it. Supply the existing comment through a SecretRef to preserve it."
+              }
+            ],
+            "reason": "Confirmed named firewall objects and literal members only; native digests required where supported, empty-only set deletion, no rename/force/member-alias branches. Comments use SecretRefs and reads remain private.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Inspect the selected scope privately; do not retry uncertain operations. Creation and empty-set deletion provide no native optimistic guard."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/",
+                [
+                  "Sys.Modify"
+                ]
+              ]
+            },
+            "response": {
+              "type": "null"
+            },
+            "source": "Pinned schemas and reviewed Aliases.pm/IPSet.pm locks, digest guards, empty-set deletion and member replacement behavior."
           },
           "contract": "dist/contracts.json#/contracts/721"
         }
@@ -28171,23 +29783,111 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "private-result",
+            "allowedInputs": [
+              "node",
+              "vmid",
+              "name",
+              "cidr",
+              "comment",
+              "digest"
+            ],
+            "requiredInputs": [
+              "digest"
+            ],
+            "sensitiveInputs": [
+              "comment"
+            ],
+            "inputPatterns": {
+              "name": "^[a-z][a-z0-9_-]{1,63}$(?![\\s\\S])",
+              "digest": "^[a-fA-F0-9]{40}$(?![\\s\\S])"
+            },
+            "inputFormats": {
+              "cidr": "pve-firewall-address",
+              "comment": "pve-firewall-comment"
+            },
+            "confirmationWarnings": [
+              {
+                "message": "Firewall alias or IP-set changes can alter referencing rules, guest IP filtering and management access. Confirm the exact scope, name and literal CIDR."
+              }
+            ],
+            "reason": "Confirmed named firewall objects and literal members only; native digests required where supported, empty-only set deletion, no rename/force/member-alias branches. Comments use SecretRefs and reads remain private.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Inspect the selected scope privately; do not retry uncertain operations. Creation and empty-set deletion provide no native optimistic guard."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/vms/{vmid}",
+                [
+                  "VM.Config.Network"
+                ]
+              ]
+            },
+            "response": {
+              "type": "null"
+            },
+            "source": "Pinned schemas and reviewed Aliases.pm/IPSet.pm locks, digest guards, empty-set deletion and member replacement behavior."
           },
           "contract": "dist/contracts.json#/contracts/366"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "private-result",
+            "allowedInputs": [
+              "node",
+              "vmid",
+              "name",
+              "cidr",
+              "comment",
+              "digest"
+            ],
+            "requiredInputs": [
+              "digest"
+            ],
+            "sensitiveInputs": [
+              "comment"
+            ],
+            "inputPatterns": {
+              "name": "^[a-z][a-z0-9_-]{1,63}$(?![\\s\\S])",
+              "digest": "^[a-fA-F0-9]{40}$(?![\\s\\S])"
+            },
+            "inputFormats": {
+              "cidr": "pve-firewall-address",
+              "comment": "pve-firewall-comment"
+            },
+            "confirmationWarnings": [
+              {
+                "message": "Firewall alias or IP-set changes can alter referencing rules, guest IP filtering and management access. Confirm the exact scope, name and literal CIDR."
+              }
+            ],
+            "reason": "Confirmed named firewall objects and literal members only; native digests required where supported, empty-only set deletion, no rename/force/member-alias branches. Comments use SecretRefs and reads remain private.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Inspect the selected scope privately; do not retry uncertain operations. Creation and empty-set deletion provide no native optimistic guard."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/vms/{vmid}",
+                [
+                  "VM.Config.Network"
+                ]
+              ]
+            },
+            "response": {
+              "type": "null"
+            },
+            "source": "Pinned schemas and reviewed Aliases.pm/IPSet.pm locks, digest guards, empty-set deletion and member replacement behavior."
           },
           "contract": "dist/contracts.json#/contracts/1034"
         }
@@ -28204,23 +29904,121 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "private-result",
+            "allowedInputs": [
+              "node",
+              "vmid",
+              "name",
+              "cidr",
+              "comment",
+              "nomatch",
+              "digest"
+            ],
+            "requiredInputs": [
+              "digest",
+              "nomatch"
+            ],
+            "sensitiveInputs": [
+              "comment"
+            ],
+            "inputPatterns": {
+              "name": "^[a-z][a-z0-9_-]{1,63}$(?![\\s\\S])",
+              "digest": "^[a-fA-F0-9]{40}$(?![\\s\\S])"
+            },
+            "inputFormats": {
+              "cidr": "pve-firewall-member",
+              "comment": "pve-firewall-comment"
+            },
+            "confirmationWarnings": [
+              {
+                "message": "Firewall alias or IP-set changes can alter referencing rules, guest IP filtering and management access. Confirm the exact scope, name and literal CIDR."
+              },
+              {
+                "message": "MEMBER UPDATE replaces nomatch and comment; omitting comment clears it. Supply the existing comment through a SecretRef to preserve it."
+              }
+            ],
+            "reason": "Confirmed named firewall objects and literal members only; native digests required where supported, empty-only set deletion, no rename/force/member-alias branches. Comments use SecretRefs and reads remain private.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Inspect the selected scope privately; do not retry uncertain operations. Creation and empty-set deletion provide no native optimistic guard."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/vms/{vmid}",
+                [
+                  "VM.Config.Network"
+                ]
+              ]
+            },
+            "response": {
+              "type": "null"
+            },
+            "source": "Pinned schemas and reviewed Aliases.pm/IPSet.pm locks, digest guards, empty-set deletion and member replacement behavior."
           },
           "contract": "dist/contracts.json#/contracts/374"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "private-result",
+            "allowedInputs": [
+              "node",
+              "vmid",
+              "name",
+              "cidr",
+              "comment",
+              "nomatch",
+              "digest"
+            ],
+            "requiredInputs": [
+              "digest",
+              "nomatch"
+            ],
+            "sensitiveInputs": [
+              "comment"
+            ],
+            "inputPatterns": {
+              "name": "^[a-z][a-z0-9_-]{1,63}$(?![\\s\\S])",
+              "digest": "^[a-fA-F0-9]{40}$(?![\\s\\S])"
+            },
+            "inputFormats": {
+              "cidr": "pve-firewall-member",
+              "comment": "pve-firewall-comment"
+            },
+            "confirmationWarnings": [
+              {
+                "message": "Firewall alias or IP-set changes can alter referencing rules, guest IP filtering and management access. Confirm the exact scope, name and literal CIDR."
+              },
+              {
+                "message": "MEMBER UPDATE replaces nomatch and comment; omitting comment clears it. Supply the existing comment through a SecretRef to preserve it."
+              }
+            ],
+            "reason": "Confirmed named firewall objects and literal members only; native digests required where supported, empty-only set deletion, no rename/force/member-alias branches. Comments use SecretRefs and reads remain private.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Inspect the selected scope privately; do not retry uncertain operations. Creation and empty-set deletion provide no native optimistic guard."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/vms/{vmid}",
+                [
+                  "VM.Config.Network"
+                ]
+              ]
+            },
+            "response": {
+              "type": "null"
+            },
+            "source": "Pinned schemas and reviewed Aliases.pm/IPSet.pm locks, digest guards, empty-set deletion and member replacement behavior."
           },
           "contract": "dist/contracts.json#/contracts/1042"
         }
@@ -29309,23 +31107,111 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "private-result",
+            "allowedInputs": [
+              "node",
+              "vmid",
+              "name",
+              "cidr",
+              "comment",
+              "digest"
+            ],
+            "requiredInputs": [
+              "digest"
+            ],
+            "sensitiveInputs": [
+              "comment"
+            ],
+            "inputPatterns": {
+              "name": "^[a-z][a-z0-9_-]{1,63}$(?![\\s\\S])",
+              "digest": "^[a-fA-F0-9]{40}$(?![\\s\\S])"
+            },
+            "inputFormats": {
+              "cidr": "pve-firewall-address",
+              "comment": "pve-firewall-comment"
+            },
+            "confirmationWarnings": [
+              {
+                "message": "Firewall alias or IP-set changes can alter referencing rules, guest IP filtering and management access. Confirm the exact scope, name and literal CIDR."
+              }
+            ],
+            "reason": "Confirmed named firewall objects and literal members only; native digests required where supported, empty-only set deletion, no rename/force/member-alias branches. Comments use SecretRefs and reads remain private.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Inspect the selected scope privately; do not retry uncertain operations. Creation and empty-set deletion provide no native optimistic guard."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/vms/{vmid}",
+                [
+                  "VM.Config.Network"
+                ]
+              ]
+            },
+            "response": {
+              "type": "null"
+            },
+            "source": "Pinned schemas and reviewed Aliases.pm/IPSet.pm locks, digest guards, empty-set deletion and member replacement behavior."
           },
           "contract": "dist/contracts.json#/contracts/467"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "private-result",
+            "allowedInputs": [
+              "node",
+              "vmid",
+              "name",
+              "cidr",
+              "comment",
+              "digest"
+            ],
+            "requiredInputs": [
+              "digest"
+            ],
+            "sensitiveInputs": [
+              "comment"
+            ],
+            "inputPatterns": {
+              "name": "^[a-z][a-z0-9_-]{1,63}$(?![\\s\\S])",
+              "digest": "^[a-fA-F0-9]{40}$(?![\\s\\S])"
+            },
+            "inputFormats": {
+              "cidr": "pve-firewall-address",
+              "comment": "pve-firewall-comment"
+            },
+            "confirmationWarnings": [
+              {
+                "message": "Firewall alias or IP-set changes can alter referencing rules, guest IP filtering and management access. Confirm the exact scope, name and literal CIDR."
+              }
+            ],
+            "reason": "Confirmed named firewall objects and literal members only; native digests required where supported, empty-only set deletion, no rename/force/member-alias branches. Comments use SecretRefs and reads remain private.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Inspect the selected scope privately; do not retry uncertain operations. Creation and empty-set deletion provide no native optimistic guard."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/vms/{vmid}",
+                [
+                  "VM.Config.Network"
+                ]
+              ]
+            },
+            "response": {
+              "type": "null"
+            },
+            "source": "Pinned schemas and reviewed Aliases.pm/IPSet.pm locks, digest guards, empty-set deletion and member replacement behavior."
           },
           "contract": "dist/contracts.json#/contracts/1137"
         }
@@ -29342,23 +31228,121 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "private-result",
+            "allowedInputs": [
+              "node",
+              "vmid",
+              "name",
+              "cidr",
+              "comment",
+              "nomatch",
+              "digest"
+            ],
+            "requiredInputs": [
+              "digest",
+              "nomatch"
+            ],
+            "sensitiveInputs": [
+              "comment"
+            ],
+            "inputPatterns": {
+              "name": "^[a-z][a-z0-9_-]{1,63}$(?![\\s\\S])",
+              "digest": "^[a-fA-F0-9]{40}$(?![\\s\\S])"
+            },
+            "inputFormats": {
+              "cidr": "pve-firewall-member",
+              "comment": "pve-firewall-comment"
+            },
+            "confirmationWarnings": [
+              {
+                "message": "Firewall alias or IP-set changes can alter referencing rules, guest IP filtering and management access. Confirm the exact scope, name and literal CIDR."
+              },
+              {
+                "message": "MEMBER UPDATE replaces nomatch and comment; omitting comment clears it. Supply the existing comment through a SecretRef to preserve it."
+              }
+            ],
+            "reason": "Confirmed named firewall objects and literal members only; native digests required where supported, empty-only set deletion, no rename/force/member-alias branches. Comments use SecretRefs and reads remain private.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Inspect the selected scope privately; do not retry uncertain operations. Creation and empty-set deletion provide no native optimistic guard."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/vms/{vmid}",
+                [
+                  "VM.Config.Network"
+                ]
+              ]
+            },
+            "response": {
+              "type": "null"
+            },
+            "source": "Pinned schemas and reviewed Aliases.pm/IPSet.pm locks, digest guards, empty-set deletion and member replacement behavior."
           },
           "contract": "dist/contracts.json#/contracts/475"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "private-result",
+            "allowedInputs": [
+              "node",
+              "vmid",
+              "name",
+              "cidr",
+              "comment",
+              "nomatch",
+              "digest"
+            ],
+            "requiredInputs": [
+              "digest",
+              "nomatch"
+            ],
+            "sensitiveInputs": [
+              "comment"
+            ],
+            "inputPatterns": {
+              "name": "^[a-z][a-z0-9_-]{1,63}$(?![\\s\\S])",
+              "digest": "^[a-fA-F0-9]{40}$(?![\\s\\S])"
+            },
+            "inputFormats": {
+              "cidr": "pve-firewall-member",
+              "comment": "pve-firewall-comment"
+            },
+            "confirmationWarnings": [
+              {
+                "message": "Firewall alias or IP-set changes can alter referencing rules, guest IP filtering and management access. Confirm the exact scope, name and literal CIDR."
+              },
+              {
+                "message": "MEMBER UPDATE replaces nomatch and comment; omitting comment clears it. Supply the existing comment through a SecretRef to preserve it."
+              }
+            ],
+            "reason": "Confirmed named firewall objects and literal members only; native digests required where supported, empty-only set deletion, no rename/force/member-alias branches. Comments use SecretRefs and reads remain private.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Inspect the selected scope privately; do not retry uncertain operations. Creation and empty-set deletion provide no native optimistic guard."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/vms/{vmid}",
+                [
+                  "VM.Config.Network"
+                ]
+              ]
+            },
+            "response": {
+              "type": "null"
+            },
+            "source": "Pinned schemas and reviewed Aliases.pm/IPSet.pm locks, digest guards, empty-set deletion and member replacement behavior."
           },
           "contract": "dist/contracts.json#/contracts/1145"
         }

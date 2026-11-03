@@ -218,6 +218,11 @@ Ordered rule reads and individually confirmed creation, editing, reorder and del
 Follow the [ordered-rule guide](skills/proxmox-axi/references/firewall-management.md#ordered-firewall-rules) for private pipe setup, disabled staging, non-atomic creation limits, digest guards, supported inputs and uncertainty handling.
 The pinned [provider implementation](https://github.com/proxmox/pve-firewall/blob/82888bc0a16a989e2858f47dc56c73741fd36d5b/src/PVE/API2/Firewall/Rules.pm) prepends new rules and ignores creation digests.
 
+Cluster and QEMU/LXC alias and IP-set/member reads and mutations are also admitted through the existing verbs.
+See the [alias and IP-set guide](skills/proxmox-axi/references/firewall-management.md#aliases-and-ip-sets) for private reads, comment SecretRefs, native digests, exact literal CIDR identities and empty-only set deletion.
+Neither retained catalogue exposes node-local alias/IP-set routes; renames, force deletion and member alias references remain refused.
+The pinned [alias implementation](https://github.com/proxmox/pve-firewall/blob/82888bc0a16a989e2858f47dc56c73741fd36d5b/src/PVE/API2/Firewall/Aliases.pm) and [IP-set implementation](https://github.com/proxmox/pve-firewall/blob/82888bc0a16a989e2858f47dc56c73741fd36d5b/src/PVE/API2/Firewall/IPSet.pm) define native digest and member-replacement behavior.
+
 ### Guest power control
 
 QEMU and LXC support guest `start`, `shutdown`, `stop`, `reboot`, `suspend` and `resume` through `create '/nodes/{node}/<qemu-or-lxc>/{vmid}/status/<action>'`.

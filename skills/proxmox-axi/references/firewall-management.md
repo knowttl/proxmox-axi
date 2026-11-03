@@ -110,3 +110,38 @@ Successful client completion also means the ordered result matched the private p
 After an uncertain create or any other uncertain mutation, retain the journal and inspect the complete current list privately without retry or automatic deletion.
 A matching rule or position alone does not prove which writer created it.
 `journal reconcile` does not turn a later matching list into proof that this request succeeded.
+
+## Aliases and IP sets
+
+Both catalogues support cluster, QEMU and LXC scopes at `/cluster/firewall` and `/nodes/{node}/<qemu-or-lxc>/{vmid}/firewall`.
+Neither catalogue exposes node-local aliases or IP sets.
+Use the existing private result pipe for complete reads and confirmed null write results; names and CIDR path identities must be non-secret identifiers.
+Discover exact operation IDs and inputs with `schema create|set|delete <template>`, enable their profile/host grants, and preview then confirm each exact request.
+Changes can alter referencing rules, guest IP filtering and management access; inspect those dependencies before confirming, including special `ipfilter-netN` sets.
+
+Use `get .../aliases` and `get .../aliases/{name}` for private alias discovery.
+Create with `create .../aliases` and a body containing `name` and `cidr`.
+Use `set .../aliases/{name}` with the new `cidr` and the current aliases-list `digest`; delete uses `delete .../aliases/{name}` with that digest and its own confirmation.
+Alias names admitted for mutation use 2-64 lower-case letters, digits, underscores or hyphens, starting with a letter.
+Alias CIDRs allow literal IPv4/pure IPv6 addresses with optional prefix lengths.
+Renaming remains refused, so dependent references are never silently rewritten.
+
+Create an empty set with `create .../ipset` and `name`; inspect it through `get .../ipset` and `get .../ipset/{name}`.
+Add a literal member with `create .../ipset/{name}` and `cidr`, optionally `nomatch`.
+Member aliases, zero-prefix members, zone identifiers and IPv4-mapped IPv6 spellings remain refused.
+Creation can normalize CIDRs; use the exact stored spelling returned by the private member list for subsequent reads, updates or deletion.
+Pass CIDRs literally, without percent-encoding them yourself; the CLI validates and encodes the member path once.
+Use `get .../ipset/{name}/{cidr}` to inspect a member privately.
+Update it with `set .../ipset/{name}/{cidr}`, explicitly supplying boolean `nomatch` and the current members-list `digest`.
+MEMBER UPDATE replaces both nomatch and comment: omitting comment clears it.
+Preserve an existing comment by supplying it through a SecretRef when updating.
+Delete a member with `delete .../ipset/{name}/{cidr}` and the current members-list digest, then independently preview/confirm `delete .../ipset/{name}` for the now-empty set.
+Force deletion of nonempty sets remains refused, and the provider checks emptiness under its configuration lock.
+
+Comments, where supported, require a body-file env/file SecretRef such as `"comment": {"env": "FIREWALL_COMMENT"}`.
+Literal comments are refused; admitted comments are bounded to 1024 characters and exclude control characters.
+Comments remain private in read results, errors and journals.
+Provider digests are mandatory for alias/member edit and delete, and become part of the exact confirmation.
+Creation and empty-set deletion provide no native optimistic guard; this slice binds exact inputs rather than claiming state-bound rule plans for these operations.
+Synchronous success reports the provider response, not proof of effective filtering or that a deleted identity previously existed.
+On uncertainty, inspect the selected scope privately without retrying; no operation automatically retries or recreates a deleted object.
