@@ -21,11 +21,13 @@ export function backupVolumePattern(family?: 'qemu' | 'lxc'): string {
 }
 
 export function namedFormatPattern(name: string): string | undefined {
+  if (name === 'pve-firewall-member') return namedFormatPattern('pve-firewall-address')!.replace('^', '^(?!.*\/0$)')
+  if (name === 'pve-firewall-comment') return '^[^\\x00-\\x1f\\x7f]{0,1024}(?![\\s\\S])'
   if (name === 'pve-firewall-address') {
     const hex = '[0-9A-Fa-f]{1,4}'
     const ipv6 = [Array(8).fill(hex).join(':'), ...Array.from({ length: 8 }, (_, left) =>
       Array.from({ length: 8 - left }, (_, right) => `${Array(left).fill(hex).join(':')}::${Array(right).fill(hex).join(':')}`)).flat()].join('|')
-    return `^(?:${ipv4}(?:/(?:[0-9]|[12][0-9]|3[0-2]))?|(?:${ipv6})(?:/(?:[0-9]|[1-9][0-9]|1[01][0-9]|12[0-8]))?)$`
+    return `^(?:${ipv4}(?:/(?:[0-9]|[12][0-9]|3[0-2]))?|(?:${ipv6})(?:/(?:[0-9]|[1-9][0-9]|1[01][0-9]|12[0-8]))?)$(?![\\s\\S])`
   }
   if (name === 'pve-firewall-port') return '^(?:[1-9]|[1-9][0-9]{1,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])$'
   if (name === 'pve-firewall-protocol') return '^(?:tcp|udp|icmp|icmpv6)$'

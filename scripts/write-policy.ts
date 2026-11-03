@@ -17,6 +17,25 @@ const pool = new Set(['create_pool', 'update_pool', 'delete_pool'])
 export function reviewWrite(operation: Operation) {
   const { path, method } = operation
   const name = operation.vendorMetadata.name
+  const firewallObjects = /^(?:\/cluster|\/nodes\/\{node\}\/(?:qemu|lxc)\/\{vmid\})\/firewall\/(aliases|ipset)(?:\/\{name\})?(?:\/\{cidr\})?$/.exec(path)
+  if (firewallObjects && operation.allowtoken !== 0 && ['create_alias', 'update_alias', 'remove_alias', 'create_ipset', 'delete_ipset', 'create_ip', 'update_ip', 'remove_ip'].includes(name ?? '')) {
+    const alias = firewallObjects[1] === 'aliases', member = path.endsWith('/{cidr}') || name === 'create_ip'
+    const guarded = (alias || member) && ['PUT', 'DELETE'].includes(method)
+    const comment = method !== 'DELETE'
+    return { effect: 'write', transport: 'json', secrets: 'private-result',
+      allowedInputs: ['node', 'vmid', 'name', ...(alias || member ? ['cidr'] : []), ...(comment ? ['comment'] : []),
+        ...(member && comment ? ['nomatch'] : []), ...(guarded ? ['digest'] : [])].filter(key => operation.parameters.properties?.[key]),
+      requiredInputs: [...(guarded ? ['digest'] : []), ...(method === 'PUT' && member ? ['nomatch'] : [])],
+      sensitiveInputs: comment ? ['comment'] : [],
+      inputPatterns: { name: '^[a-z][a-z0-9_-]{1,63}$(?![\\s\\S])', ...(guarded ? { digest: '^[a-fA-F0-9]{40}$(?![\\s\\S])' } : {}) },
+      inputFormats: { ...(alias || member ? { cidr: member ? 'pve-firewall-member' : 'pve-firewall-address' } : {}), ...(comment ? { comment: 'pve-firewall-comment' } : {}) },
+      confirmationWarnings: [{ message: 'Firewall alias or IP-set changes can alter referencing rules, guest IP filtering and management access. Confirm the exact scope, name and literal CIDR.' },
+        ...(method === 'DELETE' ? [{ message: 'DELETION: explicitly confirm the selected alias, member or empty set. Force deletion of nonempty sets is refused.' }] : []),
+        ...(method === 'PUT' && member ? [{ message: 'MEMBER UPDATE replaces nomatch and comment; omitting comment clears it. Supply the existing comment through a SecretRef to preserve it.' }] : [])],
+      reason: 'Confirmed named firewall objects and literal members only; native digests required where supported, empty-only set deletion, no rename/force/member-alias branches. Comments use SecretRefs and reads remain private.',
+      reconciliation: { kind: 'none', reason: 'Inspect the selected scope privately; do not retry uncertain operations. Creation and empty-set deletion provide no native optimistic guard.' },
+      privileges: operation.permissions, response: operation.returns, source: 'Pinned schemas and reviewed Aliases.pm/IPSet.pm locks, digest guards, empty-set deletion and member replacement behavior.' }
+  }
   const rulesPath = path.replace(/\/\{pos\}$/, '')
   const firewallRules = rulesPath === '/cluster/firewall/rules' || /^\/nodes\/\{node\}(?:\/(qemu|lxc)\/\{vmid\})?\/firewall\/rules$/.test(rulesPath)
   if (firewallRules && operation.allowtoken !== 0 && ((method === 'POST' && path === rulesPath && name === 'create_rule') ||

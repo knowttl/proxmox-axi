@@ -559,6 +559,60 @@
       }
     },
     {
+      "command": "delete /cluster/firewall/aliases/{name}",
+      "operationId": "OP-DELETE-3715f749cd",
+      "method": "DELETE",
+      "path": "/cluster/firewall/aliases/{name}",
+      "sensitiveInputs": [],
+      "privateResult": true,
+      "effect": "write",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "preview": "boolean",
+        "confirm": "value",
+        "session": "value",
+        "api-digest": "value",
+        "api-name": "value"
+      }
+    },
+    {
+      "command": "delete /cluster/firewall/ipset/{name}",
+      "operationId": "OP-DELETE-78b51cb6e2",
+      "method": "DELETE",
+      "path": "/cluster/firewall/ipset/{name}",
+      "sensitiveInputs": [],
+      "privateResult": true,
+      "effect": "write",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "preview": "boolean",
+        "confirm": "value",
+        "session": "value",
+        "api-name": "value"
+      }
+    },
+    {
+      "command": "delete /cluster/firewall/ipset/{name}/{cidr}",
+      "operationId": "OP-DELETE-a613220b54",
+      "method": "DELETE",
+      "path": "/cluster/firewall/ipset/{name}/{cidr}",
+      "sensitiveInputs": [],
+      "privateResult": true,
+      "effect": "write",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "preview": "boolean",
+        "confirm": "value",
+        "session": "value",
+        "api-cidr": "value",
+        "api-digest": "value",
+        "api-name": "value"
+      }
+    },
+    {
       "command": "delete /cluster/firewall/rules/{pos}",
       "operationId": "OP-DELETE-1a7ddd36fa",
       "method": "DELETE",
@@ -613,6 +667,66 @@
         "api-force": "value",
         "api-node": "value",
         "api-purge": "value",
+        "api-vmid": "value"
+      }
+    },
+    {
+      "command": "delete /nodes/{node}/lxc/{vmid}/firewall/aliases/{name}",
+      "operationId": "OP-DELETE-51c4d3d340",
+      "method": "DELETE",
+      "path": "/nodes/{node}/lxc/{vmid}/firewall/aliases/{name}",
+      "sensitiveInputs": [],
+      "privateResult": true,
+      "effect": "write",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "preview": "boolean",
+        "confirm": "value",
+        "session": "value",
+        "api-digest": "value",
+        "api-name": "value",
+        "api-node": "value",
+        "api-vmid": "value"
+      }
+    },
+    {
+      "command": "delete /nodes/{node}/lxc/{vmid}/firewall/ipset/{name}",
+      "operationId": "OP-DELETE-cb5b56ff19",
+      "method": "DELETE",
+      "path": "/nodes/{node}/lxc/{vmid}/firewall/ipset/{name}",
+      "sensitiveInputs": [],
+      "privateResult": true,
+      "effect": "write",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "preview": "boolean",
+        "confirm": "value",
+        "session": "value",
+        "api-name": "value",
+        "api-node": "value",
+        "api-vmid": "value"
+      }
+    },
+    {
+      "command": "delete /nodes/{node}/lxc/{vmid}/firewall/ipset/{name}/{cidr}",
+      "operationId": "OP-DELETE-9ddd8ed40c",
+      "method": "DELETE",
+      "path": "/nodes/{node}/lxc/{vmid}/firewall/ipset/{name}/{cidr}",
+      "sensitiveInputs": [],
+      "privateResult": true,
+      "effect": "write",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "preview": "boolean",
+        "confirm": "value",
+        "session": "value",
+        "api-cidr": "value",
+        "api-digest": "value",
+        "api-name": "value",
+        "api-node": "value",
         "api-vmid": "value"
       }
     },
@@ -672,6 +786,66 @@
         "api-destroy-unreferenced-disks": "value",
         "api-node": "value",
         "api-purge": "value",
+        "api-vmid": "value"
+      }
+    },
+    {
+      "command": "delete /nodes/{node}/qemu/{vmid}/firewall/aliases/{name}",
+      "operationId": "OP-DELETE-19b645e857",
+      "method": "DELETE",
+      "path": "/nodes/{node}/qemu/{vmid}/firewall/aliases/{name}",
+      "sensitiveInputs": [],
+      "privateResult": true,
+      "effect": "write",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "preview": "boolean",
+        "confirm": "value",
+        "session": "value",
+        "api-digest": "value",
+        "api-name": "value",
+        "api-node": "value",
+        "api-vmid": "value"
+      }
+    },
+    {
+      "command": "delete /nodes/{node}/qemu/{vmid}/firewall/ipset/{name}",
+      "operationId": "OP-DELETE-5e0e6273bf",
+      "method": "DELETE",
+      "path": "/nodes/{node}/qemu/{vmid}/firewall/ipset/{name}",
+      "sensitiveInputs": [],
+      "privateResult": true,
+      "effect": "write",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "preview": "boolean",
+        "confirm": "value",
+        "session": "value",
+        "api-name": "value",
+        "api-node": "value",
+        "api-vmid": "value"
+      }
+    },
+    {
+      "command": "delete /nodes/{node}/qemu/{vmid}/firewall/ipset/{name}/{cidr}",
+      "operationId": "OP-DELETE-fe19d49ad5",
+      "method": "DELETE",
+      "path": "/nodes/{node}/qemu/{vmid}/firewall/ipset/{name}/{cidr}",
+      "sensitiveInputs": [],
+      "privateResult": true,
+      "effect": "write",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "preview": "boolean",
+        "confirm": "value",
+        "session": "value",
+        "api-cidr": "value",
+        "api-digest": "value",
+        "api-name": "value",
+        "api-node": "value",
         "api-vmid": "value"
       }
     },
@@ -875,6 +1049,66 @@
         "api-privsep": "value",
         "api-tokenid": "value",
         "api-userid": "value"
+      }
+    },
+    {
+      "command": "create /cluster/firewall/aliases",
+      "operationId": "OP-POST-ca9493ff2b",
+      "method": "POST",
+      "path": "/cluster/firewall/aliases",
+      "sensitiveInputs": [
+        "comment"
+      ],
+      "privateResult": true,
+      "effect": "write",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "preview": "boolean",
+        "confirm": "value",
+        "session": "value",
+        "api-cidr": "value",
+        "api-name": "value"
+      }
+    },
+    {
+      "command": "create /cluster/firewall/ipset",
+      "operationId": "OP-POST-9811b3d98d",
+      "method": "POST",
+      "path": "/cluster/firewall/ipset",
+      "sensitiveInputs": [
+        "comment"
+      ],
+      "privateResult": true,
+      "effect": "write",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "preview": "boolean",
+        "confirm": "value",
+        "session": "value",
+        "api-name": "value"
+      }
+    },
+    {
+      "command": "create /cluster/firewall/ipset/{name}",
+      "operationId": "OP-POST-6ce70da0d0",
+      "method": "POST",
+      "path": "/cluster/firewall/ipset/{name}",
+      "sensitiveInputs": [
+        "comment"
+      ],
+      "privateResult": true,
+      "effect": "write",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "preview": "boolean",
+        "confirm": "value",
+        "session": "value",
+        "api-cidr": "value",
+        "api-name": "value",
+        "api-nomatch": "value"
       }
     },
     {
@@ -1343,6 +1577,72 @@
       }
     },
     {
+      "command": "create /nodes/{node}/lxc/{vmid}/firewall/aliases",
+      "operationId": "OP-POST-2d5190c5f9",
+      "method": "POST",
+      "path": "/nodes/{node}/lxc/{vmid}/firewall/aliases",
+      "sensitiveInputs": [
+        "comment"
+      ],
+      "privateResult": true,
+      "effect": "write",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "preview": "boolean",
+        "confirm": "value",
+        "session": "value",
+        "api-cidr": "value",
+        "api-name": "value",
+        "api-node": "value",
+        "api-vmid": "value"
+      }
+    },
+    {
+      "command": "create /nodes/{node}/lxc/{vmid}/firewall/ipset",
+      "operationId": "OP-POST-766517347a",
+      "method": "POST",
+      "path": "/nodes/{node}/lxc/{vmid}/firewall/ipset",
+      "sensitiveInputs": [
+        "comment"
+      ],
+      "privateResult": true,
+      "effect": "write",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "preview": "boolean",
+        "confirm": "value",
+        "session": "value",
+        "api-name": "value",
+        "api-node": "value",
+        "api-vmid": "value"
+      }
+    },
+    {
+      "command": "create /nodes/{node}/lxc/{vmid}/firewall/ipset/{name}",
+      "operationId": "OP-POST-b29b1ef5c8",
+      "method": "POST",
+      "path": "/nodes/{node}/lxc/{vmid}/firewall/ipset/{name}",
+      "sensitiveInputs": [
+        "comment"
+      ],
+      "privateResult": true,
+      "effect": "write",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "preview": "boolean",
+        "confirm": "value",
+        "session": "value",
+        "api-cidr": "value",
+        "api-name": "value",
+        "api-node": "value",
+        "api-nomatch": "value",
+        "api-vmid": "value"
+      }
+    },
+    {
       "command": "create /nodes/{node}/lxc/{vmid}/firewall/rules",
       "operationId": "OP-POST-8d36152b44",
       "method": "POST",
@@ -1797,6 +2097,72 @@
       }
     },
     {
+      "command": "create /nodes/{node}/qemu/{vmid}/firewall/aliases",
+      "operationId": "OP-POST-664eba5f43",
+      "method": "POST",
+      "path": "/nodes/{node}/qemu/{vmid}/firewall/aliases",
+      "sensitiveInputs": [
+        "comment"
+      ],
+      "privateResult": true,
+      "effect": "write",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "preview": "boolean",
+        "confirm": "value",
+        "session": "value",
+        "api-cidr": "value",
+        "api-name": "value",
+        "api-node": "value",
+        "api-vmid": "value"
+      }
+    },
+    {
+      "command": "create /nodes/{node}/qemu/{vmid}/firewall/ipset",
+      "operationId": "OP-POST-194944237f",
+      "method": "POST",
+      "path": "/nodes/{node}/qemu/{vmid}/firewall/ipset",
+      "sensitiveInputs": [
+        "comment"
+      ],
+      "privateResult": true,
+      "effect": "write",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "preview": "boolean",
+        "confirm": "value",
+        "session": "value",
+        "api-name": "value",
+        "api-node": "value",
+        "api-vmid": "value"
+      }
+    },
+    {
+      "command": "create /nodes/{node}/qemu/{vmid}/firewall/ipset/{name}",
+      "operationId": "OP-POST-78ef5382b5",
+      "method": "POST",
+      "path": "/nodes/{node}/qemu/{vmid}/firewall/ipset/{name}",
+      "sensitiveInputs": [
+        "comment"
+      ],
+      "privateResult": true,
+      "effect": "write",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "preview": "boolean",
+        "confirm": "value",
+        "session": "value",
+        "api-cidr": "value",
+        "api-name": "value",
+        "api-node": "value",
+        "api-nomatch": "value",
+        "api-vmid": "value"
+      }
+    },
+    {
       "command": "create /nodes/{node}/qemu/{vmid}/firewall/rules",
       "operationId": "OP-POST-6f3a5021ce",
       "method": "POST",
@@ -2203,6 +2569,49 @@
         "api-userid": "value",
         "api-delete": "value",
         "api-regenerate": "value"
+      }
+    },
+    {
+      "command": "set /cluster/firewall/aliases/{name}",
+      "operationId": "OP-PUT-ce3ee8a248",
+      "method": "PUT",
+      "path": "/cluster/firewall/aliases/{name}",
+      "sensitiveInputs": [
+        "comment"
+      ],
+      "privateResult": true,
+      "effect": "write",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "preview": "boolean",
+        "confirm": "value",
+        "session": "value",
+        "api-cidr": "value",
+        "api-digest": "value",
+        "api-name": "value"
+      }
+    },
+    {
+      "command": "set /cluster/firewall/ipset/{name}/{cidr}",
+      "operationId": "OP-PUT-91fcd48a95",
+      "method": "PUT",
+      "path": "/cluster/firewall/ipset/{name}/{cidr}",
+      "sensitiveInputs": [
+        "comment"
+      ],
+      "privateResult": true,
+      "effect": "write",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "preview": "boolean",
+        "confirm": "value",
+        "session": "value",
+        "api-cidr": "value",
+        "api-digest": "value",
+        "api-name": "value",
+        "api-nomatch": "value"
       }
     },
     {
@@ -2626,6 +3035,53 @@
       }
     },
     {
+      "command": "set /nodes/{node}/lxc/{vmid}/firewall/aliases/{name}",
+      "operationId": "OP-PUT-4c70a28520",
+      "method": "PUT",
+      "path": "/nodes/{node}/lxc/{vmid}/firewall/aliases/{name}",
+      "sensitiveInputs": [
+        "comment"
+      ],
+      "privateResult": true,
+      "effect": "write",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "preview": "boolean",
+        "confirm": "value",
+        "session": "value",
+        "api-cidr": "value",
+        "api-digest": "value",
+        "api-name": "value",
+        "api-node": "value",
+        "api-vmid": "value"
+      }
+    },
+    {
+      "command": "set /nodes/{node}/lxc/{vmid}/firewall/ipset/{name}/{cidr}",
+      "operationId": "OP-PUT-d9bec0a2a7",
+      "method": "PUT",
+      "path": "/nodes/{node}/lxc/{vmid}/firewall/ipset/{name}/{cidr}",
+      "sensitiveInputs": [
+        "comment"
+      ],
+      "privateResult": true,
+      "effect": "write",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "preview": "boolean",
+        "confirm": "value",
+        "session": "value",
+        "api-cidr": "value",
+        "api-digest": "value",
+        "api-name": "value",
+        "api-node": "value",
+        "api-nomatch": "value",
+        "api-vmid": "value"
+      }
+    },
+    {
       "command": "set /nodes/{node}/lxc/{vmid}/firewall/options",
       "operationId": "OP-PUT-b84103fb70",
       "method": "PUT",
@@ -2879,6 +3335,53 @@
       }
     },
     {
+      "command": "set /nodes/{node}/qemu/{vmid}/firewall/aliases/{name}",
+      "operationId": "OP-PUT-ad087bc60f",
+      "method": "PUT",
+      "path": "/nodes/{node}/qemu/{vmid}/firewall/aliases/{name}",
+      "sensitiveInputs": [
+        "comment"
+      ],
+      "privateResult": true,
+      "effect": "write",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "preview": "boolean",
+        "confirm": "value",
+        "session": "value",
+        "api-cidr": "value",
+        "api-digest": "value",
+        "api-name": "value",
+        "api-node": "value",
+        "api-vmid": "value"
+      }
+    },
+    {
+      "command": "set /nodes/{node}/qemu/{vmid}/firewall/ipset/{name}/{cidr}",
+      "operationId": "OP-PUT-48d1c65ef1",
+      "method": "PUT",
+      "path": "/nodes/{node}/qemu/{vmid}/firewall/ipset/{name}/{cidr}",
+      "sensitiveInputs": [
+        "comment"
+      ],
+      "privateResult": true,
+      "effect": "write",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "preview": "boolean",
+        "confirm": "value",
+        "session": "value",
+        "api-cidr": "value",
+        "api-digest": "value",
+        "api-name": "value",
+        "api-node": "value",
+        "api-nomatch": "value",
+        "api-vmid": "value"
+      }
+    },
+    {
       "command": "set /nodes/{node}/qemu/{vmid}/firewall/options",
       "operationId": "OP-PUT-68ea5099b4",
       "method": "PUT",
@@ -3037,6 +3540,46 @@
       }
     },
     {
+      "command": "ls /cluster/firewall/aliases",
+      "effect": "read",
+      "privateResult": true,
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "session": "value",
+        "limit": "value",
+        "fields": "value",
+        "full": "boolean"
+      }
+    },
+    {
+      "command": "ls /cluster/firewall/ipset",
+      "effect": "read",
+      "privateResult": true,
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "session": "value",
+        "limit": "value",
+        "fields": "value",
+        "full": "boolean"
+      }
+    },
+    {
+      "command": "ls /cluster/firewall/ipset/{name}",
+      "effect": "read",
+      "privateResult": true,
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "session": "value",
+        "limit": "value",
+        "fields": "value",
+        "full": "boolean",
+        "api-name": "value"
+      }
+    },
+    {
       "command": "ls /cluster/firewall/rules",
       "effect": "read",
       "privateResult": true,
@@ -3127,6 +3670,52 @@
       }
     },
     {
+      "command": "ls /nodes/{node}/lxc/{vmid}/firewall/aliases",
+      "effect": "read",
+      "privateResult": true,
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "session": "value",
+        "limit": "value",
+        "fields": "value",
+        "full": "boolean",
+        "api-node": "value",
+        "api-vmid": "value"
+      }
+    },
+    {
+      "command": "ls /nodes/{node}/lxc/{vmid}/firewall/ipset",
+      "effect": "read",
+      "privateResult": true,
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "session": "value",
+        "limit": "value",
+        "fields": "value",
+        "full": "boolean",
+        "api-node": "value",
+        "api-vmid": "value"
+      }
+    },
+    {
+      "command": "ls /nodes/{node}/lxc/{vmid}/firewall/ipset/{name}",
+      "effect": "read",
+      "privateResult": true,
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "session": "value",
+        "limit": "value",
+        "fields": "value",
+        "full": "boolean",
+        "api-name": "value",
+        "api-node": "value",
+        "api-vmid": "value"
+      }
+    },
+    {
       "command": "ls /nodes/{node}/lxc/{vmid}/firewall/rules",
       "effect": "read",
       "privateResult": true,
@@ -3210,6 +3799,52 @@
         "limit": "value",
         "fields": "value",
         "full": "boolean",
+        "api-node": "value",
+        "api-vmid": "value"
+      }
+    },
+    {
+      "command": "ls /nodes/{node}/qemu/{vmid}/firewall/aliases",
+      "effect": "read",
+      "privateResult": true,
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "session": "value",
+        "limit": "value",
+        "fields": "value",
+        "full": "boolean",
+        "api-node": "value",
+        "api-vmid": "value"
+      }
+    },
+    {
+      "command": "ls /nodes/{node}/qemu/{vmid}/firewall/ipset",
+      "effect": "read",
+      "privateResult": true,
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "session": "value",
+        "limit": "value",
+        "fields": "value",
+        "full": "boolean",
+        "api-node": "value",
+        "api-vmid": "value"
+      }
+    },
+    {
+      "command": "ls /nodes/{node}/qemu/{vmid}/firewall/ipset/{name}",
+      "effect": "read",
+      "privateResult": true,
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "session": "value",
+        "limit": "value",
+        "fields": "value",
+        "full": "boolean",
+        "api-name": "value",
         "api-node": "value",
         "api-vmid": "value"
       }
@@ -10884,6 +11519,115 @@
       ]
     },
     {
+      "command": "get /cluster/firewall/aliases",
+      "operationId": "OP-GET-ee09b35e69",
+      "method": "GET",
+      "path": "/cluster/firewall/aliases",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value",
+        "limit": "value",
+        "fields": "value",
+        "full": "boolean",
+        "session": "value"
+      },
+      "privateResult": true,
+      "catalogues": [
+        "legacy-8.2.7",
+        "published-current"
+      ]
+    },
+    {
+      "command": "get /cluster/firewall/aliases/{name}",
+      "operationId": "OP-GET-98caa1978e",
+      "method": "GET",
+      "path": "/cluster/firewall/aliases/{name}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value",
+        "limit": "value",
+        "fields": "value",
+        "full": "boolean",
+        "session": "value",
+        "api-name": "value"
+      },
+      "privateResult": true,
+      "catalogues": [
+        "legacy-8.2.7",
+        "published-current"
+      ]
+    },
+    {
+      "command": "get /cluster/firewall/ipset",
+      "operationId": "OP-GET-90d401d751",
+      "method": "GET",
+      "path": "/cluster/firewall/ipset",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value",
+        "limit": "value",
+        "fields": "value",
+        "full": "boolean",
+        "session": "value"
+      },
+      "privateResult": true,
+      "catalogues": [
+        "legacy-8.2.7",
+        "published-current"
+      ]
+    },
+    {
+      "command": "get /cluster/firewall/ipset/{name}",
+      "operationId": "OP-GET-cba437ce5d",
+      "method": "GET",
+      "path": "/cluster/firewall/ipset/{name}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value",
+        "limit": "value",
+        "fields": "value",
+        "full": "boolean",
+        "session": "value",
+        "api-name": "value"
+      },
+      "privateResult": true,
+      "catalogues": [
+        "legacy-8.2.7",
+        "published-current"
+      ]
+    },
+    {
+      "command": "get /cluster/firewall/ipset/{name}/{cidr}",
+      "operationId": "OP-GET-bc52598f6d",
+      "method": "GET",
+      "path": "/cluster/firewall/ipset/{name}/{cidr}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value",
+        "limit": "value",
+        "fields": "value",
+        "full": "boolean",
+        "session": "value",
+        "api-cidr": "value",
+        "api-name": "value"
+      },
+      "privateResult": true,
+      "catalogues": [
+        "legacy-8.2.7",
+        "published-current"
+      ]
+    },
+    {
       "command": "get /cluster/firewall/options",
       "operationId": "OP-GET-a93fc732fd",
       "method": "GET",
@@ -11153,6 +11897,125 @@
         "api-current": "value",
         "api-node": "value",
         "api-snapshot": "value",
+        "api-vmid": "value"
+      },
+      "privateResult": true,
+      "catalogues": [
+        "legacy-8.2.7",
+        "published-current"
+      ]
+    },
+    {
+      "command": "get /nodes/{node}/lxc/{vmid}/firewall/aliases",
+      "operationId": "OP-GET-aca0b9c3c5",
+      "method": "GET",
+      "path": "/nodes/{node}/lxc/{vmid}/firewall/aliases",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value",
+        "limit": "value",
+        "fields": "value",
+        "full": "boolean",
+        "session": "value",
+        "api-node": "value",
+        "api-vmid": "value"
+      },
+      "privateResult": true,
+      "catalogues": [
+        "legacy-8.2.7",
+        "published-current"
+      ]
+    },
+    {
+      "command": "get /nodes/{node}/lxc/{vmid}/firewall/aliases/{name}",
+      "operationId": "OP-GET-5939e855fd",
+      "method": "GET",
+      "path": "/nodes/{node}/lxc/{vmid}/firewall/aliases/{name}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value",
+        "limit": "value",
+        "fields": "value",
+        "full": "boolean",
+        "session": "value",
+        "api-name": "value",
+        "api-node": "value",
+        "api-vmid": "value"
+      },
+      "privateResult": true,
+      "catalogues": [
+        "legacy-8.2.7",
+        "published-current"
+      ]
+    },
+    {
+      "command": "get /nodes/{node}/lxc/{vmid}/firewall/ipset",
+      "operationId": "OP-GET-93fcfce87e",
+      "method": "GET",
+      "path": "/nodes/{node}/lxc/{vmid}/firewall/ipset",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value",
+        "limit": "value",
+        "fields": "value",
+        "full": "boolean",
+        "session": "value",
+        "api-node": "value",
+        "api-vmid": "value"
+      },
+      "privateResult": true,
+      "catalogues": [
+        "legacy-8.2.7",
+        "published-current"
+      ]
+    },
+    {
+      "command": "get /nodes/{node}/lxc/{vmid}/firewall/ipset/{name}",
+      "operationId": "OP-GET-ae65212099",
+      "method": "GET",
+      "path": "/nodes/{node}/lxc/{vmid}/firewall/ipset/{name}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value",
+        "limit": "value",
+        "fields": "value",
+        "full": "boolean",
+        "session": "value",
+        "api-name": "value",
+        "api-node": "value",
+        "api-vmid": "value"
+      },
+      "privateResult": true,
+      "catalogues": [
+        "legacy-8.2.7",
+        "published-current"
+      ]
+    },
+    {
+      "command": "get /nodes/{node}/lxc/{vmid}/firewall/ipset/{name}/{cidr}",
+      "operationId": "OP-GET-9f3b20e620",
+      "method": "GET",
+      "path": "/nodes/{node}/lxc/{vmid}/firewall/ipset/{name}/{cidr}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value",
+        "limit": "value",
+        "fields": "value",
+        "full": "boolean",
+        "session": "value",
+        "api-cidr": "value",
+        "api-name": "value",
+        "api-node": "value",
         "api-vmid": "value"
       },
       "privateResult": true,
@@ -11498,6 +12361,125 @@
         "api-current": "value",
         "api-node": "value",
         "api-snapshot": "value",
+        "api-vmid": "value"
+      },
+      "privateResult": true,
+      "catalogues": [
+        "legacy-8.2.7",
+        "published-current"
+      ]
+    },
+    {
+      "command": "get /nodes/{node}/qemu/{vmid}/firewall/aliases",
+      "operationId": "OP-GET-1c7ffd6b8c",
+      "method": "GET",
+      "path": "/nodes/{node}/qemu/{vmid}/firewall/aliases",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value",
+        "limit": "value",
+        "fields": "value",
+        "full": "boolean",
+        "session": "value",
+        "api-node": "value",
+        "api-vmid": "value"
+      },
+      "privateResult": true,
+      "catalogues": [
+        "legacy-8.2.7",
+        "published-current"
+      ]
+    },
+    {
+      "command": "get /nodes/{node}/qemu/{vmid}/firewall/aliases/{name}",
+      "operationId": "OP-GET-5beec9cdc7",
+      "method": "GET",
+      "path": "/nodes/{node}/qemu/{vmid}/firewall/aliases/{name}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value",
+        "limit": "value",
+        "fields": "value",
+        "full": "boolean",
+        "session": "value",
+        "api-name": "value",
+        "api-node": "value",
+        "api-vmid": "value"
+      },
+      "privateResult": true,
+      "catalogues": [
+        "legacy-8.2.7",
+        "published-current"
+      ]
+    },
+    {
+      "command": "get /nodes/{node}/qemu/{vmid}/firewall/ipset",
+      "operationId": "OP-GET-37409f14b6",
+      "method": "GET",
+      "path": "/nodes/{node}/qemu/{vmid}/firewall/ipset",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value",
+        "limit": "value",
+        "fields": "value",
+        "full": "boolean",
+        "session": "value",
+        "api-node": "value",
+        "api-vmid": "value"
+      },
+      "privateResult": true,
+      "catalogues": [
+        "legacy-8.2.7",
+        "published-current"
+      ]
+    },
+    {
+      "command": "get /nodes/{node}/qemu/{vmid}/firewall/ipset/{name}",
+      "operationId": "OP-GET-fdff1f63d5",
+      "method": "GET",
+      "path": "/nodes/{node}/qemu/{vmid}/firewall/ipset/{name}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value",
+        "limit": "value",
+        "fields": "value",
+        "full": "boolean",
+        "session": "value",
+        "api-name": "value",
+        "api-node": "value",
+        "api-vmid": "value"
+      },
+      "privateResult": true,
+      "catalogues": [
+        "legacy-8.2.7",
+        "published-current"
+      ]
+    },
+    {
+      "command": "get /nodes/{node}/qemu/{vmid}/firewall/ipset/{name}/{cidr}",
+      "operationId": "OP-GET-7ded24f35a",
+      "method": "GET",
+      "path": "/nodes/{node}/qemu/{vmid}/firewall/ipset/{name}/{cidr}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value",
+        "limit": "value",
+        "fields": "value",
+        "full": "boolean",
+        "session": "value",
+        "api-cidr": "value",
+        "api-name": "value",
+        "api-node": "value",
         "api-vmid": "value"
       },
       "privateResult": true,

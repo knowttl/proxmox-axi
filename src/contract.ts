@@ -151,7 +151,7 @@ export function buildPath(contract: Contract, values: Record<string, unknown>): 
   const path = contract.path.replace(/\{([^}]+)\}/g, (_, name: string) => {
     used.add(name)
     const value = String(values[name])
-    const separator = properties[name]?.format === 'pve-managed-volume' ? /[\\\x00-\x1f\x7f]/ : /[\\/\x00-\x1f\x7f]/
+    const separator = ['pve-managed-volume', 'pve-firewall-member'].includes(String(properties[name]?.format)) ? /[\\\x00-\x1f\x7f]/ : /[\\/\x00-\x1f\x7f]/
     if (!value || value === '.' || value === '..' || separator.test(value) || /%[0-9a-f]{2}/i.test(value)) throw invalid()
     return encodeURIComponent(value)
   })
