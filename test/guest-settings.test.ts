@@ -1,17 +1,15 @@
 import assert from 'node:assert/strict'
-import { execFile, spawn } from 'node:child_process'
+import { spawn } from 'node:child_process'
 import { createHash } from 'node:crypto'
-import { chmod, mkdtemp, readFile, readdir, rm, writeFile } from 'node:fs/promises'
+import { mkdtemp, readFile, readdir, rm, writeFile } from 'node:fs/promises'
 import { createServer } from 'node:https'
 import type { AddressInfo } from 'node:net'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import type { Readable } from 'node:stream'
-import { promisify } from 'node:util'
 import test from 'node:test'
 import { Ajv } from 'ajv'
 
-const execute = promisify(execFile)
 const executable = new URL('../../bin/proxmox-axi.mjs', import.meta.url).pathname
 const environment = Object.fromEntries(Object.entries(process.env).filter(([key]) => !key.startsWith('PROXMOX_AXI_')))
 const hash = (value: string) => createHash('sha256').update(value).digest('hex')
@@ -36,13 +34,11 @@ test('guest settings use private reads and confirmed configuration writes', asyn
   const scratch = await mkdtemp(join(tmpdir(), 'proxmox-guest-settings-'))
   t.after(() => rm(scratch, { recursive: true, force: true }))
   const caFile = join(scratch, 'server.crt')
-  await execute('openssl', ['req', '-x509', '-newkey', 'rsa:2048', '-nodes', '-days', '1', '-subj', '/CN=localhost',
-    '-addext', 'subjectAltName=IP:127.0.0.1', '-keyout', join(scratch, 'server.key'), '-out', caFile])
-  await chmod(caFile, 0o600)
+  await writeFile(caFile, await readFile(new URL('../../test/fixtures/localhost-cert.pem', import.meta.url)), { mode: 0o600 })
   let version = '8.2.7', malformed = false, rejectCloudPassword = false, imagePassword = canary
   const requests: { method: string, path: string }[] = []
   const state: Record<string, Record<string, unknown>> = Object.fromEntries(guests.map(guest => [guest.family, { ...guest.initial }]))
-  const server = createServer({ key: await readFile(join(scratch, 'server.key')), cert: await readFile(caFile) }, async (request, response) => {
+  const server = createServer({ key: await readFile(new URL('../../test/fixtures/localhost-key.pem', import.meta.url)), cert: await readFile(caFile) }, async (request, response) => {
     requests.push({ method: request.method!, path: request.url! })
     const family = request.url!.includes('/lxc/') ? 'lxc' : 'qemu'
     if (request.method === 'PUT') {
@@ -115,7 +111,7 @@ test('guest settings use private reads and confirmed configuration writes', asyn
       })
       await t.test(`${release} ${family} ${suffix} delivers protected values only privately`, async () => {
         const result = await command(['get', path, ...target, '--catalogue', release, '--full'], true)
-        assert.equal(result.code, 0, result.stderr)
+        assert.equal(result.code, 0, result.stdout + result.stderr)
         assert.deepEqual(JSON.parse(result.stdout).data, { privateResult: true })
         assert.doesNotMatch(result.stdout + result.stderr, /CANARY-private-guest-credential/)
         assert.deepEqual(result.frame?.payload, expected)
