@@ -25,7 +25,7 @@ function inventoryVisibility(path: string, permissions: unknown): string {
 export function validateFields(contract: Contract, fields?: string[]): void {
   const known = contract.policy.outputFields ?? Object.keys(contract.returns.items?.properties ?? contract.returns.properties ?? {})
   const unknown = fields?.filter(field => !known.includes(field)) ?? []
-  if (unknown.length) throw new Failure('INVALID_INPUT', `Unknown fields: ${unknown.join(', ')}.`, `Available fields: ${known.join(', ')}.`, 2)
+  if (unknown.length) throw new Failure('INVALID_INPUT', `Unknown fields: ${unknown.join(', ')}.`, known.length ? `Available fields: ${known.join(', ')}.` : 'This response has no selectable fields.', 2)
 }
 
 export async function readOperation(credentials: Credentials, initial: Contract, values: Record<string, unknown>, explicitCatalogue?: string, fields?: string[]) {
@@ -62,7 +62,8 @@ export async function readOperation(credentials: Credentials, initial: Contract,
   }
   let envelope: { data: unknown, total?: number, changes?: unknown }
   try {
-    envelope = await executeRequest(credentials, buildPath(selected, values), { method: selected.method, envelope: true }) as typeof envelope
+    envelope = await executeRequest(credentials, buildPath(selected, values), { method: selected.method, envelope: true,
+      ...(selected.path === '/nodes/{node}/aplinfo' ? { maxResponseBytes: 262_144 } : {}) }) as typeof envelope
   } catch (error) {
     if (selected.path.startsWith('/nodes/{node}/qemu/{vmid}/agent/') && error instanceof Failure &&
       (error.code === 'TIMEOUT' || (error.httpStatus ?? 0) >= 500)) {
@@ -75,7 +76,13 @@ export async function readOperation(credentials: Credentials, initial: Contract,
   if (selected.path === '/nodes/{node}/network' || selected.path === '/nodes/{node}/network/{iface}') {
     envelope.data = normalizeNetworkResponse(envelope.data)
   }
-  validateResponse(envelope.data, selected.returns)
+  let responseSchema = selected.returns
+  if (/^\/nodes\/\{node\}\/(?:qemu|lxc)\/\{vmid\}\/pending$/.test(selected.path)) {
+    const items = responseSchema.items!
+    responseSchema = { ...responseSchema, items: { ...items, properties: { ...items.properties,
+      value: { ...items.properties!.value, type: 'scalar' }, pending: { ...items.properties!.pending, type: 'scalar' } } } }
+  }
+  envelope.data = validateResponse(envelope.data, responseSchema)
   if (selected.policy.outputFields) {
     const names = selected.policy.outputFields
     const properties = selected.returns.items?.properties ?? selected.returns.properties ?? {}

@@ -2,7 +2,11 @@ import { Failure } from './errors.js'
 
 export function presentRead(result: { data: unknown, visibility?: string, providerTotal?: number }, path: string,
   options: { limit: number, full: boolean, fields?: string[], next: string }) {
-  if (!Array.isArray(result.data)) return result
+  if (!Array.isArray(result.data)) {
+    if (!options.fields || !result.data || typeof result.data !== 'object' || 'privateResult' in result.data) return result
+    const row = result.data as Record<string, unknown>
+    return { ...result, data: Object.fromEntries(options.fields.filter(field => Object.hasOwn(row, field)).map(field => [field, row[field]])) }
+  }
   const received = result.data.length
   const rows = result.data.slice(0, options.full ? received : options.limit)
   const defaults = path === '/cluster/status' ? ['id', 'name', 'type', 'online', 'quorate'] :
