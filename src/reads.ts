@@ -3,7 +3,7 @@ import { buildPath, contracts, selectContract, validateResponse, type Contract }
 import { executeRead, executeRequest, readVersion } from './transport.js'
 import { Failure } from './errors.js'
 import { resultBinding } from './private-results.js'
-import { networkObservation } from './node-network.js'
+import { networkObservation, normalizeNetworkResponse } from './node-network.js'
 
 export function capability(version: string) {
   const major = Number(/^(\d+)\./.exec(version)?.[1])
@@ -71,6 +71,9 @@ export async function readOperation(credentials: Credentials, initial: Contract,
         error.exitCode, error.httpStatus)
     }
     throw error
+  }
+  if (selected.path === '/nodes/{node}/network' || selected.path === '/nodes/{node}/network/{iface}') {
+    envelope.data = normalizeNetworkResponse(envelope.data)
   }
   validateResponse(envelope.data, selected.returns)
   if (selected.policy.outputFields) {

@@ -10,9 +10,31 @@ const input = () => new Failure('INVALID_INPUT', 'Interface settings are outside
 export interface NetworkObservation { interfaces: Interface[], pendingDiff: string | null, activeConfiguration: 'unverified', visibility: 'unknown' }
 export interface NetworkPlan { before: NetworkObservation, after: Interface[], management: { classification: 'unknown', affected: string[], addressed: string[] } }
 
+export function normalizeNetworkResponse(data: unknown): unknown {
+  if (Array.isArray(data)) return data.map(normalizeNetworkResponse)
+  if (!data || typeof data !== 'object') return data
+  const row = { ...data } as Interface
+  for (const name of ['mtu', 'netmask6', 'vlan-id', 'vxlan-id', 'bridge-access', 'ovs_tag']) {
+    const value = row[name]
+    if (typeof value === 'string') {
+      if (!/^\d+$/.test(value) || !Number.isSafeInteger(Number(value))) throw invalid()
+      row[name] = Number(value)
+    }
+  }
+  for (const name of ['bridge-learning', 'bridge-arp-nd-suppress', 'bridge-unicast-flood', 'bridge-multicast-flood']) {
+    const value = row[name]
+    if (typeof value === 'string') {
+      if (!['0', '1', 'on', 'off'].includes(value)) throw invalid()
+      row[name] = value === '1' || value === 'on' ? 1 : 0
+    }
+  }
+  return row
+}
+
 export function networkObservation(envelope: { data: unknown, changes?: unknown, total?: number }, release: string): NetworkObservation {
-  validateResponse(envelope.data, selectContract('GET', path, release).returns)
-  const interfaces = envelope.data as Interface[]
+  const data = normalizeNetworkResponse(envelope.data)
+  validateResponse(data, selectContract('GET', path, release).returns)
+  const interfaces = (data as Interface[]).sort((a, b) => String(a.iface).localeCompare(String(b.iface)))
   if ((envelope.changes != null && typeof envelope.changes !== 'string') ||
     (envelope.total !== undefined && envelope.total !== interfaces.length) ||
     new Set(interfaces.map(row => row.iface)).size !== interfaces.length) throw invalid()
@@ -59,6 +81,13 @@ export async function prepareNetwork(credentials: Credentials, contract: Contrac
   if (contract.method === 'PUT') for (const name of ['cidr', 'cidr6']) {
     if (values[name] === undefined && selected?.[name] !== undefined) values[name] = selected[name]
     if (selected?.[name === 'cidr' ? 'address' : 'address6'] && values[name] === undefined) throw input()
+  }
+  if (contract.method === 'PUT') for (const suffix of ['', '6']) {
+    const retained = suffix ? values.cidr6 : values.cidr || !values.cidr6
+    if (!retained && ['options', 'gateway', 'broadcast', 'netmask'].some(name => {
+      const value = selected?.[`${name}${suffix}`]
+      return Array.isArray(value) ? value.length > 0 : value !== undefined
+    })) throw input()
   }
   const patch = Object.fromEntries(Object.entries(values).filter(([name]) => !['node', 'iface'].includes(name)))
   const proposed: Interface = { ...selected, ...patch, iface: values.iface, method: (values.cidr ?? selected?.cidr) ? 'static' : 'manual',

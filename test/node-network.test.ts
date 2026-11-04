@@ -19,7 +19,7 @@ const initial = (): Row[] => [
   ...['eth0', 'eth1', 'eth2'].map(iface => ({ iface, type: 'eth', method: 'manual', autostart: 1, active: 1, exists: 1 })),
   { iface: 'bond0', type: 'bond', slaves: 'eth0 eth1', bond_mode: 'active-backup', method: 'manual', active: 1 },
   { iface: 'vmbr0', type: 'bridge', bridge_ports: 'bond0', method: 'static', cidr: '192.0.2.10/24', address: '192.0.2.10', netmask: '24', comments: canary },
-  { iface: 'vmbr0.20', type: 'vlan', 'vlan-raw-device': 'vmbr0', 'vlan-id': 20, method: 'manual', method6: 'static', cidr6: '2001:db8::10/64' },
+  { iface: 'vmbr0.20', type: 'vlan', 'vlan-raw-device': 'vmbr0', 'vlan-id': '20', method: 'manual', method6: 'static', cidr6: '2001:db8::10/64' },
 ]
 
 test('pending Linux bridges retain private diffs, management warnings and exact confirmation', async t => {
@@ -28,7 +28,7 @@ test('pending Linux bridges retain private diffs, management warnings and exact 
   const caFile = join(scratch, 'server.crt'), config = join(scratch, 'config.json'), journal = join(scratch, 'journal')
   await writeFile(caFile, await readFile(new URL('../../test/fixtures/localhost-cert.pem', import.meta.url)), { mode: 0o600 })
   let version = '8.2.7', pending = initial(), changes: unknown = null, mode = 'success', revision = 0, dispatched = false
-  const active = initial(), writes: Row[] = [], requests: string[] = []
+  const writes: Row[] = [], requests: string[] = []
   const server = createServer({ key: await readFile(new URL('../../test/fixtures/localhost-key.pem', import.meta.url)), cert: await readFile(caFile) }, async (request, response) => {
     const url = new URL(request.url!, 'https://fake.invalid'), route = url.pathname
     requests.push(`${request.method} ${route}`)
@@ -53,11 +53,14 @@ test('pending Linux bridges retain private diffs, management warnings and exact 
         autostart: fields.autostart === undefined ? selected?.autostart ?? 0 : Number(fields.autostart),
         bridge_ports: [...new Set(String(fields.bridge_ports ?? selected?.bridge_ports ?? '').split(' ').filter(Boolean))].sort().join(' '),
         bridge_stp: selected?.bridge_stp ?? 'off', bridge_fd: selected?.bridge_fd ?? '0' }
-      if (fields.mtu) row.mtu = Number(fields.mtu)
+      if (fields.mtu) row.mtu = fields.mtu
       for (const suffix of ['', '6']) if (fields[`cidr${suffix}`]) {
         const [address, mask] = fields[`cidr${suffix}`]!.split('/')
         row[`address${suffix}`] = address
-        row[`netmask${suffix}`] = suffix ? Number(mask) : mask
+        row[`netmask${suffix}`] = mask
+      }
+      for (const suffix of ['', '6']) if (suffix ? !fields.cidr6 : !fields.cidr && fields.cidr6) {
+        for (const name of ['address', 'netmask', 'cidr', 'options', 'gateway', 'broadcast']) delete row[`${name}${suffix}`]
       }
       pending = [...pending.filter(row => row.iface !== name), row]
     }
@@ -68,7 +71,7 @@ test('pending Linux bridges retain private diffs, management warnings and exact 
     }
     dispatched = true
     changes = `--- /etc/network/interfaces\n+++ /etc/network/interfaces.new\n@@ -1 +1 @@\n-# revision ${revision++}\n+# ${canary}\n`
-    if (mode === 'race') pending[0]!.autostart = 0
+    if (mode === 'race') pending.find(row => row.iface === 'eth0')!.autostart = 0
     response.end(JSON.stringify({ data: null }))
   })
   await new Promise<void>(resolve => server.listen(0, '127.0.0.1', resolve))
@@ -98,11 +101,67 @@ test('pending Linux bridges retain private diffs, management warnings and exact 
     const preview = await command(verb, route, api, ['--preview'])
     assert.equal(preview.code, 0, JSON.stringify(preview.value))
     assert.match(JSON.stringify(preview.value.warnings), /MANAGEMENT ACCESS AT RISK.*UNKNOWN/)
+    pending.reverse()
     return command(verb, route, api, ['--confirm', preview.value.confirmation])
   }
   for (const release of ['8.2.7', '9.2.1']) {
     version = release
     const reset = () => { pending = initial(); changes = null; mode = 'success'; dispatched = false }
+    await t.test(`${release} native scalar strings normalize in private reads and mutation verification`, async () => {
+      reset()
+      const native = { mtu: '1500', netmask6: '64', 'vlan-id': '20', 'vxlan-id': '100', 'bridge-access': '20', ovs_tag: '30',
+        'bridge-learning': 'on', 'bridge-arp-nd-suppress': 'off', 'bridge-unicast-flood': '1', 'bridge-multicast-flood': '0' }
+      const expected = { mtu: 1500, netmask6: 64, 'vlan-id': 20, 'vxlan-id': 100, 'bridge-access': 20, ovs_tag: 30,
+        'bridge-learning': 1, 'bridge-arp-nd-suppress': 0, 'bridge-unicast-flood': 1, 'bridge-multicast-flood': 0 }
+      Object.assign(pending[0]!, native)
+      const collection = await command('get', path, { node: target.node })
+      assert.equal(collection.code, 0, JSON.stringify(collection.value))
+      const detail = await command('get', item, { node: target.node, iface: 'eth0' })
+      assert.equal(detail.code, 0, JSON.stringify(detail.value))
+      for (const [name, value] of Object.entries(expected)) {
+        assert.equal(collection.payload.interfaces.find((row: Row) => row.iface === 'eth0')[name], value)
+        assert.equal(detail.payload[name], value)
+      }
+      assert.equal((await confirm('create', path, { ...target, mtu: 1500 })).value.status, 'success')
+    })
+    for (const [name, value] of [['mtu', '1500oops'], ['netmask6', '64.0'], ['vlan-id', ' 20'], ['vxlan-id', '1e2'],
+      ['bridge-access', '9007199254740992'], ['ovs_tag', ''], ['bridge-learning', 'true'], ['bridge-arp-nd-suppress', '2'],
+      ['bridge-unicast-flood', 'enabled'], ['bridge-multicast-flood', 'false']]) {
+      await t.test(`${release} malformed native ${name} is refused at every network boundary`, async () => {
+        reset()
+        pending[0]![name!] = value
+        const count = writes.length
+        for (const [verb, route, api, flags] of [['get', path, { node: target.node }, []],
+          ['get', item, { node: target.node, iface: 'eth0' }, []], ['create', path, target, ['--preview']]] as const) {
+          assert.equal((await command(verb, route, api, [...flags])).value.error.code, 'INVALID_RESPONSE')
+        }
+        assert.equal(writes.length, count)
+      })
+    }
+    for (const suffix of ['', '6']) for (const [name, value] of [['options', [`post-up ${canary}`]],
+      ['gateway', suffix ? '2001:db8::1' : '192.0.2.1'], ['broadcast', suffix ? '2001:db8::ffff' : '192.0.2.255']] as const) {
+      await t.test(`${release} refuses losing manual IPv${suffix ? '6' : '4'} ${name} during an unrelated update`, async () => {
+        reset()
+        pending.push({ ...target, type: 'bridge', method: suffix ? 'static' : 'manual', method6: suffix ? 'manual' : 'static',
+          [suffix ? 'cidr' : 'cidr6']: suffix ? '198.51.100.10/24' : '2001:db8::10/64', [`${name}${suffix}`]: value })
+        const count = writes.length
+        assert.equal((await command('set', item, { ...target, mtu: 1500 }, ['--preview'])).value.error.code, 'INVALID_INPUT')
+        assert.equal(writes.length, count)
+      })
+    }
+    await t.test(`${release} retains settings in both static families and the default manual IPv4 family`, async () => {
+      reset()
+      const settings = { options: [`post-up ${canary}`], options6: [`post-up ${canary}`], gateway: '198.51.100.1',
+        gateway6: '2001:db8::1', broadcast: '198.51.100.255', broadcast6: '2001:db8::ffff' }
+      pending.push({ ...target, type: 'bridge', method: 'static', method6: 'static', cidr: '198.51.100.10/24', cidr6: '2001:db8::10/64', ...settings })
+      assert.equal((await confirm('set', item, { ...target, mtu: 1500 })).value.status, 'success')
+      const detail = await command('get', item, target)
+      for (const [name, value] of Object.entries(settings)) assert.deepEqual(detail.payload[name], value)
+      pending = pending.filter(row => row.iface !== target.iface)
+      pending.push({ ...target, type: 'bridge', method: 'manual', options: settings.options })
+      assert.equal((await confirm('set', item, { ...target, mtu: 1500 })).value.status, 'success')
+      assert.deepEqual((await command('get', item, target)).payload.options, settings.options)
+    })
     await t.test(`${release} bridge CRUD changes pending configuration without applying it`, async () => {
       reset()
       assert.equal((await confirm('create', path, { ...target, bridge_ports: 'eth2 eth2', autostart: true, cidr: '198.51.100.10/24', cidr6: '2001:db8::10/64' })).value.status, 'success')
@@ -120,7 +179,6 @@ test('pending Linux bridges retain private diffs, management warnings and exact 
       assert.equal(detail.payload.mtu, 1500)
       assert.equal((await confirm('delete', item, target)).value.status, 'success')
       assert.equal((await command('get', path, { node: target.node })).payload.interfaces.some((row: Row) => row.iface === target.iface), false)
-      assert.deepEqual(active, initial())
     })
     await t.test(`${release} indirect addressed bond/VLAN dependencies remain explicitly uncertain`, async () => {
       reset()
@@ -150,7 +208,6 @@ test('pending Linux bridges retain private diffs, management warnings and exact 
       assert.equal(result.value.error.code, failure === 'reject' ? 'HTTP_ERROR' : 'WRITE_UNCERTAIN')
       assert.equal(writes.length, count + 1)
       assert.equal(pending.some(row => row.iface === target.iface), failure !== 'reject')
-      assert.deepEqual(active, initial())
     })
     await t.test(`${release} private reads and previews require a sink before provider access`, async () => {
       reset()
