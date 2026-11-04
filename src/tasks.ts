@@ -115,7 +115,7 @@ export async function journalOperation(credentials: Credentials, command: string
           const path = [...parent, index]
           const taskUnavailable = child.upid && unavailable.has(child.upid)
           if (child.check && Object.keys(child.check.expected).length) {
-            const value = await observeCheck(credentials, child.check, journal)
+            const value = await observeCheck(credentials, child.check, journal, child.reconciliation?.path)
             observations.push({ path, value: { ...value, ...(taskUnavailable ? { task: inconclusive() } : {}) } })
           } else if (taskUnavailable) observations.push({ path, value: inconclusive() })
           await observe(child.children, path)
@@ -134,7 +134,7 @@ export async function journalOperation(credentials: Credentials, command: string
       })
       return journalOperation(credentials, 'show', id)
     }
-    const observation = record.check && Object.keys(record.check.expected).length ? await observeCheck(credentials, record.check, journal) :
+    const observation = record.check && Object.keys(record.check.expected).length ? await observeCheck(credentials, record.check, journal, record.reconciliation?.path) :
       { at: Date.now(), result: 'no-safe-automated-reconciliation; retain current outcome' }
     Object.assign(record, await journal.update(id, current => {
       current.observation = { ...observation, ...(taskUnavailable ? { task: inconclusive() } : {}) }
@@ -153,13 +153,19 @@ async function reconcileTask(credentials: Credentials, record: JournalRecord, up
   }
 }
 
-async function observeCheck(credentials: Credentials, check: NonNullable<JournalRecord['check']>, journal: Awaited<ReturnType<typeof openJournal>>) {
+async function observeCheck(credentials: Credentials, check: NonNullable<JournalRecord['check']>, journal: Awaited<ReturnType<typeof openJournal>>, path?: string) {
   let data: unknown
   try { data = await executeRead(credentials, check.path) }
   catch { return inconclusive() }
+  const properties = path && /^\/nodes\/\{node\}\/(?:qemu|lxc)\/\{vmid\}\/config$/.test(path) ?
+    selectContract('GET', path, 'published-current').returns.properties : undefined
   const matched = !!data && typeof data === 'object' && Object.entries(check.expected).every(([name, digest]) => {
     if (!Object.hasOwn(data, name)) return false
-    const value = (data as Record<string, unknown>)[name]
+    let value = (data as Record<string, unknown>)[name]
+    const schema = properties?.[name]
+    if (typeof value === 'string' && (schema?.type === 'number' || schema?.type === 'integer')) {
+      try { value = validateResponse(value, schema) } catch { return false }
+    }
     const normalized = check.booleans?.includes(name) && (value === 0 || value === 1) ? value === 1 : reconciliationValue(name, value)
     return journal.fingerprint(normalized) === digest
   })

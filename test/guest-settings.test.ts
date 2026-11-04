@@ -208,6 +208,25 @@ test('guest settings use private reads and confirmed configuration writes', asyn
       assert.doesNotMatch(observed.stdout + observed.stderr, /CANARY-private-guest-credential/)
     })
   }
+  for (const contract of releases) for (const { family, initial } of guests) {
+    await t.test(`${contract.release} ${family} reconciles a string cpulimit`, async () => {
+      version = contract.version
+      state[family] = { ...initial }
+      const args = ['set', configPath(family), ...target, '--api-cpulimit', '1']
+      const preview = await command([...args, '--preview'])
+      assert.equal(preview.code, 0, preview.stdout + preview.stderr)
+      const written = await command([...args, '--confirm', JSON.parse(preview.stdout).confirmation])
+      assert.equal(written.code, 0, written.stdout + written.stderr)
+      state[family]!.cpulimit = '1'
+      const reconciled = await command(['journal', 'reconcile', JSON.parse(written.stdout).id])
+      assert.equal(reconciled.code, 0, reconciled.stdout + reconciled.stderr)
+      assert.equal(JSON.parse(reconciled.stdout).journal.observation.desiredStateObserved, true)
+      state[family]!.cpulimit = '2'
+      const mismatch = await command(['journal', 'reconcile', JSON.parse(written.stdout).id])
+      assert.equal(mismatch.code, 0, mismatch.stdout + mismatch.stderr)
+      assert.equal(JSON.parse(mismatch.stdout).journal.observation.desiredStateObserved, false)
+    })
+  }
   const refusals: [string, string, string, string, number][] = [
     ['qemu', 'cpu', 'host', 'INVALID_INPUT', 2], ['qemu', 'cpu', 'qemu64,flags=+aes', 'INVALID_INPUT', 2],
     ['qemu', 'memory', '15', 'INVALID_INPUT', 2], ['lxc', 'memory', '15', 'INVALID_INPUT', 2],
