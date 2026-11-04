@@ -3,7 +3,7 @@ import type { Readable } from 'node:stream'
 
 // Diagnostics deliberately exclude argv, environment, output and private payloads.
 export function observePackaged<Frame>(child: ChildProcess, options: {
-  caseId: string, session?: boolean, privateFrames?: boolean, responseMs?: number, watchdogMs?: number,
+  caseId: string, session?: boolean, privateFrames?: boolean,
 }) {
   let caseId = options.caseId, state = 'running', stdout = '', stderr = '', pending = ''
   let privateBytes = Buffer.alloc(0)
@@ -28,7 +28,7 @@ export function observePackaged<Frame>(child: ChildProcess, options: {
           const reader = { resolve, reject, timer: setTimeout(() => {
             readers.splice(readers.indexOf(reader), 1)
             reject(diagnostic(channel, 'response deadline exceeded'))
-          }, options.responseMs ?? 10_000) }
+          }, 10_000) }
           readers.push(reader)
         })
       },
@@ -41,7 +41,7 @@ export function observePackaged<Frame>(child: ChildProcess, options: {
     fail('command watchdog exceeded')
     child.kill('SIGKILL')
   }
-  let timer = setTimeout(watchdog, options.watchdogMs ?? 60_000)
+  let timer = setTimeout(watchdog, 60_000)
   child.stdout!.on('data', (chunk: Buffer) => {
     stdout += chunk.toString()
     if (!options.session) return
@@ -89,6 +89,6 @@ export function observePackaged<Frame>(child: ChildProcess, options: {
   return { child, lines, frames, closed, begin(id: string) {
     caseId = id
     clearTimeout(timer)
-    timer = setTimeout(watchdog, options.watchdogMs ?? 60_000)
+    timer = setTimeout(watchdog, 60_000)
   } }
 }
