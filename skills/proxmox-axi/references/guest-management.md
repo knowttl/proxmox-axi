@@ -55,6 +55,7 @@ These payloads can contain credentials.
 Launch the CLI executable directly from the caller that owns that pipe.
 Terminals, regular files, stdout and stderr are refused, and a missing private pipe fails before provider access.
 For standalone reads, stdout contains `data: { "privateResult": true }`; the complete validated payload travels privately, is not trimmed by table display flags, and creates no journal.
+QEMU and LXC `/pending` entries accept strings, finite numbers or booleans in `value` and `pending`, plus null where optional; objects and arrays are rejected.
 Each frame is a four-byte unsigned big-endian byte length followed by at most 65536 bytes of UTF-8 JSON containing `version: 1`, `binding` and `payload`.
 Validate the frame version and expected origin, identity, operation, request, actor and credential-revision bindings before consuming it.
 Standalone guest-read request bindings hash `<selected catalogue> <encoded request path including query>` with SHA-256; hosted callers use the authenticated request ID supplied by the host.

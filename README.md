@@ -448,7 +448,8 @@ Only reviewed managed backup sources are admitted; force overwrite, raw host pat
 
 ## Safety
 
-- Ordinary JSON reads use trusted HTTPS, a five-second total deadline and a 64 KiB response bound, and reject redirects.
+- Ordinary JSON reads use trusted HTTPS, a five-second total deadline and a 64 KiB response bound, except appliance catalogue reads (`GET /nodes/{node}/aplinfo`), which allow 256 KiB.
+  Redirects are rejected.
   Managed transfers have separate administrator-controlled byte and elapsed limits.
 - Operations whose effects, transport or secret handling are not reviewed remain discoverable but uncallable.
   Unresolved policy fields deny invocation, and changing a capture never admits new operations automatically.
@@ -558,11 +559,15 @@ No insecure-TLS flag or automatic trust update exists.
 ## Output and exit codes
 
 - TOON is the default, and `--format json` preserves the same structured result.
+- Read responses normalize decimal strings to numbers where the selected schema declares an integer or number; integer values must remain safe integers and numbers must be finite.
+  Numeric strings with whitespace or exponent notation are rejected.
+  Schema-optional response fields may be absent or null; required fields still follow their declared types.
 - Lists default to 100 compact rows.
   `--limit <1-1000>` changes the display limit, `--fields` chooses fields, and `--full` includes all received rows and, unless `--fields` is supplied, all fields retained after safety filtering.
   Protected configuration and pending-setting reads follow the [private result contract](docs/s4-contract.md) instead of list display formatting.
   See [Infrastructure discovery across profiles](#infrastructure-discovery-across-profiles) for storage index filtering.
-  Unknown `--fields` names return `INVALID_INPUT` with available names from the selected policy's `outputFields` when defined, otherwise from the response schema.
+  `--fields` also selects fields from ordinary object reads, after safety filtering, and takes precedence over `--full`.
+  Unknown `--fields` names return `INVALID_INPUT` with available names from the selected policy's `outputFields` when defined, otherwise from the response schema, or a hint that the response has no selectable fields.
   Except for `/version`, automatic reads validate field names after target catalogue detection; an explicit `--catalogue` validates them before network access.
 - Provider totals and pagination remain separate from received counts and display truncation.
   An empty received page with a positive `providerTotal` reports `empty: empty-page`, regardless of visibility.
