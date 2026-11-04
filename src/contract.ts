@@ -183,19 +183,26 @@ export function validateOperationResponse(value: unknown, contract: Contract): v
   validateResponse(value, contract.returns)
 }
 
-export function validateResponse(value: unknown, schema: VendorSchema): void {
+export function validateResponse(value: unknown, schema: VendorSchema): unknown {
   const fail = () => new Failure('INVALID_RESPONSE', 'Response does not match the selected vendor shape.', 'Check the selected catalogue and server response.')
+  if (value === null && schema.optional) return value
+  if ((schema.type === 'integer' || schema.type === 'number') && typeof value === 'string' && /^-?(?:0|[1-9][0-9]*)(?:\.[0-9]+)?$/.test(value)) value = Number(value)
   if (schema.type === 'array') {
     if (!Array.isArray(value)) throw fail()
-    if (schema.items) for (const item of value) validateResponse(item, schema.items)
+    if (schema.items) for (let i = 0; i < value.length; i++) value[i] = validateResponse(value[i], schema.items)
   } else if (schema.type === 'object' || schema.properties) {
     if (!value || typeof value !== 'object' || Array.isArray(value)) throw fail()
     for (const [name, constraint] of Object.entries(schema.properties ?? {})) {
       if (!Object.hasOwn(value, name)) { if (!constraint.optional) throw fail(); continue }
-      validateResponse((value as Record<string, unknown>)[name], constraint)
+      const row = value as Record<string, unknown>
+      row[name] = validateResponse(row[name], constraint)
     }
   } else if (schema.type === 'integer') {
     if (!Number.isSafeInteger(value)) throw fail()
+  } else if (schema.type === 'number') {
+    if (typeof value !== 'number' || !Number.isFinite(value)) throw fail()
+  } else if (schema.type === 'scalar') {
+    if (typeof value !== 'string' && typeof value !== 'boolean' && (typeof value !== 'number' || !Number.isFinite(value))) throw fail()
   } else if (schema.type === 'null') {
     if (value !== null) throw fail()
   } else if (schema.type === 'boolean') {
@@ -203,4 +210,5 @@ export function validateResponse(value: unknown, schema: VendorSchema): void {
     if (typeof value !== 'boolean' && value !== 0 && value !== 1) throw fail()
   } else if (schema.type && schema.type !== 'any' && typeof value !== schema.type) throw fail()
   if (schema.enum && !schema.enum.includes(value)) throw fail()
+  return value
 }

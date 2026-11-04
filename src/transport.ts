@@ -45,7 +45,7 @@ export async function executeRead(credentials: Credentials, wirePath: string, en
 
 // Mutation callers must durably record intent and consume confirmation before calling.
 export async function executeRequest(credentials: Credentials, wirePath: string, options: {
-  method: string, envelope?: boolean, body?: string, deadlineMs?: number, unauthenticated?: boolean
+  method: string, envelope?: boolean, body?: string, deadlineMs?: number, unauthenticated?: boolean, maxResponseBytes?: number
 }): Promise<unknown> {
   if (!options.unauthenticated && credentials.auth === 'password') throw new Failure('AUTH_REQUIRED', 'A completed user session is required.', 'Use explicit authentication acquisition before provider operations.')
   if (!wirePath.startsWith('/api2/json/') || wirePath.includes('#')) throw new Failure('INVALID_INPUT', 'Invalid API path.', 'Select a reviewed API operation.', 2)
@@ -84,7 +84,8 @@ export async function executeRequest(credentials: Credentials, wirePath: string,
       const chunks: Buffer[] = []
       response.on('data', (chunk: Buffer) => {
         bytes += chunk.length
-        if (bytes > 65_536) req!.destroy(new Failure('OUTPUT_LIMIT', 'Response exceeds 65536 bytes.', 'Check the server response contract.'))
+        const limit = options.maxResponseBytes ?? 65_536
+        if (bytes > limit) req!.destroy(new Failure('OUTPUT_LIMIT', `Response exceeds ${limit} bytes.`, 'Check the server response contract.'))
         else chunks.push(chunk)
       })
       response.on('end', () => resolve(Buffer.concat(chunks).toString('utf8')))

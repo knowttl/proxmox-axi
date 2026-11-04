@@ -173,7 +173,7 @@ test('infrastructure discovery through named profiles', async t => {
   const routes = [
     { path: '/cluster/status', api: [], wire: '/api2/json/cluster/status', invalid: {},
       expected: (name: string) => [{ id: 'cluster', name, type: 'cluster', quorate: 1 }, { id: 'node/node-a', name: 'node-a', type: 'node', online: 1 }] },
-    { path: '/cluster/nextid', api: ['--api-vmid', '123'], wire: '/api2/json/cluster/nextid?vmid=123', invalid: '123', expected: () => 123 },
+    { path: '/cluster/nextid', api: ['--api-vmid', '123'], wire: '/api2/json/cluster/nextid?vmid=123', invalid: '123x', expected: () => 123 },
     { path: '/nodes/{node}/status', api: ['--api-node', 'node-a'], wire: '/api2/json/nodes/node-a/status', invalid: { ...nodeStatus, memory: null }, expected: () => nodeStatus },
     { path: '/storage', api: [], wire: '/api2/json/storage', invalid: [{}], expected: (name: string) => [{ storage: `${name}-store` }] },
     { path: '/nodes/{node}/storage/{storage}/status', api: ['--api-node', 'node-a', '--api-storage', 'local'],

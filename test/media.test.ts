@@ -61,7 +61,7 @@ test('media discovery and confirmed installation through the CLI', async t => {
         type: 'download', user: 'synthetic@pve', status: 'stopped', exitstatus: current.failed ? 'ERROR: storage unavailable' : 'OK' } })); return
     }
     let data: unknown
-    if (url.pathname.endsWith('/aplinfo')) data = [{ template: mode === 'malformed' ? {} : template, package: 'base', version: '1', type: 'lxc', os: 'base', location: hidden, source: hidden, description: hidden }]
+    if (url.pathname.endsWith('/aplinfo')) data = [{ template: mode === 'malformed' ? {} : template, package: 'base', version: '1', type: 'lxc', os: 'base', location: hidden, source: hidden, description: mode === 'large' ? 'x'.repeat(95_000) : mode === 'oversize' ? 'x'.repeat(263_000) : hidden }]
     else if (url.pathname.endsWith('/content')) data = url.searchParams.get('content') === 'iso' ? volumes.filter(row => row.format === 'iso') : volumes
     else if (url.pathname.includes('/content/')) data = { format: 'iso', size: 4096, used: 2048, path: hidden, notes: hidden, extra: hidden }
     else { response.writeHead(404).end(); return }
@@ -102,6 +102,8 @@ test('media discovery and confirmed installation through the CLI', async t => {
       const detail = await command(['get', `${contentPath}/{volume}`, ...storage, '--api-volume', 'local:iso/installer.iso', '--full'])
       assert.equal(detail.code, 0, JSON.stringify(detail.data))
       assert.deepEqual(detail.data.data, { format: 'iso', size: 4096, used: 2048 })
+      const selected = await command(['get', `${contentPath}/{volume}`, ...storage, '--api-volume', 'local:iso/installer.iso', '--fields', 'size'])
+      assert.deepEqual(selected.data.data, { size: 4096 })
     })
     for (const kind of ['catalogue', 'iso', 'vztmpl']) await t.test(`${release.name} confirms ${kind} installation and waits before storage inspection`, async () => {
       mode = 'success'
@@ -150,6 +152,13 @@ test('media discovery and confirmed installation through the CLI', async t => {
     const result = await command(['get', cataloguePath, ...node])
     assert.equal(result.code, 1)
     assert.equal(result.data.error.code, 'INVALID_RESPONSE')
+    mode = 'success'
+  })
+  await t.test('catalogue permits a large response but retains a hard bound', async () => {
+    mode = 'large'
+    assert.equal((await command(['get', cataloguePath, ...node, '--limit', '3'])).code, 0)
+    mode = 'oversize'
+    assert.equal((await command(['get', cataloguePath, ...node])).data.error.code, 'OUTPUT_LIMIT')
     mode = 'success'
   })
   for (const { args, transfer } of [
