@@ -3,6 +3,7 @@ import { buildPath, contracts, selectContract, validateResponse, type Contract }
 import { executeRead, executeRequest, readVersion } from './transport.js'
 import { Failure } from './errors.js'
 import { resultBinding } from './private-results.js'
+import { networkObservation } from './node-network.js'
 
 export function capability(version: string) {
   const major = Number(/^(\d+)\./.exec(version)?.[1])
@@ -30,6 +31,9 @@ export function validateFields(contract: Contract, fields?: string[]): void {
 export async function readOperation(credentials: Credentials, initial: Contract, values: Record<string, unknown>, explicitCatalogue?: string, fields?: string[]) {
   if (initial.policy.transport !== 'json') throw new Failure('INVALID_INPUT', 'This operation requires managed transport.', 'Use proxmox-axi transfer --help.', 2)
   if (initial.policy.effect !== 'read') throw new Failure('WRITE_DISABLED', 'Operation requires the write execution policy.', 'Use create, set or delete with a preview and exact confirmation.')
+  if (initial.policy.allowedInputs && Object.keys(values).some(name => !initial.policy.allowedInputs!.includes(name))) {
+    throw new Failure('CONTRACT_UNRESOLVED', 'Supplied read parameter branch has not been admitted.', 'Inspect the invocation schema and use reviewed inputs only.')
+  }
   // Validate before any version or permission request.
   buildPath(initial, values)
   const privateResult = initial.policy.secrets === 'private-result'
@@ -56,7 +60,7 @@ export async function readOperation(credentials: Credentials, initial: Contract,
       visibility = inventoryVisibility(selected.path, permissions)
     }
   }
-  let envelope: { data: unknown, total?: number }
+  let envelope: { data: unknown, total?: number, changes?: unknown }
   try {
     envelope = await executeRequest(credentials, buildPath(selected, values), { method: selected.method, envelope: true }) as typeof envelope
   } catch (error) {
@@ -83,6 +87,7 @@ export async function readOperation(credentials: Credentials, initial: Contract,
     envelope.data = Array.isArray(envelope.data) ? envelope.data.map(project) : project(envelope.data)
   }
   if (privateResult) {
+    if (selected.path === '/nodes/{node}/network') envelope.data = networkObservation(envelope, selected.release)
     await credentials.results.deliver(resultBinding(credentials.origin, credentials.tokenId, selected.id,
       `${selected.release} ${buildPath(selected, values)}`), envelope.data)
     envelope.data = { privateResult: true }

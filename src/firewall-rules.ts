@@ -33,7 +33,7 @@ function canonical(value: unknown): string {
 
 // Attach the verified native digest to position-based request values.
 export async function prepareRules(credentials: Credentials, contract: Contract, values: Record<string, unknown>): Promise<RulesPlan | undefined> {
-  if (!contract.policy.stateBinding) return
+  if (contract.policy.stateBinding?.kind !== 'firewall-rules') return
   const path = contract.policy.stateBinding.path, before = await readRules(credentials, path, values, contract.release)
   const guest = /^\/nodes\/\{node\}\/(qemu|lxc)\/\{vmid\}\/firewall\/rules$/.test(path)
   const existingReference = (rule: Rule) => guest && rule.type === 'group' && typeof rule.action === 'string' && /^[A-Za-z][A-Za-z0-9_-]{1,19}$(?![\s\S])/.test(rule.action)

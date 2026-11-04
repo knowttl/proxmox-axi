@@ -19,6 +19,20 @@ const pool = new Set(['create_pool', 'update_pool', 'delete_pool'])
 export function reviewWrite(operation: Operation) {
   const { path, method } = operation
   const name = operation.vendorMetadata.name
+  if (operation.allowtoken !== 0 && ((method === 'POST' && path === '/nodes/{node}/network' && name === 'create_network') ||
+    (path === '/nodes/{node}/network/{iface}' && ((method === 'PUT' && name === 'update_network') || (method === 'DELETE' && name === 'delete_network'))))) {
+    return { effect: 'write', transport: 'json', secrets: 'private-result', stateBinding: { kind: 'node-network', path: '/nodes/{node}/network' },
+      allowedInputs: ['node', 'iface', ...(method !== 'DELETE' ? ['type', 'autostart', 'bridge_ports', 'mtu', 'cidr', 'cidr6', 'gateway', 'gateway6'] : [])],
+      ...(method !== 'DELETE' ? { fixedInputs: { type: 'bridge' } } : {}),
+      inputFormats: { iface: 'pve-node-bridge', bridge_ports: 'pve-node-ports', cidr: 'pve-firewall-address', cidr6: 'pve-firewall-address', gateway: 'pve-firewall-address', gateway6: 'pve-firewall-address' },
+      ...(method !== 'DELETE' ? { inputPatterns: { cidr: '^[^:]+/[1-9][0-9]*$(?![\\s\\S])', cidr6: '^[^/]*:[^/]*/[1-9][0-9]*$(?![\\s\\S])', gateway: '^[^:/]+$(?![\\s\\S])', gateway6: '^[^/]*:[^/]*$(?![\\s\\S])' } } : {}),
+      confirmationWarnings: [{ message: 'MANAGEMENT ACCESS AT RISK: this pending change can cut host access when applied or on reboot. Classification is UNKNOWN: active addresses, hidden interfaces and external configuration are unverified. Inspect the private affected/addressed bridge, bond and VLAN dependencies before explicitly confirming.' },
+        { message: 'PENDING ONLY, NON-ATOMIC: no native digest guards dispatch. Confirm the private pending diff and proposed configuration; application/revert are separate refused operations. Unexpected observations remain uncertain without retry or automatic recovery.' },
+        ...(method === 'DELETE' ? [{ message: 'BRIDGE DELETION: explicitly confirm removal of this pending bridge configuration and inspect its consumers.' }] : [])],
+      reason: 'Confirmed pending Linux bridge CRUD only, with private native diff and state binding. Physical/OVS/VLAN/bond mutations, custom options, setting deletion and apply/revert remain refused.',
+      reconciliation: { kind: 'none', reason: 'Inspect pending configuration privately without retry or automatic apply/revert; runtime reachability and active addresses are unverified.' },
+      privileges: operation.permissions, response: operation.returns, source: 'Pinned Network.pm shadow-file CRUD and common INotify/Interfaces serialization; no native optimistic digest.' }
+  }
   if (operation.allowtoken !== 0 && ((method === 'POST' && path === '/cluster/firewall/groups' && name === 'create_security_group') ||
     (method === 'DELETE' && path === '/cluster/firewall/groups/{group}' && name === 'delete_security_group'))) {
     return { effect: 'write', transport: 'json', secrets: 'private-result', allowedInputs: ['group', ...(method === 'POST' ? ['comment'] : [])],

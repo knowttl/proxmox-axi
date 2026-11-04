@@ -3090,23 +3090,111 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "private-result",
+            "stateBinding": {
+              "kind": "node-network",
+              "path": "/nodes/{node}/network"
+            },
+            "allowedInputs": [
+              "node",
+              "iface"
+            ],
+            "inputFormats": {
+              "iface": "pve-node-bridge",
+              "bridge_ports": "pve-node-ports",
+              "cidr": "pve-firewall-address",
+              "cidr6": "pve-firewall-address",
+              "gateway": "pve-firewall-address",
+              "gateway6": "pve-firewall-address"
+            },
+            "confirmationWarnings": [
+              {
+                "message": "MANAGEMENT ACCESS AT RISK: this pending change can cut host access when applied or on reboot. Classification is UNKNOWN: active addresses, hidden interfaces and external configuration are unverified. Inspect the private affected/addressed bridge, bond and VLAN dependencies before explicitly confirming."
+              },
+              {
+                "message": "PENDING ONLY, NON-ATOMIC: no native digest guards dispatch. Confirm the private pending diff and proposed configuration; application/revert are separate refused operations. Unexpected observations remain uncertain without retry or automatic recovery."
+              },
+              {
+                "message": "BRIDGE DELETION: explicitly confirm removal of this pending bridge configuration and inspect its consumers."
+              }
+            ],
+            "reason": "Confirmed pending Linux bridge CRUD only, with private native diff and state binding. Physical/OVS/VLAN/bond mutations, custom options, setting deletion and apply/revert remain refused.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Inspect pending configuration privately without retry or automatic apply/revert; runtime reachability and active addresses are unverified."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/nodes/{node}",
+                [
+                  "Sys.Modify"
+                ]
+              ]
+            },
+            "response": {
+              "type": "null"
+            },
+            "source": "Pinned Network.pm shadow-file CRUD and common INotify/Interfaces serialization; no native optimistic digest."
           },
           "contract": "dist/contracts.json#/contracts/420"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "private-result",
+            "stateBinding": {
+              "kind": "node-network",
+              "path": "/nodes/{node}/network"
+            },
+            "allowedInputs": [
+              "node",
+              "iface"
+            ],
+            "inputFormats": {
+              "iface": "pve-node-bridge",
+              "bridge_ports": "pve-node-ports",
+              "cidr": "pve-firewall-address",
+              "cidr6": "pve-firewall-address",
+              "gateway": "pve-firewall-address",
+              "gateway6": "pve-firewall-address"
+            },
+            "confirmationWarnings": [
+              {
+                "message": "MANAGEMENT ACCESS AT RISK: this pending change can cut host access when applied or on reboot. Classification is UNKNOWN: active addresses, hidden interfaces and external configuration are unverified. Inspect the private affected/addressed bridge, bond and VLAN dependencies before explicitly confirming."
+              },
+              {
+                "message": "PENDING ONLY, NON-ATOMIC: no native digest guards dispatch. Confirm the private pending diff and proposed configuration; application/revert are separate refused operations. Unexpected observations remain uncertain without retry or automatic recovery."
+              },
+              {
+                "message": "BRIDGE DELETION: explicitly confirm removal of this pending bridge configuration and inspect its consumers."
+              }
+            ],
+            "reason": "Confirmed pending Linux bridge CRUD only, with private native diff and state binding. Physical/OVS/VLAN/bond mutations, custom options, setting deletion and apply/revert remain refused.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Inspect pending configuration privately without retry or automatic apply/revert; runtime reachability and active addresses are unverified."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/nodes/{node}",
+                [
+                  "Sys.Modify"
+                ]
+              ]
+            },
+            "response": {
+              "type": "null"
+            },
+            "source": "Pinned Network.pm shadow-file CRUD and common INotify/Interfaces serialization; no native optimistic digest."
           },
           "contract": "dist/contracts.json#/contracts/1089"
         }
@@ -11778,23 +11866,29 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "read",
+            "transport": "json",
+            "secrets": "private-result",
+            "allowedInputs": [
+              "node"
+            ],
+            "reason": "Preferred pending/current interfaces and native pending envelope diff require private results; active address configuration and complete visibility remain unverified."
           },
           "contract": "dist/contracts.json#/contracts/417"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "read",
+            "transport": "json",
+            "secrets": "private-result",
+            "allowedInputs": [
+              "node"
+            ],
+            "reason": "Preferred pending/current interfaces and native pending envelope diff require private results; active address configuration and complete visibility remain unverified."
           },
           "contract": "dist/contracts.json#/contracts/1086"
         }
@@ -11811,23 +11905,29 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "read",
+            "transport": "json",
+            "secrets": "private-result",
+            "inputFormats": {
+              "iface": "pve-firewall-interface"
+            },
+            "reason": "Preferred interface configuration including comments and custom options requires private results; this is not an active address snapshot."
           },
           "contract": "dist/contracts.json#/contracts/421"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "read",
+            "transport": "json",
+            "secrets": "private-result",
+            "inputFormats": {
+              "iface": "pve-firewall-interface"
+            },
+            "reason": "Preferred interface configuration including comments and custom options requires private results; this is not an active address snapshot."
           },
           "contract": "dist/contracts.json#/contracts/1090"
         }
@@ -22320,23 +22420,139 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "private-result",
+            "stateBinding": {
+              "kind": "node-network",
+              "path": "/nodes/{node}/network"
+            },
+            "allowedInputs": [
+              "node",
+              "iface",
+              "type",
+              "autostart",
+              "bridge_ports",
+              "mtu",
+              "cidr",
+              "cidr6",
+              "gateway",
+              "gateway6"
+            ],
+            "fixedInputs": {
+              "type": "bridge"
+            },
+            "inputFormats": {
+              "iface": "pve-node-bridge",
+              "bridge_ports": "pve-node-ports",
+              "cidr": "pve-firewall-address",
+              "cidr6": "pve-firewall-address",
+              "gateway": "pve-firewall-address",
+              "gateway6": "pve-firewall-address"
+            },
+            "inputPatterns": {
+              "cidr": "^[^:]+/[1-9][0-9]*$(?![\\s\\S])",
+              "cidr6": "^[^/]*:[^/]*/[1-9][0-9]*$(?![\\s\\S])",
+              "gateway": "^[^:/]+$(?![\\s\\S])",
+              "gateway6": "^[^/]*:[^/]*$(?![\\s\\S])"
+            },
+            "confirmationWarnings": [
+              {
+                "message": "MANAGEMENT ACCESS AT RISK: this pending change can cut host access when applied or on reboot. Classification is UNKNOWN: active addresses, hidden interfaces and external configuration are unverified. Inspect the private affected/addressed bridge, bond and VLAN dependencies before explicitly confirming."
+              },
+              {
+                "message": "PENDING ONLY, NON-ATOMIC: no native digest guards dispatch. Confirm the private pending diff and proposed configuration; application/revert are separate refused operations. Unexpected observations remain uncertain without retry or automatic recovery."
+              }
+            ],
+            "reason": "Confirmed pending Linux bridge CRUD only, with private native diff and state binding. Physical/OVS/VLAN/bond mutations, custom options, setting deletion and apply/revert remain refused.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Inspect pending configuration privately without retry or automatic apply/revert; runtime reachability and active addresses are unverified."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/nodes/{node}",
+                [
+                  "Sys.Modify"
+                ]
+              ]
+            },
+            "response": {
+              "type": "null"
+            },
+            "source": "Pinned Network.pm shadow-file CRUD and common INotify/Interfaces serialization; no native optimistic digest."
           },
           "contract": "dist/contracts.json#/contracts/418"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "private-result",
+            "stateBinding": {
+              "kind": "node-network",
+              "path": "/nodes/{node}/network"
+            },
+            "allowedInputs": [
+              "node",
+              "iface",
+              "type",
+              "autostart",
+              "bridge_ports",
+              "mtu",
+              "cidr",
+              "cidr6",
+              "gateway",
+              "gateway6"
+            ],
+            "fixedInputs": {
+              "type": "bridge"
+            },
+            "inputFormats": {
+              "iface": "pve-node-bridge",
+              "bridge_ports": "pve-node-ports",
+              "cidr": "pve-firewall-address",
+              "cidr6": "pve-firewall-address",
+              "gateway": "pve-firewall-address",
+              "gateway6": "pve-firewall-address"
+            },
+            "inputPatterns": {
+              "cidr": "^[^:]+/[1-9][0-9]*$(?![\\s\\S])",
+              "cidr6": "^[^/]*:[^/]*/[1-9][0-9]*$(?![\\s\\S])",
+              "gateway": "^[^:/]+$(?![\\s\\S])",
+              "gateway6": "^[^/]*:[^/]*$(?![\\s\\S])"
+            },
+            "confirmationWarnings": [
+              {
+                "message": "MANAGEMENT ACCESS AT RISK: this pending change can cut host access when applied or on reboot. Classification is UNKNOWN: active addresses, hidden interfaces and external configuration are unverified. Inspect the private affected/addressed bridge, bond and VLAN dependencies before explicitly confirming."
+              },
+              {
+                "message": "PENDING ONLY, NON-ATOMIC: no native digest guards dispatch. Confirm the private pending diff and proposed configuration; application/revert are separate refused operations. Unexpected observations remain uncertain without retry or automatic recovery."
+              }
+            ],
+            "reason": "Confirmed pending Linux bridge CRUD only, with private native diff and state binding. Physical/OVS/VLAN/bond mutations, custom options, setting deletion and apply/revert remain refused.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Inspect pending configuration privately without retry or automatic apply/revert; runtime reachability and active addresses are unverified."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/nodes/{node}",
+                [
+                  "Sys.Modify"
+                ]
+              ]
+            },
+            "response": {
+              "type": "null"
+            },
+            "source": "Pinned Network.pm shadow-file CRUD and common INotify/Interfaces serialization; no native optimistic digest."
           },
           "contract": "dist/contracts.json#/contracts/1087"
         }
@@ -31654,23 +31870,139 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "private-result",
+            "stateBinding": {
+              "kind": "node-network",
+              "path": "/nodes/{node}/network"
+            },
+            "allowedInputs": [
+              "node",
+              "iface",
+              "type",
+              "autostart",
+              "bridge_ports",
+              "mtu",
+              "cidr",
+              "cidr6",
+              "gateway",
+              "gateway6"
+            ],
+            "fixedInputs": {
+              "type": "bridge"
+            },
+            "inputFormats": {
+              "iface": "pve-node-bridge",
+              "bridge_ports": "pve-node-ports",
+              "cidr": "pve-firewall-address",
+              "cidr6": "pve-firewall-address",
+              "gateway": "pve-firewall-address",
+              "gateway6": "pve-firewall-address"
+            },
+            "inputPatterns": {
+              "cidr": "^[^:]+/[1-9][0-9]*$(?![\\s\\S])",
+              "cidr6": "^[^/]*:[^/]*/[1-9][0-9]*$(?![\\s\\S])",
+              "gateway": "^[^:/]+$(?![\\s\\S])",
+              "gateway6": "^[^/]*:[^/]*$(?![\\s\\S])"
+            },
+            "confirmationWarnings": [
+              {
+                "message": "MANAGEMENT ACCESS AT RISK: this pending change can cut host access when applied or on reboot. Classification is UNKNOWN: active addresses, hidden interfaces and external configuration are unverified. Inspect the private affected/addressed bridge, bond and VLAN dependencies before explicitly confirming."
+              },
+              {
+                "message": "PENDING ONLY, NON-ATOMIC: no native digest guards dispatch. Confirm the private pending diff and proposed configuration; application/revert are separate refused operations. Unexpected observations remain uncertain without retry or automatic recovery."
+              }
+            ],
+            "reason": "Confirmed pending Linux bridge CRUD only, with private native diff and state binding. Physical/OVS/VLAN/bond mutations, custom options, setting deletion and apply/revert remain refused.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Inspect pending configuration privately without retry or automatic apply/revert; runtime reachability and active addresses are unverified."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/nodes/{node}",
+                [
+                  "Sys.Modify"
+                ]
+              ]
+            },
+            "response": {
+              "type": "null"
+            },
+            "source": "Pinned Network.pm shadow-file CRUD and common INotify/Interfaces serialization; no native optimistic digest."
           },
           "contract": "dist/contracts.json#/contracts/422"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "write",
+            "transport": "json",
+            "secrets": "private-result",
+            "stateBinding": {
+              "kind": "node-network",
+              "path": "/nodes/{node}/network"
+            },
+            "allowedInputs": [
+              "node",
+              "iface",
+              "type",
+              "autostart",
+              "bridge_ports",
+              "mtu",
+              "cidr",
+              "cidr6",
+              "gateway",
+              "gateway6"
+            ],
+            "fixedInputs": {
+              "type": "bridge"
+            },
+            "inputFormats": {
+              "iface": "pve-node-bridge",
+              "bridge_ports": "pve-node-ports",
+              "cidr": "pve-firewall-address",
+              "cidr6": "pve-firewall-address",
+              "gateway": "pve-firewall-address",
+              "gateway6": "pve-firewall-address"
+            },
+            "inputPatterns": {
+              "cidr": "^[^:]+/[1-9][0-9]*$(?![\\s\\S])",
+              "cidr6": "^[^/]*:[^/]*/[1-9][0-9]*$(?![\\s\\S])",
+              "gateway": "^[^:/]+$(?![\\s\\S])",
+              "gateway6": "^[^/]*:[^/]*$(?![\\s\\S])"
+            },
+            "confirmationWarnings": [
+              {
+                "message": "MANAGEMENT ACCESS AT RISK: this pending change can cut host access when applied or on reboot. Classification is UNKNOWN: active addresses, hidden interfaces and external configuration are unverified. Inspect the private affected/addressed bridge, bond and VLAN dependencies before explicitly confirming."
+              },
+              {
+                "message": "PENDING ONLY, NON-ATOMIC: no native digest guards dispatch. Confirm the private pending diff and proposed configuration; application/revert are separate refused operations. Unexpected observations remain uncertain without retry or automatic recovery."
+              }
+            ],
+            "reason": "Confirmed pending Linux bridge CRUD only, with private native diff and state binding. Physical/OVS/VLAN/bond mutations, custom options, setting deletion and apply/revert remain refused.",
+            "reconciliation": {
+              "kind": "none",
+              "reason": "Inspect pending configuration privately without retry or automatic apply/revert; runtime reachability and active addresses are unverified."
+            },
+            "privileges": {
+              "check": [
+                "perm",
+                "/nodes/{node}",
+                [
+                  "Sys.Modify"
+                ]
+              ]
+            },
+            "response": {
+              "type": "null"
+            },
+            "source": "Pinned Network.pm shadow-file CRUD and common INotify/Interfaces serialization; no native optimistic digest."
           },
           "contract": "dist/contracts.json#/contracts/1091"
         }

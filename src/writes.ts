@@ -7,6 +7,7 @@ import { Failure } from './errors.js'
 import { Journal, publicChildren, reconciliationValue, type JournalRecord } from './journal.js'
 import { resultBinding } from './private-results.js'
 import { prepareRules, verifyRules } from './firewall-rules.js'
+import { prepareNetwork, verifyNetwork } from './node-network.js'
 
 interface Invocation {
   contract: Contract
@@ -33,7 +34,7 @@ function checkPolicy(credentials: Credentials, contract: Contract): void {
 
 async function invocation(credentials: Credentials, contract: Contract, input: Record<string, unknown>, budget = { count: 0 }, depth = 0): Promise<Invocation> {
   checkPolicy(credentials, contract)
-  if (depth > 0 && contract.policy.stateBinding) throw new Failure('CONTRACT_UNRESOLVED', 'State-bound firewall rules cannot be changed in execute batches.', 'Preview and confirm each rule operation independently.')
+  if (depth > 0 && contract.policy.stateBinding) throw new Failure('CONTRACT_UNRESOLVED', 'State-bound operations cannot be changed in execute batches.', 'Preview and confirm each operation independently.')
   if (depth > 0 && contract.policy.transport !== 'json') throw new Failure('INVALID_INPUT', 'Batch children cannot open byte transports.', 'Execute each transfer separately through its managed channel.', 2)
   if (++budget.count > 64 || depth > 4) throw new Failure('INVALID_INPUT', 'Batch exceeds 64 total operations or four nesting levels.', 'Use a smaller reviewed batch.', 2)
   const values = { ...contract.policy.fixedInputs, ...input }
@@ -140,6 +141,11 @@ export async function writeOperation(credentials: Credentials, initial: Contract
   if (release !== initial.release) call = await invocation(credentials, selectContract(initial.method, initial.path, release), values)
   checkPaths(call, credentials.results)
   const rules = await prepareRules(credentials, call.contract, call.values)
+  const network = await prepareNetwork(credentials, call.contract, call.values)
+  if (network) {
+    call.wire = buildPath(call.contract, call.values)
+    call.revisions.push({ pendingNetwork: network.before })
+  }
   if (rules) {
     call.wire = buildPath(call.contract, call.values)
     call.revisions.push({ orderedRules: rules.before, ...(rules.referencedGroup ? { referencedGroup: rules.referencedGroup } : {}) })
@@ -156,6 +162,7 @@ export async function writeOperation(credentials: Credentials, initial: Contract
     if (check) record.check = check
     await journal.save(record)
     const warnings = confirmationWarnings(call)
+    if (network) await credentials.results.deliver(resultBinding(credentials.origin, credentials.tokenId, call.contract.id, fingerprint), network)
     if (rules) {
       await credentials.results.deliver(resultBinding(credentials.origin, credentials.tokenId, call.contract.id, fingerprint),
         { before: rules.before, after: rules.after, nonAtomicCreate: call.contract.method === 'POST', ...(rules.referencedGroup ? { referencedGroup: rules.referencedGroup } : {}) })
@@ -163,7 +170,7 @@ export async function writeOperation(credentials: Credentials, initial: Contract
     }
     return { status: 'preview', id, operation: record.operation, confirmation: `${id}.${fingerprint}`,
       expiresInSeconds: 300, reconciliation: record.reconciliation, children: publicChildren(record.children),
-      ...(rules ? { privatePlan: true } : {}), ...(warnings.length ? { warnings } : {}), ...(options.transport ? { transport: options.transport.binding } : {}) }
+      ...(rules || network ? { privatePlan: true } : {}), ...(warnings.length ? { warnings } : {}), ...(options.transport ? { transport: options.transport.binding } : {}) }
   }
   const [id, approval, extra] = (options.confirmation ?? '').split('.')
   if (!id || !approval || extra) throw new Failure('CONFIRMATION_REQUIRED', 'Execution requires an exact preview confirmation.', 'Run the same command with --preview first.')
@@ -197,6 +204,7 @@ export async function writeOperation(credentials: Credentials, initial: Contract
     if (privateResult(call)) registerResults(call, data, credentials.results)
     if (!options.transport || data !== null) validateOperationResponse(data, call.contract)
     if (rules) await verifyRules(credentials, call.contract, call.values, rules)
+    if (network) await verifyNetwork(credentials, call.contract, call.values, network)
     outcome = resultStatus(call, data, credentials.results)
     if (privateResult(call) && !options.transport) await credentials.results.deliver(resultBinding(credentials.origin, credentials.tokenId, call.contract.id, fingerprint), data)
   } catch (error) {
