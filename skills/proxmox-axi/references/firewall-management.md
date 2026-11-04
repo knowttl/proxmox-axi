@@ -96,7 +96,7 @@ Ports require tcp/udp; guest interfaces are net0 through net31.
 Source and destination addresses must use the same IP family, consistent with icmp (IPv4) or icmpv6 (IPv6) when selected.
 Field edits are refused if the resulting rule retains aliases/IP sets, macros, ICMP subtype selectors, service/range port selectors or unreviewed protocols.
 An inherited unsupported address may be replaced with a reviewed literal address when the resulting rule meets these restrictions.
-Comments, port lists/ranges, service names, group/forward mutations and field-removal selectors are not admitted here.
+Comments, port lists/ranges, service names, forward mutations and field-removal selectors remain refused; group operations follow [Security groups and guest references](#security-groups-and-guest-references).
 Every change requires exact confirmation; broad ACCEPT rules and deletion carry explicit warnings, including when enabling an existing staged rule.
 
 Reordering uses a separate `set .../{pos}` request with `--api-moveto '<boundary>'` and no rule-field edits.
@@ -151,8 +151,8 @@ On uncertainty, inspect the selected scope privately without retrying; no operat
 ## Security groups and guest references
 
 Discover definitions privately with `get '/cluster/firewall/groups'` and ordered contents with `get '/cluster/firewall/groups/{group}'`.
-Group names must be canonical lowercase, 2-18 characters, start with a lowercase letter and contain only lowercase letters, digits, underscores or hyphens.
-The provider lowercases definition names when loading configuration; uppercase definition identities, group-rule targets and guest group-reference actions are refused locally.
+Definition identities, group-rule targets and newly created or retargeted guest references must use canonical lowercase names, 2-18 characters, starting with a lowercase letter and containing only lowercase letters, digits, underscores or hyphens.
+The provider lowercases definition names when loading configuration; existing guest references retain their action spelling and have separate cleanup rules below.
 Ordinary packet actions remain uppercase `ACCEPT`, `DROP` and `REJECT`.
 Enable each exact mutation ID in the selected profile and independent host policy, and prepare the inherited private result pipe before reading plans or confirming writes.
 Optional definition-creation comments use the existing body-file SecretRef convention; literal comments are refused.
@@ -190,6 +190,8 @@ NON-ATOMIC GROUP REFERENCE means the client rechecks and binds the observed defi
 Unexpected definition drift during dispatch leaves the result uncertain, without automatic retry, rollback or detachment.
 Once attached, a reference follows later shared group changes; its definition is not frozen by confirmation.
 Disabling with only `--api-enable 0`, reordering or deleting a reference binds the guest list without requiring the shared definition, so orphaned references can be cleaned up.
+This cleanup accepts existing reference actions of 2-20 characters, starting with an ASCII letter and otherwise containing ASCII letters of either case, digits, underscores or hyphens, including mixed-case and 19/20-character actions that cannot be created or retargeted by this tool.
+One-character actions and actions longer than 20 characters remain refused for cleanup.
 Remove references and group rules through their own confirmed operations before `delete '/cluster/firewall/groups/{group}'`.
 The provider enforces empty-only group deletion under its lock, but empty does not mean unreferenced.
 If deletion reports uncertainty, inspect the journal and private group contents; never force deletion, detach references or recreate a group automatically.
