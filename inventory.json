@@ -11778,23 +11778,29 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "read",
+            "transport": "json",
+            "secrets": "private-result",
+            "allowedInputs": [
+              "node"
+            ],
+            "reason": "Preferred pending/current interfaces and native pending envelope diff require private results; active address configuration and complete visibility remain unverified."
           },
           "contract": "dist/contracts.json#/contracts/417"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "read",
+            "transport": "json",
+            "secrets": "private-result",
+            "allowedInputs": [
+              "node"
+            ],
+            "reason": "Preferred pending/current interfaces and native pending envelope diff require private results; active address configuration and complete visibility remain unverified."
           },
           "contract": "dist/contracts.json#/contracts/1086"
         }
@@ -11811,23 +11817,29 @@
       "variants": [
         {
           "release": "legacy-8.2.7",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "read",
+            "transport": "json",
+            "secrets": "private-result",
+            "inputFormats": {
+              "iface": "pve-firewall-interface"
+            },
+            "reason": "Preferred interface configuration including comments and custom options requires private results; this is not an active address snapshot."
           },
           "contract": "dist/contracts.json#/contracts/421"
         },
         {
           "release": "published-current",
-          "callable": false,
+          "callable": true,
           "policy": {
-            "effect": "unresolved",
-            "transport": "unresolved",
-            "secrets": "unresolved",
-            "reason": "Requires operation-specific effect, transport and secret review before admission."
+            "effect": "read",
+            "transport": "json",
+            "secrets": "private-result",
+            "inputFormats": {
+              "iface": "pve-firewall-interface"
+            },
+            "reason": "Preferred interface configuration including comments and custom options requires private results; this is not an active address snapshot."
           },
           "contract": "dist/contracts.json#/contracts/1090"
         }

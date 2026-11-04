@@ -3910,6 +3910,20 @@
       }
     },
     {
+      "command": "ls /nodes/{node}/network",
+      "effect": "read",
+      "privateResult": true,
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "session": "value",
+        "limit": "value",
+        "fields": "value",
+        "full": "boolean",
+        "api-node": "value"
+      }
+    },
+    {
       "command": "ls /nodes/{node}/qemu",
       "effect": "read",
       "flags": {
@@ -12403,6 +12417,51 @@
         "api-node": "value",
         "api-vmid": "value"
       },
+      "catalogues": [
+        "legacy-8.2.7",
+        "published-current"
+      ]
+    },
+    {
+      "command": "get /nodes/{node}/network",
+      "operationId": "OP-GET-2c4842c945",
+      "method": "GET",
+      "path": "/nodes/{node}/network",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value",
+        "limit": "value",
+        "fields": "value",
+        "full": "boolean",
+        "session": "value",
+        "api-node": "value"
+      },
+      "privateResult": true,
+      "catalogues": [
+        "legacy-8.2.7",
+        "published-current"
+      ]
+    },
+    {
+      "command": "get /nodes/{node}/network/{iface}",
+      "operationId": "OP-GET-ea527f61fd",
+      "method": "GET",
+      "path": "/nodes/{node}/network/{iface}",
+      "effect": "read",
+      "flags": {
+        "help": "boolean",
+        "format": "value",
+        "catalogue": "value",
+        "limit": "value",
+        "fields": "value",
+        "full": "boolean",
+        "session": "value",
+        "api-iface": "value",
+        "api-node": "value"
+      },
+      "privateResult": true,
       "catalogues": [
         "legacy-8.2.7",
         "published-current"

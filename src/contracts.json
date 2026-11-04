@@ -67447,12 +67447,15 @@
       "id": "OP-GET-2c4842c945",
       "release": "legacy-8.2.7",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "read",
+        "transport": "json",
+        "secrets": "private-result",
+        "allowedInputs": [
+          "node"
+        ],
+        "reason": "Preferred pending/current interfaces and native pending envelope diff require private results; active address configuration and complete visibility remain unverified."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "get",
         "/nodes/{node}/network"
@@ -67472,23 +67475,6 @@
                 "node": {
                   "type": "string",
                   "pattern": "^[A-Za-z0-9][A-Za-z0-9.-]*$"
-                },
-                "type": {
-                  "enum": [
-                    "bridge",
-                    "bond",
-                    "eth",
-                    "alias",
-                    "vlan",
-                    "OVSBridge",
-                    "OVSBond",
-                    "OVSPort",
-                    "OVSIntPort",
-                    "vnet",
-                    "any_bridge",
-                    "any_local_bridge"
-                  ],
-                  "type": "string"
                 }
               },
               "required": [
@@ -68220,12 +68206,15 @@
       "id": "OP-GET-ea527f61fd",
       "release": "legacy-8.2.7",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "read",
+        "transport": "json",
+        "secrets": "private-result",
+        "inputFormats": {
+          "iface": "pve-firewall-interface"
+        },
+        "reason": "Preferred interface configuration including comments and custom options requires private results; this is not an active address snapshot."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "get",
         "/nodes/{node}/network/{iface}"
@@ -68246,8 +68235,7 @@
                   "type": "string",
                   "minLength": 2,
                   "maxLength": 20,
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^[A-Za-z][A-Za-z0-9._-]{1,19}$"
                 },
                 "node": {
                   "type": "string",
@@ -193569,12 +193557,15 @@
       "id": "OP-GET-2c4842c945",
       "release": "published-current",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "read",
+        "transport": "json",
+        "secrets": "private-result",
+        "allowedInputs": [
+          "node"
+        ],
+        "reason": "Preferred pending/current interfaces and native pending envelope diff require private results; active address configuration and complete visibility remain unverified."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "get",
         "/nodes/{node}/network"
@@ -193594,25 +193585,6 @@
                 "node": {
                   "type": "string",
                   "pattern": "^[A-Za-z0-9][A-Za-z0-9.-]*$"
-                },
-                "type": {
-                  "enum": [
-                    "bridge",
-                    "bond",
-                    "eth",
-                    "alias",
-                    "vlan",
-                    "fabric",
-                    "OVSBridge",
-                    "OVSBond",
-                    "OVSPort",
-                    "OVSIntPort",
-                    "vnet",
-                    "any_bridge",
-                    "any_local_bridge",
-                    "include_sdn"
-                  ],
-                  "type": "string"
                 }
               },
               "required": [
@@ -194356,12 +194328,15 @@
       "id": "OP-GET-ea527f61fd",
       "release": "published-current",
       "policy": {
-        "effect": "unresolved",
-        "transport": "unresolved",
-        "secrets": "unresolved",
-        "reason": "Requires operation-specific effect, transport and secret review before admission."
+        "effect": "read",
+        "transport": "json",
+        "secrets": "private-result",
+        "inputFormats": {
+          "iface": "pve-firewall-interface"
+        },
+        "reason": "Preferred interface configuration including comments and custom options requires private results; this is not an active address snapshot."
       },
-      "callable": false,
+      "callable": true,
       "command": [
         "get",
         "/nodes/{node}/network/{iface}"
@@ -194382,8 +194357,7 @@
                   "type": "string",
                   "minLength": 2,
                   "maxLength": 20,
-                  "not": {},
-                  "x-untranslated": "vendor format or property string"
+                  "pattern": "^[A-Za-z][A-Za-z0-9._-]{1,19}$"
                 },
                 "node": {
                   "type": "string",

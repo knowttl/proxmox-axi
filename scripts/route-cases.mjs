@@ -35,7 +35,7 @@ export function* routeCases(catalogues, policy) {
       else values[name] = 'fixture'
     }
     const variants = [{ branch: 'required', values }]
-    if (callable) for (const [name, schema] of Object.entries(properties)) if (schema.optional) {
+    if (callable) for (const [name, schema] of Object.entries(properties)) if (schema.optional && (!review.allowedInputs || review.allowedInputs.includes(name))) {
       if (schema.enum) for (const value of schema.enum) variants.push({ branch: `${name}=${value}`, values: { ...values, [name]: value } })
       else if (schema.type === 'boolean') for (const value of [false, true]) variants.push({ branch: `${name}=${value}`, values: { ...values, [name]: value } })
       else if (schema.type === 'integer') variants.push({ branch: `${name}=minimum`, values: { ...values, [name]: schema.minimum ?? 1 } })

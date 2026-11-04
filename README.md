@@ -228,6 +228,17 @@ Follow the [security-group guide](skills/proxmox-axi/references/firewall-managem
 The pinned [group implementation](https://github.com/proxmox/pve-firewall/blob/82888bc0a16a989e2858f47dc56c73741fd36d5b/src/PVE/API2/Firewall/Groups.pm) handles definitions; the shared rule implementation enforces empty-only deletion and native position guards.
 Renames, nested groups, group-rule interfaces and cluster/node reference mutations remain refused.
 
+### Pending node network configuration
+
+This change provides private node-network inspection.
+Use `get '/nodes/{node}/network'` or `get '/nodes/{node}/network/{iface}'` with the selected profile and inherited private result pipe.
+Follow the [installed node-network guide](skills/proxmox-axi/references/node-network.md) for private pending diffs and observation limits.
+Network mutations are deferred until authoritative complete configuration observation and serialization-preservation safeguards can be established.
+Bridge/VLAN/bond create, update and delete, network apply/revert and OVS mutations remain refused, including through batches.
+The follow-up is [complete network observation and preservation design](https://github.com/knowttl/proxmox-axi/issues/71).
+Active interface flags do not establish active addresses; visibility and active configuration remain explicitly unverified.
+The pinned [network API](https://github.com/proxmox/pve-manager/blob/700a5e0cdc420a54da34eb4327ac49802a472e4f/PVE/API2/Network.pm) and [shadow-file implementation](https://github.com/proxmox/pve-common/blob/de518d407aa349bfe3ac925da2638263784e2096/src/PVE/INotify.pm) separate pending edits from application and expose no optimistic CRUD digest.
+
 ### Guest power control
 
 QEMU and LXC support guest `start`, `shutdown`, `stop`, `reboot`, `suspend` and `resume` through `create '/nodes/{node}/<qemu-or-lxc>/{vmid}/status/<action>'`.

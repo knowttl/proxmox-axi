@@ -33,7 +33,7 @@ function checkPolicy(credentials: Credentials, contract: Contract): void {
 
 async function invocation(credentials: Credentials, contract: Contract, input: Record<string, unknown>, budget = { count: 0 }, depth = 0): Promise<Invocation> {
   checkPolicy(credentials, contract)
-  if (depth > 0 && contract.policy.stateBinding) throw new Failure('CONTRACT_UNRESOLVED', 'State-bound firewall rules cannot be changed in execute batches.', 'Preview and confirm each rule operation independently.')
+  if (depth > 0 && contract.policy.stateBinding) throw new Failure('CONTRACT_UNRESOLVED', 'State-bound operations cannot be changed in execute batches.', 'Preview and confirm each operation independently.')
   if (depth > 0 && contract.policy.transport !== 'json') throw new Failure('INVALID_INPUT', 'Batch children cannot open byte transports.', 'Execute each transfer separately through its managed channel.', 2)
   if (++budget.count > 64 || depth > 4) throw new Failure('INVALID_INPUT', 'Batch exceeds 64 total operations or four nesting levels.', 'Use a smaller reviewed batch.', 2)
   const values = { ...contract.policy.fixedInputs, ...input }
