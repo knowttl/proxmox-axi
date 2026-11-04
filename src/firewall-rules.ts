@@ -5,9 +5,9 @@ import { executeRead } from './transport.js'
 import { namedFormatPattern } from './property-format.js'
 
 type Rule = Record<string, unknown>
-export interface RulesPlan { before: Rule[], after: Rule[], path: string, warnings: string[] }
+export interface RulesPlan { before: Rule[], after: Rule[], path: string, warnings: string[], referencedGroup?: { group: string, rules: Rule[] } }
 const invalid = () => new Failure('INVALID_RESPONSE', 'The complete ordered firewall rules and digest could not be verified.', 'Inspect the selected rules privately; do not modify an incomplete ruleset.')
-const input = () => new Failure('INVALID_INPUT', 'Rule inputs or position are outside the reviewed branch.', 'Use basic in/out rules, a valid position and a separate reorder request.', 2)
+const input = () => new Failure('INVALID_INPUT', 'Rule inputs or position are outside the reviewed branch.', 'Use reviewed in/out rules or guest group references, a valid position and a separate reorder request.', 2)
 
 async function readRules(credentials: Credentials, path: string, values: Record<string, unknown>, release: string): Promise<Rule[]> {
   const contract = selectContract('GET', path, release)
@@ -35,8 +35,10 @@ function canonical(value: unknown): string {
 export async function prepareRules(credentials: Credentials, contract: Contract, values: Record<string, unknown>): Promise<RulesPlan | undefined> {
   if (!contract.policy.stateBinding) return
   const path = contract.policy.stateBinding.path, before = await readRules(credentials, path, values, contract.release)
+  const guest = /^\/nodes\/\{node\}\/(qemu|lxc)\/\{vmid\}\/firewall\/rules$/.test(path)
+  const existingReference = (rule: Rule) => guest && rule.type === 'group' && typeof rule.action === 'string' && /^[A-Za-z][A-Za-z0-9_-]{1,19}$(?![\s\S])/.test(rule.action)
   const after = before.map(settings), pos = Number(values.pos)
-  const fields = Object.fromEntries(Object.entries(values).filter(([name]) => !['node', 'vmid', 'pos', 'moveto', 'digest'].includes(name)))
+  const fields = Object.fromEntries(Object.entries(values).filter(([name]) => !contract.path.includes(`{${name}}`) && !['moveto', 'digest'].includes(name)))
   let selected: Rule
   if (contract.method === 'POST') {
     selected = fields
@@ -44,7 +46,9 @@ export async function prepareRules(credentials: Credentials, contract: Contract,
   } else {
     if (!Number.isSafeInteger(pos) || !after[pos]) throw input()
     selected = after[pos]!
-    if (!['in', 'out'].includes(String(selected.type)) || !['ACCEPT', 'DROP', 'REJECT'].includes(String(selected.action))) throw input()
+    if ((!['in', 'out'].includes(String(selected.type)) || !['ACCEPT', 'DROP', 'REJECT'].includes(String(selected.action))) && !existingReference(selected)) throw input()
+    if (values.type !== undefined && (selected.type === 'group') !== (values.type === 'group')) throw input()
+    if (existingReference(selected) && values.action !== undefined && values.type !== 'group') throw input()
     const digest = before[0]!.digest
     if (values.digest !== undefined && values.digest !== digest) throw new Failure('CONFIRMATION_MISMATCH', 'The supplied rules digest is stale.', 'Read and preview the current ordered rules again.')
     values.digest = digest
@@ -57,7 +61,11 @@ export async function prepareRules(credentials: Credentials, contract: Contract,
       }
     } else Object.assign(selected, fields)
   }
-  if (contract.method !== 'DELETE' && values.moveto === undefined) {
+  if (contract.method !== 'DELETE' && values.moveto === undefined && existingReference(selected)) {
+    delete selected.ipversion
+    if (Object.keys(selected).some(name => !['type', 'action', 'enable', 'iface', 'comment'].includes(name))) throw input()
+  } else if (contract.method !== 'DELETE' && values.moveto === undefined) {
+    if (!['in', 'out'].includes(String(selected.type)) || !['ACCEPT', 'DROP', 'REJECT'].includes(String(selected.action))) throw input()
     const addresses = [selected.source, selected.dest].filter(value => value !== undefined)
     if (selected.macro !== undefined || selected['icmp-type'] !== undefined ||
       addresses.some(value => !new RegExp(namedFormatPattern('pve-firewall-address')!).test(String(value))) ||
@@ -71,15 +79,34 @@ export async function prepareRules(credentials: Credentials, contract: Contract,
     else delete selected.ipversion
   }
   const restrictedAddress = ['source', 'dest'].some(name => selected[name] !== undefined && !String(selected[name]).endsWith('/0'))
-  const warnings = selected.action === 'ACCEPT' && !restrictedAddress && !['proto', 'sport', 'dport', 'macro', 'icmp-type'].some(name => selected[name] !== undefined) ?
+  const warnings = selected.type !== 'group' && selected.action === 'ACCEPT' && !restrictedAddress && !['proto', 'sport', 'dport', 'macro', 'icmp-type'].some(name => selected[name] !== undefined) ?
     ['ACCEPT-ALL RULE: inspect its disabled/active state and direction explicitly before confirming.'] : []
-  return { before, after: after.map((rule, index) => ({ ...rule, pos: index })), path, warnings }
+  let referencedGroup: RulesPlan['referencedGroup']
+  if (existingReference(selected) && contract.method !== 'DELETE' && values.moveto === undefined &&
+    (contract.method === 'POST' || values.enable !== 0 || Object.keys(fields).some(name => name !== 'enable'))) {
+    const group = String(selected.action)
+    referencedGroup = { group, rules: await readRules(credentials, '/cluster/firewall/groups/{group}', { group }, contract.release) }
+    if (selected.enable === 1 && referencedGroup.rules.some(rule => Object.hasOwn(rule, 'errors'))) {
+      throw new Failure('INVALID_INPUT', 'Referenced group reports rule errors.', 'Inspect and repair the group privately before activation; disabled staging and orphan cleanup remain available.', 2)
+    }
+    warnings.push('NON-ATOMIC GROUP REFERENCE: inspect the private referencedGroup definition. Client rechecks cannot atomically couple guest and cluster files; unexpected definition drift remains uncertain, without retry or detachment.')
+  }
+  return { before, after: after.map((rule, index) => ({ ...rule, pos: index })), path, warnings, ...(referencedGroup ? { referencedGroup } : {}) }
 }
 
 export async function verifyRules(credentials: Credentials, contract: Contract, values: Record<string, unknown>, plan: RulesPlan): Promise<void> {
   let observed: Rule[]
-  try { observed = await readRules(credentials, plan.path, values, contract.release) }
+  let referenced: Rule[] | undefined
+  try {
+    observed = await readRules(credentials, plan.path, values, contract.release)
+    if (plan.referencedGroup) {
+      referenced = await readRules(credentials, '/cluster/firewall/groups/{group}', { group: plan.referencedGroup.group }, contract.release)
+    }
+  }
   catch { throw new Failure('INVALID_RESPONSE', 'Post-write ordered-rule verification is unavailable.', 'Retain uncertainty; inspect rules privately without retry or automatic deletion.') }
+  if (plan.referencedGroup && canonical(referenced) !== canonical(plan.referencedGroup.rules)) {
+    throw new Failure('INVALID_RESPONSE', 'Referenced group differs from the confirmed definition.', 'Retain uncertainty; inspect the shared group privately without retry or automatic detachment.')
+  }
   if (canonical(observed.map(settings)) !== canonical(plan.after.map(settings))) {
     throw new Failure('INVALID_RESPONSE', 'Observed ordered rules differ from the confirmed plan.', 'Retain uncertainty; inspect rules privately without retrying or automatically deleting anything.')
   }

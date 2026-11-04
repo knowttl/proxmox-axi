@@ -44,7 +44,7 @@ There is no task UPID to pass to `task wait` for this update.
 After a provider refusal or uncertain delivery, inspect `journal show '<intent-id>'` and the selected options before deciding on recovery; never automatically retry or disable protection to regain access.
 `journal reconcile` compares supplied settings only and cannot establish effective filtering or attribute a matching configuration to this request.
 
-Option delete/reset selectors, logging/filter/conntrack/backend changes, SDN-vnet firewall operations and security-group administration remain refused in this admission.
+Option delete/reset selectors, logging/filter/conntrack/backend changes and SDN-vnet firewall operations remain refused in this admission.
 For admitted alias and IP-set operations, follow [Aliases and IP sets](#aliases-and-ip-sets).
 
 ## Ordered firewall rules
@@ -96,7 +96,7 @@ Ports require tcp/udp; guest interfaces are net0 through net31.
 Source and destination addresses must use the same IP family, consistent with icmp (IPv4) or icmpv6 (IPv6) when selected.
 Field edits are refused if the resulting rule retains aliases/IP sets, macros, ICMP subtype selectors, service/range port selectors or unreviewed protocols.
 An inherited unsupported address may be replaced with a reviewed literal address when the resulting rule meets these restrictions.
-Comments, port lists/ranges, service names, group/forward mutations and field-removal selectors are not admitted here.
+Comments, port lists/ranges, service names, forward mutations and field-removal selectors remain refused; group operations follow [Security groups and guest references](#security-groups-and-guest-references).
 Every change requires exact confirmation; broad ACCEPT rules and deletion carry explicit warnings, including when enabling an existing staged rule.
 
 Reordering uses a separate `set .../{pos}` request with `--api-moveto '<boundary>'` and no rule-field edits.
@@ -104,7 +104,8 @@ The provider inserts before the original boundary position, not at an interprete
 A boundary at or beyond the original length appends; moving to the same position preserves order.
 Inspect the private resulting order before confirming.
 Deletion uses `delete .../rules/{pos}` with its own preview and confirmation and preserves the relative order of remaining rules.
-Group-reference and forward targets, SDN-vnet and security-group rule namespaces remain refused.
+Forward targets, nested groups and SDN-vnet rule namespaces remain refused.
+For admitted shared groups and guest references, follow [Security groups and guest references](#security-groups-and-guest-references).
 
 Rule writes return synchronous null results, with completion metadata on stdout and the validated null result privately.
 Successful client completion also means the ordered result matched the private plan at the post-write observation; it does not prove effective filtering, enduring state or attribution of concurrent changes.
@@ -146,3 +147,52 @@ Provider digests are mandatory for alias/member edit and delete, and become part
 Creation and empty-set deletion provide no native optimistic guard; this slice binds exact inputs rather than claiming state-bound rule plans for these operations.
 Synchronous success reports the provider response, not proof of effective filtering or that a deleted identity previously existed.
 On uncertainty, inspect the selected scope privately without retrying; no operation automatically retries or recreates a deleted object.
+
+## Security groups and guest references
+
+Discover definitions privately with `get '/cluster/firewall/groups'` and ordered contents with `get '/cluster/firewall/groups/{group}'`.
+Definition identities, group-rule targets and newly created or retargeted guest references must use canonical lowercase names, 2-18 characters, starting with a lowercase letter and containing only lowercase letters, digits, underscores or hyphens.
+The provider lowercases definition names when loading configuration; existing guest references retain their action spelling and have separate cleanup rules below.
+Ordinary packet actions remain uppercase `ACCEPT`, `DROP` and `REJECT`.
+Enable each exact mutation ID in the selected profile and independent host policy, and prepare the inherited private result pipe before reading plans or confirming writes.
+Optional definition-creation comments use the existing body-file SecretRef convention; literal comments are refused.
+
+Create an empty definition and a staged rule through separate previews:
+
+```sh
+proxmox-axi create '/cluster/firewall/groups' --api-group '<group>' --profile '<profile>' --preview
+proxmox-axi create '/cluster/firewall/groups/{group}' --api-group '<group>' --api-type in --api-action ACCEPT --api-proto tcp --api-dport 443 --profile '<profile>' --preview
+```
+
+Confirm each exact request independently after inspecting its metadata or complete private rule plan.
+Group rule creation always prepends a disabled rule, with the same NON-ATOMIC CREATE limitation as other ordered rules.
+Enable a rule through a separate fresh `set .../groups/{group}/{pos}` preview with `--api-enable 1`.
+Group rule editing, separate-branch reorder and deletion use the native rules-list digest and exact observed-state binding.
+Basic in/out fields follow the ordered-rule restrictions above; interfaces and nested groups are forbidden inside group definitions.
+Shared group changes affect every existing cluster, node or guest reference, including management traffic; audit those dependencies before confirming.
+The client does not enumerate or lock every consumer, and successful configuration observation does not prove effective filtering.
+
+Attach a reference to a selected QEMU guest; LXC uses the corresponding `/lxc/{vmid}/firewall/rules` route:
+
+```sh
+proxmox-axi create '/nodes/{node}/qemu/{vmid}/firewall/rules' --api-node '<node>' --api-vmid 100 --api-type group --api-action '<group>' --api-iface net0 --profile '<profile>' --preview
+```
+
+The reference is fixed disabled staging and cannot be created enabled.
+The private plan contains the guest `before`/`after` order and `referencedGroup: {group, rules}`; inspect both before confirming.
+Reference creation and activation require readable group contents, including the provider audit permission for that group.
+Provider rule errors block activation; disabled staging remains available for inspection and repair.
+Activate through a separate fresh `set .../rules/{pos}` preview with `--api-enable 1` and its own exact confirmation.
+To retarget an existing reference, supply explicit `--api-type group --api-action '<new-group>'`, optionally changing the reviewed `netN` interface.
+Reference packet selectors are refused, and conversion between ordinary rules and references requires deletion and staged creation.
+
+NON-ATOMIC GROUP REFERENCE means the client rechecks and binds the observed definition but cannot atomically couple guest and cluster files.
+Unexpected definition drift during dispatch leaves the result uncertain, without automatic retry, rollback or detachment.
+Once attached, a reference follows later shared group changes; its definition is not frozen by confirmation.
+Disabling with only `--api-enable 0`, reordering or deleting a reference binds the guest list without requiring the shared definition, so orphaned references can be cleaned up.
+This cleanup accepts existing reference actions of 2-20 characters, starting with an ASCII letter and otherwise containing ASCII letters of either case, digits, underscores or hyphens, including mixed-case and 19/20-character actions that cannot be created or retargeted by this tool.
+One-character actions and actions longer than 20 characters remain refused for cleanup.
+Remove references and group rules through their own confirmed operations before `delete '/cluster/firewall/groups/{group}'`.
+The provider enforces empty-only group deletion under its lock, but empty does not mean unreferenced.
+If deletion reports uncertainty, inspect the journal and private group contents; never force deletion, detach references or recreate a group automatically.
+Renames/metadata updates, nested groups, rule-comment writes, group-rule interfaces and cluster/node reference mutations remain refused.

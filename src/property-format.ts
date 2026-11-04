@@ -21,6 +21,7 @@ export function backupVolumePattern(family?: 'qemu' | 'lxc'): string {
 }
 
 export function namedFormatPattern(name: string): string | undefined {
+  if (name === 'pve-firewall-group') return '^[a-z][a-z0-9_-]{1,17}$(?![\\s\\S])'
   if (name === 'pve-firewall-member') return namedFormatPattern('pve-firewall-address')!.replace('^', '^(?!.*\/0$)')
   if (name === 'pve-firewall-comment') return '^[^\\x00-\\x1f\\x7f]{0,1024}(?![\\s\\S])'
   if (name === 'pve-firewall-address') {

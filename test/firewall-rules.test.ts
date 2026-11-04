@@ -18,9 +18,10 @@ const scopes = [
   { name: 'cluster', path: '/cluster/firewall/rules', target: {} },
   { name: 'node', path: '/nodes/{node}/firewall/rules', target: { node: 'node-a' } },
   ...['qemu', 'lxc'].map(name => ({ name, path: `/nodes/{node}/${name}/{vmid}/firewall/rules`, target: { node: 'node-a', vmid: 100 } })),
+  { name: 'group', path: '/cluster/firewall/groups/{group}', target: { group: 'web' } },
 ]
 const operationId = (method: string, path: string) => `OP-${method}-${createHash('sha256').update(`${method} ${path}`).digest('hex').slice(0, 10)}`
-const canary = 'CANARY-private-rule-comment', batch = '/nodes/{node}/execute'
+const canary = 'CANARY-private-rule-comment', batch = '/nodes/{node}/execute', groups = '/cluster/firewall/groups'
 const initial = (): Rule[] => [{ type: 'in', action: 'DROP', proto: 'tcp', dport: '1001', enable: 1, comment: canary },
   { type: 'out', action: 'ACCEPT', proto: 'udp', dport: '1002', enable: 1 }]
 
@@ -31,25 +32,48 @@ test('ordered firewall changes stage disabled creation and guard later mutations
   await writeFile(caFile, await readFile(new URL('../../test/fixtures/localhost-cert.pem', import.meta.url)), { mode: 0o600 })
   let version = '8.2.7', mode = 'success', applied = false
   const state = new Map<string, Rule[]>(), requests: string[] = [], writes: { method: string, path: string, fields: Record<string, string> }[] = []
-  const wire = (path: string) => `/api2/json${path.replace('{node}', 'node-a').replace('{vmid}', '100')}`
+  const groupComments = new Map<string, string>()
+  const wire = (path: string, group = 'web') => `/api2/json${path.replace('{node}', 'node-a').replace('{vmid}', '100').replace('{group}', group)}`
   const digest = (rules: Rule[]) => createHash('sha1').update(JSON.stringify(rules.map(({ errors, ...settings }) => settings))).digest('hex')
   const server = createServer({ key: await readFile(new URL('../../test/fixtures/localhost-key.pem', import.meta.url)), cert: await readFile(caFile) }, async (request, response) => {
     const url = new URL(request.url!, 'https://fake.invalid'), path = url.pathname
     requests.push(`${request.method} ${path}`)
     if (path.endsWith('/version')) { response.end(JSON.stringify({ data: { version, release: 'synthetic', repoid: 'synthetic' } })); return }
-    const match = /^(.*\/rules)(?:\/(\d+))?$/.exec(path)!
+    const chunks: Buffer[] = []
+    if (request.method !== 'GET') for await (const chunk of request) chunks.push(Buffer.from(chunk))
+    const fields = Object.fromEntries(request.method === 'DELETE' ? url.searchParams : new URLSearchParams(Buffer.concat(chunks).toString()))
+    if (request.method !== 'GET') writes.push({ method: request.method!, path, fields })
+    if (path === wire(groups)) {
+      if (request.method === 'GET') {
+        const rows = [...state.keys()].filter(key => key.startsWith(`${wire(groups)}/`)).sort().map(key => {
+          const group = key.slice(wire(groups).length + 1)
+          return { group, ...(groupComments.has(group) ? { comment: groupComments.get(group) } : {}) }
+        })
+        response.end(JSON.stringify({ data: rows.map(row => ({ ...row, digest: digest(rows) })) })); return
+      }
+      if (mode === 'metadata-reject') { response.writeHead(400).end(JSON.stringify({ message: canary })); return }
+      if (state.has(`${wire(groups)}/${fields.group}`)) { response.writeHead(400).end(JSON.stringify({ message: 'group already exists' })); return }
+      const group = fields.group!.toLowerCase()
+      state.set(`${wire(groups)}/${group}`, [])
+      if (fields.comment !== undefined) groupComments.set(group, fields.comment)
+      response.end(JSON.stringify({ data: null })); return
+    }
+    const match = /^(.*(?:\/rules|\/groups\/[^/]+))(?:\/(\d+))?$/.exec(path)!
     assert.ok(match)
     const rules = state.get(match[1]!)!, pos = match[2] === undefined ? undefined : Number(match[2])
-    assert.ok(rules)
+    if (!rules) { response.writeHead(500).end(JSON.stringify({ message: 'no such security group' })); return }
     if (request.method === 'GET') {
       if (mode === 'verify-unavailable' && applied) { response.writeHead(403).end(JSON.stringify({ message: canary })); return }
       const rows = rules.map((rule, index) => ({ ...rule, pos: index, digest: digest(rules) }))
       response.end(JSON.stringify({ data: mode === 'malformed' ? [{ type: 'in', action: 'DROP', pos: 9, digest: 'bad' }] : pos === undefined ? rows : rows[pos] })); return
     }
-    const chunks: Buffer[] = []
-    for await (const chunk of request) chunks.push(Buffer.from(chunk))
-    const fields = Object.fromEntries(request.method === 'DELETE' ? url.searchParams : new URLSearchParams(Buffer.concat(chunks).toString()))
-    writes.push({ method: request.method!, path, fields })
+    if (path.startsWith(`${wire(groups)}/`) && pos === undefined && request.method === 'DELETE') {
+      if (rules.length) { response.writeHead(500).end(JSON.stringify({ message: 'Security group is not empty' })); return }
+      state.delete(path)
+      groupComments.delete(path.slice(wire(groups).length + 1))
+      response.end(JSON.stringify({ data: null })); return
+    }
+    if (path.startsWith(`${wire(groups)}/`) && (fields.type === 'group' || fields.iface !== undefined)) { response.writeHead(400).end(JSON.stringify({ message: 'unsupported group rule' })); return }
     if (mode === 'native-race') rules.reverse()
     if (request.method !== 'POST' && fields.digest !== digest(rules)) { response.writeHead(400).end(JSON.stringify({ message: 'rules digest mismatch' })); return }
     if (request.method === 'POST') {
@@ -68,6 +92,10 @@ test('ordered firewall changes stage disabled creation and guard later mutations
     }
     for (const rule of rules) {
       delete rule.errors
+      if (rule.type === 'group') {
+        for (const name of Object.keys(rule)) if (!['type', 'action', 'enable', 'iface', 'comment'].includes(name)) delete rule[name]
+        continue
+      }
       for (const field of ['source', 'dest']) {
         if (rule[field] === 'missing-alias') rule.errors = { ...rule.errors as Record<string, string>, [field]: canary }
       }
@@ -76,6 +104,7 @@ test('ordered firewall changes stage disabled creation and guard later mutations
       else if (rule.proto === 'icmp' || rule.proto === 'icmpv6') rule.ipversion = rule.proto === 'icmp' ? 4 : 6
       else delete rule.ipversion
     }
+    if (mode === 'reference-race' && rules[pos ?? 0]?.type === 'group') state.get(`${wire(groups)}/${rules[pos ?? 0]!.action}`)!.push({ type: 'in', action: 'DROP', enable: 1 })
     applied = true
     response.end(JSON.stringify({ data: null }))
   })
@@ -83,14 +112,14 @@ test('ordered firewall changes stage disabled creation and guard later mutations
   t.after(() => new Promise<void>(resolve => server.close(() => resolve())))
   await writeFile(config, JSON.stringify({ version: 1, defaultProfile: 'lab', profiles: { lab: {
     auth: 'api-token', origin: `https://127.0.0.1:${(server.address() as AddressInfo).port}`, caBundle: caFile,
-    tokenId: 'synthetic@pve!rules', token: { env: 'RULES_TOKEN' }, writes: { operations: [operationId('POST', batch), ...scopes.flatMap(scope =>
+    tokenId: 'synthetic@pve!rules', token: { env: 'RULES_TOKEN' }, writes: { operations: [operationId('POST', batch), operationId('POST', groups), operationId('DELETE', `${groups}/{group}`), ...scopes.flatMap(scope =>
       [operationId('POST', scope.path), operationId('PUT', `${scope.path}/{pos}`), operationId('DELETE', `${scope.path}/{pos}`)])] },
   } } }), { mode: 0o600 })
   const command = async (verb: string, path: string, api: Record<string, unknown>, flags: string[] = [], privateResult = true, extraEnv: Record<string, string> = {}) => {
     const body = join(scratch, 'request.json')
     await writeFile(body, JSON.stringify(api), { mode: 0o600 })
     const child = spawn(process.execPath, [executable, verb, path, '--body-file', body, ...flags, '--config', config, '--format', 'json'], {
-      env: { ...environment, RULES_TOKEN: 'synthetic-token', PROXMOX_AXI_WRITE_LOG: log, PROXMOX_AXI_RESULT_FD: privateResult ? '3' : '', ...extraEnv },
+      env: { ...environment, RULES_TOKEN: 'synthetic-token', RULE_COMMENT: canary, PROXMOX_AXI_WRITE_LOG: log, PROXMOX_AXI_RESULT_FD: privateResult ? '3' : '', ...extraEnv },
       stdio: ['ignore', 'pipe', 'pipe', ...(privateResult ? ['pipe' as const] : [])],
     })
     let stdout = '', stderr = '', bytes = Buffer.alloc(0)
@@ -104,6 +133,12 @@ test('ordered firewall changes stage disabled creation and guard later mutations
     return { code, value: JSON.parse(stdout), frame: bytes.length ? JSON.parse(bytes.subarray(4).toString()) : undefined }
   }
   const saved = async (intent: string) => JSON.parse(await readFile(join(`${log}.d`, `${intent}.json`), 'utf8'))
+  const confirmed = async (verb: string, path: string, api: Record<string, unknown>) => {
+    const before = writes.length, preview = await command(verb, path, api, ['--preview'])
+    assert.equal(preview.code, 0)
+    assert.equal(writes.length, before)
+    return command(verb, path, api, ['--confirm', preview.value.confirmation])
+  }
   for (const release of [{ name: 'legacy-8.2.7', version: '8.2.7', source: '192.0.2.0/24' }, { name: 'published-current', version: '9.2.1', source: '2001:db8::/64' }]) {
     version = release.version
     for (const scope of scopes) {
@@ -199,6 +234,224 @@ test('ordered firewall changes stage disabled creation and guard later mutations
         assert.deepEqual(observed.frame.payload.map((rule: Rule) => rule.dport), ['1001', '1002'])
       })
     }
+    const definition = `${groups}/{group}`, groupItem = `${definition}/{pos}`
+    for (const guest of scopes.filter(scope => ['qemu', 'lxc'].includes(scope.name))) {
+      const name = `onboard-${guest.name}`, groupKey = wire(definition, name), guestKey = wire(guest.path), item = `${guest.path}/{pos}`
+      const reference = { ...guest.target, type: 'group', action: name, iface: 'net0' }
+      await t.test(`${release.name} ${guest.name} provisions a group and independently stages and enables its reference`, async () => {
+        mode = 'success'
+        state.delete(groupKey)
+        groupComments.delete(name)
+        state.set(guestKey, initial())
+        assert.equal((await confirmed('create', groups, { group: name, comment: { env: 'RULE_COMMENT' } })).value.status, 'success')
+        const index = await command('get', groups, {})
+        assert.equal(index.frame.payload.find((row: Rule) => row.group === name).comment, canary)
+        assert.equal((await confirmed('create', definition, { group: name, type: 'in', action: 'ACCEPT', proto: 'tcp', dport: '443' })).value.status, 'success')
+        assert.equal((await confirmed('set', groupItem, { group: name, pos: 0, enable: 1 })).value.status, 'success')
+        const preview = await command('create', guest.path, reference, ['--preview'])
+        assert.deepEqual(preview.frame.payload.after[0], { type: 'group', action: name, enable: 0, iface: 'net0', pos: 0 })
+        assert.equal(preview.frame.payload.referencedGroup.group, name)
+        assert.equal(preview.frame.payload.referencedGroup.rules[0].dport, '443')
+        assert.match(JSON.stringify(preview.value.warnings), /NON-ATOMIC GROUP REFERENCE/)
+        assert.equal((await command('create', guest.path, reference, ['--confirm', preview.value.confirmation])).value.status, 'success')
+        assert.equal((await command('get', item, { ...guest.target, pos: 0 })).frame.payload.enable, 0)
+        assert.equal((await confirmed('set', item, { ...guest.target, pos: 0, enable: 1 })).value.status, 'success')
+        assert.equal((await command('get', item, { ...guest.target, pos: 0 })).frame.payload.enable, 1)
+        const move = { ...guest.target, pos: 0, moveto: 2 }, ordered = await command('set', item, move, ['--preview'])
+        assert.deepEqual(ordered.frame.payload.after.map((row: Rule) => row.type), ['in', 'group', 'out'])
+        assert.equal((await command('set', item, { ...move, moveto: 3 }, ['--confirm', ordered.value.confirmation])).value.error.code, 'CONFIRMATION_MISMATCH')
+        assert.equal((await command('set', item, move, ['--confirm', ordered.value.confirmation])).value.status, 'success')
+        assert.equal((await confirmed('delete', item, { ...guest.target, pos: 1 })).value.status, 'success')
+        assert.equal((await confirmed('delete', groupItem, { group: name, pos: 0 })).value.status, 'success')
+        assert.equal((await confirmed('delete', definition, { group: name })).value.status, 'success')
+        assert.equal((await command('get', groups, {})).frame.payload.some((row: Rule) => row.group === name), false)
+      })
+      await t.test(`${release.name} ${guest.name} reference confirmation binds group identity and observed ordered content`, async () => {
+        mode = 'success'
+        state.set(groupKey, initial())
+        state.set(wire(definition, 'other'), initial())
+        state.set(guestKey, initial())
+        const before = writes.length, preview = await command('create', guest.path, reference, ['--preview'])
+        assert.equal(preview.frame.payload.referencedGroup.rules[0].comment, canary)
+        const changed = await command('create', guest.path, { ...reference, action: 'other' }, ['--confirm', preview.value.confirmation])
+        assert.equal(changed.value.error.code, 'CONFIRMATION_MISMATCH')
+        state.get(groupKey)!.reverse()
+        const stale = await command('create', guest.path, reference, ['--confirm', preview.value.confirmation])
+        assert.equal(stale.value.error.code, 'CONFIRMATION_MISMATCH')
+        assert.equal(writes.length, before)
+        assert.deepEqual(state.get(guestKey), initial())
+      })
+      await t.test(`${release.name} ${guest.name} retargeting inspects the new group without rewriting either definition`, async () => {
+        mode = 'success'
+        state.set(groupKey, initial())
+        state.set(wire(definition, 'other'), [{ type: 'out', action: 'DROP', enable: 1 }])
+        state.set(guestKey, [{ type: 'group', action: name, enable: 1, iface: 'net0' }])
+        const api = { ...guest.target, pos: 0, type: 'group', action: 'other', iface: 'net1' }, preview = await command('set', item, api, ['--preview'])
+        assert.equal(preview.frame.payload.referencedGroup.group, 'other')
+        assert.equal(preview.frame.payload.referencedGroup.rules[0].type, 'out')
+        assert.equal((await command('set', item, api, ['--confirm', preview.value.confirmation])).value.status, 'success')
+        assert.deepEqual((await command('get', item, { ...guest.target, pos: 0 })).frame.payload, { type: 'group', action: 'other', enable: 1, iface: 'net1', pos: 0, digest: digest([{ type: 'group', action: 'other', enable: 1, iface: 'net1' }]) })
+        assert.deepEqual(state.get(groupKey), initial())
+      })
+      await t.test(`${release.name} ${guest.name} activation retains uncertainty when a shared group changes during dispatch`, async () => {
+        mode = 'success'
+        state.set(groupKey, initial())
+        state.set(guestKey, [{ type: 'group', action: name, enable: 0 }])
+        const api = { ...guest.target, pos: 0, enable: 1 }, preview = await command('set', item, api, ['--preview']), before = writes.length
+        mode = 'reference-race'
+        const result = await command('set', item, api, ['--confirm', preview.value.confirmation])
+        assert.equal(result.value.error.code, 'WRITE_UNCERTAIN')
+        assert.equal(state.get(guestKey)![0]!.enable, 1)
+        assert.equal((await saved(preview.value.id)).status, 'uncertain')
+        mode = 'success'
+        assert.equal((await command('set', item, api, ['--confirm', preview.value.confirmation])).value.error.code, 'CONFIRMATION_USED')
+        assert.equal(writes.length, before + 1)
+      })
+      for (const { action, cleanup, creation } of [
+        { action: 'a', cleanup: false, creation: false },
+        { action: 'A', cleanup: false, creation: false },
+        { action: 'web', cleanup: true, creation: true },
+        { action: 'Web', cleanup: true, creation: false },
+        { action: 'abcdefghijklmnopqr', cleanup: true, creation: true },
+        { action: 'abcdefghijklmnopqrs', cleanup: true, creation: false },
+        { action: 'Abcdefghijklmnopqrs', cleanup: true, creation: false },
+        { action: 'abcdefghijklmnopqrst', cleanup: true, creation: false },
+        { action: 'Abcdefghijklmnopqrst', cleanup: true, creation: false },
+        { action: 'a_0123456789-ABCDEFG', cleanup: true, creation: false },
+        { action: 'abcdefghijklmnopqrstu', cleanup: false, creation: false },
+        { action: 'Abcdefghijklmnopqrstu', cleanup: false, creation: false },
+        { action: '1web', cleanup: false, creation: false },
+        { action: '_web', cleanup: false, creation: false },
+        { action: 'web.name', cleanup: false, creation: false },
+      ]) await t.test(`${release.name} ${guest.name} reference ${action} has independent creation and orphan-cleanup boundaries`, async () => {
+        mode = 'success'
+        const targetGroup = wire(definition, action.toLowerCase())
+        state.delete(targetGroup)
+        state.set(guestKey, [])
+        if (creation) {
+          assert.equal((await confirmed('create', groups, { group: action })).value.status, 'success')
+          assert.equal((await confirmed('create', guest.path, { ...guest.target, type: 'group', action })).value.status, 'success')
+          assert.equal((await command('get', item, { ...guest.target, pos: 0 })).frame.payload.enable, 0)
+        } else {
+          const count = requests.length
+          for (const [verb, path, api] of [
+            ['create', groups, { group: action }],
+            ['create', guest.path, { ...guest.target, type: 'group', action }],
+            ['set', item, { ...guest.target, pos: 0, type: 'group', action }],
+          ] as const) assert.equal((await command(verb, path, api, ['--preview'])).value.error.code, 'INVALID_INPUT')
+          assert.equal(requests.length, count)
+        }
+        state.delete(groupKey)
+        state.delete(targetGroup)
+        const orphan = { type: 'group', action, enable: 1 }
+        state.set(guestKey, [{ ...orphan }, ...initial()])
+        assert.equal((await command('get', item, { ...guest.target, pos: 0 })).frame.payload.action, action)
+        assert.deepEqual((await command('get', guest.path, guest.target)).frame.payload,
+          [orphan, ...initial()].map((rule, pos) => ({ ...rule, pos, digest: digest([orphan, ...initial()]) })))
+        if (!cleanup) {
+          const count = writes.length
+          for (const [verb, api] of [
+            ['set', { ...guest.target, pos: 0, moveto: 3 }],
+            ['set', { ...guest.target, pos: 0, enable: 0 }],
+            ['delete', { ...guest.target, pos: 0 }],
+          ] as const) assert.equal((await command(verb, item, api, ['--preview'])).value.error.code, 'INVALID_INPUT')
+          assert.equal(writes.length, count)
+          assert.deepEqual(state.get(guestKey), [orphan, ...initial()])
+          return
+        }
+        const requestStart = requests.length
+        assert.equal((await confirmed('set', item, { ...guest.target, pos: 0, moveto: 3 })).value.status, 'success')
+        assert.equal(writes.at(-1)!.fields.digest, digest([orphan, ...initial()]))
+        assert.equal((await command('get', item, { ...guest.target, pos: 2 })).frame.payload.action, action)
+        assert.equal((await confirmed('set', item, { ...guest.target, pos: 2, enable: 0 })).value.status, 'success')
+        assert.equal(writes.at(-1)!.fields.digest, digest([...initial(), orphan]))
+        assert.deepEqual((await command('get', item, { ...guest.target, pos: 2 })).frame.payload,
+          { ...orphan, enable: 0, pos: 2, digest: digest([...initial(), { ...orphan, enable: 0 }]) })
+        assert.equal((await confirmed('delete', item, { ...guest.target, pos: 2 })).value.status, 'success')
+        assert.equal(writes.at(-1)!.fields.digest, digest([...initial(), { ...orphan, enable: 0 }]))
+        assert.deepEqual((await command('get', guest.path, guest.target)).frame.payload,
+          initial().map((rule, pos) => ({ ...rule, pos, digest: digest(initial()) })))
+        assert.equal(requests.slice(requestStart).some(request => request.includes(wire(groups))), false)
+        assert.equal(state.has(groupKey), false)
+        assert.equal(state.has(targetGroup), false)
+      })
+      await t.test(`${release.name} ${guest.name} missing definitions block reference activation`, async () => {
+        mode = 'success'
+        state.delete(groupKey)
+        state.set(guestKey, [{ type: 'group', action: name, enable: 0 }])
+        const before = writes.length, preview = await command('set', item, { ...guest.target, pos: 0, enable: 1 }, ['--preview'])
+        assert.equal(preview.value.error.code, 'HTTP_ERROR')
+        assert.equal(state.get(guestKey)![0]!.enable, 0)
+        assert.equal(writes.length, before)
+      })
+      await t.test(`${release.name} ${guest.name} reported group errors prevent activation without exposing diagnostics`, async () => {
+        mode = 'success'
+        state.set(groupKey, [{ type: 'in', action: 'DROP', source: 'missing-alias', enable: 1, errors: { source: canary } }])
+        state.set(guestKey, [{ type: 'group', action: name, enable: 0 }])
+        const before = writes.length, result = await command('set', item, { ...guest.target, pos: 0, enable: 1 }, ['--preview'])
+        assert.equal(result.value.error.code, 'INVALID_INPUT')
+        assert.equal(state.get(guestKey)![0]!.enable, 0)
+        assert.equal(writes.length, before)
+      })
+    }
+    await t.test(`${release.name} group deletion retains its native nonempty guard and uncertain error semantics`, async () => {
+      mode = 'success'
+      state.set(wire(definition, 'protected'), initial())
+      const result = await confirmed('delete', definition, { group: 'protected' })
+      assert.equal(result.value.error.code, 'WRITE_UNCERTAIN')
+      assert.deepEqual(state.get(wire(definition, 'protected')), initial())
+    })
+    await t.test(`${release.name} provider comment rejection does not expose a group creation secret`, async () => {
+      mode = 'metadata-reject'
+      state.delete(wire(definition, 'rejected'))
+      const result = await confirmed('create', groups, { group: 'rejected', comment: { env: 'RULE_COMMENT' } })
+      assert.equal(result.value.error.code, 'HTTP_ERROR')
+      assert.equal(state.has(wire(definition, 'rejected')), false)
+      mode = 'success'
+    })
+    await t.test(`${release.name} a canonical accept group survives discovery and reference staging`, async () => {
+      mode = 'success'
+      state.delete(wire(definition, 'accept'))
+      assert.equal((await confirmed('create', groups, { group: 'accept' })).value.status, 'success')
+      assert.equal((await command('get', groups, {})).frame.payload.some((row: Rule) => row.group === 'accept'), true)
+      assert.equal((await confirmed('create', definition, { group: 'accept', type: 'in', action: 'DROP' })).value.status, 'success')
+      state.set(wire(scopes[2]!.path), [])
+      const api = { ...scopes[2]!.target, type: 'group', action: 'accept' }, preview = await command('create', scopes[2]!.path, api, ['--preview'])
+      assert.equal(preview.frame.payload.referencedGroup.rules[0].action, 'DROP')
+      assert.equal(JSON.stringify(preview.value.warnings).includes('ACCEPT-ALL RULE'), false)
+      assert.equal((await command('create', scopes[2]!.path, api, ['--confirm', preview.value.confirmation])).value.status, 'success')
+      assert.equal((await command('get', scopes[2]!.path, scopes[2]!.target)).frame.payload[0].type, 'group')
+    })
+    for (const [verb, path, api] of [
+      ['create', groups, { group: 'Web' }],
+      ['delete', definition, { group: 'Web' }],
+      ['get', definition, { group: 'Web' }],
+      ['get', groupItem, { group: 'Web', pos: 0 }],
+      ['create', definition, { group: 'Web', type: 'in', action: 'ACCEPT' }],
+      ['set', groupItem, { group: 'Web', pos: 0, enable: 0 }],
+      ['delete', groupItem, { group: 'Web', pos: 0 }],
+      ...scopes.slice(2, 4).flatMap(guest => [
+        ['create', guest.path, { ...guest.target, type: 'group', action: 'Web' }],
+        ['set', `${guest.path}/{pos}`, { ...guest.target, pos: 0, type: 'group', action: 'Web' }],
+      ] as const),
+    ] as const) await t.test(`${release.name} refuses noncanonical identity for ${verb} ${path}`, async () => {
+      const before = requests.length
+      const result = await command(verb, path, api, verb === 'get' ? [] : ['--preview'])
+      assert.equal(result.value.error.code, 'INVALID_INPUT')
+      assert.equal(requests.length, before)
+      const schema = await execute(process.execPath, [executable, 'schema', verb, path, '--catalogue', release.name, '--format', 'json'], { env: environment })
+      const validate = new Ajv({ strict: false }).compile(JSON.parse(schema.stdout).invocation.schema)
+      assert.equal(validate({ api }), false)
+    })
+    for (const guest of scopes.slice(2, 4)) for (const verb of ['create', 'set']) await t.test(`${release.name} ${guest.name} ${verb} schema distinguishes packet actions from reference names`, async () => {
+      const path = verb === 'create' ? guest.path : `${guest.path}/{pos}`
+      const schema = await execute(process.execPath, [executable, 'schema', verb, path, '--catalogue', release.name, '--format', 'json'], { env: environment })
+      const validate = new Ajv({ strict: false }).compile(JSON.parse(schema.stdout).invocation.schema)
+      const target = { ...guest.target, ...(verb === 'set' ? { pos: 0 } : {}) }
+      for (const type of ['in', 'out']) for (const action of ['ACCEPT', 'DROP', 'REJECT']) assert.equal(validate({ api: { ...target, type, action } }), true)
+      assert.equal(validate({ api: { ...target, type: 'group', action: 'web' } }), true)
+      assert.equal(validate({ api: { ...target, type: 'group', action: 'ACCEPT' } }), false)
+    })
     const scope = scopes[2]!, item = `${scope.path}/{pos}`, create = { ...scope.target, type: 'in', action: 'ACCEPT' }
     for (const method of ['create', 'set', 'reorder', 'delete']) await t.test(`${release.name} diagnostic-only changes invalidate ${method} confirmation`, async () => {
       state.set(wire(scope.path), [{ ...initial()[0], errors: { source: canary } }, initial()[1]!])
@@ -236,11 +489,12 @@ test('ordered firewall changes stage disabled creation and guard later mutations
       assert.deepEqual(observed.frame.payload.map((rule: Rule) => rule.dport), move.order)
     })
     await t.test(`${release.name} unverifiable rules metadata prevents preview and mutation`, async () => {
+      state.set(wire(scope.path), initial())
       const before = writes.length
       mode = 'malformed'
       const result = await command('create', scope.path, create, ['--preview'])
       mode = 'success'
-      assert.equal(result.value.error.code, 'INVALID_RESPONSE')
+      assert.equal(result.value.error.code, 'INVALID_RESPONSE', JSON.stringify(result.value.error))
       assert.equal(writes.length, before)
     })
     for (const method of ['create', 'set', 'delete']) await t.test(`${release.name} changed ordered state invalidates ${method} before mutation`, async () => {
@@ -319,7 +573,12 @@ test('ordered firewall changes stage disabled creation and guard later mutations
       ['set', item, { ...scope.target, pos: 0, enable: 2 }, 'INVALID_INPUT'],
       ['create', batch, { node: 'node-a', commands: JSON.stringify([{ method: 'POST', path: 'qemu/100/firewall/rules', args: { type: 'in', action: 'ACCEPT' } }]) }, 'CONTRACT_UNRESOLVED'],
       ['create', '/cluster/sdn/vnets/{vnet}/firewall/rules', { vnet: 'net-a', type: 'forward', action: 'ACCEPT' }, 'CONTRACT_UNRESOLVED'],
-      ['create', '/cluster/firewall/groups/{group}', { group: 'group-a', type: 'in', action: 'ACCEPT' }, 'CONTRACT_UNRESOLVED'],
+      ['create', '/cluster/firewall/groups/{group}', { group: 'group-a', type: 'group', action: 'nested' }, 'INVALID_INPUT'],
+      ['create', '/cluster/firewall/groups/{group}', { group: 'group-a', type: 'in', action: 'ACCEPT', iface: 'eth0' }, 'CONTRACT_UNRESOLVED'],
+      ['create', scope.path, { ...scope.target, type: 'group', action: 'web', source: '192.0.2.0/24' }, 'INVALID_INPUT'],
+      ['create', '/nodes/{node}/firewall/rules', { node: 'node-a', type: 'group', action: 'web' }, 'INVALID_INPUT'],
+      ['create', groups, { group: 'web', rename: 'other' }, 'CONTRACT_UNRESOLVED'],
+      ['create', groups, { group: 'web', comment: canary }, 'INVALID_INPUT'],
     ] as const) await t.test(`${release.name} refuses ${verb} ${path} ${Object.keys(api).at(-1)}`, async () => {
       const before = requests.length
       const result = await command(verb, path, api, ['--preview'])
