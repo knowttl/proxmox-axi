@@ -806,24 +806,6 @@
       }
     },
     {
-      "command": "delete /nodes/{node}/network/{iface}",
-      "operationId": "OP-DELETE-8a74dfbfc2",
-      "method": "DELETE",
-      "path": "/nodes/{node}/network/{iface}",
-      "sensitiveInputs": [],
-      "privateResult": true,
-      "effect": "write",
-      "flags": {
-        "help": "boolean",
-        "format": "value",
-        "preview": "boolean",
-        "confirm": "value",
-        "session": "value",
-        "api-iface": "value",
-        "api-node": "value"
-      }
-    },
-    {
       "command": "delete /nodes/{node}/qemu/{vmid}",
       "operationId": "OP-DELETE-5e826ea6b0",
       "method": "DELETE",
@@ -1977,32 +1959,6 @@
         "api-vmid": "value",
         "api-websocket": "value",
         "api-width": "value"
-      }
-    },
-    {
-      "command": "create /nodes/{node}/network",
-      "operationId": "OP-POST-31d829c871",
-      "method": "POST",
-      "path": "/nodes/{node}/network",
-      "sensitiveInputs": [],
-      "privateResult": true,
-      "effect": "write",
-      "flags": {
-        "help": "boolean",
-        "format": "value",
-        "preview": "boolean",
-        "confirm": "value",
-        "session": "value",
-        "api-autostart": "value",
-        "api-bridge_ports": "value",
-        "api-cidr": "value",
-        "api-cidr6": "value",
-        "api-gateway": "value",
-        "api-gateway6": "value",
-        "api-iface": "value",
-        "api-mtu": "value",
-        "api-node": "value",
-        "api-type": "value"
       }
     },
     {
@@ -3307,32 +3263,6 @@
       }
     },
     {
-      "command": "set /nodes/{node}/network/{iface}",
-      "operationId": "OP-PUT-1fd88ef01b",
-      "method": "PUT",
-      "path": "/nodes/{node}/network/{iface}",
-      "sensitiveInputs": [],
-      "privateResult": true,
-      "effect": "write",
-      "flags": {
-        "help": "boolean",
-        "format": "value",
-        "preview": "boolean",
-        "confirm": "value",
-        "session": "value",
-        "api-autostart": "value",
-        "api-bridge_ports": "value",
-        "api-cidr": "value",
-        "api-cidr6": "value",
-        "api-gateway": "value",
-        "api-gateway6": "value",
-        "api-iface": "value",
-        "api-mtu": "value",
-        "api-node": "value",
-        "api-type": "value"
-      }
-    },
-    {
       "command": "set /nodes/{node}/qemu/{vmid}/cloudinit",
       "operationId": "OP-PUT-483437800e",
       "method": "PUT",
@@ -3990,8 +3920,7 @@
         "limit": "value",
         "fields": "value",
         "full": "boolean",
-        "api-node": "value",
-        "api-type": "value"
+        "api-node": "value"
       }
     },
     {
@@ -12507,8 +12436,7 @@
         "fields": "value",
         "full": "boolean",
         "session": "value",
-        "api-node": "value",
-        "api-type": "value"
+        "api-node": "value"
       },
       "privateResult": true,
       "catalogues": [

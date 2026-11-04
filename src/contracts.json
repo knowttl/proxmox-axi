@@ -67756,70 +67756,12 @@
       "id": "OP-POST-31d829c871",
       "release": "legacy-8.2.7",
       "policy": {
-        "effect": "write",
-        "transport": "json",
-        "secrets": "private-result",
-        "stateBinding": {
-          "kind": "node-network",
-          "path": "/nodes/{node}/network"
-        },
-        "allowedInputs": [
-          "node",
-          "iface",
-          "type",
-          "autostart",
-          "bridge_ports",
-          "mtu",
-          "cidr",
-          "cidr6",
-          "gateway",
-          "gateway6"
-        ],
-        "fixedInputs": {
-          "type": "bridge"
-        },
-        "inputFormats": {
-          "iface": "pve-node-bridge",
-          "bridge_ports": "pve-node-ports",
-          "cidr": "pve-firewall-address",
-          "cidr6": "pve-firewall-address",
-          "gateway": "pve-firewall-address",
-          "gateway6": "pve-firewall-address"
-        },
-        "inputPatterns": {
-          "cidr": "^[^:]+/[1-9][0-9]*$(?![\\s\\S])",
-          "cidr6": "^[^/]*:[^/]*/[1-9][0-9]*$(?![\\s\\S])",
-          "gateway": "^[^:/]+$(?![\\s\\S])",
-          "gateway6": "^[^/]*:[^/]*$(?![\\s\\S])"
-        },
-        "confirmationWarnings": [
-          {
-            "message": "MANAGEMENT ACCESS AT RISK: this pending change can cut host access when applied or on reboot. Classification is UNKNOWN: active addresses, hidden interfaces and external configuration are unverified. Inspect the private affected/addressed bridge, bond and VLAN dependencies before explicitly confirming."
-          },
-          {
-            "message": "PENDING ONLY, NON-ATOMIC: no native digest guards dispatch. Confirm the private pending diff and proposed configuration; application/revert are separate refused operations. Unexpected observations remain uncertain without retry or automatic recovery."
-          }
-        ],
-        "reason": "Confirmed pending Linux bridge CRUD only, with private native diff and state binding. Physical/OVS/VLAN/bond mutations, custom options, setting deletion and apply/revert remain refused.",
-        "reconciliation": {
-          "kind": "none",
-          "reason": "Inspect pending configuration privately without retry or automatic apply/revert; runtime reachability and active addresses are unverified."
-        },
-        "privileges": {
-          "check": [
-            "perm",
-            "/nodes/{node}",
-            [
-              "Sys.Modify"
-            ]
-          ]
-        },
-        "response": {
-          "type": "null"
-        },
-        "source": "Pinned Network.pm shadow-file CRUD and common INotify/Interfaces serialization; no native optimistic digest."
+        "effect": "unresolved",
+        "transport": "unresolved",
+        "secrets": "unresolved",
+        "reason": "Requires operation-specific effect, transport and secret review before admission."
       },
-      "callable": true,
+      "callable": false,
       "command": [
         "post",
         "/nodes/{node}/network"
@@ -67836,63 +67778,140 @@
               "type": "object",
               "additionalProperties": false,
               "properties": {
+                "address": {
+                  "type": "string",
+                  "not": {},
+                  "x-untranslated": "vendor format or property string"
+                },
+                "address6": {
+                  "type": "string",
+                  "not": {},
+                  "x-untranslated": "vendor format or property string"
+                },
                 "autostart": {
                   "type": "boolean"
                 },
+                "bond-primary": {
+                  "type": "string",
+                  "not": {},
+                  "x-untranslated": "vendor format or property string"
+                },
+                "bond_mode": {
+                  "enum": [
+                    "balance-rr",
+                    "active-backup",
+                    "balance-xor",
+                    "broadcast",
+                    "802.3ad",
+                    "balance-tlb",
+                    "balance-alb",
+                    "balance-slb",
+                    "lacp-balance-slb",
+                    "lacp-balance-tcp"
+                  ],
+                  "type": "string"
+                },
+                "bond_xmit_hash_policy": {
+                  "enum": [
+                    "layer2",
+                    "layer2+3",
+                    "layer3+4"
+                  ],
+                  "type": "string"
+                },
                 "bridge_ports": {
                   "type": "string",
-                  "pattern": "^(?:[A-Za-z][A-Za-z0-9_.-]{1,14}(?: [A-Za-z][A-Za-z0-9_.-]{1,14})*)?$(?![\\s\\S])"
+                  "not": {},
+                  "x-untranslated": "vendor format or property string"
+                },
+                "bridge_vids": {
+                  "type": "string",
+                  "not": {},
+                  "x-untranslated": "vendor format or property string"
+                },
+                "bridge_vlan_aware": {
+                  "type": "boolean"
                 },
                 "cidr": {
                   "type": "string",
-                  "pattern": "^(?:(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])(?:\\.(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])){3}(?:/(?:[0-9]|[12][0-9]|3[0-2]))?|(?:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::|::[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::)(?:/(?:[0-9]|[1-9][0-9]|1[01][0-9]|12[0-8]))?)$(?![\\s\\S])",
-                  "allOf": [
-                    {
-                      "pattern": "^[^:]+/[1-9][0-9]*$(?![\\s\\S])"
-                    }
-                  ]
+                  "not": {},
+                  "x-untranslated": "vendor format or property string"
                 },
                 "cidr6": {
                   "type": "string",
-                  "pattern": "^(?:(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])(?:\\.(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])){3}(?:/(?:[0-9]|[12][0-9]|3[0-2]))?|(?:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::|::[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::)(?:/(?:[0-9]|[1-9][0-9]|1[01][0-9]|12[0-8]))?)$(?![\\s\\S])",
-                  "allOf": [
-                    {
-                      "pattern": "^[^/]*:[^/]*/[1-9][0-9]*$(?![\\s\\S])"
-                    }
-                  ]
+                  "not": {},
+                  "x-untranslated": "vendor format or property string"
+                },
+                "comments": {
+                  "type": "string"
+                },
+                "comments6": {
+                  "type": "string"
                 },
                 "gateway": {
                   "type": "string",
-                  "pattern": "^(?:(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])(?:\\.(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])){3}(?:/(?:[0-9]|[12][0-9]|3[0-2]))?|(?:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::|::[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::)(?:/(?:[0-9]|[1-9][0-9]|1[01][0-9]|12[0-8]))?)$(?![\\s\\S])",
-                  "allOf": [
-                    {
-                      "pattern": "^[^:/]+$(?![\\s\\S])"
-                    }
-                  ]
+                  "not": {},
+                  "x-untranslated": "vendor format or property string"
                 },
                 "gateway6": {
                   "type": "string",
-                  "pattern": "^(?:(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])(?:\\.(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])){3}(?:/(?:[0-9]|[12][0-9]|3[0-2]))?|(?:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::|::[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::)(?:/(?:[0-9]|[1-9][0-9]|1[01][0-9]|12[0-8]))?)$(?![\\s\\S])",
-                  "allOf": [
-                    {
-                      "pattern": "^[^/]*:[^/]*$(?![\\s\\S])"
-                    }
-                  ]
+                  "not": {},
+                  "x-untranslated": "vendor format or property string"
                 },
                 "iface": {
                   "type": "string",
                   "minLength": 2,
                   "maxLength": 20,
-                  "pattern": "^vmbr[0-9]{1,11}$(?![\\s\\S])"
+                  "not": {},
+                  "x-untranslated": "vendor format or property string"
                 },
                 "mtu": {
                   "type": "integer",
                   "minimum": 1280,
                   "maximum": 65520
                 },
+                "netmask": {
+                  "type": "string",
+                  "not": {},
+                  "x-untranslated": "vendor format or property string"
+                },
+                "netmask6": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 128
+                },
                 "node": {
                   "type": "string",
                   "pattern": "^[A-Za-z0-9][A-Za-z0-9.-]*$"
+                },
+                "ovs_bonds": {
+                  "type": "string",
+                  "not": {},
+                  "x-untranslated": "vendor format or property string"
+                },
+                "ovs_bridge": {
+                  "type": "string",
+                  "not": {},
+                  "x-untranslated": "vendor format or property string"
+                },
+                "ovs_options": {
+                  "type": "string",
+                  "maxLength": 1024
+                },
+                "ovs_ports": {
+                  "type": "string",
+                  "not": {},
+                  "x-untranslated": "vendor format or property string"
+                },
+                "ovs_tag": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 4094
+                },
+                "slaves": {
+                  "type": "string",
+                  "not": {},
+                  "x-untranslated": "vendor format or property string"
                 },
                 "type": {
                   "enum": [
@@ -67908,9 +67927,17 @@
                     "vnet",
                     "unknown"
                   ],
+                  "type": "string"
+                },
+                "vlan-id": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 4094
+                },
+                "vlan-raw-device": {
                   "type": "string",
-                  "const": "bridge",
-                  "default": "bridge"
+                  "not": {},
+                  "x-untranslated": "vendor format or property string"
                 }
               },
               "required": [
@@ -67918,7 +67945,20 @@
                 "node",
                 "type"
               ],
-              "dependencies": {}
+              "dependencies": {
+                "address": [
+                  "netmask"
+                ],
+                "address6": [
+                  "netmask6"
+                ],
+                "netmask": [
+                  "address"
+                ],
+                "netmask6": [
+                  "address6"
+                ]
+              }
             }
           },
           "required": [
@@ -68060,56 +68100,12 @@
       "id": "OP-DELETE-8a74dfbfc2",
       "release": "legacy-8.2.7",
       "policy": {
-        "effect": "write",
-        "transport": "json",
-        "secrets": "private-result",
-        "stateBinding": {
-          "kind": "node-network",
-          "path": "/nodes/{node}/network"
-        },
-        "allowedInputs": [
-          "node",
-          "iface"
-        ],
-        "inputFormats": {
-          "iface": "pve-node-bridge",
-          "bridge_ports": "pve-node-ports",
-          "cidr": "pve-firewall-address",
-          "cidr6": "pve-firewall-address",
-          "gateway": "pve-firewall-address",
-          "gateway6": "pve-firewall-address"
-        },
-        "confirmationWarnings": [
-          {
-            "message": "MANAGEMENT ACCESS AT RISK: this pending change can cut host access when applied or on reboot. Classification is UNKNOWN: active addresses, hidden interfaces and external configuration are unverified. Inspect the private affected/addressed bridge, bond and VLAN dependencies before explicitly confirming."
-          },
-          {
-            "message": "PENDING ONLY, NON-ATOMIC: no native digest guards dispatch. Confirm the private pending diff and proposed configuration; application/revert are separate refused operations. Unexpected observations remain uncertain without retry or automatic recovery."
-          },
-          {
-            "message": "BRIDGE DELETION: explicitly confirm removal of this pending bridge configuration and inspect its consumers."
-          }
-        ],
-        "reason": "Confirmed pending Linux bridge CRUD only, with private native diff and state binding. Physical/OVS/VLAN/bond mutations, custom options, setting deletion and apply/revert remain refused.",
-        "reconciliation": {
-          "kind": "none",
-          "reason": "Inspect pending configuration privately without retry or automatic apply/revert; runtime reachability and active addresses are unverified."
-        },
-        "privileges": {
-          "check": [
-            "perm",
-            "/nodes/{node}",
-            [
-              "Sys.Modify"
-            ]
-          ]
-        },
-        "response": {
-          "type": "null"
-        },
-        "source": "Pinned Network.pm shadow-file CRUD and common INotify/Interfaces serialization; no native optimistic digest."
+        "effect": "unresolved",
+        "transport": "unresolved",
+        "secrets": "unresolved",
+        "reason": "Requires operation-specific effect, transport and secret review before admission."
       },
-      "callable": true,
+      "callable": false,
       "command": [
         "delete",
         "/nodes/{node}/network/{iface}"
@@ -68130,7 +68126,8 @@
                   "type": "string",
                   "minLength": 2,
                   "maxLength": 20,
-                  "pattern": "^vmbr[0-9]{1,11}$(?![\\s\\S])"
+                  "not": {},
+                  "x-untranslated": "vendor format or property string"
                 },
                 "node": {
                   "type": "string",
@@ -68532,70 +68529,12 @@
       "id": "OP-PUT-1fd88ef01b",
       "release": "legacy-8.2.7",
       "policy": {
-        "effect": "write",
-        "transport": "json",
-        "secrets": "private-result",
-        "stateBinding": {
-          "kind": "node-network",
-          "path": "/nodes/{node}/network"
-        },
-        "allowedInputs": [
-          "node",
-          "iface",
-          "type",
-          "autostart",
-          "bridge_ports",
-          "mtu",
-          "cidr",
-          "cidr6",
-          "gateway",
-          "gateway6"
-        ],
-        "fixedInputs": {
-          "type": "bridge"
-        },
-        "inputFormats": {
-          "iface": "pve-node-bridge",
-          "bridge_ports": "pve-node-ports",
-          "cidr": "pve-firewall-address",
-          "cidr6": "pve-firewall-address",
-          "gateway": "pve-firewall-address",
-          "gateway6": "pve-firewall-address"
-        },
-        "inputPatterns": {
-          "cidr": "^[^:]+/[1-9][0-9]*$(?![\\s\\S])",
-          "cidr6": "^[^/]*:[^/]*/[1-9][0-9]*$(?![\\s\\S])",
-          "gateway": "^[^:/]+$(?![\\s\\S])",
-          "gateway6": "^[^/]*:[^/]*$(?![\\s\\S])"
-        },
-        "confirmationWarnings": [
-          {
-            "message": "MANAGEMENT ACCESS AT RISK: this pending change can cut host access when applied or on reboot. Classification is UNKNOWN: active addresses, hidden interfaces and external configuration are unverified. Inspect the private affected/addressed bridge, bond and VLAN dependencies before explicitly confirming."
-          },
-          {
-            "message": "PENDING ONLY, NON-ATOMIC: no native digest guards dispatch. Confirm the private pending diff and proposed configuration; application/revert are separate refused operations. Unexpected observations remain uncertain without retry or automatic recovery."
-          }
-        ],
-        "reason": "Confirmed pending Linux bridge CRUD only, with private native diff and state binding. Physical/OVS/VLAN/bond mutations, custom options, setting deletion and apply/revert remain refused.",
-        "reconciliation": {
-          "kind": "none",
-          "reason": "Inspect pending configuration privately without retry or automatic apply/revert; runtime reachability and active addresses are unverified."
-        },
-        "privileges": {
-          "check": [
-            "perm",
-            "/nodes/{node}",
-            [
-              "Sys.Modify"
-            ]
-          ]
-        },
-        "response": {
-          "type": "null"
-        },
-        "source": "Pinned Network.pm shadow-file CRUD and common INotify/Interfaces serialization; no native optimistic digest."
+        "effect": "unresolved",
+        "transport": "unresolved",
+        "secrets": "unresolved",
+        "reason": "Requires operation-specific effect, transport and secret review before admission."
       },
-      "callable": true,
+      "callable": false,
       "command": [
         "put",
         "/nodes/{node}/network/{iface}"
@@ -68612,63 +68551,144 @@
               "type": "object",
               "additionalProperties": false,
               "properties": {
+                "address": {
+                  "type": "string",
+                  "not": {},
+                  "x-untranslated": "vendor format or property string"
+                },
+                "address6": {
+                  "type": "string",
+                  "not": {},
+                  "x-untranslated": "vendor format or property string"
+                },
                 "autostart": {
                   "type": "boolean"
                 },
+                "bond-primary": {
+                  "type": "string",
+                  "not": {},
+                  "x-untranslated": "vendor format or property string"
+                },
+                "bond_mode": {
+                  "enum": [
+                    "balance-rr",
+                    "active-backup",
+                    "balance-xor",
+                    "broadcast",
+                    "802.3ad",
+                    "balance-tlb",
+                    "balance-alb",
+                    "balance-slb",
+                    "lacp-balance-slb",
+                    "lacp-balance-tcp"
+                  ],
+                  "type": "string"
+                },
+                "bond_xmit_hash_policy": {
+                  "enum": [
+                    "layer2",
+                    "layer2+3",
+                    "layer3+4"
+                  ],
+                  "type": "string"
+                },
                 "bridge_ports": {
                   "type": "string",
-                  "pattern": "^(?:[A-Za-z][A-Za-z0-9_.-]{1,14}(?: [A-Za-z][A-Za-z0-9_.-]{1,14})*)?$(?![\\s\\S])"
+                  "not": {},
+                  "x-untranslated": "vendor format or property string"
+                },
+                "bridge_vids": {
+                  "type": "string",
+                  "not": {},
+                  "x-untranslated": "vendor format or property string"
+                },
+                "bridge_vlan_aware": {
+                  "type": "boolean"
                 },
                 "cidr": {
                   "type": "string",
-                  "pattern": "^(?:(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])(?:\\.(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])){3}(?:/(?:[0-9]|[12][0-9]|3[0-2]))?|(?:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::|::[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::)(?:/(?:[0-9]|[1-9][0-9]|1[01][0-9]|12[0-8]))?)$(?![\\s\\S])",
-                  "allOf": [
-                    {
-                      "pattern": "^[^:]+/[1-9][0-9]*$(?![\\s\\S])"
-                    }
-                  ]
+                  "not": {},
+                  "x-untranslated": "vendor format or property string"
                 },
                 "cidr6": {
                   "type": "string",
-                  "pattern": "^(?:(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])(?:\\.(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])){3}(?:/(?:[0-9]|[12][0-9]|3[0-2]))?|(?:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::|::[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::)(?:/(?:[0-9]|[1-9][0-9]|1[01][0-9]|12[0-8]))?)$(?![\\s\\S])",
-                  "allOf": [
-                    {
-                      "pattern": "^[^/]*:[^/]*/[1-9][0-9]*$(?![\\s\\S])"
-                    }
-                  ]
+                  "not": {},
+                  "x-untranslated": "vendor format or property string"
+                },
+                "comments": {
+                  "type": "string"
+                },
+                "comments6": {
+                  "type": "string"
+                },
+                "delete": {
+                  "type": "string",
+                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*(?:[,; ][A-Za-z][A-Za-z0-9._-]*)*$"
                 },
                 "gateway": {
                   "type": "string",
-                  "pattern": "^(?:(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])(?:\\.(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])){3}(?:/(?:[0-9]|[12][0-9]|3[0-2]))?|(?:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::|::[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::)(?:/(?:[0-9]|[1-9][0-9]|1[01][0-9]|12[0-8]))?)$(?![\\s\\S])",
-                  "allOf": [
-                    {
-                      "pattern": "^[^:/]+$(?![\\s\\S])"
-                    }
-                  ]
+                  "not": {},
+                  "x-untranslated": "vendor format or property string"
                 },
                 "gateway6": {
                   "type": "string",
-                  "pattern": "^(?:(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])(?:\\.(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])){3}(?:/(?:[0-9]|[12][0-9]|3[0-2]))?|(?:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::|::[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::)(?:/(?:[0-9]|[1-9][0-9]|1[01][0-9]|12[0-8]))?)$(?![\\s\\S])",
-                  "allOf": [
-                    {
-                      "pattern": "^[^/]*:[^/]*$(?![\\s\\S])"
-                    }
-                  ]
+                  "not": {},
+                  "x-untranslated": "vendor format or property string"
                 },
                 "iface": {
                   "type": "string",
                   "minLength": 2,
                   "maxLength": 20,
-                  "pattern": "^vmbr[0-9]{1,11}$(?![\\s\\S])"
+                  "not": {},
+                  "x-untranslated": "vendor format or property string"
                 },
                 "mtu": {
                   "type": "integer",
                   "minimum": 1280,
                   "maximum": 65520
                 },
+                "netmask": {
+                  "type": "string",
+                  "not": {},
+                  "x-untranslated": "vendor format or property string"
+                },
+                "netmask6": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 128
+                },
                 "node": {
                   "type": "string",
                   "pattern": "^[A-Za-z0-9][A-Za-z0-9.-]*$"
+                },
+                "ovs_bonds": {
+                  "type": "string",
+                  "not": {},
+                  "x-untranslated": "vendor format or property string"
+                },
+                "ovs_bridge": {
+                  "type": "string",
+                  "not": {},
+                  "x-untranslated": "vendor format or property string"
+                },
+                "ovs_options": {
+                  "type": "string",
+                  "maxLength": 1024
+                },
+                "ovs_ports": {
+                  "type": "string",
+                  "not": {},
+                  "x-untranslated": "vendor format or property string"
+                },
+                "ovs_tag": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 4094
+                },
+                "slaves": {
+                  "type": "string",
+                  "not": {},
+                  "x-untranslated": "vendor format or property string"
                 },
                 "type": {
                   "enum": [
@@ -68684,9 +68704,17 @@
                     "vnet",
                     "unknown"
                   ],
+                  "type": "string"
+                },
+                "vlan-id": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 4094
+                },
+                "vlan-raw-device": {
                   "type": "string",
-                  "const": "bridge",
-                  "default": "bridge"
+                  "not": {},
+                  "x-untranslated": "vendor format or property string"
                 }
               },
               "required": [
@@ -68694,7 +68722,20 @@
                 "node",
                 "type"
               ],
-              "dependencies": {}
+              "dependencies": {
+                "address": [
+                  "netmask"
+                ],
+                "address6": [
+                  "netmask6"
+                ],
+                "netmask": [
+                  "address"
+                ],
+                "netmask6": [
+                  "address6"
+                ]
+              }
             }
           },
           "required": [
@@ -193826,70 +193867,12 @@
       "id": "OP-POST-31d829c871",
       "release": "published-current",
       "policy": {
-        "effect": "write",
-        "transport": "json",
-        "secrets": "private-result",
-        "stateBinding": {
-          "kind": "node-network",
-          "path": "/nodes/{node}/network"
-        },
-        "allowedInputs": [
-          "node",
-          "iface",
-          "type",
-          "autostart",
-          "bridge_ports",
-          "mtu",
-          "cidr",
-          "cidr6",
-          "gateway",
-          "gateway6"
-        ],
-        "fixedInputs": {
-          "type": "bridge"
-        },
-        "inputFormats": {
-          "iface": "pve-node-bridge",
-          "bridge_ports": "pve-node-ports",
-          "cidr": "pve-firewall-address",
-          "cidr6": "pve-firewall-address",
-          "gateway": "pve-firewall-address",
-          "gateway6": "pve-firewall-address"
-        },
-        "inputPatterns": {
-          "cidr": "^[^:]+/[1-9][0-9]*$(?![\\s\\S])",
-          "cidr6": "^[^/]*:[^/]*/[1-9][0-9]*$(?![\\s\\S])",
-          "gateway": "^[^:/]+$(?![\\s\\S])",
-          "gateway6": "^[^/]*:[^/]*$(?![\\s\\S])"
-        },
-        "confirmationWarnings": [
-          {
-            "message": "MANAGEMENT ACCESS AT RISK: this pending change can cut host access when applied or on reboot. Classification is UNKNOWN: active addresses, hidden interfaces and external configuration are unverified. Inspect the private affected/addressed bridge, bond and VLAN dependencies before explicitly confirming."
-          },
-          {
-            "message": "PENDING ONLY, NON-ATOMIC: no native digest guards dispatch. Confirm the private pending diff and proposed configuration; application/revert are separate refused operations. Unexpected observations remain uncertain without retry or automatic recovery."
-          }
-        ],
-        "reason": "Confirmed pending Linux bridge CRUD only, with private native diff and state binding. Physical/OVS/VLAN/bond mutations, custom options, setting deletion and apply/revert remain refused.",
-        "reconciliation": {
-          "kind": "none",
-          "reason": "Inspect pending configuration privately without retry or automatic apply/revert; runtime reachability and active addresses are unverified."
-        },
-        "privileges": {
-          "check": [
-            "perm",
-            "/nodes/{node}",
-            [
-              "Sys.Modify"
-            ]
-          ]
-        },
-        "response": {
-          "type": "null"
-        },
-        "source": "Pinned Network.pm shadow-file CRUD and common INotify/Interfaces serialization; no native optimistic digest."
+        "effect": "unresolved",
+        "transport": "unresolved",
+        "secrets": "unresolved",
+        "reason": "Requires operation-specific effect, transport and secret review before admission."
       },
-      "callable": true,
+      "callable": false,
       "command": [
         "post",
         "/nodes/{node}/network"
@@ -193906,63 +193889,140 @@
               "type": "object",
               "additionalProperties": false,
               "properties": {
+                "address": {
+                  "type": "string",
+                  "not": {},
+                  "x-untranslated": "vendor format or property string"
+                },
+                "address6": {
+                  "type": "string",
+                  "not": {},
+                  "x-untranslated": "vendor format or property string"
+                },
                 "autostart": {
                   "type": "boolean"
                 },
+                "bond-primary": {
+                  "type": "string",
+                  "not": {},
+                  "x-untranslated": "vendor format or property string"
+                },
+                "bond_mode": {
+                  "enum": [
+                    "balance-rr",
+                    "active-backup",
+                    "balance-xor",
+                    "broadcast",
+                    "802.3ad",
+                    "balance-tlb",
+                    "balance-alb",
+                    "balance-slb",
+                    "lacp-balance-slb",
+                    "lacp-balance-tcp"
+                  ],
+                  "type": "string"
+                },
+                "bond_xmit_hash_policy": {
+                  "enum": [
+                    "layer2",
+                    "layer2+3",
+                    "layer3+4"
+                  ],
+                  "type": "string"
+                },
                 "bridge_ports": {
                   "type": "string",
-                  "pattern": "^(?:[A-Za-z][A-Za-z0-9_.-]{1,14}(?: [A-Za-z][A-Za-z0-9_.-]{1,14})*)?$(?![\\s\\S])"
+                  "not": {},
+                  "x-untranslated": "vendor format or property string"
+                },
+                "bridge_vids": {
+                  "type": "string",
+                  "not": {},
+                  "x-untranslated": "vendor format or property string"
+                },
+                "bridge_vlan_aware": {
+                  "type": "boolean"
                 },
                 "cidr": {
                   "type": "string",
-                  "pattern": "^(?:(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])(?:\\.(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])){3}(?:/(?:[0-9]|[12][0-9]|3[0-2]))?|(?:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::|::[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::)(?:/(?:[0-9]|[1-9][0-9]|1[01][0-9]|12[0-8]))?)$(?![\\s\\S])",
-                  "allOf": [
-                    {
-                      "pattern": "^[^:]+/[1-9][0-9]*$(?![\\s\\S])"
-                    }
-                  ]
+                  "not": {},
+                  "x-untranslated": "vendor format or property string"
                 },
                 "cidr6": {
                   "type": "string",
-                  "pattern": "^(?:(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])(?:\\.(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])){3}(?:/(?:[0-9]|[12][0-9]|3[0-2]))?|(?:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::|::[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::)(?:/(?:[0-9]|[1-9][0-9]|1[01][0-9]|12[0-8]))?)$(?![\\s\\S])",
-                  "allOf": [
-                    {
-                      "pattern": "^[^/]*:[^/]*/[1-9][0-9]*$(?![\\s\\S])"
-                    }
-                  ]
+                  "not": {},
+                  "x-untranslated": "vendor format or property string"
+                },
+                "comments": {
+                  "type": "string"
+                },
+                "comments6": {
+                  "type": "string"
                 },
                 "gateway": {
                   "type": "string",
-                  "pattern": "^(?:(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])(?:\\.(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])){3}(?:/(?:[0-9]|[12][0-9]|3[0-2]))?|(?:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::|::[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::)(?:/(?:[0-9]|[1-9][0-9]|1[01][0-9]|12[0-8]))?)$(?![\\s\\S])",
-                  "allOf": [
-                    {
-                      "pattern": "^[^:/]+$(?![\\s\\S])"
-                    }
-                  ]
+                  "not": {},
+                  "x-untranslated": "vendor format or property string"
                 },
                 "gateway6": {
                   "type": "string",
-                  "pattern": "^(?:(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])(?:\\.(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])){3}(?:/(?:[0-9]|[12][0-9]|3[0-2]))?|(?:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::|::[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::)(?:/(?:[0-9]|[1-9][0-9]|1[01][0-9]|12[0-8]))?)$(?![\\s\\S])",
-                  "allOf": [
-                    {
-                      "pattern": "^[^/]*:[^/]*$(?![\\s\\S])"
-                    }
-                  ]
+                  "not": {},
+                  "x-untranslated": "vendor format or property string"
                 },
                 "iface": {
                   "type": "string",
                   "minLength": 2,
                   "maxLength": 20,
-                  "pattern": "^vmbr[0-9]{1,11}$(?![\\s\\S])"
+                  "not": {},
+                  "x-untranslated": "vendor format or property string"
                 },
                 "mtu": {
                   "type": "integer",
                   "minimum": 1280,
                   "maximum": 65520
                 },
+                "netmask": {
+                  "type": "string",
+                  "not": {},
+                  "x-untranslated": "vendor format or property string"
+                },
+                "netmask6": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 128
+                },
                 "node": {
                   "type": "string",
                   "pattern": "^[A-Za-z0-9][A-Za-z0-9.-]*$"
+                },
+                "ovs_bonds": {
+                  "type": "string",
+                  "not": {},
+                  "x-untranslated": "vendor format or property string"
+                },
+                "ovs_bridge": {
+                  "type": "string",
+                  "not": {},
+                  "x-untranslated": "vendor format or property string"
+                },
+                "ovs_options": {
+                  "type": "string",
+                  "maxLength": 1024
+                },
+                "ovs_ports": {
+                  "type": "string",
+                  "not": {},
+                  "x-untranslated": "vendor format or property string"
+                },
+                "ovs_tag": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 4094
+                },
+                "slaves": {
+                  "type": "string",
+                  "not": {},
+                  "x-untranslated": "vendor format or property string"
                 },
                 "type": {
                   "enum": [
@@ -193979,9 +194039,17 @@
                     "vnet",
                     "unknown"
                   ],
+                  "type": "string"
+                },
+                "vlan-id": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 4094
+                },
+                "vlan-raw-device": {
                   "type": "string",
-                  "const": "bridge",
-                  "default": "bridge"
+                  "not": {},
+                  "x-untranslated": "vendor format or property string"
                 }
               },
               "required": [
@@ -193989,7 +194057,20 @@
                 "node",
                 "type"
               ],
-              "dependencies": {}
+              "dependencies": {
+                "address": [
+                  "netmask"
+                ],
+                "address6": [
+                  "netmask6"
+                ],
+                "netmask": [
+                  "address"
+                ],
+                "netmask6": [
+                  "address6"
+                ]
+              }
             }
           },
           "required": [
@@ -194141,56 +194222,12 @@
       "id": "OP-DELETE-8a74dfbfc2",
       "release": "published-current",
       "policy": {
-        "effect": "write",
-        "transport": "json",
-        "secrets": "private-result",
-        "stateBinding": {
-          "kind": "node-network",
-          "path": "/nodes/{node}/network"
-        },
-        "allowedInputs": [
-          "node",
-          "iface"
-        ],
-        "inputFormats": {
-          "iface": "pve-node-bridge",
-          "bridge_ports": "pve-node-ports",
-          "cidr": "pve-firewall-address",
-          "cidr6": "pve-firewall-address",
-          "gateway": "pve-firewall-address",
-          "gateway6": "pve-firewall-address"
-        },
-        "confirmationWarnings": [
-          {
-            "message": "MANAGEMENT ACCESS AT RISK: this pending change can cut host access when applied or on reboot. Classification is UNKNOWN: active addresses, hidden interfaces and external configuration are unverified. Inspect the private affected/addressed bridge, bond and VLAN dependencies before explicitly confirming."
-          },
-          {
-            "message": "PENDING ONLY, NON-ATOMIC: no native digest guards dispatch. Confirm the private pending diff and proposed configuration; application/revert are separate refused operations. Unexpected observations remain uncertain without retry or automatic recovery."
-          },
-          {
-            "message": "BRIDGE DELETION: explicitly confirm removal of this pending bridge configuration and inspect its consumers."
-          }
-        ],
-        "reason": "Confirmed pending Linux bridge CRUD only, with private native diff and state binding. Physical/OVS/VLAN/bond mutations, custom options, setting deletion and apply/revert remain refused.",
-        "reconciliation": {
-          "kind": "none",
-          "reason": "Inspect pending configuration privately without retry or automatic apply/revert; runtime reachability and active addresses are unverified."
-        },
-        "privileges": {
-          "check": [
-            "perm",
-            "/nodes/{node}",
-            [
-              "Sys.Modify"
-            ]
-          ]
-        },
-        "response": {
-          "type": "null"
-        },
-        "source": "Pinned Network.pm shadow-file CRUD and common INotify/Interfaces serialization; no native optimistic digest."
+        "effect": "unresolved",
+        "transport": "unresolved",
+        "secrets": "unresolved",
+        "reason": "Requires operation-specific effect, transport and secret review before admission."
       },
-      "callable": true,
+      "callable": false,
       "command": [
         "delete",
         "/nodes/{node}/network/{iface}"
@@ -194211,7 +194248,8 @@
                   "type": "string",
                   "minLength": 2,
                   "maxLength": 20,
-                  "pattern": "^vmbr[0-9]{1,11}$(?![\\s\\S])"
+                  "not": {},
+                  "x-untranslated": "vendor format or property string"
                 },
                 "node": {
                   "type": "string",
@@ -194614,70 +194652,12 @@
       "id": "OP-PUT-1fd88ef01b",
       "release": "published-current",
       "policy": {
-        "effect": "write",
-        "transport": "json",
-        "secrets": "private-result",
-        "stateBinding": {
-          "kind": "node-network",
-          "path": "/nodes/{node}/network"
-        },
-        "allowedInputs": [
-          "node",
-          "iface",
-          "type",
-          "autostart",
-          "bridge_ports",
-          "mtu",
-          "cidr",
-          "cidr6",
-          "gateway",
-          "gateway6"
-        ],
-        "fixedInputs": {
-          "type": "bridge"
-        },
-        "inputFormats": {
-          "iface": "pve-node-bridge",
-          "bridge_ports": "pve-node-ports",
-          "cidr": "pve-firewall-address",
-          "cidr6": "pve-firewall-address",
-          "gateway": "pve-firewall-address",
-          "gateway6": "pve-firewall-address"
-        },
-        "inputPatterns": {
-          "cidr": "^[^:]+/[1-9][0-9]*$(?![\\s\\S])",
-          "cidr6": "^[^/]*:[^/]*/[1-9][0-9]*$(?![\\s\\S])",
-          "gateway": "^[^:/]+$(?![\\s\\S])",
-          "gateway6": "^[^/]*:[^/]*$(?![\\s\\S])"
-        },
-        "confirmationWarnings": [
-          {
-            "message": "MANAGEMENT ACCESS AT RISK: this pending change can cut host access when applied or on reboot. Classification is UNKNOWN: active addresses, hidden interfaces and external configuration are unverified. Inspect the private affected/addressed bridge, bond and VLAN dependencies before explicitly confirming."
-          },
-          {
-            "message": "PENDING ONLY, NON-ATOMIC: no native digest guards dispatch. Confirm the private pending diff and proposed configuration; application/revert are separate refused operations. Unexpected observations remain uncertain without retry or automatic recovery."
-          }
-        ],
-        "reason": "Confirmed pending Linux bridge CRUD only, with private native diff and state binding. Physical/OVS/VLAN/bond mutations, custom options, setting deletion and apply/revert remain refused.",
-        "reconciliation": {
-          "kind": "none",
-          "reason": "Inspect pending configuration privately without retry or automatic apply/revert; runtime reachability and active addresses are unverified."
-        },
-        "privileges": {
-          "check": [
-            "perm",
-            "/nodes/{node}",
-            [
-              "Sys.Modify"
-            ]
-          ]
-        },
-        "response": {
-          "type": "null"
-        },
-        "source": "Pinned Network.pm shadow-file CRUD and common INotify/Interfaces serialization; no native optimistic digest."
+        "effect": "unresolved",
+        "transport": "unresolved",
+        "secrets": "unresolved",
+        "reason": "Requires operation-specific effect, transport and secret review before admission."
       },
-      "callable": true,
+      "callable": false,
       "command": [
         "put",
         "/nodes/{node}/network/{iface}"
@@ -194694,63 +194674,144 @@
               "type": "object",
               "additionalProperties": false,
               "properties": {
+                "address": {
+                  "type": "string",
+                  "not": {},
+                  "x-untranslated": "vendor format or property string"
+                },
+                "address6": {
+                  "type": "string",
+                  "not": {},
+                  "x-untranslated": "vendor format or property string"
+                },
                 "autostart": {
                   "type": "boolean"
                 },
+                "bond-primary": {
+                  "type": "string",
+                  "not": {},
+                  "x-untranslated": "vendor format or property string"
+                },
+                "bond_mode": {
+                  "enum": [
+                    "balance-rr",
+                    "active-backup",
+                    "balance-xor",
+                    "broadcast",
+                    "802.3ad",
+                    "balance-tlb",
+                    "balance-alb",
+                    "balance-slb",
+                    "lacp-balance-slb",
+                    "lacp-balance-tcp"
+                  ],
+                  "type": "string"
+                },
+                "bond_xmit_hash_policy": {
+                  "enum": [
+                    "layer2",
+                    "layer2+3",
+                    "layer3+4"
+                  ],
+                  "type": "string"
+                },
                 "bridge_ports": {
                   "type": "string",
-                  "pattern": "^(?:[A-Za-z][A-Za-z0-9_.-]{1,14}(?: [A-Za-z][A-Za-z0-9_.-]{1,14})*)?$(?![\\s\\S])"
+                  "not": {},
+                  "x-untranslated": "vendor format or property string"
+                },
+                "bridge_vids": {
+                  "type": "string",
+                  "not": {},
+                  "x-untranslated": "vendor format or property string"
+                },
+                "bridge_vlan_aware": {
+                  "type": "boolean"
                 },
                 "cidr": {
                   "type": "string",
-                  "pattern": "^(?:(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])(?:\\.(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])){3}(?:/(?:[0-9]|[12][0-9]|3[0-2]))?|(?:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::|::[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::)(?:/(?:[0-9]|[1-9][0-9]|1[01][0-9]|12[0-8]))?)$(?![\\s\\S])",
-                  "allOf": [
-                    {
-                      "pattern": "^[^:]+/[1-9][0-9]*$(?![\\s\\S])"
-                    }
-                  ]
+                  "not": {},
+                  "x-untranslated": "vendor format or property string"
                 },
                 "cidr6": {
                   "type": "string",
-                  "pattern": "^(?:(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])(?:\\.(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])){3}(?:/(?:[0-9]|[12][0-9]|3[0-2]))?|(?:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::|::[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::)(?:/(?:[0-9]|[1-9][0-9]|1[01][0-9]|12[0-8]))?)$(?![\\s\\S])",
-                  "allOf": [
-                    {
-                      "pattern": "^[^/]*:[^/]*/[1-9][0-9]*$(?![\\s\\S])"
-                    }
-                  ]
+                  "not": {},
+                  "x-untranslated": "vendor format or property string"
+                },
+                "comments": {
+                  "type": "string"
+                },
+                "comments6": {
+                  "type": "string"
+                },
+                "delete": {
+                  "type": "string",
+                  "pattern": "^[A-Za-z][A-Za-z0-9._-]*(?:[,; ][A-Za-z][A-Za-z0-9._-]*)*$"
                 },
                 "gateway": {
                   "type": "string",
-                  "pattern": "^(?:(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])(?:\\.(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])){3}(?:/(?:[0-9]|[12][0-9]|3[0-2]))?|(?:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::|::[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::)(?:/(?:[0-9]|[1-9][0-9]|1[01][0-9]|12[0-8]))?)$(?![\\s\\S])",
-                  "allOf": [
-                    {
-                      "pattern": "^[^:/]+$(?![\\s\\S])"
-                    }
-                  ]
+                  "not": {},
+                  "x-untranslated": "vendor format or property string"
                 },
                 "gateway6": {
                   "type": "string",
-                  "pattern": "^(?:(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])(?:\\.(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])){3}(?:/(?:[0-9]|[12][0-9]|3[0-2]))?|(?:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::|::[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::[0-9A-Fa-f]{1,4}|[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}::)(?:/(?:[0-9]|[1-9][0-9]|1[01][0-9]|12[0-8]))?)$(?![\\s\\S])",
-                  "allOf": [
-                    {
-                      "pattern": "^[^/]*:[^/]*$(?![\\s\\S])"
-                    }
-                  ]
+                  "not": {},
+                  "x-untranslated": "vendor format or property string"
                 },
                 "iface": {
                   "type": "string",
                   "minLength": 2,
                   "maxLength": 20,
-                  "pattern": "^vmbr[0-9]{1,11}$(?![\\s\\S])"
+                  "not": {},
+                  "x-untranslated": "vendor format or property string"
                 },
                 "mtu": {
                   "type": "integer",
                   "minimum": 1280,
                   "maximum": 65520
                 },
+                "netmask": {
+                  "type": "string",
+                  "not": {},
+                  "x-untranslated": "vendor format or property string"
+                },
+                "netmask6": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 128
+                },
                 "node": {
                   "type": "string",
                   "pattern": "^[A-Za-z0-9][A-Za-z0-9.-]*$"
+                },
+                "ovs_bonds": {
+                  "type": "string",
+                  "not": {},
+                  "x-untranslated": "vendor format or property string"
+                },
+                "ovs_bridge": {
+                  "type": "string",
+                  "not": {},
+                  "x-untranslated": "vendor format or property string"
+                },
+                "ovs_options": {
+                  "type": "string",
+                  "maxLength": 1024
+                },
+                "ovs_ports": {
+                  "type": "string",
+                  "not": {},
+                  "x-untranslated": "vendor format or property string"
+                },
+                "ovs_tag": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 4094
+                },
+                "slaves": {
+                  "type": "string",
+                  "not": {},
+                  "x-untranslated": "vendor format or property string"
                 },
                 "type": {
                   "enum": [
@@ -194767,9 +194828,17 @@
                     "vnet",
                     "unknown"
                   ],
+                  "type": "string"
+                },
+                "vlan-id": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 4094
+                },
+                "vlan-raw-device": {
                   "type": "string",
-                  "const": "bridge",
-                  "default": "bridge"
+                  "not": {},
+                  "x-untranslated": "vendor format or property string"
                 }
               },
               "required": [
@@ -194777,7 +194846,20 @@
                 "node",
                 "type"
               ],
-              "dependencies": {}
+              "dependencies": {
+                "address": [
+                  "netmask"
+                ],
+                "address6": [
+                  "netmask6"
+                ],
+                "netmask": [
+                  "address"
+                ],
+                "netmask6": [
+                  "address6"
+                ]
+              }
             }
           },
           "required": [
