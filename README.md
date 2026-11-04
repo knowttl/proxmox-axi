@@ -502,6 +502,7 @@ Any failed child makes the batch fail, with partial outcomes retained and no ass
   HTTP 400, 401 and 403 refusals mark the intent failed and include bounded, sanitized parameter or permission hints when recognized.
   A refused batch wrapper leaves all its descendants `not-sent`, including nested batches.
 - `journal reconcile` can observe reviewed direct configuration or status fields, or inspect retained UPIDs.
+  QEMU and LXC configuration checks apply [numeric response normalization](#output-and-exit-codes) before comparing fields such as `cpulimit`, including in batch children.
   Description comparisons ignore trailing whitespace in both the requested and observed values.
   Observation does not attribute an uncertain mutation, and missing or filtered data never proves failure.
   Variants without a safe reconciliation read say so explicitly.
