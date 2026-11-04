@@ -1,6 +1,6 @@
 {
   "name": "@knowttl/proxmox-axi",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "AXI client for Proxmox VE",
   "license": "MIT",
   "repository": {
