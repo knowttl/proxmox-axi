@@ -7,6 +7,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url'
 import { spawn, type ChildProcess } from 'node:child_process'
 import type { IncomingMessage, ServerResponse } from 'node:http'
 import { decode } from '@toon-format/toon'
+import { observePackaged } from './packaged-process.ts'
 import live from '../test/fixtures/live-8.2.7.json' with { type: 'json' }
 
 const { description, refusals } = live
@@ -44,6 +45,7 @@ export async function exerciseWriteJourney(options: Journey): Promise<void> {
   let activeCase = ''
   let activeIntent: string | undefined
   let crashing: ChildProcess | undefined
+  const statusProcesses = new Set<ReturnType<typeof observePackaged>>()
   let bodyEvidence: Record<string, unknown>[] = []
   let taskReadStarted = () => {}, releaseTaskRead = () => {}
   let blockedTaskRead = Promise.resolve()
@@ -182,6 +184,37 @@ export async function exerciseWriteJourney(options: Journey): Promise<void> {
   }
   const argsFor = (command: string, family: string, suffix = '') => [command, `/nodes/{node}/${family}/{vmid}${suffix}`, '--api-node', 'pve-test', '--api-vmid', '100']
   const start = argsFor('create', 'qemu', '/status/start')
+  const warmStatus = async (id: string, args: string[], expected: { status: string, code: number }) => {
+    const process = observePackaged(spawn(globalThis.process.execPath, [executable, 'auth', 'session'], { env, stdio: ['pipe', 'pipe', 'pipe'] }),
+      { caseId: `${id}-warmup`, session: true })
+    statusProcesses.add(process)
+    process.child.stdin!.write(JSON.stringify(['config', 'path', '--format', 'json']) + '\n')
+    await process.lines.next()
+    let response: Record<string, unknown> | undefined
+    return {
+      async run() {
+        activeCase = id
+        const before = mutationCount
+        process.begin(id)
+        process.child.stdin!.write(JSON.stringify([...args, '--format', 'json']) + '\n')
+        response = await process.lines.next()
+        // Distinguish a transport deadline from a journal monotonicity failure.
+        assert.equal(response.status, expected.status, `${id}: task response ${JSON.stringify(response)}`)
+        assert.equal(mutationCount, before, `${id}: task reads never mutate`)
+        process.child.stdin!.end()
+      },
+      async finish() {
+        const result = await process.closed
+        assert.equal(result.code, expected.code, `${id}: ${result.stdout}${result.stderr}`)
+        assert.equal(result.stderr, '', id)
+        assert.ok(!result.stdout.includes(options.env.PROXMOX_AXI_TOKEN!), `${id}: credential leak`)
+        transcripts.push(`case: ${id}\nexit: ${result.code}\nstdout:\n${result.stdout}stderr:\n${result.stderr}`)
+        cases.push({ id: `standalone/${id}`, hosted: false, operation: args.slice(0, 2).join(' '), status: 'pass',
+          expected: { hostBoundary: false, auditExit: result.code }, actual: { exitCode: result.code, mutationTransmissions: 0 } })
+      },
+      stop() { process.child.kill('SIGKILL') },
+    }
+  }
   try {
     for (const refusal of refusals) {
       const args = ['create', '/pools', '--api-poolid', 'synthetic-pool']
@@ -484,16 +517,23 @@ export async function exerciseWriteJourney(options: Journey): Promise<void> {
           await invoke(`${label}-accepted`, [...args, '--confirm', preview.confirmation], { status: 'accepted', mutations: 1 })
           const statusArgs = ['task', 'status', '--api-node', 'pve-test', '--api-upid', upid, '--journal', preview.id]
           const expected = { status: terminal, code: terminal === 'failed' ? 1 : 0 }
+          // Both independent public CLIs are ready before any HTTP response is
+          // held. Release the stale response after the terminal public result,
+          // without waiting for another process to start or exit in that window.
+          const [older, newer] = await Promise.all([
+            warmStatus(`${label}-delayed`, statusArgs, expected), warmStatus(`${label}-terminal`, statusArgs, expected),
+          ])
           const started = new Promise<void>(resolve => { taskReadStarted = resolve })
           blockedTaskRead = new Promise<void>(resolve => { releaseTaskRead = resolve })
           mode = 'delayed-running'; delayNextRead = true
-          const delayed = invoke(`${label}-delayed`, statusArgs, expected)
+          const delayed = older.run()
           try {
             await Promise.race([started, delayed.then(() => { throw new Error('Status ended before the controlled read') })])
             taskState = terminal
-            await invoke(`${label}-terminal`, statusArgs, expected)
+            await newer.run()
           } finally { releaseTaskRead() }
           await delayed
+          await Promise.all([older.finish(), newer.finish()]).finally(() => { older.stop(); newer.stop() })
           mode = 'success'
           const retained = await invoke(`${label}-retained`, ['journal', 'show', preview.id])
           assert.equal(retained.journal.status, terminal)
@@ -505,15 +545,20 @@ export async function exerciseWriteJourney(options: Journey): Promise<void> {
       }
       const concurrent = await invoke('AC-ASYNC/concurrent-preview', [...batch, '--preview'])
       await invoke('AC-ASYNC/concurrent-accepted', [...batch, '--confirm', concurrent.confirmation], { status: 'accepted', mutations: 1 })
+      const [waitSession, statusSession] = await Promise.all([
+        warmStatus('AC-ASYNC/concurrent-wait', ['task', 'wait', '--api-node', 'pve-test', '--api-upid', upid, '--journal', concurrent.id], { status: 'success', code: 0 }),
+        warmStatus('AC-ASYNC/concurrent-status', ['task', 'status', '--api-node', 'pve-test', '--api-upid', lxcUpid, '--journal', concurrent.id], { status: 'failed', code: 1 }),
+      ])
       const started = new Promise<void>(resolve => { taskReadStarted = resolve })
       blockedTaskRead = new Promise<void>(resolve => { releaseTaskRead = resolve })
       mode = 'concurrent-followups'
-      const waiting = invoke('AC-ASYNC/concurrent-wait', ['task', 'wait', '--api-node', 'pve-test', '--api-upid', upid, '--journal', concurrent.id], { status: 'success' })
+      const waiting = waitSession.run()
       try {
         await Promise.race([started, waiting.then(() => { throw new Error('Task wait ended before the controlled read') })])
-        await invoke('AC-ASYNC/concurrent-status', ['task', 'status', '--api-node', 'pve-test', '--api-upid', lxcUpid, '--journal', concurrent.id], { code: 1, status: 'failed' })
+        await statusSession.run()
       } finally { releaseTaskRead() }
       await waiting
+      await Promise.all([waitSession.finish(), statusSession.finish()]).finally(() => { waitSession.stop(); statusSession.stop() })
       mode = 'success'
       const concurrentResult = await invoke('AC-ASYNC/concurrent-retained', ['journal', 'show', concurrent.id])
       assert.deepEqual(concurrentResult.journal.children.map((child: { status: string }) => child.status), ['success', 'failed'])
@@ -576,6 +621,9 @@ export async function exerciseWriteJourney(options: Journey): Promise<void> {
     bodyEvidence = bodyEvidence.map(row => ({ method: row.method, path: row.path, parameterNames: Object.keys(row.args as object), before: row.before, after: row.after ?? row.before }))
     await writeFile(join(options.out, `${options.hosted ? 'hosted-' : ''}business-evidence.json`), JSON.stringify({ guests: [...guestState], pools: [...pools], transmissions: bodyEvidence }, null, 2))
   } finally {
+    releaseTaskRead()
+    for (const process of statusProcesses) process.child.kill('SIGKILL')
+    await Promise.allSettled([...statusProcesses].map(process => process.closed))
     await new Promise<void>(resolve => { server.close(() => resolve()); server.closeAllConnections() })
   }
 }

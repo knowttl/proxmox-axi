@@ -7,4 +7,9 @@ function record(error, phase) {
   appendFileSync(process.env.PROXMOX_AXI_TEST_DIAGNOSTICS, `${JSON.stringify({ code, phase, elapsedMs: Math.round(performance.now()) })}\n`)
 }
 subscribe('http.client.request.error', ({ error }) => record(error, 'http'))
-subscribe('net.client.socket', ({ socket }) => socket.once('error', error => record(error, 'socket')))
+subscribe('net.client.socket', ({ socket }) => {
+  const started = performance.now()
+  socket.once('error', error => record(error, 'socket'))
+  socket.once('close', () => appendFileSync(process.env.PROXMOX_AXI_TEST_DIAGNOSTICS,
+    `${JSON.stringify({ phase: 'socket-close', durationMs: Math.round(performance.now() - started) })}\n`))
+})

@@ -4,7 +4,8 @@
     "noEmit": false,
     "rootDir": ".",
     "outDir": ".test-build",
-    "allowImportingTsExtensions": false
+    "allowImportingTsExtensions": false,
+    "rewriteRelativeImportExtensions": true
   },
   "include": ["test/*.ts", "scripts/auth-clock.ts", "scripts/journal-lock-crash.ts"]
 }
