@@ -18,3 +18,7 @@ Exempt: validation-boundary tests, contract tests against an agreed schema or re
 <!-- END canonical test-quality rules -->
 
 The build is offline: tests use fakes only and never contact a real Proxmox node or cluster or use real credentials.
+
+Acceptance request deadlines use child-process transport duration, separately from the bounded process watchdog.
+Persistent packaged sessions rearm that watchdog per command; missing responses identify the case, channel and child state without including inputs or payloads.
+Concurrent journal fixtures warm independent public CLI sessions before holding an older HTTP response and release it after the newer public result, before waiting for process exit.

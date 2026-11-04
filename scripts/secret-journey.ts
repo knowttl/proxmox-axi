@@ -5,7 +5,7 @@ import { createServer } from 'node:https'
 import { mkdir, open, readFile, readdir, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import type { Readable } from 'node:stream'
+import { observePackaged } from './packaged-process.ts'
 import { decode } from '@toon-format/toon'
 
 interface Journey {
@@ -37,21 +37,6 @@ const recovery = 'CANARY-one-time-recovery-S4'
 const taskUpid = 'UPID:pve-test:00000001:00000002:12345678:qmstart:100:synthetic@pve:'
 const version = { version: '8.2.7', release: '8.2', repoid: '3e0176e6bb2ade3b' }
 const object = (value: unknown): Record<string, unknown> => { assert.ok(value && typeof value === 'object' && !Array.isArray(value)); return value as Record<string, unknown> }
-
-function queue<T>() {
-  const values: T[] = []
-  const readers: ((value: T) => void)[] = []
-  return {
-    push(value: T) { const reader = readers.shift(); if (reader) reader(value); else values.push(value) },
-    next(): Promise<T> {
-      if (values.length) return Promise.resolve(values.shift()!)
-      return new Promise((resolve, reject) => {
-        const timer = setTimeout(() => reject(new Error('Packaged response deadline exceeded')), 10000)
-        readers.push(value => { clearTimeout(timer); resolve(value) })
-      })
-    },
-  }
-}
 
 export async function exerciseSecretJourney(options: Journey): Promise<void> {
   const { scratch, executable, caFile } = options
@@ -158,35 +143,7 @@ export async function exerciseSecretJourney(options: Journey): Promise<void> {
     const child = spawn(process.execPath, [...(!options.hosted && session ? ['--import', fileURLToPath(new URL(import.meta.url.endsWith('.ts') ? './auth-clock.ts' : './auth-clock.js', import.meta.url))] : []), executable,
       ...(options.hosted ? ['proxmox-axi'] : []), ...args], { env: { ...environment, PROXMOX_AXI_RESULT_FD: sink === 'missing' ? '' : '3' },
       stdio: ['pipe', 'pipe', 'pipe', ...(sink === 'missing' ? [] : [typeof sink === 'number' ? sink : 'pipe' as const])] })
-    const frames = queue<Frame>(), lines = queue<Record<string, unknown>>()
-    let privateBytes = Buffer.alloc(0), stdout = '', stderr = '', pending = ''
-    const timer = setTimeout(() => child.kill('SIGKILL'), 60000)
-    child.stdout!.on('data', (chunk: Buffer) => {
-      stdout += chunk.toString(); pending += chunk.toString()
-      if (session) { let end: number; while ((end = pending.indexOf('\n')) >= 0) { lines.push(object(JSON.parse(pending.slice(0, end)))); pending = pending.slice(end + 1) } }
-    })
-    child.stderr!.on('data', (chunk: Buffer) => { stderr += chunk.toString() })
-    if (typeof sink !== 'number' && sink !== 'missing') (child.stdio[3] as Readable).on('data', (chunk: Buffer) => {
-      privateBytes = Buffer.concat([privateBytes, chunk])
-      if (privateBytes.length > 65540) throw new Error('Oversized private frame')
-      while (privateBytes.length >= 4 && privateBytes.length >= 4 + privateBytes.readUInt32BE(0)) {
-        const length = privateBytes.readUInt32BE(0)
-        let frame: Frame
-        try { frame = JSON.parse(privateBytes.subarray(4, 4 + length).toString()) as Frame }
-        catch { throw new Error('Malformed private frame') }
-        frames.push(frame)
-        privateBytes = privateBytes.subarray(4 + length)
-      }
-    })
-    const closed = new Promise<{ code: number, stdout: string, stderr: string }>((resolve, reject) => {
-      child.once('error', reject)
-      child.once('close', (code, signal) => {
-        clearTimeout(timer)
-        if (signal) reject(new Error(`Command terminated by ${signal}`))
-        else resolve({ code: code!, stdout, stderr })
-      })
-    })
-    return { child, frames, lines, closed }
+    return observePackaged<Frame>(child, { caseId: activeCase, session, privateFrames: typeof sink !== 'number' && sink !== 'missing' })
   }
   let processSession: ReturnType<typeof start> | undefined
   const invoke = async (id: string, args: string[], expected: { error?: string, status?: string, mutations?: number, private?: boolean, sink?: string, otherActor?: boolean } = {}, api?: Record<string, unknown>) => {
@@ -196,6 +153,7 @@ export async function exerciseSecretJourney(options: Journey): Promise<void> {
     let value: Record<string, unknown>, frame: Frame | undefined
     if (api && !options.hosted) { await writeFile(bodyFile, JSON.stringify(api), { mode: 0o600 }); commandArgs.push('--body-file', bodyFile) }
     if (processSession) {
+      processSession.begin(id)
       processSession.child.stdin!.write(JSON.stringify(commandArgs) + '\n')
       value = await processSession.lines.next()
       if (expected.private) frame = await processSession.frames.next()
