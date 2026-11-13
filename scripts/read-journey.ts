@@ -1,10 +1,24 @@
+import type { Expected, RunCase, Vendor } from './acceptance.ts'
+import type { retainedReads as Reads } from './read-cases.ts'
 import assert from 'node:assert/strict'
-import { retainedReads } from './read-cases.mjs'
+import { retainedReads } from './read-cases.ts'
 
-export async function exerciseReadJourney({ runCase, pack, retained, contracts, env, entry, hosted, task }) {
+interface ReadJourney {
+  runCase: RunCase
+  pack: string
+  retained: Parameters<typeof Reads>[1]
+  contracts: Parameters<typeof Reads>[2]
+  env: Record<string, string>
+  entry: string
+  hosted: boolean
+  task: string
+}
+
+
+export async function exerciseReadJourney({ runCase, pack, retained, contracts, env, entry, hosted, task }: ReadJourney) {
   const cases = await retainedReads(pack, retained, contracts)
   const prefix = hosted ? ['proxmox-axi'] : []
-  const run = (id, args, expected, response) => runCase(`${hosted ? 'artium' : 'standalone'}/${id}`,
+  const run = (id: string, args: string[], expected: Expected, response: Vendor) => runCase(`${hosted ? 'artium' : 'standalone'}/${id}`,
     [...prefix, ...args], env, { ...expected, ...(hosted ? { identity: 'hosted-canary' } : {}) }, response, entry)
   for (const row of cases) {
     const value = await run(`retained/${row.id}`, [...row.args, '--catalogue', 'legacy-8.2.7', '--full', '--format', 'json'],
@@ -12,29 +26,29 @@ export async function exerciseReadJourney({ runCase, pack, retained, contracts, 
     if (Array.isArray(row.expected) && !row.verified) assert.equal(value.visibility, 'unknown', 'Pre-permission samples are never proof of empty inventory')
   }
   const verified = cases.filter(row => row.verified)
-  const version = verified.find(row => row.contract.path === '/version').response
-  const permissions = verified.find(row => row.contract.path === '/access/permissions').response
+  const version = verified.find(row => row.contract.path === '/version')!.response
+  const permissions = verified.find(row => row.contract.path === '/access/permissions')!.response
   const routes = new Map(verified.map(row => [row.path, row.response]))
   routes.set('/api2/json/access/permissions', permissions)
   routes.set('/api2/json/nodes/node-a/version', version)
-  const vendor = path => routes.get(path) ?? { httpStatus: 404, body: { data: null } }
-  for (const [route, count] of [['/nodes', 1], ['/nodes/{node}/qemu', 9], ['/nodes/{node}/lxc', 1], ['/nodes/{node}/storage', 4], ['/nodes/{node}/tasks', 1], ['/nodes/{node}/tasks/{upid}/log', 2]]) {
-    const row = verified.find(row => row.contract.path === route)
+  const vendor = (path: string) => routes.get(path) ?? { httpStatus: 404, body: { data: null } }
+  for (const [route, count] of [['/nodes', 1], ['/nodes/{node}/qemu', 9], ['/nodes/{node}/lxc', 1], ['/nodes/{node}/storage', 4], ['/nodes/{node}/tasks', 1], ['/nodes/{node}/tasks/{upid}/log', 2]] as const) {
+    const row = verified.find(row => row.contract.path === route)!
     const paths = ['/api2/json/version', ...(row.values.node ? ['/api2/json/nodes/node-a/version'] : []),
       ...(route.endsWith('/log') ? [] : ['/api2/json/access/permissions']), row.path]
     for (const format of ['toon', 'json']) {
       const value = await run(`AC-READ/${route}/${format}`, [...row.args, '--format', format], { exitCode: 0, requests: paths.length, paths }, vendor)
       assert.equal(value.count, count, route)
       if (!route.endsWith('/log')) assert.equal(value.visibility, 'complete')
-      if (route.endsWith('/log')) assert.deepEqual(value.data.map(row => row.n), [1, 2])
+      if (route.endsWith('/log')) assert.deepEqual((value.data as { n: number }[]).map(row => row.n), [1, 2])
     }
   }
-  const status = verified.find(row => row.contract.path.endsWith('/status'))
+  const status = verified.find(row => row.contract.path.endsWith('/status'))!
   const statusPaths = ['/api2/json/version', '/api2/json/nodes/node-a/version', status.path]
   const stopped = await run('AC-READ/stopped-task', [...status.args, '--format', 'json'], { exitCode: 0, requests: 3, paths: statusPaths }, vendor)
-  assert.equal(stopped.data.status, 'stopped')
-  assert.equal(stopped.data.exitstatus, 'OK')
-  const nodes = verified.find(row => row.contract.path === '/nodes')
+  assert.equal((stopped.data as Record<string, unknown>).status, 'stopped')
+  assert.equal((stopped.data as Record<string, unknown>).exitstatus, 'OK')
+  const nodes = verified.find(row => row.contract.path === '/nodes')!
   const nodePaths = ['/api2/json/version', '/api2/json/access/permissions', nodes.path]
   await run('AC-PERMISSIONS/forbidden', ['ls', '--format', 'json'],
     { exitCode: 1, requests: 2, paths: nodePaths.slice(0, 2), error: 'PERMISSION_DENIED' },
@@ -47,14 +61,14 @@ export async function exerciseReadJourney({ runCase, pack, retained, contracts, 
     assert.equal(value.visibility, granted ? 'complete' : 'permission-filtered')
     assert.equal(value.total, null)
   }
-  const vms = verified.find(row => row.contract.path.endsWith('/qemu'))
+  const vms = verified.find(row => row.contract.path.endsWith('/qemu'))!
   const vmPaths = ['/api2/json/version', '/api2/json/nodes/node-a/version', '/api2/json/access/permissions', vms.path]
   const bounded = await run('display-limit', [...vms.args, '--limit', '2', '--format', 'json'], { exitCode: 0, requests: 4, paths: vmPaths }, vendor)
   assert.equal(bounded.count, 2)
   assert.equal(bounded.received, 9)
   assert.equal(bounded.displayTruncated, true)
   const page = await run('provider-page', [...vms.args, '--catalogue', 'legacy-8.2.7', '--full', '--format', 'json'],
-    { exitCode: 0, requests: 1, path: vms.path }, { httpStatus: 200, body: { data: vms.expected.slice(0, 2), total: 20 } })
+    { exitCode: 0, requests: 1, path: vms.path }, { httpStatus: 200, body: { data: (vms.expected as unknown[]).slice(0, 2), total: 20 } })
   assert.equal(page.providerTotal, 20)
   assert.equal(page.providerPagination, 'partial')
   assert.equal(page.displayTruncated, false)
@@ -64,14 +78,14 @@ export async function exerciseReadJourney({ runCase, pack, retained, contracts, 
   await run('invalid-provider-total', [...vms.args, '--catalogue', 'legacy-8.2.7', '--format', 'json'],
     { exitCode: 1, requests: 1, path: vms.path, error: 'INVALID_RESPONSE' }, { httpStatus: 200, body: { data: vms.expected, total: 1 } })
   await run('rendered-output-cap', ['get', '/version', '--format', 'json'], { exitCode: 1, requests: 1, error: 'OUTPUT_LIMIT' },
-    { httpStatus: 200, body: { data: { ...version.body.data, repoid: 'x'.repeat(65400) } } })
-  const added = { ...version, body: { data: { ...version.body.data, compatibleAddedField: 'retained' } } }
+    { httpStatus: 200, body: { data: { ...(version.body.data as Record<string, unknown>), repoid: 'x'.repeat(65400) } } })
+  const added = { ...version, body: { data: { ...(version.body.data as Record<string, unknown>), compatibleAddedField: 'retained' } } }
   const extra = await run('compatible-added-fields', ['get', '/version', '--format', 'json'], { exitCode: 0, requests: 1 }, added)
   assert.equal(extra.version.compatibleAddedField, 'retained')
   const explicitVersion = await run('D7/version-explicit-catalogue', ['get', '/version', '--catalogue', 'published-current', '--format', 'json'], { exitCode: 0, requests: 1 }, version)
   assert.equal(explicitVersion.compatibility.catalogue, 'legacy-8.2.7', 'Version compatibility describes the server, independent of the replay contract')
   await run('D7/unknown-field', [...nodes.args, '--catalogue', 'legacy-8.2.7', '--fields', 'node,bogus', '--format', 'json'], { exitCode: 2, requests: 0, error: 'INVALID_INPUT' }, vendor)
-  for (const [httpStatus, error] of [[403, 'PERMISSION_DENIED'], [404, 'NOT_FOUND_OR_HIDDEN'], [429, 'HTTP_ERROR']]) {
+  for (const [httpStatus, error] of [[403, 'PERMISSION_DENIED'], [404, 'NOT_FOUND_OR_HIDDEN'], [429, 'HTTP_ERROR']] as const) {
     await run(`http/${httpStatus}`, ['get', '/version', '--format', 'json'], { exitCode: 1, requests: 1, error }, { httpStatus, body: '' })
   }
   for (const command of [['home'], ['auth', 'status'], ['profile', 'list'], ['config', 'path'], ['help']]) {
@@ -84,10 +98,10 @@ export async function exerciseReadJourney({ runCase, pack, retained, contracts, 
     assert.equal(checked.checks.length, 9)
     assert.equal(checked.compatibility.evidence, 'legacy regression fixtures')
     assert.deepEqual(checked.permissions, permissions.body.data)
-    assert.equal(Object.hasOwn(checked.checks.find(check => check.path === '/access/permissions'), 'data'), false)
+    assert.equal(Object.hasOwn(checked.checks.find(check => check.path === '/access/permissions')!, 'data'), false)
     for (const target of ['8.2.7', '9.2.1', '10.0.1']) {
       const value = await run(`VP-01/mixed-node/${target}`, [...vms.args, '--format', 'json'], { exitCode: 0, requests: 4, paths: vmPaths },
-        path => path.endsWith('/node-a/version') ? { httpStatus: 200, body: { data: { ...version.body.data, version: target } } } : vendor(path))
+        path => path.endsWith('/node-a/version') ? { httpStatus: 200, body: { data: { ...(version.body.data as Record<string, unknown>), version: target } } } : vendor(path))
       assert.equal(value.compatibility.catalogue, target.startsWith('8') ? 'legacy-8.2.7' : 'published-current')
       assert.equal(value.compatibility.status, target.startsWith('9.2') ? 'supported' : 'unverified')
       assert.equal(value.compatibility.writeVerification, 'unverified')
