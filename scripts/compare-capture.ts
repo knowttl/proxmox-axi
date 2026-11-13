@@ -1,6 +1,7 @@
+import type { Catalogue } from './catalogue.ts'
 import { readFile, stat } from 'node:fs/promises'
 import { isAbsolute } from 'node:path'
-import { replay, sha256, compareCatalogues } from './catalogue.mjs'
+import { replay, sha256, compareCatalogues } from './catalogue.ts'
 
 try {
   const paths = process.argv.slice(2)
@@ -12,8 +13,8 @@ try {
     const bytes = await readFile(path)
     catalogues.push(replay(bytes, { release: index ? 'candidate' : 'previous', sha256: sha256(bytes) }))
   }
-  console.log(JSON.stringify({ previousSha256: catalogues[0].captureSha256, candidateSha256: catalogues[1].captureSha256,
-    ...compareCatalogues(...catalogues), admitted: false,
+  console.log(JSON.stringify({ previousSha256: catalogues[0]!.captureSha256, candidateSha256: catalogues[1]!.captureSha256,
+    ...compareCatalogues(...catalogues as [Catalogue, Catalogue]), admitted: false,
     help: ['Review effects, secret fields, transports and contract changes before updating catalogue hashes or operation admission.'] }))
 } catch {
   console.log(JSON.stringify({ error: { code: 'INVALID_CAPTURE', message: 'Supply two absolute, valid API schema captures of at most 8 MiB each.' } }))

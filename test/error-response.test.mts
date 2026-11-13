@@ -1,3 +1,5 @@
+import type { AddressInfo } from 'node:net'
+import type { IncomingMessage } from 'node:http'
 import assert from 'node:assert/strict'
 import { createServer, get } from 'node:http'
 import test from 'node:test'
@@ -5,7 +7,7 @@ import { responseFailure } from '../dist/errors.js'
 import { PrivateResults } from '../dist/private-results.js'
 
 const permission = 'Permission check failed (/, Pool.Allocate)'
-for (const operation of ['Request', 'Transfer']) {
+for (const operation of ['Request', 'Transfer'] as const) {
   for (const { name, status, statusMessage, body, expected } of [
     { name: 'legacy permission status', status: 403, statusMessage: permission, body: { data: null }, expected: permission },
     { name: 'modern permission body', status: 403, statusMessage: 'Forbidden', body: { data: null, message: permission }, expected: permission },
@@ -20,9 +22,9 @@ for (const operation of ['Request', 'Transfer']) {
       const results = new PrivateResults()
       results.register(name === 'protected permission value' ? 'Pool.Allocate' : 'synthetic-secret')
       const server = createServer((_request, response) => response.writeHead(status, statusMessage).end(JSON.stringify(body)))
-      await new Promise(resolve => server.listen(0, '127.0.0.1', resolve))
+      await new Promise<void>(resolve => server.listen(0, '127.0.0.1', resolve))
       try {
-        const response = await new Promise((resolve, reject) => get(`http://127.0.0.1:${server.address().port}`, resolve).once('error', reject))
+        const response = await new Promise<IncomingMessage>((resolve, reject) => get(`http://127.0.0.1:${(server.address() as AddressInfo).port}`, resolve).once('error', reject))
         const failure = await responseFailure(response, operation, results)
         assert.equal(failure.message, `${operation} returned HTTP ${status}.${expected ? ` ${expected}` : ''}`)
         assert.equal(failure.httpStatus, status)

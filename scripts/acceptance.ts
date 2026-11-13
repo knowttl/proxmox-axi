@@ -1,3 +1,7 @@
+import type { ChildProcess, SpawnOptions } from 'node:child_process'
+import type { AddressInfo } from 'node:net'
+import type { OperationPolicy } from './route-cases.ts'
+import type fixturePin from '../test/artium-fixture.json'
 import assert from 'node:assert/strict'
 import { spawn } from 'node:child_process'
 import { createHash, X509Certificate } from 'node:crypto'
@@ -8,10 +12,10 @@ import { chmod, copyFile, mkdir, mkdtemp, readFile, readdir, readlink, realpath,
 import { isAbsolute, join, relative, sep } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 import { decode } from '@toon-format/toon'
-import { verifyHostRuntime } from './host-identity.mjs'
-import { captures, replay, routeKey } from './catalogue.mjs'
-import { routeCases, verifyDiscovery } from './route-cases.mjs'
-import { exerciseReadJourney } from './read-journey.mjs'
+import { verifyHostRuntime } from './host-identity.ts'
+import { captures, replay, routeKey } from './catalogue.ts'
+import { routeCases, verifyDiscovery } from './route-cases.ts'
+import { exerciseReadJourney } from './read-journey.ts'
 import { exerciseWriteJourney } from './write-journey.ts'
 import { exerciseSecretJourney } from './secret-journey.ts'
 import { exerciseStreamJourney } from './stream-journey.ts'
@@ -19,13 +23,108 @@ import { exerciseNativeJourney } from './native-journey.ts'
 import { verifyPackageAdmission } from './package-admission.ts'
 import { assertRequestDeadline } from './request-deadline.ts'
 
-const root = fileURLToPath(new URL('../', import.meta.url))
-const digest = (bytes, algorithm = 'sha256') => createHash(algorithm).update(bytes).digest(algorithm === 'sha512' ? 'base64' : 'hex')
-const json = async path => JSON.parse(await readFile(path, 'utf8'))
-const save = (path, value) => writeFile(path, `${JSON.stringify(value, null, 2)}\n`)
+type CommandOptions = Omit<SpawnOptions, 'stdio'> & { timeoutMs?: number }
+interface CommandResult { code: number, signal: NodeJS.Signals | null, stdout: string, stderr: string }
+type Selection = Record<'--task' | '--pack' | '--out' | '--network' | '--through', string> & {
+  '--repeat-through'?: string, '--available-through'?: string, '--native-platform'?: string,
+  '--all-route-variants'?: boolean, '--all-outcomes'?: boolean
+}
+export interface VendorResponse {
+  httpStatus: number
+  body?: unknown
+  headers?: Record<string, string>
+  disconnect?: boolean
+  stall?: boolean
+  trickle?: boolean
+  split?: boolean
+}
+export type Vendor = VendorResponse | ((path: string) => VendorResponse)
+export interface Expected {
+  exitCode: number
+  requests: number
+  path?: string
+  paths?: string[]
+  data?: unknown
+  version?: boolean
+  profile?: string
+  tokenSource?: string
+  identity?: string
+  bareVersion?: boolean
+  hostBoundary?: boolean
+  help?: boolean
+  error?: string
+  auditExit?: number
+}
+export interface PublicOutput {
+  error?: { code: string }
+  data: unknown
+  version: Record<string, unknown>
+  credential: { profile: string, tokenSource: string }
+  purpose: string
+  usage: string
+  visibility: string
+  count: number
+  empty: string
+  total: number | null
+  received: number
+  displayTruncated: boolean
+  providerTotal: number
+  providerPagination: string
+  compatibility: { catalogue: string, status: string, writeVerification: string, evidence: string }
+  checks: { path: string }[]
+  permissions: unknown
+}
+export type RunCase = (id: string, args: string[], environment: Record<string, string>, expected: Expected, vendor?: Vendor, entry?: string) => Promise<PublicOutput>
+interface CaseRecord extends Record<string, unknown> {
+  id: string
+  status: string
+  hosted?: boolean
+  expected?: Expected
+  actual?: { exitCode: number, requests: number, output?: PublicOutput, requestDurationMs?: number }
+  invocation?: { executable: string, args: string[] }
+  transportDiagnostics?: { code?: string, phase: string, durationMs?: number }[]
+}
+interface HostEvent {
+  event: string
+  url: string
+  executable: string
+  namespace: string
+  callsRemaining: string[]
+  audit: { event: string, exit_code: number }[]
+}
+interface Host extends Record<string, unknown> {
+  status: string
+  reason?: string
+  evidence?: HostEvent
+}
+interface Outcome { id: string, journey: string, status: string, basis?: string, reason?: string | undefined }
+interface AcceptanceResult extends Record<string, unknown> {
+  task: string
+  through: string
+  platform: string
+  node: string
+  operation: string
+  catalogue: string
+  cases: CaseRecord[]
+  status: string
+  host: Host
+  outcomes?: Outcome[]
+  network?: { mode: string, namespace: string, externalEgress: string, denial?: string | undefined }
+  fixtures?: { path: string, sha256: string }[]
+  scope?: string
+  failure?: string
+}
+interface HostInput { fixture: string, pin: typeof fixturePin, host?: Host }
+interface PackageManifest extends Record<string, unknown> { name: string, version: string, packageManager: string, pnpm: unknown }
 
-async function runtimeFiles(directory, prefix = '') {
-  const files = {}
+
+const root = fileURLToPath(new URL('../', import.meta.url))
+const digest = (bytes: Buffer, algorithm = 'sha256') => createHash(algorithm).update(bytes).digest(algorithm === 'sha512' ? 'base64' : 'hex')
+const json = async <T>(path: string): Promise<T> => JSON.parse(await readFile(path, 'utf8'))
+const save = (path: string, value: unknown) => writeFile(path, `${JSON.stringify(value, null, 2)}\n`)
+
+async function runtimeFiles(directory: string, prefix = ''): Promise<Record<string, string>> {
+  const files: Record<string, string> = {}
   for (const entry of (await readdir(join(directory, prefix), { withFileTypes: true })).sort((a, b) => a.name.localeCompare(b.name))) {
     const path = join(prefix, entry.name)
     if (entry.isDirectory()) Object.assign(files, await runtimeFiles(directory, path))
@@ -34,17 +133,17 @@ async function runtimeFiles(directory, prefix = '') {
   return files
 }
 
-async function command(executable, args, options = {}) {
+async function command(executable: string, args: string[], options: CommandOptions = {}): Promise<CommandResult> {
   const { timeoutMs = 60_000, ...spawnOptions } = options
   const child = spawn(executable, args, { cwd: root, stdio: ['ignore', 'pipe', 'pipe'], ...spawnOptions })
-  const stdout = [], stderr = []
+  const stdout: Buffer[] = [], stderr: Buffer[] = []
   let bytes = 0
-  let terminationReason
+  let terminationReason: string | undefined
   const timer = setTimeout(() => {
     terminationReason ??= `deadline of ${timeoutMs} ms`
     child.kill('SIGKILL')
   }, timeoutMs)
-  for (const [stream, chunks] of [[child.stdout, stdout], [child.stderr, stderr]]) stream.on('data', chunk => {
+  for (const [stream, chunks] of [[child.stdout, stdout], [child.stderr, stderr]] as const) stream.on('data', chunk => {
     bytes += chunk.length
     if (bytes > 1_048_576) {
       terminationReason ??= '1048576-byte output budget'
@@ -52,29 +151,29 @@ async function command(executable, args, options = {}) {
     }
     else chunks.push(chunk)
   })
-  return await new Promise((resolve, reject) => {
+  return await new Promise<CommandResult>((resolve, reject) => {
     child.once('error', error => { clearTimeout(timer); reject(error) })
     child.once('close', (code, signal) => {
       clearTimeout(timer)
-      const result = { code, signal, stdout: Buffer.concat(stdout).toString(), stderr: Buffer.concat(stderr).toString() }
+      const result = { code: code!, signal, stdout: Buffer.concat(stdout).toString(), stderr: Buffer.concat(stderr).toString() }
       if (signal) reject(new Error(terminationReason ? `Command exceeded its ${terminationReason} (${signal}).` : `Command terminated by ${signal}.`))
       else resolve(result)
     })
   })
 }
 
-async function checked(executable, args, options) {
+async function checked(executable: string, args: string[], options?: CommandOptions) {
   const result = await command(executable, args, options)
   assert.equal(result.code, 0, `${executable} failed: ${result.stderr || result.stdout}`)
   return result.stdout.trim()
 }
 
-function hostMessage(child, event) {
-  return new Promise((resolve, reject) => {
+function hostMessage(child: ChildProcess, event: string): Promise<HostEvent> {
+  return new Promise<HostEvent>((resolve, reject) => {
     const cleanup = () => { clearTimeout(timer); child.off('message', message); child.off('exit', exited); child.off('error', failed) }
-    const message = value => { if (value.event === event) { cleanup(); resolve(value) } }
+    const message = (value: unknown) => { if ((value as HostEvent).event === event) { cleanup(); resolve(value as HostEvent) } }
     const exited = () => { cleanup(); reject(new Error(`Actual Artium server exited before ${event}`)) }
-    const failed = error => { cleanup(); reject(error) }
+    const failed = (error: Error) => { cleanup(); reject(error) }
     const timer = setTimeout(() => { cleanup(); reject(new Error(`Actual Artium server did not report ${event} within 30000 ms`)) }, 30_000)
     child.on('message', message)
     child.once('exit', exited)
@@ -82,10 +181,10 @@ function hostMessage(child, event) {
   })
 }
 
-function selection(args) {
-  const values = {}
+function selection(args: string[]): Selection {
+  const values: Record<string, string | boolean> = {}
   for (let index = 0; index < args.length; index++) {
-    const key = args[index]
+    const key = args[index]!
     if (key === '--' && index === 0) continue
     assert.ok(['--task', '--pack', '--out', '--network', '--through', '--repeat-through', '--available-through', '--all-route-variants', '--native-platform', '--all-outcomes'].includes(key), `Unknown argument: ${key}`)
     assert.equal(values[key], undefined, `Duplicate argument: ${key}`)
@@ -94,44 +193,45 @@ function selection(args) {
     assert.ok(value && !value.startsWith('--'), `Missing value for ${key}`)
     values[key] = value
   }
-  assert.ok(['S1.1', 'S1.2', 'S2.1', 'S2.2', 'S2.3', 'S3.1', 'S3.2', 'S4.1', 'S4.2', 'S5.1', 'S5.2', 'S6.1', 'S6.2'].includes(values['--task']), 'Select a task from S1.1 through S6.2')
-  if (values['--repeat-through']) assert.ok(['S1', 'S2', 'S3', 'S4', 'S5', 'S6'].includes(values['--repeat-through']))
-  if (values['--native-platform']) assert.equal(values['--native-platform'], 'current')
-  if (values['--task'].startsWith('S6.')) assert.equal(process.platform, 'linux', 'S6 currently supports native Linux only; Windows remains pending')
-  if (values['--available-through']) assert.equal(values['--available-through'], 'S2')
-  assert.equal(values['--network'], 'fake-only', 'Only fake-only networking is permitted')
-  assert.ok(['standalone', 'both'].includes(values['--through']), 'Select --through standalone or both')
-  for (const key of ['--pack', '--out']) assert.ok(values[key] && isAbsolute(values[key]), `${key} must be absolute`)
-  const outputRelative = relative(root, values['--out'])
+  const selected = values as Selection
+  assert.ok(['S1.1', 'S1.2', 'S2.1', 'S2.2', 'S2.3', 'S3.1', 'S3.2', 'S4.1', 'S4.2', 'S5.1', 'S5.2', 'S6.1', 'S6.2'].includes(selected['--task']), 'Select a task from S1.1 through S6.2')
+  if (selected['--repeat-through']!) assert.ok(['S1', 'S2', 'S3', 'S4', 'S5', 'S6'].includes(selected['--repeat-through']))
+  if (selected['--native-platform']) assert.equal(selected['--native-platform'], 'current')
+  if (selected['--task'].startsWith('S6.')) assert.equal(process.platform, 'linux', 'S6 currently supports native Linux only; Windows remains pending')
+  if (selected['--available-through']) assert.equal(selected['--available-through'], 'S2')
+  assert.equal(selected['--network'], 'fake-only', 'Only fake-only networking is permitted')
+  assert.ok(['standalone', 'both'].includes(selected['--through']), 'Select --through standalone or both')
+  for (const key of ['--pack', '--out'] as const) assert.ok(selected[key] && isAbsolute(selected[key]), `${key} must be absolute`)
+  const outputRelative = relative(root, selected['--out'])
   assert.ok(outputRelative === '..' || outputRelative.startsWith(`..${sep}`) || isAbsolute(outputRelative), '--out must be outside the source tree')
-  return values
+  return selected
 }
 
-function includesRoutes(values) {
+function includesRoutes(values: Selection) {
   return values['--task'] === 'S2.1' || values['--task'] === 'S6.2' || values['--all-route-variants'] ||
     values['--repeat-through'] === 'S2' ||
-    (/^S[3456]\./.test(values['--task']) && ['S3', 'S4', 'S5', 'S6'].includes(values['--repeat-through']))
+    (/^S[3456]\./.test(values['--task']) && ['S3', 'S4', 'S5', 'S6'].includes(values['--repeat-through']!))
 }
 
-async function preparePackage(values, out, scratch) {
-  const pkg = await json(join(root, 'package.json'))
+async function preparePackage(values: Selection, out: string, scratch: string) {
+  const pkg = await json<PackageManifest>(join(root, 'package.json'))
   const archive = join(out, `knowttl-proxmox-axi-${pkg.version}.tgz`)
-  let hostInput
+  let hostInput: HostInput | undefined
   if (values['--through'] === 'both') {
     assert.ok(process.env.PROXMOX_AXI_ARTIUM_FIXTURE && process.env.PROXMOX_AXI_ARTIUM_MANIFEST,
       '--through both requires PROXMOX_AXI_ARTIUM_FIXTURE and PROXMOX_AXI_ARTIUM_MANIFEST')
-    const pin = await json(join(root, 'test/artium-fixture.json'))
+    const pin = await json<typeof fixturePin>(join(root, 'test/artium-fixture.json'))
     const manifestBytes = await readFile(process.env.PROXMOX_AXI_ARTIUM_MANIFEST)
     assert.equal(digest(manifestBytes), pin.manifestSha256, 'Reviewed host fixture manifest digest')
-    const manifest = JSON.parse(manifestBytes)
+    const manifest = JSON.parse(manifestBytes.toString()) as { fixtureCommit: string, tools: { tool: string, tarball: string }[] }
     assert.equal(manifest.fixtureCommit, pin.revision, 'Reviewed temporary admission revision')
     const fixture = await realpath(process.env.PROXMOX_AXI_ARTIUM_FIXTURE)
     for (const [path, hash] of Object.entries(pin.sourceHashes)) assert.equal(digest(await readFile(join(fixture, path))), hash, `Host source pin: ${path}`)
     const runtimeHashes = await verifyHostRuntime(fixture)
     const admitted = manifest.tools.find(tool => tool.tool === 'proxmox-axi')
-    assert.equal(digest(await readFile(admitted.tarball)), pin.packageSha256, 'Admitted tool archive')
-    assert.equal(`sha512-${digest(await readFile(admitted.tarball), 'sha512')}`, pin.packageIntegrity, 'Admitted tool archive integrity')
-    await copyFile(admitted.tarball, archive)
+    assert.equal(digest(await readFile(admitted!.tarball)), pin.packageSha256, 'Admitted tool archive')
+    assert.equal(`sha512-${digest(await readFile(admitted!.tarball), 'sha512')}`, pin.packageIntegrity, 'Admitted tool archive integrity')
+    await copyFile(admitted!.tarball, archive)
     hostInput = { fixture, pin }
     hostInput.host = { status: 'starting', revision: pin.revision, manifestSha256: pin.manifestSha256,
       admission: pin.status, sourceHashes: pin.sourceHashes, runtimeHashes,
@@ -147,59 +247,59 @@ async function preparePackage(values, out, scratch) {
   return { pkg, archive, consumer, installed, executable, hostInput }
 }
 
-async function verify(values, prepared, scratch) {
+async function verify(values: Selection, prepared: Awaited<ReturnType<typeof preparePackage>>, scratch: string) {
   const out = values['--out']
-  const ledger = [], transcripts = [], tlsErrors = []
-  const secrets = []
-  const publicText = value => {
+  const ledger: Record<string, unknown>[] = [], transcripts: string[] = [], tlsErrors: { case: string, code: string }[] = []
+  const secrets: string[] = []
+  const publicText = (value: string) => {
     for (const secret of secrets) for (const form of [secret, encodeURIComponent(secret), JSON.stringify(secret).slice(1, -1)]) {
       value = value.replaceAll(form, '[REDACTED]')
     }
     return value
   }
-  const result = { task: values['--task'], through: values['--through'], platform: `${process.platform}/${process.arch}`,
+  const result: AcceptanceResult = { task: values['--task'], through: values['--through'], platform: `${process.platform}/${process.arch}`,
     node: process.version, operation: 'OP-GET-version', catalogue: 'legacy-8.2.7',
     cases: [], status: 'fail', host: { status: 'pending', reason: 'Actual Artium fixture inputs were not selected.' } }
-  let server
-  let hostChild
-  const hostLogs = []
+  let server: ReturnType<typeof createServer> | undefined
+  let hostChild: ChildProcess | undefined
+  const hostLogs: Buffer[] = []
   try {
     result.sourceHead = await checked('git', ['rev-parse', 'HEAD'])
     result.network = { mode: 'fake-only', namespace: await readlink('/proc/self/ns/net'), externalEgress: 'denied' }
     const interfaces = Object.keys(networkInterfaces())
     assert.ok(interfaces.every(name => name === 'lo'), 'Network namespace must contain only loopback')
-    const egress = await new Promise(resolve => {
+    const egress = await new Promise<string | undefined>(resolve => {
       const socket = createConnection({ host: '192.0.2.1', port: 443 })
       socket.setTimeout(1000, () => { socket.destroy(); resolve('timeout') })
       socket.once('connect', () => { socket.destroy(); resolve('connected') })
-      socket.once('error', error => resolve(error.code))
+      socket.once('error', error => resolve((error as NodeJS.ErrnoException).code))
     })
     assert.equal(egress, 'ENETUNREACH', 'External destination must be unreachable at the OS boundary')
     result.network.denial = egress
-    const retained = await json(join(root, 'evidence/retained.json'))
+    const retained = await json<{ path: string, sha256: string }[]>(join(root, 'evidence/retained.json'))
     result.fixtures = []
     for (const fixture of retained) {
       const bytes = await readFile(join(values['--pack'], fixture.path))
       assert.equal(digest(bytes), fixture.sha256, `Fixture hash mismatch: ${fixture.path}`)
       result.fixtures.push(fixture)
     }
-    const success = await json(join(values['--pack'], retained[0].path))
-    const denied = await json(join(values['--pack'], retained[1].path))
+    const success = await json<VendorResponse & { body: { data: { version: string, release: string, repoid: string } } }>(join(values['--pack'], retained[0]!.path))
+    const denied = await json<VendorResponse>(join(values['--pack'], retained[1]!.path))
     assert.equal(success.body.data.version, '8.2.7', 'Approved fixture version')
     assert.equal(denied.httpStatus, 401, 'Approved denial fixture')
 
     const { pkg, archive, consumer, installed, executable, hostInput } = prepared
     const archiveBytes = await readFile(archive)
-    if (hostInput) result.host = hostInput.host
+    if (hostInput) result.host = hostInput.host!
     assert.notEqual(installed, root, 'Must execute the installed archive, not source')
-    const installedPackage = await json(join(installed, 'package.json'))
+    const installedPackage = await json<PackageManifest>(join(installed, 'package.json'))
     assert.equal(installedPackage.name, pkg.name)
     assert.equal(installedPackage.version, pkg.version)
     if (hostInput) {
       for (const directory of ['bin', 'dist']) {
         assert.deepEqual(await runtimeFiles(join(root, directory)), await runtimeFiles(join(installed, directory)), `Complete shipped ${directory} tree must match the current build`)
       }
-      const admittedInventory = await json(join(hostInput.fixture, 'tools/inventories/proxmox-axi.json'))
+      const admittedInventory = await json<{ sources: { path: string, sha256: string }[] }>(join(hostInput.fixture, 'tools/inventories/proxmox-axi.json'))
       for (const source of admittedInventory.sources) {
         assert.equal(digest(await readFile(join(installed, source.path))), source.sha256, `Admitted package source: ${source.path}`)
         if (source.path === 'package.json') {
@@ -210,10 +310,10 @@ async function verify(values, prepared, scratch) {
       }
       assert.equal(digest(await readFile(executable)), digest(await readFile(join(root, 'bin/proxmox-axi.mjs'))), 'Current executable matches admitted package')
     }
-    const inventory = await json(join(installed, 'inventory.json'))
+    const inventory = await json<Parameters<typeof verifyDiscovery>[0]>(join(installed, 'inventory.json'))
     const catalogues = await Promise.all(captures.map(async capture => replay(await readFile(join(root, 'vendor', capture.file)), capture)))
     assert.deepEqual(new Set(inventory.operations.map(routeKey)), new Set(catalogues.flatMap(catalogue => catalogue.operations.map(routeKey))), 'Inventory covers the exact independent vendor union')
-    const helpMetadata = await json(join(installed, 'help.json'))
+    const helpMetadata = await json<{ commands: { command: string, purpose: string }[] }>(join(installed, 'help.json'))
     assert.deepEqual(new Set(helpMetadata.commands.map(entry => entry.command)), new Set(inventory.operations.map(entry => entry.command.join(' '))), 'Generated help covers the inventory')
     result.package = { name: pkg.name, version: pkg.version, archive, sha256: digest(archiveBytes),
       integrity: `sha512-${digest(archiveBytes, 'sha512')}`, executable,
@@ -223,7 +323,7 @@ async function verify(values, prepared, scratch) {
     await save(join(out, 'package-identity.json'), result.package)
     await writeFile(join(out, 'installed-lock.yaml'), await readFile(join(consumer, 'pnpm-lock.yaml')))
     if (values['--task'].startsWith('S6.')) {
-      await checked(process.execPath, ['scripts/generate.mjs', '--check'])
+      await checked(process.execPath, ['scripts/generate.ts', '--check'])
       result.admission = await verifyPackageAdmission(root, installed, archive, scratch)
       await save(join(out, 'admission-delta.json'), result.admission)
     }
@@ -247,10 +347,10 @@ async function verify(values, prepared, scratch) {
     const hostedToken = 'CANARY-proxmox-hosted-token-S1-1'
     secrets.push(token, fileToken, decoy, hostedToken, 'CANARY-local-password')
     const tokenId = 'synthetic@pve!acceptance'
-    let response = success
+    let response: Vendor = success
     let activeCase = ''
     server = createServer({ key: await readFile(join(scratch, 'server.key')), cert: await readFile(caFile) }, (request, reply) => {
-      const vendor = typeof response === 'function' ? response(request.url) : response
+      const vendor = typeof response === 'function' ? response(request.url!) : response
       const authorization = request.headers.authorization
       const identity = authorization === `PVEAPIToken=${tokenId}=${token}` ? 'environment-canary' :
         authorization === `PVEAPIToken=${tokenId}=${fileToken}` ? 'protected-file-canary' :
@@ -260,7 +360,7 @@ async function verify(values, prepared, scratch) {
       if (identity === 'unexpected') { reply.writeHead(401); reply.end(); return }
       reply.writeHead(vendor.httpStatus, { 'Content-Type': 'application/json', ...(vendor.headers ?? {}) })
       if (vendor.disconnect) {
-        reply.write('{"data":', () => reply.socket.end())
+        reply.write('{"data":', () => reply.socket!.end())
         return
       }
       if (vendor.stall) { reply.write('{"data":'); return }
@@ -277,11 +377,11 @@ async function verify(values, prepared, scratch) {
       } else reply.end(payload)
     })
     server.on('tlsClientError', error => {
-      const code = typeof error.code === 'string' && /^[A-Z][A-Z0-9_]{0,95}$/.test(error.code) ? error.code : 'UNKNOWN'
+      const code = typeof (error as NodeJS.ErrnoException).code === 'string' && /^[A-Z][A-Z0-9_]{0,95}$/.test((error as NodeJS.ErrnoException).code!) ? (error as NodeJS.ErrnoException).code! : 'UNKNOWN'
       tlsErrors.push({ case: activeCase, code })
     })
-    await new Promise((resolve, reject) => { server.once('error', reject); server.listen(0, '127.0.0.1', resolve) })
-    const origin = `https://127.0.0.1:${server.address().port}`
+    await new Promise<void>((resolve, reject) => { server!.once('error', reject); server!.listen(0, '127.0.0.1', resolve) })
+    const origin = `https://127.0.0.1:${(server.address() as AddressInfo).port}`
     const home = join(scratch, 'home')
     const config = join(scratch, 'selected.json')
     const secretFile = join(scratch, 'token.txt')
@@ -303,18 +403,18 @@ async function verify(values, prepared, scratch) {
       PROXMOX_AXI_TOKEN: token, PROXMOX_AXI_CA_BUNDLE: caFile }
     if (values['--task'].startsWith('S6.')) await exerciseNativeJourney({ scratch, installed, executable, caFile, env, command, cases: result.cases })
 
-    const runCase = async (id, args, environment, expected, vendor = success, entry = executable) => {
+    const runCase: RunCase = async (id, args, environment, expected, vendor = success, entry = executable) => {
       activeCase = id
       response = vendor
       const before = ledger.length
       const diagnostics = join(scratch, 'transport.jsonl')
       await writeFile(diagnostics, '')
-      const invocation = ['--import', fileURLToPath(new URL('./transport-observer.mjs', import.meta.url)), entry, ...args]
+      const invocation = ['--import', fileURLToPath(new URL('./transport-observer.ts', import.meta.url)), entry, ...args]
       const start = performance.now()
-      if (entry !== executable) await verifyHostRuntime(hostInput.fixture)
+      if (entry !== executable) await verifyHostRuntime(hostInput!.fixture)
       const actual = await command(process.execPath, invocation,
         { env: { ...environment, PROXMOX_AXI_TEST_DIAGNOSTICS: diagnostics }, cwd: scratch })
-      const record = { id, hosted: entry !== executable, status: 'fail', expected, actual: { exitCode: actual.code, requests: ledger.length - before },
+      const record: CaseRecord = { id, hosted: entry !== executable, status: 'fail', expected, actual: { exitCode: actual.code, requests: ledger.length - before },
         invocation: { executable: process.execPath, args: invocation.map(publicText) }, elapsedMs: Math.round(performance.now() - start),
         transportDiagnostics: (await readFile(diagnostics, 'utf8')).split('\n').filter(Boolean).map(line => JSON.parse(line)) }
       result.cases.push(record)
@@ -324,15 +424,15 @@ async function verify(values, prepared, scratch) {
         }
       }
       transcripts.push(`case: ${id}\nexit: ${actual.code}\nstdout:\n${actual.stdout}stderr:\n${actual.stderr}`)
-      const value = expected.bareVersion ? undefined : expected.hostBoundary ? decode(actual.stdout) : args.includes('json') ? JSON.parse(actual.stdout) : decode(actual.stdout)
-      record.actual.output = value
+      const value = (expected.bareVersion ? undefined : expected.hostBoundary ? decode(actual.stdout) : args.includes('json') ? JSON.parse(actual.stdout) : decode(actual.stdout)) as PublicOutput
+      record.actual!.output = value
       if (entry !== executable && expected.exitCode !== 0) {
         assert.ok((expected.hostBoundary && actual.stderr === '') || /^artium-axi: request_id [0-9a-f-]{36}\n$/.test(actual.stderr), `${id}: only the host's safe request ID diagnostic`)
       } else assert.equal(actual.stderr, '', `${id}: no raw diagnostics on stderr`)
       assert.equal(actual.code, expected.exitCode, `${id}: exit code; stdout=${actual.stdout}`)
       if (expected.error) assert.equal(value.error?.code, expected.error, `${id}: observed public code ${value.error?.code ?? 'none'}`)
-      assert.equal(record.actual.requests, expected.requests,
-        `${id}: request count; observed public code ${value?.error?.code ?? 'none'}; transport codes ${record.transportDiagnostics.map(entry => entry.code).join(',')}`)
+      assert.equal(record.actual!.requests, expected.requests,
+        `${id}: request count; observed public code ${value?.error?.code ?? 'none'}; transport codes ${record.transportDiagnostics!.map(entry => entry.code).join(',')}`)
       // command() enforces the separate 60-second process watchdog. Request
       // timing is measured inside the child, rather than charging CLI startup.
       assert.ok(Buffer.byteLength(actual.stdout) <= 65537, `${id}: public output budget`)
@@ -343,7 +443,7 @@ async function verify(values, prepared, scratch) {
         if (expected.tokenSource) assert.equal(value.credential.tokenSource, expected.tokenSource, `${id}: secret reference source`)
       } else if (expected.bareVersion) assert.equal(actual.stdout, `${pkg.version}\n`)
       else if (expected.help) {
-        assert.equal(value.purpose, helpMetadata.commands.find(entry => entry.command === 'get /version').purpose, `${id}: help matches admitted command`)
+        assert.equal(value.purpose, helpMetadata.commands.find(entry => entry.command === 'get /version')!.purpose, `${id}: help matches admitted command`)
         assert.ok(value.usage.startsWith('proxmox-axi get /version '), `${id}: invocable version help`)
       }
       for (const [index, request] of ledger.slice(before).entries()) {
@@ -393,7 +493,7 @@ async function verify(values, prepared, scratch) {
     await runCase('offline-help', ['get', '--help'], base, { exitCode: 0, requests: 0, help: true })
     if (values['--task'] !== 'S1.1') {
       const selectedProfile = { auth: 'api-token', origin, tokenId, caBundle: caFile }
-      const writeProfile = async profile => {
+      const writeProfile = async (profile: unknown) => {
         await save(config, { version: 1, profiles: { selected: profile } })
         await chmod(config, 0o600)
       }
@@ -428,7 +528,7 @@ async function verify(values, prepared, scratch) {
         { httpStatus: 200, split: true, body: { data: { version: token, release: encodeURIComponent(token), repoid: token } } })
       await runCase('elapsed-deadline/trickle', ['get', '/version', '--format', 'json'], env,
         { exitCode: 1, requests: 1, error: 'TIMEOUT' }, { httpStatus: 200, trickle: true })
-      result.cases.at(-1).actual.requestDurationMs = assertRequestDeadline(result.cases.at(-1).transportDiagnostics)
+      result.cases.at(-1)!.actual!.requestDurationMs = assertRequestDeadline(result.cases.at(-1)!.transportDiagnostics!)
       const pin = new X509Certificate(await readFile(caFile)).fingerprint256.replaceAll(':', '').toLowerCase()
       await writeProfile({ auth: 'api-token', origin, tokenId, certificatePin: { origin, sha256: pin } })
       await runCase('CRED-20/valid', fileArgs, env, { exitCode: 0, requests: 1, version: true })
@@ -444,7 +544,7 @@ async function verify(values, prepared, scratch) {
       await writeProfile({ auth: 'api-token', origin, tokenId, certificatePin: { origin, sha256: expiredPin } })
       await runCase('CRED-20/expired', fileArgs, env, { exitCode: 1, requests: 0, error: 'CONNECTION_FAILED' })
       server.setSecureContext({ key: await readFile(join(scratch, 'server.key')), cert: await readFile(caFile) })
-      const { replacePrivateFile, readPrivateFile } = await import(pathToFileURL(join(installed, 'dist/private-file.js')))
+      const { replacePrivateFile, readPrivateFile } = await import(pathToFileURL(join(installed, 'dist/private-file.js')).href) as typeof import('../src/private-file.ts')
       const atomicPath = join(scratch, 'atomic.json')
       await replacePrivateFile(atomicPath, 'prior-valid-state')
       await assert.rejects(replacePrivateFile(atomicPath, 'replacement', { platform: 'win32',
@@ -455,11 +555,11 @@ async function verify(values, prepared, scratch) {
       result.cases.push({ id: 'CRED-10/atomic-replacement', status: 'pass', basis: 'Installed private-file interface; interrupted protection retains old state, successful replacement publishes complete state; native Windows rename contention remains S6.1' })
       await writeProfile(selectedProfile)
     }
-    const operationPolicy = await json(join(root, 'src/operation-policy.json'))
-    const readJourney = (environment, entry = executable) => exerciseReadJourney({ runCase, pack: values['--pack'], retained,
+    const operationPolicy = await json<OperationPolicy>(join(root, 'src/operation-policy.json'))
+    const readJourney = (environment: Record<string, string>, entry = executable) => exerciseReadJourney({ runCase, pack: values['--pack'], retained,
       contracts: catalogues.flatMap(catalogue => catalogue.operations.map(operation => ({ ...operation, release: catalogue.release }))),
       env: environment, entry, hosted: entry !== executable, task: /^S[3456]\./.test(values['--task']) ? 'S2.3' : values['--task'] })
-    const exerciseRoutes = async (environment, entry = executable) => {
+    const exerciseRoutes = async (environment: Record<string, string>, entry = executable) => {
       const hosted = entry !== executable
       const coverage = { union: 681, variants: 1285, admitted: 0, denied: 0 }
       for (const route of routeCases(catalogues, operationPolicy)) {
@@ -479,13 +579,13 @@ async function verify(values, prepared, scratch) {
       return coverage
     }
     if (includesRoutes(values)) {
-      verifyDiscovery(inventory, catalogues, (await json(join(installed, 'dist/contracts.json'))).contracts, operationPolicy)
+      verifyDiscovery(inventory, catalogues, (await json<{ contracts: Parameters<typeof verifyDiscovery>[2] }>(join(installed, 'dist/contracts.json'))).contracts, operationPolicy)
       const bodyRoute = [...routeCases(catalogues, operationPolicy)].find(route => route.callable && route.operation.path === '/nodes/{node}/tasks')
       const bodyFile = join(scratch, 'parameters.json')
       await save(bodyFile, { node: 'pve-test', limit: 1 })
       await runCase('body-file/valid', ['get', '/nodes/{node}/tasks', '--body-file', bodyFile, '--format', 'json', '--catalogue', 'legacy-8.2.7', '--full'], env,
-        { exitCode: 0, requests: 1, path: '/api2/json/nodes/pve-test/tasks?limit=1', data: bodyRoute.response },
-        { httpStatus: 200, body: { data: bodyRoute.response } })
+        { exitCode: 0, requests: 1, path: '/api2/json/nodes/pve-test/tasks?limit=1', data: bodyRoute!.response },
+        { httpStatus: 200, body: { data: bodyRoute!.response } })
       await save(bodyFile, JSON.parse('{"node":"pve-test","__proto__":{"ignored":true}}'))
       await runCase('body-file/unknown-field', ['get', '/nodes/{node}/tasks', '--body-file', bodyFile, '--format', 'json', '--catalogue', 'legacy-8.2.7'], env,
         { exitCode: 2, requests: 0, error: 'INVALID_INPUT' })
@@ -520,31 +620,31 @@ async function verify(values, prepared, scratch) {
       const hostDirectory = join(scratch, 'host')
       await mkdir(join(hostDirectory, 'tools'), { recursive: true, mode: 0o700 })
       await symlink(join(consumer, 'node_modules'), join(hostDirectory, 'tools/node_modules'))
-      const startupArgs = [fileURLToPath(new URL('./artium-host.mjs', import.meta.url)), hostInput.fixture, hostDirectory, origin, caFile]
+      const startupArgs = [fileURLToPath(new URL('./artium-host.ts', import.meta.url)), hostInput.fixture, hostDirectory, origin, caFile]
       result.host.startup = { executable: process.execPath, args: startupArgs, cwd: hostDirectory }
       hostChild = spawn(process.execPath, startupArgs, { cwd: hostDirectory,
         env: { ...env, PROXMOX_AXI_ACCEPTANCE_HOST_TOKEN: hostedToken }, stdio: ['ignore', 'pipe', 'pipe', 'ipc'] })
-      hostChild.stdout.on('data', chunk => hostLogs.push(chunk))
-      hostChild.stderr.on('data', chunk => hostLogs.push(chunk))
-      const ready = await hostMessage(hostChild, 'ready')
+      hostChild.stdout!.on('data', chunk => hostLogs.push(chunk))
+      hostChild.stderr!.on('data', chunk => hostLogs.push(chunk))
+      const ready = await hostMessage(hostChild!, 'ready')
       result.host.ready = ready
       assert.equal(ready.namespace, result.network.namespace, 'Actual host shares the fake-only network namespace')
       assert.equal(await realpath(ready.executable), executable, 'Actual host must execute the same pinned installed package')
       const login = await fetch(`${ready.url}/v1/auth/login`, { method: 'POST',
         headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ username: 'synthetic-user', password: 'CANARY-local-password' }) })
       assert.equal(login.status, 200, 'Real local Artium authentication')
-      const session = await login.json()
+      const session = await login.json() as { status: string, accessToken: string, refreshToken: string }
       assert.equal(session.status, 'authenticated')
       secrets.push(session.accessToken, session.refreshToken)
       await verifyHostRuntime(hostInput.fixture)
-      const { SessionStore } = await import(pathToFileURL(join(hostInput.fixture, 'dist/src/cli/session.js')))
+      const { SessionStore } = await import(pathToFileURL(join(hostInput.fixture, 'dist/src/cli/session.js')).href)
       new SessionStore(ready.url, join(base.XDG_CONFIG_HOME, 'artium-axi/session.json')).write(session)
       const client = join(hostInput.fixture, 'dist/cli/artium-axi.mjs')
       const clientEnvironment = { ...env, ARTIUM_AXI_URL: ready.url, ARTIUM_AXI_TEST_HTTP: '1' }
       const secondaryLogin = await fetch(`${ready.url}/v1/auth/login`, { method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username: 'synthetic-secondary', password: 'CANARY-local-password' }) })
       assert.equal(secondaryLogin.status, 200)
-      const secondarySession = await secondaryLogin.json()
+      const secondarySession = await secondaryLogin.json() as { accessToken: string, refreshToken: string }
       secrets.push(secondarySession.accessToken, secondarySession.refreshToken)
       const secondaryConfig = join(scratch, 'secondary-config')
       new SessionStore(ready.url, join(secondaryConfig, 'artium-axi/session.json')).write(secondarySession)
@@ -562,8 +662,8 @@ async function verify(values, prepared, scratch) {
         await exerciseWriteJourney({ scratch, out, executable: client, caFile, env: { ...clientEnvironment, PROXMOX_AXI_TOKEN: hostedToken },
           command, cases: result.cases, ledger, transcripts, hosted: { log: join(hostDirectory, 'writes.log'), otherActorEnv: secondaryEnvironment,
             configure: async (origin, toolOperations, hostOperations, enabled) => {
-              const configured = hostMessage(hostChild, 'configured-writes')
-              hostChild.send({ event: 'configure-writes', origin, toolOperations, hostOperations, enabled })
+              const configured = hostMessage(hostChild!, 'configured-writes')
+              hostChild!.send!({ event: 'configure-writes', origin, toolOperations, hostOperations, enabled })
               await configured
             } } })
         for (const id of ['AC-WRITES', 'AC-WRITE', 'AC-SPECIAL-BATCH-POLICY', 'AC-ASYNC', 'AC-SPECIAL-BATCH-RESULTS']) {
@@ -574,32 +674,32 @@ async function verify(values, prepared, scratch) {
         env: { ...clientEnvironment, PROXMOX_AXI_TOKEN: hostedToken }, cases: result.cases, ledger, transcripts,
         hosted: { otherActorEnv: secondaryEnvironment, stateDirectory: hostDirectory,
           configure: async (origin, auth, operations) => {
-            const configured = hostMessage(hostChild, 'configured-s4')
-            hostChild.send({ event: 'configure-s4', origin, auth, operations })
+            const configured = hostMessage(hostChild!, 'configured-s4')
+            hostChild!.send!({ event: 'configure-s4', origin, auth, operations })
             await configured
           }, clock: async offset => {
-            const changed = hostMessage(hostChild, 'clock-changed')
-            hostChild.send({ event: 'clock', offset })
+            const changed = hostMessage(hostChild!, 'clock-changed')
+            hostChild!.send!({ event: 'clock', offset })
             await changed
           } } })
       if (/^S[56]\./.test(values['--task'])) await exerciseStreamJourney({ task: values['--task'].startsWith('S6.') ? 'S5.2' : values['--task'], scratch, out, executable: client, caFile,
         env: clientEnvironment, cases: result.cases, ledger, transcripts, hosted: { otherActorEnv: secondaryEnvironment,
           configure: async (origin, operations) => {
-            const configured = hostMessage(hostChild, 'configured-s4')
-            hostChild.send({ event: 'configure-s4', origin, auth: 'api-token', operations })
+            const configured = hostMessage(hostChild!, 'configured-s4')
+            hostChild!.send!({ event: 'configure-s4', origin, auth: 'api-token', operations })
             await configured
           }, limits: async (bytes, idleMs) => {
-            const changed = hostMessage(hostChild, 'stream-limits-changed')
-            hostChild.send({ event: 'stream-limits', bytes, idleMs })
+            const changed = hostMessage(hostChild!, 'stream-limits-changed')
+            hostChild!.send!({ event: 'stream-limits', bytes, idleMs })
             await changed
           } } })
-      const snapshot = hostMessage(hostChild, 'snapshot')
-      hostChild.send('snapshot')
+      const snapshot = hostMessage(hostChild!, 'snapshot')
+      hostChild!.send!('snapshot')
       result.host.evidence = await snapshot
       assert.deepEqual(result.host.evidence.callsRemaining, [], 'Actual runner cleans its private call directories')
       assert.deepEqual(result.host.evidence.audit.filter(row => row.event === 'run-terminal').map(row => row.exit_code),
-        result.cases.filter(row => row.hosted && (!row.expected.hostBoundary || Object.hasOwn(row.expected, 'auditExit')))
-          .map(row => Object.hasOwn(row.expected, 'auditExit') ? row.expected.auditExit : row.actual.exitCode), 'Actual host audit records public command outcomes')
+        result.cases.filter(row => row.hosted && (!row.expected!.hostBoundary || Object.hasOwn(row.expected!, 'auditExit')))
+          .map(row => Object.hasOwn(row.expected!, 'auditExit') ? row.expected!.auditExit : row.actual!.exitCode), 'Actual host audit records public command outcomes')
       result.host.status = 'pass'
       result.outcomes = result.outcomes.filter(row => row.journey !== 'artium' || row.status !== 'pending')
       for (const id of ['AC-HOST', 'AC-VERSION-AUTH', 'AC-VERIFIED-VERSION', 'CRED-05', 'CRED-19', 'CRED-21']) {
@@ -622,14 +722,14 @@ async function verify(values, prepared, scratch) {
     }
     if (values['--task'].startsWith('S6.')) {
       result.native = { linux: 'pass', windows: 'pending', reason: 'Native Windows machine unavailable; Linux is not a substitute.' }
-      const transportEvidence = {
-        'AC-TRANSFER': row => row.invocation.args.includes('transfer'),
-        'AC-TRANSPORT': row => row.invocation.args.includes('transfer') || row.invocation.args.includes('duplex'),
+      const transportEvidence: Record<string, (row: CaseRecord) => boolean> = {
+        'AC-TRANSFER': row => row.invocation!.args.includes('transfer'),
+        'AC-TRANSPORT': row => row.invocation!.args.includes('transfer') || row.invocation!.args.includes('duplex'),
         'AC-SPECIAL-BATCH-POLICY': row => row.id === 'S5.2/batch-cannot-open-byte-channel',
         'AC-SPECIAL-GUEST-FILE': row => row.id.startsWith('S5.2/guest-'),
-        'AC-STREAM': row => row.invocation.args.includes('duplex'),
+        'AC-STREAM': row => row.invocation!.args.includes('duplex'),
       }
-      const evidenceFor = id => result.cases.filter(row => row.id.split('/').includes(id) ||
+      const evidenceFor = (id: string) => result.cases.filter(row => row.id.split('/').includes(id) ||
         row.id.startsWith('S5.2/') && transportEvidence[id]?.(row)).map(row => row.id)
       result.caseCoverage = Array.from({ length: 21 }, (_, index) => `CRED-${String(index + 1).padStart(2, '0')}`).map(id => {
         const evidence = evidenceFor(id)
@@ -656,16 +756,16 @@ async function verify(values, prepared, scratch) {
     result.scope = hostInput ? `${result.task} through both journeys using the unmerged admission fixture; stock Artium is unsupported.` : `Standalone subset only; full ${result.task} requires --through both.`
     if (values['--task'].startsWith('S6.')) result.scope += ' Native Linux and immutable admission infrastructure only; release completeness remains pending on unresolved admission coverage, Windows and the release-candidate Artium fold.'
   } catch (error) {
-    result.failure = publicText(error.message)
+    result.failure = publicText((error as Error).message)
     process.exitCode = 1
   } finally {
     if (hostChild && hostChild.exitCode === null && hostChild.signalCode === null) {
-      const stopped = new Promise(resolve => hostChild.once('close', resolve))
-      if (hostChild.connected) hostChild.send('stop')
+      const stopped = new Promise(resolve => hostChild!.once('close', resolve))
+      if (hostChild.connected) hostChild!.send!('stop')
       else hostChild.kill('SIGTERM')
       await stopped
     }
-    if (server) await new Promise(resolve => { server.close(resolve); server.closeAllConnections() })
+    if (server) await new Promise<Error | undefined>(resolve => { server!.close(resolve); server!.closeAllConnections() })
     await writeFile(join(out, 'result.json'), publicText(`${JSON.stringify(result, null, 2)}\n`))
     await writeFile(join(out, 'requests.jsonl'), ledger.map(row => JSON.stringify(row)).join('\n') + (ledger.length ? '\n' : ''))
     await save(join(out, 'tls-errors.json'), tlsErrors)
@@ -676,8 +776,8 @@ async function verify(values, prepared, scratch) {
     failure: result.failure, evidence: join(out, 'result.json') }))
 }
 
-let scratch
-let values
+let scratch: string | undefined
+let values: Selection | undefined
 try {
   values = selection(process.argv.slice(2))
   if (!process.env.PROXMOX_AXI_ACCEPTANCE_NETNS) {
@@ -701,13 +801,13 @@ try {
     assert.ok(Object.keys(networkInterfaces()).every(name => name === 'lo'), 'Must isolate networking before configuring loopback')
     await checked('ip', ['link', 'set', 'lo', 'up'])
     const preparedScratch = process.env.PROXMOX_AXI_ACCEPTANCE_SCRATCH
-    await verify(values, await json(join(preparedScratch, 'prepared.json')), preparedScratch)
+    await verify(values, await json<Awaited<ReturnType<typeof preparePackage>>>(join(preparedScratch!, 'prepared.json')), preparedScratch!)
   }
 } catch (error) {
   if (scratch) {
-    await save(join(values['--out'], 'result.json'), { status: 'fail', failure: error.message, cases: [], host: { status: 'pending' } })
+    await save(join(values!['--out'], 'result.json'), { status: 'fail', failure: (error as Error).message, cases: [], host: { status: 'pending' } })
   }
-  console.log(JSON.stringify({ status: 'fail', error: error.message }))
+  console.log(JSON.stringify({ status: 'fail', error: (error as Error).message }))
   process.exitCode = 1
 } finally {
   if (scratch) await rm(scratch, { recursive: true, force: true })

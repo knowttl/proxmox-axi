@@ -634,7 +634,7 @@ Policy and data sources:
   The generated `write-policy.json` records every other route as refused, with its vendor privileges, input classification and contract reference.
 - `src/operations.json` owns required version fields and version help metadata.
 - `src/profile-schema.json` owns the profile contract and runtime validation.
-- Before admitting a new schema, compare captures offline with `node scripts/compare-capture.mjs /absolute/previous.txt /absolute/candidate.txt`.
+- Before admitting a new schema, compare captures offline with `node scripts/compare-capture.ts /absolute/previous.txt /absolute/candidate.txt`.
   It parses the JSON schema without executing JavaScript, reports changed contracts and capture hashes, and never updates admission policy or pins.
 
 ### Tests

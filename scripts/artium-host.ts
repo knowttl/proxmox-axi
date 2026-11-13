@@ -1,11 +1,18 @@
 import { readFileSync, readdirSync, readlinkSync } from 'node:fs'
 import { join } from 'node:path'
 import { pathToFileURL } from 'node:url'
-import { verifyHostRuntime } from './host-identity.mjs'
+import { verifyHostRuntime } from './host-identity.ts'
 
-const [fixture, directory, origin, caFile] = process.argv.slice(2)
+type HostMessage = 'snapshot' | 'stop' |
+  { event: 'stream-limits', bytes: number, idleMs?: number } |
+  { event: 'clock', offset: number } |
+  { event: 'configure-s4', auth: string, origin: string, operations: string[] } |
+  { event: 'configure-writes', origin: string, toolOperations: string[], hostOperations: string[], enabled: boolean }
+
+
+const [fixture, directory, origin, caFile] = process.argv.slice(2) as [string, string, string, string]
 await verifyHostRuntime(fixture)
-const load = path => import(pathToFileURL(join(fixture, 'dist', path)))
+const load = (path: string) => import(pathToFileURL(join(fixture, 'dist', path)).href)
 const { createApp } = await load('src/server/app.js')
 const { createProxmoxAdapter } = await load('src/server/adapters/proxmox.js')
 const { Audit } = await load('src/server/audit/audit.js')
@@ -42,17 +49,17 @@ const app = createApp({ db, audit: new Audit(db, Date.now, () => {}), runner, cr
   adapters: [createProxmoxAdapter(source, join(directory, 'writes.log'))] })
 const url = await app.listen({ host: '127.0.0.1', port: 0 })
 const actualNow = Date.now
-process.send({ event: 'ready', url, pid: process.pid, executable: toolPaths['proxmox-axi'], namespace: readlinkSync('/proc/self/ns/net') })
-process.on('message', async message => {
+process.send!({ event: 'ready', url, pid: process.pid, executable: toolPaths['proxmox-axi'], namespace: readlinkSync('/proc/self/ns/net') })
+process.on('message', async (message: HostMessage) => {
   if (message && typeof message === 'object' && message.event === 'stream-limits') {
     if (!Number.isSafeInteger(message.bytes) || message.bytes < 1) throw new Error('Invalid test transfer quota')
     process.env.ARTIUM_PVE_TRANSFER_BYTES = String(message.bytes)
     process.env.ARTIUM_PVE_DUPLEX_IDLE_MS = String(message.idleMs ?? 30000)
-    process.send({ event: 'stream-limits-changed' })
+    process.send!({ event: 'stream-limits-changed' })
   }
   if (message && typeof message === 'object' && message.event === 'clock') {
     Date.now = () => actualNow() + message.offset
-    process.send({ event: 'clock-changed' })
+    process.send!({ event: 'clock-changed' })
   }
   if (message && typeof message === 'object' && message.event === 'configure-s4') {
     const current = store.findCredential('proxmox-axi')
@@ -62,7 +69,7 @@ process.on('message', async message => {
       caBundle: readFileSync(caFile, 'utf8'), writes: { operations: message.operations } }, current?.revision ?? 0, 'synthetic-development-user', Date.now())
     db.prepare("UPDATE tools SET native_settings = ? WHERE name = 'proxmox-axi'")
       .run(JSON.stringify({ hostWrites: { allowWrites: true, operations: message.operations } }))
-    process.send({ event: 'configured-s4' })
+    process.send!({ event: 'configured-s4' })
   }
   if (message && typeof message === 'object' && message.event === 'configure-writes') {
     const current = store.findCredential('proxmox-axi')
@@ -71,9 +78,9 @@ process.on('message', async message => {
     current?.revision ?? 0, 'synthetic-development-user', Date.now())
     db.prepare("UPDATE tools SET native_settings = ? WHERE name = 'proxmox-axi'")
       .run(JSON.stringify({ hostWrites: { allowWrites: message.enabled, operations: message.hostOperations } }))
-    process.send({ event: 'configured-writes' })
+    process.send!({ event: 'configured-writes' })
   }
-  if (message === 'snapshot') process.send({ event: 'snapshot', callsRemaining: readdirSync(join(directory, 'calls')),
+  if (message === 'snapshot') process.send!({ event: 'snapshot', callsRemaining: readdirSync(join(directory, 'calls')),
     audit: db.prepare("SELECT event, tool, arguments, exit_code, error_code, action FROM audit WHERE tool = 'proxmox-axi' ORDER BY id").all() })
   if (message === 'stop') {
     await app.close()

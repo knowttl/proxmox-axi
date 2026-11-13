@@ -6,6 +6,22 @@ import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import test from 'node:test'
 
+interface Coverage { id: string, status: string, evidence: string[] }
+interface AcceptanceResult {
+  status: string
+  failure?: string
+  host: { status: string }
+  cases: { id: string, status: string }[]
+  routeCoverage: { union: number, variants: number }
+  native: { linux: string, windows: string, reason: string }
+  admission: { status: string, baseline: { version: string }, coexistence: { status: string, ownedVersion: string }, completeness: { variants: number, status: string, unresolved: number } }
+  package: { version: string }
+  caseCoverage: Coverage[]
+  outcomeCoverage: Coverage[]
+  outcomes: { id: string, journey: string, status: string }[]
+}
+
+
 for (const scenario of [
   { name: 'native Linux paths and private files satisfy S6.1 with outbound networking denied', task: 'S6.1', through: 'standalone', exitCode: 0, status: 'pass', host: 'pending' },
   { name: 'immutable installed package records S6.2 admission gaps with outbound networking denied', task: 'S6.2', through: 'standalone', exitCode: 0, status: 'pass', host: 'pending' },
@@ -31,17 +47,17 @@ for (const scenario of [
   const temporary = await mkdtemp(join(tmpdir(), 'proxmox-axi-test-'))
   const out = join(temporary, 'S1.1')
   try {
-    const child = spawn(process.execPath, [join(root, 'scripts/acceptance.mjs'), '--task', scenario.task ?? 'S1.1',
+    const child = spawn(process.execPath, [join(root, 'scripts/acceptance.ts'), '--task', scenario.task ?? 'S1.1',
       '--pack', join(root, 'evidence'), '--out', out, '--network', 'fake-only', '--through', scenario.through,
       ...(scenario.repeat ? ['--repeat-through', scenario.repeat] : [])],
     { stdio: ['ignore', 'pipe', 'pipe'], env: { ...process.env,
       ...(scenario.missingHost ? { PROXMOX_AXI_ARTIUM_FIXTURE: '', PROXMOX_AXI_ARTIUM_MANIFEST: '' } : {}) } })
-    const output = []
+    const output: Buffer[] = []
     child.stdout.on('data', chunk => output.push(chunk))
     child.stderr.on('data', chunk => output.push(chunk))
     const exitCode = await new Promise((resolve, reject) => { child.once('error', reject); child.once('close', resolve) })
     assert.equal(exitCode, scenario.exitCode, Buffer.concat(output).toString())
-    const result = JSON.parse(await readFile(join(out, 'result.json'), 'utf8'))
+    const result = JSON.parse(await readFile(join(out, 'result.json'), 'utf8')) as AcceptanceResult
     assert.equal(result.status, scenario.status, result.failure)
     assert.equal(result.failure, scenario.failure)
     assert.equal(result.host.status, scenario.host)
@@ -49,7 +65,7 @@ for (const scenario of [
     if (scenario.repeat === 'S2') {
       assert.equal(result.routeCoverage.union, 681)
       assert.equal(result.routeCoverage.variants, 1285)
-      for (const [release, count] of [['legacy-8.2.7', 605], ['published-current', 680]]) {
+      for (const [release, count] of [['legacy-8.2.7', 605], ['published-current', 680]] as const) {
         assert.equal(result.cases.filter(row => row.id.startsWith(`standalone/contract/${release}/`) && row.id.endsWith('/required/valid')).length, count)
         assert.equal(result.cases.filter(row => row.id.startsWith(`standalone/contract/${release}/`) && row.id.endsWith('/required/invalid')).length, count)
       }
@@ -63,10 +79,10 @@ for (const scenario of [
       assert.equal(result.admission.completeness.variants, 1285)
       assert.equal(result.admission.completeness.status, 'pending')
       assert.ok(result.admission.completeness.unresolved > 0)
-      assert.equal(result.caseCoverage.find(row => row.id === 'CRED-08').status, 'pass')
-      assert.equal(result.caseCoverage.find(row => row.id === 'CRED-07').status, 'pending')
+      assert.equal(result.caseCoverage.find(row => row.id === 'CRED-08')!.status, 'pass')
+      assert.equal(result.caseCoverage.find(row => row.id === 'CRED-07')!.status, 'pending')
       for (const id of ['CRED-01', 'CRED-02', 'CRED-03', 'CRED-12']) {
-        const coverage = result.caseCoverage.find(row => row.id === id)
+        const coverage = result.caseCoverage.find(row => row.id === id)!
         assert.equal(coverage.status, 'pass', `#31 executed exact ID ${id}`)
         assert.ok(coverage.evidence.includes(id))
       }
@@ -76,12 +92,12 @@ for (const scenario of [
         ['AC-SPECIAL-GUEST-FILE', 'S5.2/guest-16777216-bytes'],
         ['AC-STREAM', 'S5.2/qemu/{vmid}/vncproxy-frames'],
         ['AC-SPECIAL-BATCH-POLICY', 'S5.2/batch-cannot-open-byte-channel'],
-      ]) {
-        const coverage = result.outcomeCoverage.find(row => row.id === id)
+      ] as const) {
+        const coverage = result.outcomeCoverage.find(row => row.id === id)!
         assert.equal(coverage.status, 'pass', `#31 mapped transport outcome ${id}`)
         assert.ok(coverage.evidence.includes(evidence))
       }
-      for (const id of ['AC-HOST', 'AC-FULL', 'AC-COVERAGE', 'AC-PLATFORM']) assert.equal(result.outcomeCoverage.find(row => row.id === id).status, 'pending')
+      for (const id of ['AC-HOST', 'AC-FULL', 'AC-COVERAGE', 'AC-PLATFORM']) assert.equal(result.outcomeCoverage.find(row => row.id === id)!.status, 'pending')
     }
     if (scenario.task === 'S3.2' && scenario.through === 'both') {
       assert.deepEqual(result.outcomes.filter(row => row.journey === 'artium' && [

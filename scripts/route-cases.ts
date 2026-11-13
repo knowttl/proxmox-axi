@@ -1,9 +1,20 @@
+import type { Contract, VendorSchema } from '../src/contract.ts'
+import type { Catalogue } from './catalogue.ts'
 import assert from 'node:assert/strict'
 import { Ajv } from 'ajv'
-import { routeKey } from './catalogue.mjs'
+import { routeKey } from './catalogue.ts'
 import { reviewWrite } from './write-policy.ts'
 
-function responseFixture(schema) {
+export interface OperationPolicy {
+  reviewed: Record<string, Contract['policy']>
+  default: Contract['policy']
+  captureBindings: Record<string, string>
+}
+interface DiscoveryContract extends Omit<Contract, 'invocation'> { invocation: { schema: object } }
+interface Inventory { operations: { method: string, path: string, command: string[], variants: { release: string, contract: string }[] }[] }
+
+
+function responseFixture(schema: VendorSchema): unknown {
   if (schema.enum) return schema.enum[0]
   if (schema.type === 'array') return schema.items ? [responseFixture(schema.items)] : []
   if (schema.type === 'object') return Object.fromEntries(Object.entries(schema.properties ?? {})
@@ -15,13 +26,13 @@ function responseFixture(schema) {
 }
 
 // Only vendor constraints and the checked admission policy supply the expected wire contract.
-export function* routeCases(catalogues, policy) {
+export function* routeCases(catalogues: Catalogue[], policy: OperationPolicy) {
   for (const catalogue of catalogues) for (const operation of catalogue.operations) {
     const review = policy.reviewed[routeKey(operation)] ?? policy.default
     const reviewedWrite = !!reviewWrite(operation)
     const callable = policy.captureBindings[catalogue.release] === catalogue.captureSha256 && review.effect === 'read' && review.transport === 'json' && ['none', 'private-result'].includes(review.secrets) && operation.allowtoken !== 0
     const privateResult = callable && review.secrets === 'private-result'
-    const values = {}
+    const values: Record<string, unknown> = {}
     const properties = operation.parameters?.properties ?? {}
     for (const [name, schema] of Object.entries(properties)) if (!schema.optional || operation.path.includes(`{${name}}`)) {
       if (name === 'node') values[name] = 'pve-test'
@@ -44,7 +55,7 @@ export function* routeCases(catalogues, policy) {
       const taskLogDownload = operation.method === 'GET' && operation.path === '/nodes/{node}/tasks/{upid}/log' && variant.values.download === true
       const args = [operation.method.toLowerCase(), operation.path, '--catalogue', catalogue.release, '--format', 'json', ...(reviewedWrite ? [] : ['--full'])]
       const response = operation.path.endsWith('/version') ? { version: '8.2.7', release: '8.2', repoid: '3e0176e6bb2ade3b' } : responseFixture(operation.returns ?? {})
-      const project = row => Object.fromEntries(Object.entries(row).filter(([name]) => review.outputFields.includes(name)))
+      const project = (row: unknown) => Object.fromEntries(Object.entries(row as Record<string, unknown>).filter(([name]) => review.outputFields!.includes(name)))
       const publicResponse = review.outputFields ? Array.isArray(response) ? response.map(project) : project(response) : response
       if (callable) for (const [name, value] of Object.entries(variant.values)) args.push(`--api-${name}`, String(value))
       let path = operation.path
@@ -65,22 +76,22 @@ export function* routeCases(catalogues, policy) {
   }
 }
 
-export function verifyDiscovery(inventory, catalogues, contracts, policy) {
+export function verifyDiscovery(inventory: Inventory, catalogues: Catalogue[], contracts: DiscoveryContract[], policy: OperationPolicy) {
   const ajv = new Ajv({ strict: false })
   const validators = new Map(contracts.map(contract => [`${contract.release}/${routeKey(contract)}`, ajv.compile(contract.invocation.schema)]))
   assert.equal(inventory.operations.length, 681)
   assert.deepEqual(new Set(inventory.operations.map(routeKey)), new Set(catalogues.flatMap(catalogue => catalogue.operations.map(routeKey))))
   for (const catalogue of catalogues) for (const operation of catalogue.operations) {
     const route = inventory.operations.find(entry => routeKey(entry) === routeKey(operation))
-    const variant = route.variants.find(entry => entry.release === catalogue.release)
+    const variant = route!.variants.find(entry => entry.release === catalogue.release)
     const contract = contracts.find(entry => entry.release === catalogue.release && routeKey(entry) === routeKey(operation))
-    assert.equal(variant.contract, `dist/contracts.json#/contracts/${contracts.indexOf(contract)}`)
-    assert.deepEqual(contract.parameters, operation.parameters, `${catalogue.release}/${routeKey(operation)} preserves vendor constraints`)
-    assert.deepEqual(contract.returns, operation.returns, `${catalogue.release}/${routeKey(operation)} preserves vendor response metadata`)
+    assert.equal(variant!.contract, `dist/contracts.json#/contracts/${contracts.indexOf(contract!)}`)
+    assert.deepEqual(contract!.parameters, operation.parameters, `${catalogue.release}/${routeKey(operation)} preserves vendor constraints`)
+    assert.deepEqual(contract!.returns, operation.returns, `${catalogue.release}/${routeKey(operation)} preserves vendor response metadata`)
   }
   for (const route of routeCases(catalogues, policy)) if (route.callable) {
     const validate = validators.get(`${route.release}/${routeKey(route.operation)}`)
-    assert.equal(validate({ api: route.values }), true, `${route.id}: generated schema accepts the reviewed branch`)
-    assert.equal(validate({ api: { ...route.values, constructor: 'invalid' } }), false, `${route.id}: generated schema refuses unknown parameters`)
+    assert.equal(validate!({ api: route.values }), true, `${route.id}: generated schema accepts the reviewed branch`)
+    assert.equal(validate!({ api: { ...route.values, constructor: 'invalid' } }), false, `${route.id}: generated schema refuses unknown parameters`)
   }
 }

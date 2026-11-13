@@ -1,3 +1,4 @@
+import type { AddressInfo } from 'node:net'
 import assert from 'node:assert/strict'
 import test from 'node:test'
 import { readFile } from 'node:fs/promises'
@@ -13,20 +14,20 @@ test('synthetic captured read shapes validate and normalize', () => {
     ['/nodes/{node}/storage/{storage}/content', [{ volid: 'local:vm-100-disk-0', format: 'raw', size: 1024, parent: null }], [{ volid: 'local:vm-100-disk-0', format: 'raw', size: 1024, parent: null }]],
     ['/cluster/nextid', '100', 100],
     ['/nodes/{node}/qemu/{vmid}/firewall/rules/{pos}', { pos: '0', type: 'in', action: 'ACCEPT' }, { pos: 0, type: 'in', action: 'ACCEPT' }],
-  ]) {
+  ] as [string, unknown, unknown][]) {
     assert.deepEqual(validateResponse(data, selectContract('GET', path, 'legacy-8.2.7').returns), expected, path)
   }
 })
 
 test('pending reads accept scalar values and reject objects', async t => {
-  let data = [{ key: 'cores', value: 2, pending: 3 }, { key: 'onboot', value: 0, pending: null }]
-  let delivered
+  let data: unknown = [{ key: 'cores', value: 2, pending: 3 }, { key: 'onboot', value: 0, pending: null }]
+  let delivered: unknown
   const cert = await readFile(new URL('./fixtures/localhost-cert.pem', import.meta.url))
   const server = createServer({ cert, key: await readFile(new URL('./fixtures/localhost-key.pem', import.meta.url)) }, (_request, response) => response.end(JSON.stringify({ data })))
-  await new Promise(resolve => server.listen(0, '127.0.0.1', resolve))
+  await new Promise<void>(resolve => server.listen(0, '127.0.0.1', resolve))
   t.after(() => new Promise(resolve => server.close(resolve)))
-  const credentials = { origin: `https://127.0.0.1:${server.address().port}`, ca: cert, auth: 'api-token', tokenId: 'synthetic', token: 'synthetic',
-    results: { sink() {}, async deliver(_binding, value) { delivered = value } } }
+  const credentials = { origin: `https://127.0.0.1:${(server.address() as AddressInfo).port}`, ca: cert, auth: 'api-token', tokenId: 'synthetic', token: 'synthetic',
+    results: { sink() {}, async deliver(_binding: unknown, value: unknown) { delivered = value } } } as unknown as Parameters<typeof readOperation>[0]
   for (const guest of ['qemu', 'lxc']) {
     const contract = selectContract('GET', `/nodes/{node}/${guest}/{vmid}/pending`, 'legacy-8.2.7')
     await readOperation(credentials, contract, { node: 'node-a', vmid: 100 }, 'legacy-8.2.7')
