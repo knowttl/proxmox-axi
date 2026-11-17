@@ -106,6 +106,25 @@ test('disk growth uses confirmed relative increments and retained task outcomes'
       assert.deepEqual(requests, [])
     })
   }
+  await t.test('concurrent submissions of one confirmation apply once and refuse the other as used', async () => {
+    const args = ['set', resize('qemu'), ...target, '--api-disk', 'scsi0', '--api-size', '+8G']
+    const rounds = 200, parallel = 8
+    const outcomes = { applied: 0, used: 0, other: [] as string[] }
+    const before = sizeGiB
+    for (let batch = 0; batch < rounds / parallel; batch++) {
+      await Promise.all(Array.from({ length: parallel }, async () => {
+        const preview = await command([...args, '--preview'])
+        const results = await Promise.all([1, 2].map(() => command([...args, '--confirm', preview.data.confirmation])))
+        for (const result of results) {
+          if (result.code === 0) outcomes.applied++
+          else if (result.data.error.code === 'CONFIRMATION_USED') outcomes.used++
+          else outcomes.other.push(result.data.error.code)
+        }
+      }))
+    }
+    assert.deepEqual(outcomes, { applied: rounds, used: rounds, other: [] })
+    assert.equal(sizeGiB - before, 8 * rounds)
+  })
   await t.test('lost growth response retains uncertainty and prevents replay of its confirmation', async () => {
     sizeGiB = 32
     const args = ['set', resize('qemu'), ...target, '--api-disk', 'scsi0', '--api-size', '+8G']

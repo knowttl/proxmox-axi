@@ -1,4 +1,4 @@
-import { constants } from 'node:fs'
+import { constants, type Stats } from 'node:fs'
 import { chmod, lstat, mkdir, open, rename, rm } from 'node:fs/promises'
 import { randomUUID } from 'node:crypto'
 import { dirname, isAbsolute, join } from 'node:path'
@@ -10,15 +10,18 @@ const insecure = () => new Failure('CONFIG_INSECURE', 'File is not a protected o
 
 export async function readPrivateFile(path: string, secret = false, verifyAcl = false): Promise<string> {
   if (!isAbsolute(path) || (process.platform === 'win32' && !/^[A-Za-z]:[\\/]/.test(path))) throw insecure()
-  const info = await lstat(path)
-  const safe = (stat: typeof info) => stat.isFile() && !stat.isSymbolicLink() &&
-    (process.platform === 'win32' || (stat.uid === process.getuid?.() && (stat.mode & (secret ? 0o077 : 0o022)) === 0))
-  if (!safe(info)) throw insecure()
-  if (process.platform === 'win32') await windowsProtection(path, verifyAcl ? 'verify' : 'read')
-  const file = await open(path, constants.O_RDONLY | (process.platform === 'win32' ? 0 : constants.O_NOFOLLOW))
+  const windows = process.platform === 'win32'
+  const safe = (stat: Stats) => stat.isFile() && !stat.isSymbolicLink() &&
+    (windows || (stat.uid === process.getuid?.() && (stat.mode & (secret ? 0o077 : 0o022)) === 0))
+  const info = windows ? await lstat(path) : undefined
+  if (info && !safe(info)) throw insecure()
+  if (windows) await windowsProtection(path, verifyAcl ? 'verify' : 'read')
+  const file = await open(path, constants.O_RDONLY | (windows ? 0 : constants.O_NOFOLLOW | constants.O_NONBLOCK)).catch(error => {
+    throw ['ELOOP', 'EMLINK'].includes((error as NodeJS.ErrnoException).code ?? '') ? insecure() : error
+  })
   try {
     const opened = await file.stat()
-    if (!safe(opened) || opened.ino !== info.ino || opened.dev !== info.dev || opened.size > 1_048_576) throw insecure()
+    if (!safe(opened) || (info && (opened.ino !== info.ino || opened.dev !== info.dev)) || opened.size > 1_048_576) throw insecure()
     const bytes = Buffer.alloc(1_048_577)
     let length = 0
     while (length < bytes.length) {
