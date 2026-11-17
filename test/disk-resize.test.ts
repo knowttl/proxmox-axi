@@ -45,10 +45,12 @@ test('disk growth uses confirmed relative increments and retained task outcomes'
     token: { env: 'RESIZE_TOKEN' }, caBundle: caFile, writes: { operations: ['qemu', 'lxc'].map(family =>
       `OP-PUT-${createHash('sha256').update(`PUT ${resize(family)}`).digest('hex').slice(0, 10)}`) },
   } } }), { mode: 0o600 })
-  const command = async (args: string[]) => {
-    const child = spawn(process.execPath, [executable, ...args, '--config', config, '--format', 'json'], {
-      env: { ...environment, RESIZE_TOKEN: 'synthetic-token', PROXMOX_AXI_WRITE_LOG: join(scratch, 'writes.log') }, stdio: ['ignore', 'pipe', 'pipe'],
+  const command = async (args: string[], coordination?: { role: string, message: (message: string, release: () => void) => void }) => {
+    const preload = new URL('../../test/fixtures/journal-race.mjs', import.meta.url).pathname
+    const child = spawn(process.execPath, [...(coordination ? ['--import', preload] : []), executable, ...args, '--config', config, '--format', 'json'], {
+      env: { ...environment, RESIZE_TOKEN: 'synthetic-token', PROXMOX_AXI_WRITE_LOG: join(scratch, 'writes.log'), ...(coordination ? { JOURNAL_RACE_ROLE: coordination.role } : {}) }, stdio: ['ignore', 'pipe', 'pipe', 'ipc'],
     })
+    if (coordination) child.on('message', message => coordination.message(String(message), () => child.send('release')))
     let stdout = '', stderr = ''
     child.stdout.on('data', chunk => { stdout += chunk.toString() })
     child.stderr.on('data', chunk => { stderr += chunk.toString() })
@@ -108,22 +110,26 @@ test('disk growth uses confirmed relative increments and retained task outcomes'
   }
   await t.test('concurrent submissions of one confirmation apply once and refuse the other as used', async () => {
     const args = ['set', resize('qemu'), ...target, '--api-disk', 'scsi0', '--api-size', '+8G']
-    const rounds = 200, parallel = 8
-    const outcomes = { applied: 0, used: 0, other: [] as string[] }
     const before = sizeGiB
-    for (let batch = 0; batch < rounds / parallel; batch++) {
-      await Promise.all(Array.from({ length: parallel }, async () => {
-        const preview = await command([...args, '--preview'])
-        const results = await Promise.all([1, 2].map(() => command([...args, '--confirm', preview.data.confirmation])))
-        for (const result of results) {
-          if (result.code === 0) outcomes.applied++
-          else if (result.data.error.code === 'CONFIRMATION_USED') outcomes.used++
-          else outcomes.other.push(result.data.error.code)
-        }
-      }))
-    }
-    assert.deepEqual(outcomes, { applied: rounds, used: rounds, other: [] })
-    assert.equal(sizeGiB - before, 8 * rounds)
+    const preview = await command([...args, '--preview'])
+    assert.equal(preview.code, 0, preview.stderr)
+    let releaseWinner = () => {}
+    let winnerReady!: () => void
+    const ready = new Promise<void>(resolve => { winnerReady = resolve })
+    const winner = command([...args, '--confirm', preview.data.confirmation], { role: 'winner', message: (_message, release) => {
+      releaseWinner = release
+      winnerReady()
+    } })
+    await ready
+    let boundary = ''
+    const loser = command([...args, '--confirm', preview.data.confirmation], { role: 'loser', message: message => {
+      if (!boundary) { boundary = message; releaseWinner() }
+    } })
+    const [applied, used] = await Promise.all([winner, loser])
+    assert.equal(boundary, 'contended')
+    assert.equal(applied.code, 0, JSON.stringify(applied.data))
+    assert.equal(used.data.error.code, 'CONFIRMATION_USED')
+    assert.equal(sizeGiB - before, 8)
   })
   await t.test('lost growth response retains uncertainty and prevents replay of its confirmation', async () => {
     sizeGiB = 32

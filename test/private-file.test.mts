@@ -24,7 +24,8 @@ test('private read returns the replacement when the file is atomically replaced 
       return open(...args)
     })
     syncBuiltinESMExports()
-    assert.equal(await readPrivateFile(path, true), 'after-replacement')
+    if (process.platform === 'win32') await assert.rejects(readPrivateFile(path, true), { code: 'CONFIG_INSECURE' })
+    else assert.equal(await readPrivateFile(path, true), 'after-replacement')
     assert.equal(replaced, true)
   } finally {
     t.mock.restoreAll()

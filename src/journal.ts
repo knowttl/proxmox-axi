@@ -124,7 +124,7 @@ export class Journal {
 
   async update(id: string, change: (record: JournalRecord) => void): Promise<JournalRecord> {
     return this.locked(id, async () => {
-      const record = await this.read(id)
+      const record = await this.readLocked(id)
       change(record)
       await this.replace(record)
       return record
@@ -178,6 +178,10 @@ export class Journal {
   }
 
   async read(id: string): Promise<JournalRecord> {
+    return this.locked(id, () => this.readLocked(id))
+  }
+
+  private async readLocked(id: string): Promise<JournalRecord> {
     const record = JSON.parse(await readPrivateFile(this.path(id), true)) as JournalRecord
     if (record.version !== 1 || record.id !== id) throw unavailable()
     // A claim without a terminal record means a crash, never permission to replay.
