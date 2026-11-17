@@ -52,8 +52,8 @@ test('disk growth uses confirmed relative increments and retained task outcomes'
     })
     if (coordination) child.on('message', message => coordination.message(String(message), () => child.send('release')))
     let stdout = '', stderr = ''
-    child.stdout.on('data', chunk => { stdout += chunk.toString() })
-    child.stderr.on('data', chunk => { stderr += chunk.toString() })
+    child.stdout!.on('data', chunk => { stdout += chunk.toString() })
+    child.stderr!.on('data', chunk => { stderr += chunk.toString() })
     const code = await new Promise<number | null>((resolve, reject) => { child.once('error', reject); child.once('close', resolve) })
     return { code, data: JSON.parse(stdout), stderr }
   }
