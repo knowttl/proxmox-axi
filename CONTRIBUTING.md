@@ -21,4 +21,4 @@ The build is offline: tests use fakes only and never contact a real Proxmox node
 
 Acceptance request deadlines use child-process transport duration, separately from the bounded process watchdog.
 Persistent packaged sessions rearm that watchdog per command; missing responses identify the case, channel and child state without including inputs or payloads.
-Concurrent journal fixtures warm independent public CLI sessions before holding an older HTTP response and release it after the newer public result, before waiting for process exit.
+Fixtures for out-of-order journal outcomes warm independent public CLI sessions before holding an older HTTP response and release it after the newer public result, before waiting for process exit.

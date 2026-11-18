@@ -45,13 +45,15 @@ test('disk growth uses confirmed relative increments and retained task outcomes'
     token: { env: 'RESIZE_TOKEN' }, caBundle: caFile, writes: { operations: ['qemu', 'lxc'].map(family =>
       `OP-PUT-${createHash('sha256').update(`PUT ${resize(family)}`).digest('hex').slice(0, 10)}`) },
   } } }), { mode: 0o600 })
-  const command = async (args: string[]) => {
-    const child = spawn(process.execPath, [executable, ...args, '--config', config, '--format', 'json'], {
-      env: { ...environment, RESIZE_TOKEN: 'synthetic-token', PROXMOX_AXI_WRITE_LOG: join(scratch, 'writes.log') }, stdio: ['ignore', 'pipe', 'pipe'],
+  const command = async (args: string[], coordination?: { role: string, message: (message: string, release: () => void) => void }) => {
+    const preload = new URL('../../test/fixtures/journal-race.mjs', import.meta.url).pathname
+    const child = spawn(process.execPath, [...(coordination ? ['--import', preload] : []), executable, ...args, '--config', config, '--format', 'json'], {
+      env: { ...environment, RESIZE_TOKEN: 'synthetic-token', PROXMOX_AXI_WRITE_LOG: join(scratch, 'writes.log'), ...(coordination ? { JOURNAL_RACE_ROLE: coordination.role } : {}) }, stdio: ['ignore', 'pipe', 'pipe', 'ipc'],
     })
+    if (coordination) child.on('message', message => coordination.message(String(message), () => child.send('release')))
     let stdout = '', stderr = ''
-    child.stdout.on('data', chunk => { stdout += chunk.toString() })
-    child.stderr.on('data', chunk => { stderr += chunk.toString() })
+    child.stdout!.on('data', chunk => { stdout += chunk.toString() })
+    child.stderr!.on('data', chunk => { stderr += chunk.toString() })
     const code = await new Promise<number | null>((resolve, reject) => { child.once('error', reject); child.once('close', resolve) })
     return { code, data: JSON.parse(stdout), stderr }
   }
@@ -106,6 +108,29 @@ test('disk growth uses confirmed relative increments and retained task outcomes'
       assert.deepEqual(requests, [])
     })
   }
+  await t.test('concurrent submissions of one confirmation apply once and refuse the other as used', async () => {
+    const args = ['set', resize('qemu'), ...target, '--api-disk', 'scsi0', '--api-size', '+8G']
+    const before = sizeGiB
+    const preview = await command([...args, '--preview'])
+    assert.equal(preview.code, 0, preview.stderr)
+    let releaseWinner = () => {}
+    let winnerReady!: () => void
+    const ready = new Promise<void>(resolve => { winnerReady = resolve })
+    const winner = command([...args, '--confirm', preview.data.confirmation], { role: 'winner', message: (_message, release) => {
+      releaseWinner = release
+      winnerReady()
+    } })
+    await ready
+    let boundary = ''
+    const loser = command([...args, '--confirm', preview.data.confirmation], { role: 'loser', message: message => {
+      if (!boundary) { boundary = message; releaseWinner() }
+    } })
+    const [applied, used] = await Promise.all([winner, loser])
+    assert.equal(boundary, 'contended')
+    assert.equal(applied.code, 0, JSON.stringify(applied.data))
+    assert.equal(used.data.error.code, 'CONFIRMATION_USED')
+    assert.equal(sizeGiB - before, 8)
+  })
   await t.test('lost growth response retains uncertainty and prevents replay of its confirmation', async () => {
     sizeGiB = 32
     const args = ['set', resize('qemu'), ...target, '--api-disk', 'scsi0', '--api-size', '+8G']
