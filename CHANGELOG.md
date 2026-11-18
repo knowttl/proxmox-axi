@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.4](https://github.com/knowttl/proxmox-axi/compare/proxmox-axi-v0.1.3...proxmox-axi-v0.1.4) (2026-11-18)
+
+
+### Bug Fixes
+
+* prevent races when reading journal files ([#80](https://github.com/knowttl/proxmox-axi/issues/80)) ([bb43f02](https://github.com/knowttl/proxmox-axi/commit/bb43f022f0af5be25838b9d01badb4c32c831052))
+
 ## [0.1.3](https://github.com/knowttl/proxmox-axi/compare/proxmox-axi-v0.1.2...proxmox-axi-v0.1.3) (2026-11-04)
 
 
